@@ -1,4 +1,4 @@
-#include "RepWindow.hpp"
+#include "MinWindow.hpp"
 #include "resource.h"
 
 using namespace glm;
@@ -121,6 +121,15 @@ HWND MinWindow::GetWndHandle() const noexcept
 MSG MinWindow::GetLastWndMessage() const
 {
 	return wndMsg;
+}
+
+void MinWindow::RegisterComponent(WindowComponentBase* component)
+{
+	if (component != nullptr && !component->isRegistered && component->parent == this)
+	{
+		components.push_back(component);
+		component->isRegistered = true;
+	}
 }
 
 MSG MinWindow::RunMessageLoop()

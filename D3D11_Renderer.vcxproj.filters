@@ -18,7 +18,7 @@
     <ClCompile Include="RepMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RepWindow.cpp">
+    <ClCompile Include="MinWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RepExeption.cpp">
@@ -27,12 +27,15 @@
     <ClCompile Include="RepWinException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WindowComponentBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RepLeanWin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RepWindow.hpp">
+    <ClInclude Include="MinWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RepMain.h">
@@ -48,6 +51,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UniqueCollections.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererD3D11.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowComponentBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

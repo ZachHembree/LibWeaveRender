@@ -1,5 +1,5 @@
 #pragma once
-#include "RepWindow.hpp"
+#include "MinWindow.hpp"
 #include "RepException.hpp"
 
 #define REP_EXCEPT(hr) RepWinException(__LINE__, __FILE__, hr)
