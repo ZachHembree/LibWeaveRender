@@ -33,12 +33,12 @@ class MinWindow
 		/// <summary>
 		/// Registers component object to the window.
 		/// </summary>
-		void RegisterComponent(WindowComponentBase* component);
+		virtual void RegisterComponent(WindowComponentBase* component);
 
 		/// <summary>
 		/// Updates window message loop until the window is closed
 		/// </summary>
-		MSG RunMessageLoop();
+		virtual MSG RunMessageLoop();
 
 		/// <summary>
 		/// Returns the name of the window
@@ -58,9 +58,9 @@ class MinWindow
 		/// <summary>
 		/// Returns the last message recieved by the Win32 API
 		/// </summary>
-		MSG GetLastWndMessage() const;
+		MSG GetLastWndMessage() const noexcept;
 
-	private:		
+	protected:		
 		HINSTANCE hInst;
 		HWND hWnd;
 		MSG wndMsg;
@@ -74,12 +74,22 @@ class MinWindow
 		/// Processes next window message without removing it from the queue.
 		/// Returns false only on exit.
 		/// </summary>
-		bool PollWindowMessages();
+		virtual bool PollWindowMessages();
 
 		/// <summary>
 		/// Proceedure for processing window messages sent from Win32 API
 		/// </summary>
-		static LRESULT CALLBACK OnWndMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
+		LRESULT OnWndMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
+
+		/// <summary>
+		/// Handles messaging setup on creation of new windows
+		/// </summary>
+		static LRESULT CALLBACK HandleWindowSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+		/// <summary>
+		/// Forwards messages from the Win32 API to the appropriate window instance
+		/// </summary>
+		static LRESULT CALLBACK WindowMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 
 #endif

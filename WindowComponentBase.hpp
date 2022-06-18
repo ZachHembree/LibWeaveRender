@@ -17,7 +17,7 @@ public:
 	/// <summary>
 	/// Called after each message poll in the window class
 	/// </summary>
-	virtual void Update() = 0;
+	virtual void Update() { }
 
 	bool GetIsRegistered();
 

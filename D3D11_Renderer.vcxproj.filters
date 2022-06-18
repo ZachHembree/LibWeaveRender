@@ -30,6 +30,9 @@
     <ClCompile Include="WindowComponentBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RendererD3D11.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RepLeanWin.h">
@@ -57,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WindowComponentBase.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

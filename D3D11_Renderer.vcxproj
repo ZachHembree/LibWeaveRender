@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="RendererD3D11.cpp" />
     <ClCompile Include="RepExeption.cpp" />
     <ClCompile Include="MinWindow.cpp" />
     <ClCompile Include="RepWinException.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="WindowComponentBase.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Input.hpp" />
     <ClInclude Include="RendererD3D11.hpp" />
     <ClInclude Include="RepLeanWin.h" />
     <ClInclude Include="RepException.hpp" />

@@ -6,11 +6,11 @@ using namespace glm;
 // Has title bar | Has minimize button | Has window menu on its title bar
 const long wndStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 
-HWND InitWindow(const HINSTANCE hInst, const ivec2 size, WNDPROC procPtr);
+HWND InitWindow(const HINSTANCE hInst, const ivec2 size, WNDPROC procPtr, MinWindow* windowPtr);
 
 MinWindow::MinWindow(const HINSTANCE hInst, const ivec2 size) :
 	hInst(hInst),
-	hWnd(InitWindow(hInst, size, &OnWndMessage)),
+	hWnd(InitWindow(hInst, size, &HandleWindowSetup, this)),
 	wndMsg(MSG{})
 {
 	// Make the window visible
@@ -20,7 +20,7 @@ MinWindow::MinWindow(const HINSTANCE hInst, const ivec2 size) :
 /// <summary>
 /// Initialize window registered to this process with the given size and event callback
 /// </summary>
-HWND InitWindow(const HINSTANCE hInst, const ivec2 size, WNDPROC procPtr)
+HWND InitWindow(const HINSTANCE hInst, const ivec2 size, WNDPROC procPtr, MinWindow* windowPtr)
 {
 	// Setup window descriptor
 	WNDCLASSEX wc = { 0 };
@@ -64,7 +64,7 @@ HWND InitWindow(const HINSTANCE hInst, const ivec2 size, WNDPROC procPtr)
 		wr.bottom - wr.top,
 		nullptr, nullptr,
 		hInst,
-		nullptr
+		windowPtr
 	);
 
 	// Check if window creation failed
@@ -99,6 +99,7 @@ MinWindow::~MinWindow()
 {
 	if (hWnd != nullptr)
 	{
+		UnregisterClass(GetName(), hInst);
 		DestroyWindow(hWnd);
 	}
 }
@@ -118,7 +119,7 @@ HWND MinWindow::GetWndHandle() const noexcept
 	return hWnd;
 }
 
-MSG MinWindow::GetLastWndMessage() const
+MSG MinWindow::GetLastWndMessage() const noexcept
 {
 	return wndMsg;
 }
@@ -160,7 +161,7 @@ bool MinWindow::PollWindowMessages()
 	return true;
 }
 
-LRESULT CALLBACK MinWindow::OnWndMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -169,5 +170,31 @@ LRESULT CALLBACK MinWindow::OnWndMessage(HWND window, UINT msg, WPARAM wParam, L
 		break;
 	}
 
-	return DefWindowProc(window, msg, wParam, lParam);
+	return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+
+LRESULT CALLBACK MinWindow::HandleWindowSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (WM_NCCREATE)
+	{
+		// Retrieve custom window pointer from create data
+		const CREATESTRUCT* const data = reinterpret_cast<CREATESTRUCT*>(lParam);
+		MinWindow* wndPtr = static_cast<MinWindow*>(data->lpCreateParams);
+
+		// Add pointer to user data field
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(wndPtr));
+
+		// Switch to main message forwarding proceedure
+		SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&WindowMessageHandler));
+
+		return wndPtr->OnWndMessage(hWnd, msg, wParam, lParam);
+	}
+	else
+		return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+
+LRESULT CALLBACK MinWindow::WindowMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	MinWindow* const wndPtr = reinterpret_cast<MinWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	return wndPtr->OnWndMessage(hWnd, msg, wParam, lParam);
 }
