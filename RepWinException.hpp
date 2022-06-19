@@ -4,6 +4,7 @@
 
 #define REP_EXCEPT(hr) RepWinException(__LINE__, __FILE__, hr)
 #define REP_EXCEPT_LAST() RepWinException(__LINE__, __FILE__, GetLastError())
+#define THROW_FAILED(hr) if (FAILED(hr)) { throw RepWinException(__LINE__, __FILE__, hr); }
 
 class RepWinException : public RepException
 {
@@ -15,10 +16,10 @@ class RepWinException : public RepException
 		std::string GetErrorString() const noexcept;
 		HRESULT GetErrorCode() const noexcept;
 		const char* GetType() const noexcept override;
-
+		
 		static std::string GetTranslatedErrorCode(HRESULT hr) noexcept;
 
-	private:
+	protected:
 		HRESULT hr;
 
 };

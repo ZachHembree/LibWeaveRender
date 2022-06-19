@@ -3,13 +3,15 @@
 #include <chrono>
 
 using namespace std::chrono;
+using namespace Microsoft::WRL;
+using namespace glm;
 
 RendererD3D11::RendererD3D11(MinWindow* window) :
 	WindowComponentBase(window),
-	d3dDevice(nullptr),
-	devContext(nullptr),
-	swapChain(nullptr),
-	backBufRT(nullptr)
+	pDevice(nullptr),
+	pContext(nullptr),
+	pSwapChain(nullptr),
+	pBackBufView(nullptr)
 {
 	DXGI_SWAP_CHAIN_DESC swapDesc = {};
 	swapDesc.BufferDesc.Width = 0; // Use window size for buffer dimensions
@@ -22,64 +24,126 @@ RendererD3D11::RendererD3D11(MinWindow* window) :
 	swapDesc.SampleDesc.Count = 1; // No MSAA
 	swapDesc.SampleDesc.Quality = 0;
 	swapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapDesc.BufferCount = 1; // Double buffered
+	swapDesc.BufferCount = 2; // Triple buffered
 	swapDesc.OutputWindow = window->GetWndHandle(); // Target window
 	swapDesc.Windowed = TRUE;
-	swapDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 	swapDesc.Flags = 0;
 
-	D3D_FEATURE_LEVEL featureLevel;
-
-	D3D11CreateDeviceAndSwapChain(
+	GFX_THROW_FAILED(D3D11CreateDeviceAndSwapChain(
 		nullptr, // Default device
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr, // No software rasterizer
-		0, // No Flags
+		D3D11_CREATE_DEVICE_DEBUG, // Enable debugging
 		nullptr,
 		0,
 		D3D11_SDK_VERSION,
 		&swapDesc,
-		&swapChain,
-		&d3dDevice,
-		&featureLevel,
-		&devContext
-	);
+		&pSwapChain,
+		&pDevice,
+		nullptr,
+		&pContext
+	));
 
 	// Retrieve buffer in swap chain at index 0 to get back buf
-	ID3D11Resource* backBuf = nullptr;
-	swapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&backBuf));
-
-	// Get back buffer RT
-	d3dDevice->CreateRenderTargetView(backBuf, nullptr, &backBufRT);
-
-	// Back buffer handle no longer requried once an RT handle is obtained
-	backBuf->Release();
-}
-
-RendererD3D11::~RendererD3D11()
-{
-	// Release D3D COM objects
-	if (backBufRT != nullptr)
-		backBufRT->Release();
-
-	if (devContext != nullptr)
-		devContext->Release();
-
-	if (swapChain != nullptr)
-		swapChain->Release();
-
-	if (d3dDevice != nullptr)
-		d3dDevice->Release();
+	ComPtr<ID3D11Resource> backBuf;
+	GFX_THROW_FAILED(pSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), &backBuf));
+	
+	// Get back buffer view
+	GFX_THROW_FAILED(pDevice->CreateRenderTargetView(backBuf.Get(), nullptr, &pBackBufView));
 }
 
 void RendererD3D11::Update()
 {
 	const duration<float> time = duration_cast<duration<float>>(steady_clock::now().time_since_epoch());
-	const glm::vec4 color(abs(sin(time.count() * 2)), 0.0f, 0.0f, 1.0f);
+	glm::vec4 color(abs(sin(time.count() * 2)), 0.0f, 0.0f, 1.0f);
 
 	// Clear back buffer to color specified
-	devContext->ClearRenderTargetView(backBufRT, reinterpret_cast<const float*>(&color));
+	pContext->ClearRenderTargetView(pBackBufView.Get(), reinterpret_cast<float*>(&color));
 
+	vec2 vertices[3] = 
+	{
+		{0.0f, 0.5f},
+		{-0.5f, -0.5f},
+		{0.5f, -0.5f}
+	};
+
+	// Define and create vertex buffer
+	D3D11_BUFFER_DESC desc = {};
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	desc.CPUAccessFlags = 0u;
+	desc.MiscFlags = 0u;
+	desc.StructureByteStride = sizeof(vec2);
+	desc.ByteWidth = (UINT)(sizeof(vec2) * std::size(vertices));
+
+	D3D11_SUBRESOURCE_DATA resData = {};
+	resData.pSysMem = &vertices;
+
+	ComPtr<ID3D11Buffer> pVertBuf;
+	pDevice->CreateBuffer(&desc, &resData, &pVertBuf);
+
+	const UINT stride = sizeof(vec2);
+	const UINT offset = 0u;
+
+	// Assign vertex buffer
+	pContext->IASetVertexBuffers(0u, 1u, pVertBuf.GetAddressOf(), &stride, &offset);
+
+	// Defines vertex connectivity
+	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	ComPtr<ID3DBlob> pBlob;
+
+	// Load VS binary
+	D3DReadFileToBlob(L"DefaultVertShader.cso", &pBlob);
+
+	// Compile and assign VS
+	ComPtr<ID3D11VertexShader> pVS;
+	pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVS);
+	pContext->VSSetShader(pVS.Get(), nullptr, 0u);
+
+	// Define position semantic
+	D3D11_INPUT_ELEMENT_DESC vDesc = {};
+	vDesc.SemanticName = "Position";
+	vDesc.SemanticIndex = 0;
+	vDesc.Format = DXGI_FORMAT_R32G32_FLOAT;
+	vDesc.InputSlot = 0;
+	vDesc.AlignedByteOffset = 0;
+	vDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	vDesc.InstanceDataStepRate = 0;
+
+	ComPtr<ID3D11InputLayout> pVsLayout;
+	pDevice->CreateInputLayout(
+		&vDesc,
+		1u,
+		pBlob->GetBufferPointer(),
+		pBlob->GetBufferSize(),
+		&pVsLayout
+	);
+	pContext->IASetInputLayout(pVsLayout.Get());
+
+	D3DReadFileToBlob(L"DefaultPixShader.cso", &pBlob);
+
+	// Compile and assign PS
+	ComPtr<ID3D11PixelShader> pPS;
+	pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPS);
+	pContext->PSSetShader(pPS.Get(), nullptr, 0u);
+
+	// Bind back buffer as render target
+	pContext->OMSetRenderTargets(1u, pBackBufView.GetAddressOf(), nullptr);
+
+	// Set viewport bounds
+	D3D11_VIEWPORT viewPort = {};
+	viewPort.Width = 640;
+	viewPort.Height = 480;
+	viewPort.MaxDepth = 1;
+	viewPort.MinDepth = 0;
+	viewPort.TopLeftX = 0;
+	viewPort.TopLeftY = 0;
+	pContext->RSSetViewports(1u, &viewPort);
+
+	pContext->Draw((UINT)std::size(vertices), 0u);
+	 
 	// Present frame
-	swapChain->Present(1u, 0);
+	GFX_THROW_FAILED(pSwapChain->Present(1u, 0));
 }

@@ -65,6 +65,9 @@
     <ClInclude Include="Input.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GfxException.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon.ico">
@@ -75,5 +78,13 @@
     <ResourceCompile Include="ReplicaRenderer.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="DefaultVertShader.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="DefaultPixShader.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
