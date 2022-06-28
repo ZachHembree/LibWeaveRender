@@ -4,7 +4,7 @@
 
 #define REP_EXCEPT(hr) RepWinException(__LINE__, __FILE__, hr)
 #define REP_EXCEPT_LAST() RepWinException(__LINE__, __FILE__, GetLastError())
-#define THROW_FAILED(hr) if (FAILED(hr)) { throw RepWinException(__LINE__, __FILE__, hr); }
+#define THROW_FAILED(x) { HRESULT hr = x; if (FAILED(hr)) { throw RepWinException(__LINE__, __FILE__, hr); } }
 
 class RepWinException : public RepException
 {

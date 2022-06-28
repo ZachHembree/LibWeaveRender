@@ -61,30 +61,31 @@ void RendererD3D11::Update()
 	// Clear back buffer to color specified
 	pContext->ClearRenderTargetView(pBackBufView.Get(), reinterpret_cast<float*>(&color));
 
-	vec2 vertices[3] = 
+	vec2 vertices[] = 
 	{
-		{0.0f, 0.5f},
-		{-0.5f, -0.5f},
-		{0.5f, -0.5f}
+		{ 0.0f, 0.5f },
+		{ 0.5f, -0.5f },
+		{ -0.5f, -0.5f },
 	};
 
 	// Define and create vertex buffer
 	D3D11_BUFFER_DESC desc = {};
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	desc.CPUAccessFlags = 0u;
-	desc.MiscFlags = 0u;
-	desc.StructureByteStride = sizeof(vec2);
 	desc.ByteWidth = (UINT)(sizeof(vec2) * std::size(vertices));
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA resData = {};
-	resData.pSysMem = &vertices;
+	D3D11_SUBRESOURCE_DATA vBufDesc;
+	vBufDesc.pSysMem = &vertices;
+	vBufDesc.SysMemPitch = 0;
+	vBufDesc.SysMemSlicePitch = 0;
 
 	ComPtr<ID3D11Buffer> pVertBuf;
-	pDevice->CreateBuffer(&desc, &resData, &pVertBuf);
+	GFX_THROW_FAILED(pDevice->CreateBuffer(&desc, &vBufDesc, &pVertBuf));
 
 	const UINT stride = sizeof(vec2);
-	const UINT offset = 0u;
+	const UINT offset = 0;
 
 	// Assign vertex buffer
 	pContext->IASetVertexBuffers(0u, 1u, pVertBuf.GetAddressOf(), &stride, &offset);
@@ -95,11 +96,11 @@ void RendererD3D11::Update()
 	ComPtr<ID3DBlob> pBlob;
 
 	// Load VS binary
-	D3DReadFileToBlob(L"DefaultVertShader.cso", &pBlob);
+	GFX_THROW_FAILED(D3DReadFileToBlob(L"DefaultVertShader.cso", &pBlob));
 
 	// Compile and assign VS
 	ComPtr<ID3D11VertexShader> pVS;
-	pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVS);
+	GFX_THROW_FAILED(pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVS));
 	pContext->VSSetShader(pVS.Get(), nullptr, 0u);
 
 	// Define position semantic
@@ -129,9 +130,6 @@ void RendererD3D11::Update()
 	pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPS);
 	pContext->PSSetShader(pPS.Get(), nullptr, 0u);
 
-	// Bind back buffer as render target
-	pContext->OMSetRenderTargets(1u, pBackBufView.GetAddressOf(), nullptr);
-
 	// Set viewport bounds
 	D3D11_VIEWPORT viewPort = {};
 	viewPort.Width = 640;
@@ -141,6 +139,9 @@ void RendererD3D11::Update()
 	viewPort.TopLeftX = 0;
 	viewPort.TopLeftY = 0;
 	pContext->RSSetViewports(1u, &viewPort);
+
+	// Bind back buffer as render target
+	pContext->OMSetRenderTargets(1u, pBackBufView.GetAddressOf(), nullptr);
 
 	pContext->Draw((UINT)std::size(vertices), 0u);
 	 
