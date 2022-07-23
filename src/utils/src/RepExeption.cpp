@@ -2,6 +2,7 @@
 #include <sstream>
 
 using namespace std;
+using namespace Replica;
 
 RepException::RepException(int line, const char* file) noexcept :
 	line(line),

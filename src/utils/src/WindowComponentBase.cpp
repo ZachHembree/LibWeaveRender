@@ -1,5 +1,7 @@
 #include "WindowComponentBase.hpp"
 
+using namespace Replica;
+
 WindowComponentBase::WindowComponentBase(MinWindow* window) :
 	parent(window),
 	isRegistered(false)

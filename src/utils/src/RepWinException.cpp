@@ -3,6 +3,7 @@
 #include <winnls.h>
 
 using namespace std;
+using namespace Replica;
 
 RepWinException::RepWinException(int line, const char* file, HRESULT hr) noexcept :
 	RepException(line, file),

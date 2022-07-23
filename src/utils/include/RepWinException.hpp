@@ -6,20 +6,23 @@
 #define REP_EXCEPT_LAST() RepWinException(__LINE__, __FILE__, GetLastError())
 #define THROW_FAILED(x) { HRESULT hr = x; if (FAILED(hr)) { throw RepWinException(__LINE__, __FILE__, hr); } }
 
-class RepWinException : public RepException
+namespace Replica
 {
-	public:
+	class RepWinException : public RepException
+	{
+		public:
 
-		RepWinException(int line, const char* file, HRESULT hr) noexcept;
+			RepWinException(int line, const char* file, HRESULT hr) noexcept;
 
-		const char* what() const noexcept override;
-		std::string GetErrorString() const noexcept;
-		HRESULT GetErrorCode() const noexcept;
-		const char* GetType() const noexcept override;
+			const char* what() const noexcept override;
+			std::string GetErrorString() const noexcept;
+			HRESULT GetErrorCode() const noexcept;
+			const char* GetType() const noexcept override;
 		
-		static std::string GetTranslatedErrorCode(HRESULT hr) noexcept;
+			static std::string GetTranslatedErrorCode(HRESULT hr) noexcept;
 
-	protected:
-		HRESULT hr;
+		protected:
+			HRESULT hr;
 
-};
+	};
+}

@@ -1,16 +1,18 @@
 #include "RepMain.h"
 #include "RepLeanWin.h"
 #include "MinWindow.hpp"
-#include "RendererD3D11.hpp"
+#include "D3D11/Renderer.hpp"
 
 using namespace glm;
+using namespace Replica;
+using namespace Replica::D3D11;
 
 int CALLBACK WinMain(HINSTANCE hInst, HINSTANCE, LPSTR lpCMdLine, int nCmdShow)
 {
 	try
 	{
 		MinWindow repWindow(hInst, ivec2(640, 480));
-		RendererD3D11 renderer(&repWindow);
+		Renderer renderer(&repWindow);
 
 		// Start main loop
 		const MSG lastMsg = repWindow.RunMessageLoop();

@@ -1,10 +1,12 @@
-#include "RendererD3D11.hpp"
+#include "D3D11/Renderer.hpp"
 #include <math.h>
 #include <chrono>
 
 using namespace std::chrono;
 using namespace Microsoft::WRL;
 using namespace glm;
+using namespace Replica;
+using namespace Replica::D3D11;
 
 struct Vertex
 {
@@ -13,7 +15,7 @@ public:
 	vec3 color;
 };
 
-RendererD3D11::RendererD3D11(MinWindow* window) :
+Renderer::Renderer(MinWindow* window) :
 	WindowComponentBase(window),
 	pDevice(nullptr),
 	pContext(nullptr),
@@ -60,7 +62,7 @@ RendererD3D11::RendererD3D11(MinWindow* window) :
 	GFX_THROW_FAILED(pDevice->CreateRenderTargetView(backBuf.Get(), nullptr, &pBackBufView));
 }
 
-void RendererD3D11::Update()
+void Renderer::Update()
 {
 	const duration<float> time = duration_cast<duration<float>>(steady_clock::now().time_since_epoch());
 	const float sinOffset = sin(time.count() * .5f),

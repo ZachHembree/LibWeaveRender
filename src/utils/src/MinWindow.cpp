@@ -2,6 +2,7 @@
 #include "resource.h"
 
 using namespace glm;
+using namespace Replica;
 
 // Has title bar | Has minimize button | Has window menu on its title bar
 const long wndStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;

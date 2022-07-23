@@ -30,7 +30,7 @@
     <ClCompile Include="src\utils\src\WindowComponentBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RendererD3D11\src\RendererD3D11.cpp">
+    <ClCompile Include="src\renderers\src\D3D11\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,25 +56,25 @@
     <ClInclude Include="src\utils\include\UniqueCollections.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RendererD3D11\include\RendererD3D11.hpp">
+    <ClInclude Include="src\renderers\include\D3D11\Renderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utils\include\WindowComponentBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RendererD3D11\include\Input.hpp">
+    <ClInclude Include="src\utils\include\Input.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RendererD3D11\include\GfxException.hpp">
+    <ClInclude Include="src\utils\include\GfxException.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RendererD3D11\include\BufferBase.hpp">
+    <ClInclude Include="src\renderers\include\D3D11\BufferBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RendererD3D11\include\VertexBuffer.hpp">
+    <ClInclude Include="src\renderers\include\D3D11\VertexBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RendererD3D11\include\IndexBuffer.hpp">
+    <ClInclude Include="src\renderers\include\D3D11\IndexBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -89,10 +89,10 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="src\RendererD3D11\shaders\DefaultVertShader.hlsl">
+    <FxCompile Include="src\renderers\src\D3D11\shaders\DefaultVertShader.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
-    <FxCompile Include="src\RendererD3D11\shaders\DefaultPixShader.hlsl">
+    <FxCompile Include="src\renderers\src\D3D11\shaders\DefaultPixShader.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>

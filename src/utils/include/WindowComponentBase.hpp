@@ -1,38 +1,41 @@
 #pragma once
 #include "MinWindow.hpp"
 
-class WindowComponentBase;
-class MinWindow;
-
-/// <summary>
-/// Base class for window components
-/// </summary>
-class WindowComponentBase
+namespace Replica
 {
-friend MinWindow;
-
-public:
-	const MinWindow* parent;
+	class WindowComponentBase;
+	class MinWindow;
 
 	/// <summary>
-	/// Called after each message poll in the window class
+	/// Base class for window components
 	/// </summary>
-	virtual void Update() { }
+	class WindowComponentBase
+	{
+	friend MinWindow;
 
-	bool GetIsRegistered();
+	public:
+		const MinWindow* parent;
 
-protected:
+		/// <summary>
+		/// Called after each message poll in the window class
+		/// </summary>
+		virtual void Update() { }
 
-	WindowComponentBase(MinWindow* window);
+		bool GetIsRegistered();
 
-private:
-	bool isRegistered;
+	protected:
 
-	WindowComponentBase(const WindowComponentBase&) = delete;
+		WindowComponentBase(MinWindow* window);
 
-	WindowComponentBase(WindowComponentBase&&) = delete;
+	private:
+		bool isRegistered;
 
-	WindowComponentBase& operator=(const WindowComponentBase&) = delete;
+		WindowComponentBase(const WindowComponentBase&) = delete;
 
-	WindowComponentBase& operator=(WindowComponentBase&&) = delete;
-};
+		WindowComponentBase(WindowComponentBase&&) = delete;
+
+		WindowComponentBase& operator=(const WindowComponentBase&) = delete;
+
+		WindowComponentBase& operator=(WindowComponentBase&&) = delete;
+	};
+}

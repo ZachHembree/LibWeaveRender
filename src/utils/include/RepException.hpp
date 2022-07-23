@@ -3,18 +3,21 @@
 #include <exception>
 #include <string>
 
-class RepException : public std::exception
+namespace Replica
 {
-public:
-	RepException(int line, const char* file) noexcept;
+	class RepException : public std::exception
+	{
+	public:
+		RepException(int line, const char* file) noexcept;
 
-	const char* what() const noexcept override;
-	int GetLine() const noexcept;
-	const std::string& GetFile() const noexcept;
-	virtual const char* GetType() const noexcept;
+		const char* what() const noexcept override;
+		int GetLine() const noexcept;
+		const std::string& GetFile() const noexcept;
+		virtual const char* GetType() const noexcept;
 
-protected:
-	mutable std::string whatBuf;
-	const int line;
-	const std::string file;
-};
+	protected:
+		mutable std::string whatBuf;
+		const int line;
+		const std::string file;
+	};
+}
