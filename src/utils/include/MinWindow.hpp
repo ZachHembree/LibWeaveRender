@@ -7,7 +7,7 @@
 #include "WindowComponentBase.hpp"
 
 #include <glm/glm.hpp>
-#include "UniqueCollections.hpp"
+#include "DynamicCollections.hpp"
 
 namespace Replica
 {

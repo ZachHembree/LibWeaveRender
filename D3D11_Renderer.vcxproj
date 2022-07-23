@@ -162,6 +162,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\renderers\include\D3D11\BufferBase.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Device.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\SwapChain.hpp" />
     <ClInclude Include="src\utils\include\GfxException.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\IndexBuffer.hpp" />
     <ClInclude Include="src\utils\include\Input.hpp" />
@@ -172,7 +174,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\utils\include\RepWinException.hpp" />
     <ClInclude Include="RepMain.h" />
-    <ClInclude Include="src\utils\include\UniqueCollections.hpp" />
+    <ClInclude Include="src\utils\include\DynamicCollections.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\VertexBuffer.hpp" />
     <ClInclude Include="src\utils\include\WindowComponentBase.hpp" />
   </ItemGroup>

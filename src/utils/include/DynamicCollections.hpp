@@ -1,5 +1,5 @@
-#ifndef UniqueCollections
-#define UniqueCollections
+#ifndef DynamicCollections
+#define DynamicCollections
 
 #include<vector>
 #include<exception>

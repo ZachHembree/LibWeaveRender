@@ -7,9 +7,12 @@
 #include <wrl.h>
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
+#include "Device.hpp"
+#include "SwapChain.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
+#pragma comment(lib, "Dxgi.lib")
 
 namespace Replica::D3D11
 { 
@@ -21,9 +24,8 @@ namespace Replica::D3D11
 		void Update() override;
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
-		Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;
+		Device device;
+		SwapChain swap;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pBackBufView;
 	};
 }
