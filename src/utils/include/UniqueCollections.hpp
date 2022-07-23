@@ -128,6 +128,11 @@ public:
 	size_t GetLength() const { return length; }
 
 	/// <summary>
+	/// Returns the size of the array in bytes
+	/// </summary>
+	size_t GetSize() const { return length * sizeof(T); }
+
+	/// <summary>
 	/// Provides indexed access to array member references.
 	/// </summary>
 	T& operator[](size_t index)

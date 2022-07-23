@@ -38,7 +38,10 @@ HWND InitWindow(const HINSTANCE hInst, const ivec2 size, WNDPROC procPtr, MinWin
 	wc.hIconSm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, 0);
 
 	// Register window class
-	RegisterClassEx(&wc);
+	const ATOM classID = RegisterClassEx(&wc);
+
+	if (classID == 0)
+		throw REP_EXCEPT_LAST();
 
 	// Get window rect to set body to the size given, not including border
 	RECT wr;

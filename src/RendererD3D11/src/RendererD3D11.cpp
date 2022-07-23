@@ -6,6 +6,13 @@ using namespace std::chrono;
 using namespace Microsoft::WRL;
 using namespace glm;
 
+struct Vertex
+{
+public:
+	vec2 pos;
+	vec3 color;
+};
+
 RendererD3D11::RendererD3D11(MinWindow* window) :
 	WindowComponentBase(window),
 	pDevice(nullptr),
@@ -56,42 +63,41 @@ RendererD3D11::RendererD3D11(MinWindow* window) :
 void RendererD3D11::Update()
 {
 	const duration<float> time = duration_cast<duration<float>>(steady_clock::now().time_since_epoch());
-	glm::vec4 color(abs(sin(time.count() * 2)), 0.0f, 0.0f, 1.0f);
+	const float sinOffset = sin(time.count() * .5f),
+		cosOffset = cos(time.count() * .5f);
+	vec4 color(std::abs(sinOffset), std::abs(cosOffset), std::abs(sinOffset + cosOffset), 1.0f);
 
 	// Clear back buffer to color specified
 	pContext->ClearRenderTargetView(pBackBufView.Get(), reinterpret_cast<float*>(&color));
 
-	vec2 vertices[] = 
+	UniqueArray<Vertex> vertices = 
 	{
-		{ 0.0f, 0.5f },
-		{ 0.5f, -0.5f },
-		{ -0.5f, -0.5f },
+		{ { 0.0f, 0.5f }, { color.r, color.g, color.b } },
+		{ { 0.5f, -0.5f }, { color.b, color.r, color.g } },
+		{ { -0.5f, -0.5f }, { color.g, color.b, color.r  } },
+		{ { 0.67f, 0.67f }, { color.b, color.g, color.r } }, // 3
+		{ { -0.67f, 0.67f }, { color.b, color.r, color.g } },
 	};
-
-	// Define and create vertex buffer
-	D3D11_BUFFER_DESC desc = {};
-	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	desc.ByteWidth = (UINT)(sizeof(vec2) * std::size(vertices));
-	desc.CPUAccessFlags = 0;
-	desc.MiscFlags = 0;
-
-	D3D11_SUBRESOURCE_DATA vBufDesc;
-	vBufDesc.pSysMem = &vertices;
-	vBufDesc.SysMemPitch = 0;
-	vBufDesc.SysMemSlicePitch = 0;
-
-	ComPtr<ID3D11Buffer> pVertBuf;
-	GFX_THROW_FAILED(pDevice->CreateBuffer(&desc, &vBufDesc, &pVertBuf));
-
-	const UINT stride = sizeof(vec2);
+	VertexBuffer vBuf(pDevice, vertices);
+	const UINT stride = sizeof(Vertex);
 	const UINT offset = 0;
 
 	// Assign vertex buffer
-	pContext->IASetVertexBuffers(0u, 1u, pVertBuf.GetAddressOf(), &stride, &offset);
+	pContext->IASetVertexBuffers(0u, 1u, vBuf.GetAddressOf(), &stride, &offset);
 
 	// Defines vertex connectivity
 	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	UniqueArray<USHORT> indices = 
+	{
+		0, 1, 2,
+		0, 3, 1,
+		2, 4, 0
+	};
+
+	// Assign index buffer
+	IndexBuffer iBuf(pDevice, indices);
+	pContext->IASetIndexBuffer(iBuf.Get(), DXGI_FORMAT_R16_UINT, 0);
 
 	ComPtr<ID3DBlob> pBlob;
 
@@ -104,19 +110,16 @@ void RendererD3D11::Update()
 	pContext->VSSetShader(pVS.Get(), nullptr, 0u);
 
 	// Define position semantic
-	D3D11_INPUT_ELEMENT_DESC vDesc = {};
-	vDesc.SemanticName = "Position";
-	vDesc.SemanticIndex = 0;
-	vDesc.Format = DXGI_FORMAT_R32G32_FLOAT;
-	vDesc.InputSlot = 0;
-	vDesc.AlignedByteOffset = 0;
-	vDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	vDesc.InstanceDataStepRate = 0;
+	D3D11_INPUT_ELEMENT_DESC vDesc[] = 
+	{
+		{"Position", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{"Color", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(vec2), D3D11_INPUT_PER_VERTEX_DATA, 0}
+	};
 
 	ComPtr<ID3D11InputLayout> pVsLayout;
 	pDevice->CreateInputLayout(
-		&vDesc,
-		1u,
+		(D3D11_INPUT_ELEMENT_DESC*)&vDesc,
+		(UINT)std::size(vDesc),
 		pBlob->GetBufferPointer(),
 		pBlob->GetBufferSize(),
 		&pVsLayout
@@ -143,8 +146,8 @@ void RendererD3D11::Update()
 	// Bind back buffer as render target
 	pContext->OMSetRenderTargets(1u, pBackBufView.GetAddressOf(), nullptr);
 
-	pContext->Draw((UINT)std::size(vertices), 0u);
-	 
+	pContext->DrawIndexed((UINT)indices.GetLength(), 0, 0);
+
 	// Present frame
 	GFX_THROW_FAILED(pSwapChain->Present(1u, 0));
 }

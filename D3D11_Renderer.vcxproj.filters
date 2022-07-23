@@ -18,54 +18,63 @@
     <ClCompile Include="RepMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MinWindow.cpp">
+    <ClCompile Include="src\utils\src\MinWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RepExeption.cpp">
+    <ClCompile Include="src\utils\src\RepExeption.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RepWinException.cpp">
+    <ClCompile Include="src\utils\src\RepWinException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WindowComponentBase.cpp">
+    <ClCompile Include="src\utils\src\WindowComponentBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RendererD3D11.cpp">
+    <ClCompile Include="src\RendererD3D11\src\RendererD3D11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RepLeanWin.h">
+    <ClInclude Include="src\utils\include\RepLeanWin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MinWindow.hpp">
+    <ClInclude Include="src\utils\include\MinWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RepMain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RepException.hpp">
+    <ClInclude Include="src\utils\include\RepException.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RepWinException.hpp">
+    <ClInclude Include="src\utils\include\RepWinException.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UniqueCollections.hpp">
+    <ClInclude Include="src\utils\include\UniqueCollections.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RendererD3D11.hpp">
+    <ClInclude Include="src\RendererD3D11\include\RendererD3D11.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WindowComponentBase.hpp">
+    <ClInclude Include="src\utils\include\WindowComponentBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Input.hpp">
+    <ClInclude Include="src\RendererD3D11\include\Input.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GfxException.hpp">
+    <ClInclude Include="src\RendererD3D11\include\GfxException.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RendererD3D11\include\BufferBase.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RendererD3D11\include\VertexBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RendererD3D11\include\IndexBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -80,10 +89,10 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="DefaultVertShader.hlsl">
+    <FxCompile Include="src\RendererD3D11\shaders\DefaultVertShader.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
-    <FxCompile Include="DefaultPixShader.hlsl">
+    <FxCompile Include="src\RendererD3D11\shaders\DefaultPixShader.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>

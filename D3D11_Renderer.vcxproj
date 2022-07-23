@@ -123,7 +123,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)libs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\RendererD3D11\include;$(ProjectDir)src\utils\include;$(ProjectDir);$(ProjectDir)src;$(ProjectDir)src\libs;%(AdditionalIncludeDirectories);$(ProjectDir)src\libs;$(ProjectDir)src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,6 +143,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\RendererD3D11\include;$(ProjectDir)src\utils\include;$(ProjectDir);;$(ProjectDir)src\libs;$(ProjectDir)src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -152,25 +153,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="RendererD3D11.cpp" />
-    <ClCompile Include="RepExeption.cpp" />
-    <ClCompile Include="MinWindow.cpp" />
-    <ClCompile Include="RepWinException.cpp" />
+    <ClCompile Include="src\RendererD3D11\src\RendererD3D11.cpp" />
+    <ClCompile Include="src\utils\src\RepExeption.cpp" />
+    <ClCompile Include="src\utils\src\MinWindow.cpp" />
+    <ClCompile Include="src\utils\src\RepWinException.cpp" />
     <ClCompile Include="RepMain.cpp" />
-    <ClCompile Include="WindowComponentBase.cpp" />
+    <ClCompile Include="src\utils\src\WindowComponentBase.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GfxException.hpp" />
-    <ClInclude Include="Input.hpp" />
-    <ClInclude Include="RendererD3D11.hpp" />
-    <ClInclude Include="RepLeanWin.h" />
-    <ClInclude Include="RepException.hpp" />
-    <ClInclude Include="MinWindow.hpp" />
+    <ClInclude Include="src\RendererD3D11\include\BufferBase.hpp" />
+    <ClInclude Include="src\RendererD3D11\include\GfxException.hpp" />
+    <ClInclude Include="src\RendererD3D11\include\IndexBuffer.hpp" />
+    <ClInclude Include="src\RendererD3D11\include\Input.hpp" />
+    <ClInclude Include="src\RendererD3D11\include\RendererD3D11.hpp" />
+    <ClInclude Include="src\utils\include\RepLeanWin.h" />
+    <ClInclude Include="src\utils\include\RepException.hpp" />
+    <ClInclude Include="src\utils\include\MinWindow.hpp" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="RepWinException.hpp" />
+    <ClInclude Include="src\utils\include\RepWinException.hpp" />
     <ClInclude Include="RepMain.h" />
-    <ClInclude Include="UniqueCollections.hpp" />
-    <ClInclude Include="WindowComponentBase.hpp" />
+    <ClInclude Include="src\utils\include\UniqueCollections.hpp" />
+    <ClInclude Include="src\RendererD3D11\include\VertexBuffer.hpp" />
+    <ClInclude Include="src\utils\include\WindowComponentBase.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon.ico" />
@@ -179,17 +183,19 @@
     <ResourceCompile Include="ReplicaRenderer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="DefaultPixShader.hlsl">
+    <FxCompile Include="src\RendererD3D11\shaders\DefaultPixShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjDir)%(Filename).cso</ObjectFileOutput>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="DefaultVertShader.hlsl">
+    <FxCompile Include="src\RendererD3D11\shaders\DefaultVertShader.hlsl">
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjDir)%(Filename).cso</ObjectFileOutput>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
