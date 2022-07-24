@@ -62,7 +62,7 @@ namespace Replica::D3D11
 		const BufferUsages usage;
 		const BufferAccessFlags cpuAccess;
 
-		ID3D11Buffer* Get() { return pBuf.Get(); }
+		ID3D11Buffer* Get() const { return pBuf.Get(); }
 
 		ID3D11Buffer** GetAddressOf() { return pBuf.GetAddressOf(); }
 

@@ -1,6 +1,6 @@
 #pragma once
-#include "Device.hpp"
 #include <dxgi1_2.h>
+#include "D3D11/Device.hpp"
 
 namespace Replica::D3D11
 {
@@ -56,6 +56,14 @@ namespace Replica::D3D11
 			GFX_THROW_FAILED(pSwap->GetBuffer(index, __uuidof(ID3D11Resource), &buf));
 
 			return buf;
+		}
+
+		/// <summary>
+		/// Presents rendered image with the given synchronization settings
+		/// </summary>
+		void Present(UINT syncInterval, UINT flags)
+		{
+			GFX_THROW_FAILED(pSwap->Present(syncInterval, flags));
 		}
 
 	private:

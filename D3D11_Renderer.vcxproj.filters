@@ -33,6 +33,9 @@
     <ClCompile Include="src\renderers\src\D3D11\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\renderers\src\D3D11\Device.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\utils\include\RepLeanWin.h">

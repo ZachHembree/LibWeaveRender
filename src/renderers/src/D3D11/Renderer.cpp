@@ -30,7 +30,7 @@ void Renderer::Update()
 	vec4 color(std::abs(sinOffset), std::abs(cosOffset), std::abs(sinOffset + cosOffset), 1.0f);
 
 	// Clear back buffer to color specified
-	device.GetContext()->ClearRenderTargetView(pBackBufView.Get(), reinterpret_cast<float*>(&color));
+	device.ClearRenderTarget(pBackBufView, color);
 
 	UniqueArray<Vertex> vertices = 
 	{
@@ -41,75 +41,47 @@ void Renderer::Update()
 		{ { -0.67f, 0.67f }, { color.b, color.r, color.g } },
 	};
 	VertexBuffer vBuf(device.Get(), vertices);
-	const UINT stride = sizeof(Vertex);
-	const UINT offset = 0;
 
-	// Assign vertex buffer
-	device.GetContext()->IASetVertexBuffers(0u, 1u, vBuf.GetAddressOf(), &stride, &offset);
-
-	// Defines vertex connectivity
-	device.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	// Assign vertex buffer to first slot
+	device.IASetVertexBuffer(vBuf);
+	
 	UniqueArray<USHORT> indices = 
 	{
 		0, 1, 2,
 		0, 3, 1,
 		2, 4, 0
 	};
-
+	
 	// Assign index buffer
 	IndexBuffer iBuf(device.Get(), indices);
-	device.GetContext()->IASetIndexBuffer(iBuf.Get(), DXGI_FORMAT_R16_UINT, 0);
-
-	ComPtr<ID3DBlob> pBlob;
-
-	// Load VS binary
-	GFX_THROW_FAILED(D3DReadFileToBlob(L"DefaultVertShader.cso", &pBlob));
+	device.IASetIndexBuffer(iBuf);
 
 	// Compile and assign VS
-	ComPtr<ID3D11VertexShader> pVS;
-	GFX_THROW_FAILED(device.Get()->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVS));
-	device.GetContext()->VSSetShader(pVS.Get(), nullptr, 0u);
+	ComPtr<ID3DBlob> pBlob;
+	GFX_THROW_FAILED(D3DReadFileToBlob(L"DefaultVertShader.cso", &pBlob));
+	device.VSSetShader(device.CreateVertexShader(pBlob));
 
 	// Define position semantic
-	D3D11_INPUT_ELEMENT_DESC vDesc[] = 
+	const UniqueArray<D3D11_INPUT_ELEMENT_DESC> layoutDesc =
 	{
 		{"Position", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{"Color", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(vec2), D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
-
-	ComPtr<ID3D11InputLayout> pVsLayout;
-	device.Get()->CreateInputLayout(
-		(D3D11_INPUT_ELEMENT_DESC*)&vDesc,
-		(UINT)std::size(vDesc),
-		pBlob->GetBufferPointer(),
-		pBlob->GetBufferSize(),
-		&pVsLayout
-	);
-	device.GetContext()->IASetInputLayout(pVsLayout.Get());
-
-	D3DReadFileToBlob(L"DefaultPixShader.cso", &pBlob);
+	const ComPtr<ID3D11InputLayout> pIALayout = device.CreateInputLayout(layoutDesc, pBlob);
+	device.IASetInputLayout(pIALayout);
 
 	// Compile and assign PS
-	ComPtr<ID3D11PixelShader> pPS;
-	device.Get()->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPS);
-	device.GetContext()->PSSetShader(pPS.Get(), nullptr, 0u);
-
+	D3DReadFileToBlob(L"DefaultPixShader.cso", &pBlob);
+	device.PSSetShader(device.CreatePixelShader(pBlob));
+	
 	// Set viewport bounds
-	D3D11_VIEWPORT viewPort = {};
-	viewPort.Width = 640;
-	viewPort.Height = 480;
-	viewPort.MaxDepth = 1;
-	viewPort.MinDepth = 0;
-	viewPort.TopLeftX = 0;
-	viewPort.TopLeftY = 0;
-	device.GetContext()->RSSetViewports(1u, &viewPort);
+	device.RSSetViewport(ivec2(640, 480));
 
 	// Bind back buffer as render target
-	device.GetContext()->OMSetRenderTargets(1u, pBackBufView.GetAddressOf(), nullptr);
+	device.OMSetRenderTarget(pBackBufView);
 
-	device.GetContext()->DrawIndexed((UINT)indices.GetLength(), 0, 0);
+	device.DrawIndexed((UINT)indices.GetLength());
 
 	// Present frame
-	GFX_THROW_FAILED(swap.Get()->Present(1u, 0));
+	swap.Present(1u, 0);
 }

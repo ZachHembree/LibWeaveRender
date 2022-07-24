@@ -1,18 +1,20 @@
 #pragma once
-#include "BufferBase.hpp"
+#include "D3D11/BufferBase.hpp"
 
 namespace Replica::D3D11
 {
 	class VertexBuffer : public BufferBase
 	{
 	public:
+		const UINT stride;
 
 		template<typename T>
 		VertexBuffer(
 			const Microsoft::WRL::ComPtr<ID3D11Device>& pDevice,
 			const DynamicArrayBase<T>& data,
 			BufferUsages usage = BufferUsages::Default, 
-			BufferAccessFlags cpuAccess = BufferAccessFlags::None) : 
+			BufferAccessFlags cpuAccess = BufferAccessFlags::None) :
+			stride((UINT)sizeof(T)),
 			BufferBase(BufferTypes::Vertex, usage, cpuAccess, pDevice, data)
 		{ }
 
@@ -22,6 +24,7 @@ namespace Replica::D3D11
 			const std::vector<T>& data,
 			BufferUsages usage = BufferUsages::Default,
 			BufferAccessFlags cpuAccess = BufferAccessFlags::None) :
+			stride((UINT)sizeof(T)),
 			BufferBase(BufferTypes::Vertex, usage, cpuAccess, pDevice, data)
 		{ }
 

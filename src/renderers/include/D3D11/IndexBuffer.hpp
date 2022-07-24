@@ -1,5 +1,5 @@
 #pragma once
-#include "BufferBase.hpp"
+#include "D3D11/BufferBase.hpp"
 
 namespace Replica::D3D11
 { 
