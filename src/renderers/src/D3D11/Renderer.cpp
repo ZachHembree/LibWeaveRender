@@ -19,8 +19,22 @@ Renderer::Renderer(MinWindow* window) :
 	WindowComponentBase(window),
 	device(), // Create device and context
 	swap(*window, device), // Create swap chain for window
-	pBackBufView(device.GetRtView(swap.GetBuffer(0))) // Get RT view for swap chain back buf
-{ }
+	pBackBufView(device.GetRtView(swap.GetBuffer(0))), // Get RT view for swap chain back buf
+	vBuf(device, UniqueArray<Vertex>{
+		{ { 0.0f, 0.5f }, { 1.0, 0.0, 0.0 } },
+		{ { 0.5f, -0.5f }, { 0.0, 1.0, 0.0 } },
+		{ { -0.5f, -0.5f }, { 0.0, 0.0, 1.0  } },
+		{ { 0.67f, 0.67f }, { 0.0, 1.0, 0.0 } }, // 3
+		{ { -0.67f, 0.67f }, { 1.0, 0.0, 0.0 } },
+		}),
+	iBuf(device, UniqueArray<USHORT>{
+		0, 1, 2,
+		0, 3, 1,
+		2, 4, 0
+		})
+{ 
+	
+}
 
 void Renderer::Update()
 {
@@ -32,28 +46,13 @@ void Renderer::Update()
 	// Clear back buffer to color specified
 	device.ClearRenderTarget(pBackBufView, color);
 
-	UniqueArray<Vertex> vertices = 
-	{
-		{ { 0.0f, 0.5f }, { color.r, color.g, color.b } },
-		{ { 0.5f, -0.5f }, { color.b, color.r, color.g } },
-		{ { -0.5f, -0.5f }, { color.g, color.b, color.r  } },
-		{ { 0.67f, 0.67f }, { color.b, color.g, color.r } }, // 3
-		{ { -0.67f, 0.67f }, { color.b, color.r, color.g } },
-	};
-	VertexBuffer vBuf(device, vertices);
+	// Create and assign constant bufer
+	ConstantBuffer cb(device, color);
+	device.VSSetConstantBuffer(cb);
 
 	// Assign vertex buffer to first slot
 	device.IASetVertexBuffer(vBuf);
-	
-	UniqueArray<USHORT> indices = 
-	{
-		0, 1, 2,
-		0, 3, 1,
-		2, 4, 0
-	};
-	
 	// Assign index buffer
-	IndexBuffer iBuf(device, indices);
 	device.IASetIndexBuffer(iBuf);
 
 	// Compile and assign VS
@@ -80,7 +79,7 @@ void Renderer::Update()
 	// Bind back buffer as render target
 	device.OMSetRenderTarget(pBackBufView);
 
-	device.DrawIndexed((UINT)indices.GetLength());
+	device.DrawIndexed((UINT)iBuf.GetLength());
 
 	// Present frame
 	swap.Present(1u, 0);

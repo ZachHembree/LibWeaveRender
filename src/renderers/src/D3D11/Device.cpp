@@ -1,6 +1,7 @@
 #include "D3D11/Device.hpp"
 #include "D3D11/VertexBuffer.hpp"
 #include "D3D11/IndexBuffer.hpp"
+#include "D3D11/ConstantBuffer.hpp"
 #include "D3D11/SwapChain.hpp"
 
 using namespace Microsoft::WRL;
@@ -14,7 +15,7 @@ Device::Device()
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
-		0,
+		D3D11_CREATE_DEVICE_DEBUG,
 		nullptr,
 		0,
 		D3D11_SDK_VERSION,
@@ -107,6 +108,15 @@ ComPtr<ID3D11VertexShader> Device::CreateVertexShader(const ComPtr<ID3DBlob>& vs
 void Device::VSSetShader(const ComPtr<ID3D11VertexShader>& vertexShader)
 {
 	pContext->VSSetShader(vertexShader.Get(), nullptr, 0);
+}
+
+/// <summary>
+/// Assigns given constant buffer to the given slot
+/// </summary>
+
+void Replica::D3D11::Device::VSSetConstantBuffer(ConstantBuffer& buffer, UINT slot)
+{
+	pContext->VSSetConstantBuffers(slot, 1, buffer.GetAddressOf());
 }
 
 /// <summary>

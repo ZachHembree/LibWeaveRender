@@ -14,6 +14,7 @@ namespace Replica::D3D11
 			const DynamicArrayBase<T>& data,
 			BufferUsages usage = BufferUsages::Default, 
 			BufferAccessFlags cpuAccess = BufferAccessFlags::None) :
+			count((UINT)data.GetLength()),
 			stride((UINT)sizeof(T)),
 			BufferBase(BufferTypes::Vertex, usage, cpuAccess, device, data)
 		{ }
@@ -24,11 +25,15 @@ namespace Replica::D3D11
 			const std::vector<T>& data,
 			BufferUsages usage = BufferUsages::Default,
 			BufferAccessFlags cpuAccess = BufferAccessFlags::None) :
+			count((UINT)data.size()),
 			stride((UINT)sizeof(T)),
 			BufferBase(BufferTypes::Vertex, usage, cpuAccess, device, data)
 		{ }
 
+		UINT GetLength() { return count; };
+
 	private:
+		const UINT count;
 
 	};
 }

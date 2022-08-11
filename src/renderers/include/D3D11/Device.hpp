@@ -10,6 +10,7 @@ namespace Replica::D3D11
 	class BufferBase;
 	class VertexBuffer;
 	class IndexBuffer;
+	class ConstantBuffer;
 	class SwapChain;
 
 	class Device
@@ -112,6 +113,11 @@ namespace Replica::D3D11
 		/// Binds vertex shader to the device 
 		/// </summary>
 		void VSSetShader(const Microsoft::WRL::ComPtr <ID3D11VertexShader>& vertexShader);
+
+		/// <summary>
+		/// Assigns given constant buffer to the given slot
+		/// </summary>
+		void VSSetConstantBuffer(ConstantBuffer& buffer, UINT slot = 0);
 
 		/// <summary>
 		/// Creates a pixel shader object from a compiled shader

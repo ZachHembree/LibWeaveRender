@@ -71,7 +71,12 @@ namespace Replica::D3D11
 	protected:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> pBuf;
 
-		BufferBase(BufferTypes type, BufferUsages usage, BufferAccessFlags cpuAccess, const Device& device, const void* data, const UINT byteSize);
+		BufferBase(BufferTypes type, 
+			BufferUsages usage, 
+			BufferAccessFlags cpuAccess, 
+			const Device& device, 
+			const void* data, 
+			const UINT byteSize);
 
 		template<typename T>
 		BufferBase(BufferTypes type, 
