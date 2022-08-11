@@ -57,11 +57,6 @@ namespace Replica
 			/// </summary>
 			HWND GetWndHandle() const noexcept;
 
-			/// <summary>
-			/// Returns the last message recieved by the Win32 API
-			/// </summary>
-			MSG GetLastWndMessage() const noexcept;
-
 		protected:		
 			HINSTANCE hInst;
 			HWND hWnd;

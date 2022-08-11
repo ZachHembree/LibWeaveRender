@@ -8,19 +8,19 @@ namespace Replica::D3D11
 	public:
 
 		IndexBuffer(
-			const Microsoft::WRL::ComPtr<ID3D11Device>& pDevice,
+			const Device& device,
 			const DynamicArrayBase<USHORT>& data,
 			BufferUsages usage = BufferUsages::Default,
 			BufferAccessFlags cpuAccess = BufferAccessFlags::None) :
-			BufferBase(BufferTypes::Index, usage, cpuAccess, pDevice, data)
+			BufferBase(BufferTypes::Index, usage, cpuAccess, device, data)
 		{ }
 
 		IndexBuffer(
-			const Microsoft::WRL::ComPtr<ID3D11Device>& pDevice,
+			const Device& device,
 			const std::vector<USHORT>& data,
 			BufferUsages usage = BufferUsages::Default,
 			BufferAccessFlags cpuAccess = BufferAccessFlags::None) :
-			BufferBase(BufferTypes::Index, usage, cpuAccess, pDevice, data)
+			BufferBase(BufferTypes::Index, usage, cpuAccess, device, data)
 		{ }
 
 	private:

@@ -6,9 +6,12 @@
 #include <dxgidebug.h>
 #include <wrl.h>
 #include <math.h>
+#include "D3D11/Device.hpp"
 
 namespace Replica::D3D11
 {
+	class Device;
+
 	/// <summary>
 	/// Specifies how a buffer will be used
 	/// </summary>
@@ -79,22 +82,22 @@ namespace Replica::D3D11
 		BufferBase(BufferTypes type, 
 			BufferUsages usage, 
 			BufferAccessFlags cpuAccess, 
-			const Microsoft::WRL::ComPtr<ID3D11Device>& pDevice, 
+			const Device& device, 
 			const DynamicArrayBase<T>& data) :
 			BufferBase(type, usage, cpuAccess)
 		{
-			CreateBuffer(data, pDevice);
+			CreateBuffer(data, device.Get());
 		}
 
 		template<typename T>
 		BufferBase(BufferTypes type, 
 			BufferUsages usage, 
 			BufferAccessFlags cpuAccess,
-			const Microsoft::WRL::ComPtr<ID3D11Device>& pDevice, 
+			const Device& device, 
 			const std::vector<T>& data) :
 			BufferBase(type, usage, cpuAccess)
 		{
-			CreateBuffer(data, pDevice);
+			CreateBuffer(data, device.Get());
 		}
 
 		BufferBase(const BufferBase&) = delete;
@@ -103,7 +106,7 @@ namespace Replica::D3D11
 		BufferBase& operator=(BufferBase&&) = delete;
 
 		template<typename T>
-		void CreateBuffer(const DynamicArrayBase<T>& data, const Microsoft::WRL::ComPtr<ID3D11Device>& pDevice)
+		void CreateBuffer(const DynamicArrayBase<T>& data, ID3D11Device* pDevice)
 		{
 			D3D11_BUFFER_DESC desc;
 			D3D11_SUBRESOURCE_DATA resDesc;
@@ -113,7 +116,7 @@ namespace Replica::D3D11
 		}
 
 		template<typename T>
-		void CreateBuffer(const std::vector<T>& data, const Microsoft::WRL::ComPtr<ID3D11Device>& pDevice)
+		void CreateBuffer(const std::vector<T>& data, ID3D11Device* pDevice)
 		{
 			D3D11_BUFFER_DESC desc;
 			D3D11_SUBRESOURCE_DATA resDesc;

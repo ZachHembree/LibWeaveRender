@@ -4,11 +4,14 @@
 #include <d3dcompiler.h>
 #include <dxgidebug.h>
 #include <wrl.h>
-#include "D3D11/VertexBuffer.hpp"
-#include "D3D11/IndexBuffer.hpp"
 
 namespace Replica::D3D11
 {
+	class BufferBase;
+	class VertexBuffer;
+	class IndexBuffer;
+	class SwapChain;
+
 	class Device
 	{
 	public:

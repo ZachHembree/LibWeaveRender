@@ -123,11 +123,6 @@ HWND MinWindow::GetWndHandle() const noexcept
 	return hWnd;
 }
 
-MSG MinWindow::GetLastWndMessage() const noexcept
-{
-	return wndMsg;
-}
-
 void MinWindow::RegisterComponent(WindowComponentBase* component)
 {
 	if (component != nullptr && !component->isRegistered && component->parent == this)

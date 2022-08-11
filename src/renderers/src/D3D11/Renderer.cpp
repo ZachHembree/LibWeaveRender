@@ -40,7 +40,7 @@ void Renderer::Update()
 		{ { 0.67f, 0.67f }, { color.b, color.g, color.r } }, // 3
 		{ { -0.67f, 0.67f }, { color.b, color.r, color.g } },
 	};
-	VertexBuffer vBuf(device.Get(), vertices);
+	VertexBuffer vBuf(device, vertices);
 
 	// Assign vertex buffer to first slot
 	device.IASetVertexBuffer(vBuf);
@@ -53,7 +53,7 @@ void Renderer::Update()
 	};
 	
 	// Assign index buffer
-	IndexBuffer iBuf(device.Get(), indices);
+	IndexBuffer iBuf(device, indices);
 	device.IASetIndexBuffer(iBuf);
 
 	// Compile and assign VS

@@ -1,4 +1,7 @@
 #include "D3D11/Device.hpp"
+#include "D3D11/VertexBuffer.hpp"
+#include "D3D11/IndexBuffer.hpp"
+#include "D3D11/SwapChain.hpp"
 
 using namespace Microsoft::WRL;
 using namespace glm;
