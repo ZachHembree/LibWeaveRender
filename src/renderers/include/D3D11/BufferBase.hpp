@@ -6,7 +6,6 @@
 #include <dxgidebug.h>
 #include <wrl.h>
 #include <math.h>
-#include "D3D11/Device.hpp"
 
 namespace Replica::D3D11
 {
@@ -72,11 +71,7 @@ namespace Replica::D3D11
 	protected:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> pBuf;
 
-		BufferBase(BufferTypes type, BufferUsages usage, BufferAccessFlags cpuAccess) :
-			type(type),
-			usage(usage),
-			cpuAccess(cpuAccess)
-		{ }
+		BufferBase(BufferTypes type, BufferUsages usage, BufferAccessFlags cpuAccess, const Device& device, const void* data, const UINT byteSize);
 
 		template<typename T>
 		BufferBase(BufferTypes type, 
@@ -84,10 +79,8 @@ namespace Replica::D3D11
 			BufferAccessFlags cpuAccess, 
 			const Device& device, 
 			const DynamicArrayBase<T>& data) :
-			BufferBase(type, usage, cpuAccess)
-		{
-			CreateBuffer(data, device.Get());
-		}
+			BufferBase(type, usage, cpuAccess, device, data.GetPtr(), data.GetSize())
+		{ }
 
 		template<typename T>
 		BufferBase(BufferTypes type, 
@@ -95,66 +88,16 @@ namespace Replica::D3D11
 			BufferAccessFlags cpuAccess,
 			const Device& device, 
 			const std::vector<T>& data) :
-			BufferBase(type, usage, cpuAccess)
-		{
-			CreateBuffer(data, device.Get());
-		}
+			BufferBase(type, usage, cpuAccess, device, data.data(), data.size() * sizeof(T))
+		{ }
 
 		BufferBase(const BufferBase&) = delete;
 		BufferBase(BufferBase&&) = delete;
 		BufferBase& operator=(const BufferBase&) = delete;
 		BufferBase& operator=(BufferBase&&) = delete;
 
-		template<typename T>
-		void CreateBuffer(const DynamicArrayBase<T>& data, ID3D11Device* pDevice)
-		{
-			D3D11_BUFFER_DESC desc;
-			D3D11_SUBRESOURCE_DATA resDesc;
+		void CreateBuffer(const void* data, const UINT byteSize, ID3D11Device* pDevice);
 
-			GetBufferDesc(data, desc, resDesc);
-			GFX_THROW_FAILED(pDevice->CreateBuffer(&desc, &resDesc, &pBuf));
-		}
-
-		template<typename T>
-		void CreateBuffer(const std::vector<T>& data, ID3D11Device* pDevice)
-		{
-			D3D11_BUFFER_DESC desc;
-			D3D11_SUBRESOURCE_DATA resDesc;
-
-			GetBufferDesc(data, desc, resDesc);
-			GFX_THROW_FAILED(pDevice->CreateBuffer(&desc, &resDesc, &pBuf));
-		}
-
-		template<typename T>
-		void GetBufferDesc(const DynamicArrayBase<T>& data, D3D11_BUFFER_DESC& desc, 
-			D3D11_SUBRESOURCE_DATA& resDesc)
-		{
-			desc = {};
-			desc.Usage = (D3D11_USAGE)usage;
-			desc.BindFlags = (UINT)type;
-			desc.ByteWidth = (UINT)data.GetSize();
-			desc.CPUAccessFlags = (UINT)cpuAccess;
-			desc.MiscFlags = 0;
-
-			resDesc.pSysMem = data.GetPtr();
-			resDesc.SysMemPitch = 0;
-			resDesc.SysMemSlicePitch = 0;
-		}
-
-		template<typename T>
-		void GetBufferDesc(const std::vector<T>& data, D3D11_BUFFER_DESC& desc,
-			D3D11_SUBRESOURCE_DATA& resDesc)
-		{
-			desc = {};
-			desc.Usage = (D3D11_USAGE)usage;
-			desc.BindFlags = (UINT)type;
-			desc.ByteWidth = (UINT)data.size() * sizeof(T);
-			desc.CPUAccessFlags = (UINT)cpuAccess;
-			desc.MiscFlags = 0;
-
-			resDesc.pSysMem = data.data();
-			resDesc.SysMemPitch = 0;
-			resDesc.SysMemSlicePitch = 0;
-		}
+		void GetBufferDesc(const void* data, const UINT byteSize, D3D11_BUFFER_DESC& desc, D3D11_SUBRESOURCE_DATA& resDesc);
 	};
 }

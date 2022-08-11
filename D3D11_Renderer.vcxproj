@@ -153,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\renderers\src\D3D11\BufferBase.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Device.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Renderer.cpp" />
     <ClCompile Include="src\utils\src\RepExeption.cpp" />
@@ -163,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\renderers\include\D3D11\BufferBase.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\ConstantBuffer.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Device.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\SwapChain.hpp" />
     <ClInclude Include="src\utils\include\GfxException.hpp" />
