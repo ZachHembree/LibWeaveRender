@@ -13,7 +13,7 @@ struct Vertex
 {
 public:
 	vec3 pos;
-	vec3 color;
+	tvec4<byte> color;
 };
 
 Renderer::Renderer(MinWindow* window) :
@@ -22,14 +22,14 @@ Renderer::Renderer(MinWindow* window) :
 	swap(*window, device), // Create swap chain for window
 	pBackBufView(device.GetRtView(swap.GetBuffer(0))), // Get RT view for swap chain back buf
 	vBuf(device, UniqueArray<Vertex>{
-		{ { -1.0, -1.0, -1.0 }, { 1.0, 0.0, 0.0 } },
-		{ { 1.0, -1.0, -1.0 }, { 0.0, 1.0, 0.0 } },
-		{ { -1.0, 1.0, -1.0 }, { 0.0, 0.0, 1.0  } },
-		{ { 1.0, 1.0, -1.0 }, { 0.0, 1.0, 0.0 } }, // 3
-		{ { -1.0, -1.0, 1.0 }, { 1.0, 0.0, 0.0 } }, 
-		{ { 1.0, -1.0, 1.0 }, { 1.0, 0.0, 0.0 } },
-		{ { -1.0, 1.0, 1.0 }, { 0.0, 1.0, 0.0 } },
-		{ { 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0  } },
+		{ { -1.0, -1.0, -1.0 }, { 255, 0, 0, 255 } },
+		{ { 1.0, -1.0, -1.0 }, { 0, 255, 0, 255 } },
+		{ { -1.0, 1.0, -1.0 }, { 0, 0, 255, 255  } },
+		{ { 1.0, 1.0, -1.0 }, { 0, 255, 0, 255 } }, // 3
+		{ { -1.0, -1.0, 1.0 }, { 255, 0, 0, 255 } },
+		{ { 1.0, -1.0, 1.0 }, { 255, 0, 0, 255 } },
+		{ { -1.0, 1.0, 1.0 }, { 0, 255, 0, 255 } },
+		{ { 1.0, 1.0, 1.0 }, { 0, 0, 255, 255  } },
 	}),
 	iBuf(device, UniqueArray<USHORT>{
 		0, 1, 2,  2, 1, 3,
@@ -93,7 +93,7 @@ void Renderer::Update()
 	const UniqueArray<D3D11_INPUT_ELEMENT_DESC> layoutDesc =
 	{
 		{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{"Color", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(vec3), D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{"Color", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, sizeof(vec3), D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 	const ComPtr<ID3D11InputLayout> pIALayout = device.CreateInputLayout(layoutDesc, pBlob);
 	device.IASetInputLayout(pIALayout);
