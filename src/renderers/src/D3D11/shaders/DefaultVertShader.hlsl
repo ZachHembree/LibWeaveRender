@@ -10,7 +10,7 @@ struct VertOut
 	float3 color : Color;
 };
 
-cbuffer cBuf
+cbuffer _
 {
 	float4 tint;
 	float4x4 mvp;

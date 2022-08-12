@@ -55,10 +55,10 @@ void Renderer::Update()
 	{
 		vec4 tint;
 		mat4 mvp;
-	} cBuf;
-
+	} cBuf{};
+	
 	cBuf.tint = vec4(std::abs(sinOffset), std::abs(cosOffset), std::abs(sinOffset + cosOffset), 1.0f);
-
+	
 	mat4 model = identity<mat4>(),
 		view = identity<mat4>(),
 		proj = perspective(45.0f, aspectRatio, 0.5f, 100.0f);
@@ -66,10 +66,10 @@ void Renderer::Update()
 	model = translate(model, vec3(0.0f, 0.0f, -4.0f));
 	model = rotate(model, pi<float>() * sinOffset, normalize(vec3(1.0f, 0.5f, 0.25f)));
 	model = scale(model, vec3(.75f));
-
+	
 	view = rotate(view, 0.1f * pi<float>() * cosOffset, normalize(vec3(0.25f, 0.5f, 1.0f)));
 
-	// D3D expects row major matrices, but GLM is column major
+	// D3D expects row major matrices
 	cBuf.mvp = transpose(proj * view * model);
 
 	// Clear back buffer to color specified

@@ -5,11 +5,31 @@
 #include <d3dcompiler.h>
 #include <dxgidebug.h>
 #include <wrl.h>
+
 #include "D3D11/Device.hpp"
 #include "D3D11/VertexBuffer.hpp"
 #include "D3D11/IndexBuffer.hpp"
 #include "D3D11/ConstantBuffer.hpp"
 #include "D3D11/SwapChain.hpp"
+
+#include "BufferHelpers.h"
+#include "CommonStates.h"
+#include "DDSTextureLoader.h"
+#include "DirectXHelpers.h"
+#include "Effects.h"
+#include "GamePad.h"
+#include "GeometricPrimitive.h"
+#include "GraphicsMemory.h"
+#include "Keyboard.h"
+#include "Model.h"
+#include "Mouse.h"
+#include "PostProcess.h"
+#include "PrimitiveBatch.h"
+#include "ScreenGrab.h"
+#include "SpriteBatch.h"
+#include "SpriteFont.h"
+#include "VertexTypes.h"
+#include "WICTextureLoader.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
