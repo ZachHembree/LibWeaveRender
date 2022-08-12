@@ -1,6 +1,7 @@
 #include "D3D11/Renderer.hpp"
 #include <math.h>
 #include <chrono>
+#include <glm/gtc/matrix_transform.hpp>
 
 using namespace std::chrono;
 using namespace Microsoft::WRL;
@@ -11,7 +12,7 @@ using namespace Replica::D3D11;
 struct Vertex
 {
 public:
-	vec2 pos;
+	vec3 pos;
 	vec3 color;
 };
 
@@ -21,17 +22,23 @@ Renderer::Renderer(MinWindow* window) :
 	swap(*window, device), // Create swap chain for window
 	pBackBufView(device.GetRtView(swap.GetBuffer(0))), // Get RT view for swap chain back buf
 	vBuf(device, UniqueArray<Vertex>{
-		{ { 0.0f, 0.5f }, { 1.0, 0.0, 0.0 } },
-		{ { 0.5f, -0.5f }, { 0.0, 1.0, 0.0 } },
-		{ { -0.5f, -0.5f }, { 0.0, 0.0, 1.0  } },
-		{ { 0.67f, 0.67f }, { 0.0, 1.0, 0.0 } }, // 3
-		{ { -0.67f, 0.67f }, { 1.0, 0.0, 0.0 } },
-		}),
+		{ { -1.0, -1.0, -1.0 }, { 1.0, 0.0, 0.0 } },
+		{ { 1.0, -1.0, -1.0 }, { 0.0, 1.0, 0.0 } },
+		{ { -1.0, 1.0, -1.0 }, { 0.0, 0.0, 1.0  } },
+		{ { 1.0, 1.0, -1.0 }, { 0.0, 1.0, 0.0 } }, // 3
+		{ { -1.0, -1.0, 1.0 }, { 1.0, 0.0, 0.0 } }, 
+		{ { 1.0, -1.0, 1.0 }, { 1.0, 0.0, 0.0 } },
+		{ { -1.0, 1.0, 1.0 }, { 0.0, 1.0, 0.0 } },
+		{ { 1.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0  } },
+	}),
 	iBuf(device, UniqueArray<USHORT>{
-		0, 1, 2,
-		0, 3, 1,
-		2, 4, 0
-		})
+		0, 1, 2,  2, 1, 3,
+		1, 5, 3,  3, 5, 7,
+		2, 3, 6,  3, 7, 6,
+		4, 7, 5,  4, 6, 7,
+		0, 2, 4,  2, 6, 4,
+		0, 4, 1,  1, 4, 5
+	})
 { 
 	
 }
@@ -39,15 +46,37 @@ Renderer::Renderer(MinWindow* window) :
 void Renderer::Update()
 {
 	const duration<float> time = duration_cast<duration<float>>(steady_clock::now().time_since_epoch());
+	const ivec2 wndSize = parent->GetSize();
 	const float sinOffset = sin(time.count() * .5f),
-		cosOffset = cos(time.count() * .5f);
-	vec4 color(std::abs(sinOffset), std::abs(cosOffset), std::abs(sinOffset + cosOffset), 1.0f);
+		cosOffset = cos(time.count() * .5f),
+		aspectRatio = (float)wndSize.x / wndSize.y;
+
+	struct
+	{
+		vec4 tint;
+		mat4 mvp;
+	} cBuf;
+
+	cBuf.tint = vec4(std::abs(sinOffset), std::abs(cosOffset), std::abs(sinOffset + cosOffset), 1.0f);
+
+	mat4 model = identity<mat4>(),
+		view = identity<mat4>(),
+		proj = perspective(45.0f, aspectRatio, 0.5f, 100.0f);
+
+	model = translate(model, vec3(0.0f, 0.0f, -4.0f));
+	model = rotate(model, pi<float>() * sinOffset, normalize(vec3(1.0f, 0.5f, 0.25f)));
+	model = scale(model, vec3(.75f));
+
+	view = rotate(view, 0.1f * pi<float>() * cosOffset, normalize(vec3(0.25f, 0.5f, 1.0f)));
+
+	// D3D expects row major matrices, but GLM is column major
+	cBuf.mvp = transpose(proj * view * model);
 
 	// Clear back buffer to color specified
-	device.ClearRenderTarget(pBackBufView, color);
+	device.ClearRenderTarget(pBackBufView, vec4(0));
 
 	// Create and assign constant bufer
-	ConstantBuffer cb(device, color);
+	ConstantBuffer cb(device, cBuf);
 	device.VSSetConstantBuffer(cb);
 
 	// Assign vertex buffer to first slot
@@ -63,8 +92,8 @@ void Renderer::Update()
 	// Define position semantic
 	const UniqueArray<D3D11_INPUT_ELEMENT_DESC> layoutDesc =
 	{
-		{"Position", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{"Color", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(vec2), D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{"Color", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(vec3), D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 	const ComPtr<ID3D11InputLayout> pIALayout = device.CreateInputLayout(layoutDesc, pBlob);
 	device.IASetInputLayout(pIALayout);

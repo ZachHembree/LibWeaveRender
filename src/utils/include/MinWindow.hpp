@@ -57,10 +57,13 @@ namespace Replica
 			/// </summary>
 			HWND GetWndHandle() const noexcept;
 
+			glm::ivec2 GetSize() const { return size; };
+
 		protected:		
 			HINSTANCE hInst;
 			HWND hWnd;
 			MSG wndMsg;
+			glm::ivec2 size;
 
 			/// <summary>
 			/// Component objects associated with the window

@@ -3,5 +3,5 @@
 
 class InputComponent : public WindowComponentBase
 {
-
+	
 };

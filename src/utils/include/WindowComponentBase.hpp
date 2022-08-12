@@ -3,7 +3,6 @@
 
 namespace Replica
 {
-	class WindowComponentBase;
 	class MinWindow;
 
 	/// <summary>

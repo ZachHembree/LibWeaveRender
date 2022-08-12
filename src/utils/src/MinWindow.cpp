@@ -12,7 +12,8 @@ HWND InitWindow(const HINSTANCE hInst, const ivec2 size, WNDPROC procPtr, MinWin
 MinWindow::MinWindow(const HINSTANCE hInst, const ivec2 size) :
 	hInst(hInst),
 	hWnd(InitWindow(hInst, size, &HandleWindowSetup, this)),
-	wndMsg(MSG{})
+	wndMsg(MSG{}),
+	size(size)
 {
 	// Make the window visible
 	ShowWindow(hWnd, SW_SHOW);
