@@ -2,6 +2,7 @@
 #include <chrono>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <sstream>
 #include <d3dcompiler.h>
 #include <dxgidebug.h>
@@ -26,6 +27,19 @@ public:
 	vec3 pos;
 	tvec4<byte> color;
 };
+
+fquat QuatFromAxis(vec3 axis, float rad)
+{
+	rad *= 0.5f;
+	float a = sin(rad);
+
+	return fquat(
+		a * axis.x,
+		a * axis.y,
+		a * axis.z,
+		cos(rad)
+	);
+}
 
 Renderer::Renderer(MinWindow* window) :
 	WindowComponentBase(window),
@@ -77,14 +91,16 @@ void Renderer::Update()
 	} cBuf{};
 	
 	cBuf.tint = vec4(std::abs(sinOffset), std::abs(cosOffset), std::abs(sinOffset + cosOffset), 1.0f);
-	
+
 	mat4 model = identity<mat4>(),
 		view = identity<mat4>(),
 		proj = perspectiveLH(45.0f, aspectRatio, 0.5f, 100.0f);
 
 	model = translate(model, vec3(0.0f, 0.0f, 4.0f));
-	model = rotate(model, normMousePos.x * pi<float>(), normalize(vec3(0.0f, 1.0f, 0.0f)));
-	model = rotate(model, normMousePos.y * pi<float>(), normalize(vec3(0.0f, 0.0f, 1.0f)));
+
+	fquat rot = QuatFromAxis(vec3(0, 1, 0), pi<float>() * normMousePos.x);
+	rot = QuatFromAxis(vec3(0, 0, 1), pi<float>() * normMousePos.y) * rot;
+	model *= toMat4(rot);
 	//model = scale(model, vec3(.75f));
 	
 	//view = translate(view, vec3(clipMousePos, 0.0f));
