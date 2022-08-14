@@ -50,7 +50,7 @@ vec2 InputComponent::GetNormMousePos()
 	ivec2 screenSize = parent->GetSize();
 	auto state = mouse.GetState();
 	float aspectRatio = (float)screenSize.y / screenSize.x;
-	vec2 pos(state.x * aspectRatio, -state.y);
+	vec2 pos(state.x * aspectRatio, state.y);
 
 	return (1.0f / screenSize.y) * pos;
 }

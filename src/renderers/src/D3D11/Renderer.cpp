@@ -33,12 +33,12 @@ Renderer::Renderer(MinWindow* window) :
 		{ { 1.0, 1.0, 1.0 }, { 0, 0, 255, 255  } },
 	}),
 	iBuf(device, UniqueArray<USHORT>{
-		0, 1, 2,  2, 1, 3,
-		1, 5, 3,  3, 5, 7,
-		2, 3, 6,  3, 7, 6,
-		4, 7, 5,  4, 6, 7,
-		0, 2, 4,  2, 6, 4,
-		0, 4, 1,  1, 4, 5
+		0, 2, 1,  2, 3, 1,
+		1, 3, 5,  3, 7, 5,
+		2, 6, 3,  3, 6, 7,
+		4, 5, 7,  4, 7, 6,
+		0, 4, 2,  2, 4, 6,
+		0, 1, 4,  1, 5, 4
 	})
 { 
 	
@@ -64,10 +64,11 @@ void Renderer::Update()
 	
 	mat4 model = identity<mat4>(),
 		view = identity<mat4>(),
-		proj = perspective(45.0f, aspectRatio, 0.5f, 100.0f);
+		proj = perspectiveLH(45.0f, aspectRatio, 0.5f, 100.0f);
 
-	model = translate(model, vec3(0.0f, 0.0f, -4.0f));
-	model = rotate(model, pi<float>(), normalize(vec3(normMousePos, 0.0f) + 0.001f));
+	model = translate(model, vec3(0.0f, 0.0f, 4.0f));
+	model = rotate(model, normMousePos.x * pi<float>(), normalize(vec3(0.0f, 1.0f, 0.0f)));
+	model = rotate(model, normMousePos.y * pi<float>(), normalize(vec3(0.0f, 0.0f, 1.0f)));
 	//model = scale(model, vec3(.75f));
 	
 	//view = translate(view, vec3(clipMousePos, 0.0f));
