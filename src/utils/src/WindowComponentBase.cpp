@@ -1,4 +1,5 @@
 #include "WindowComponentBase.hpp"
+#include "MinWindow.hpp"
 
 using namespace Replica;
 

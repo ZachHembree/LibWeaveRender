@@ -4,6 +4,8 @@
 #include <d3dcompiler.h>
 #include <dxgidebug.h>
 #include <wrl.h>
+#include <glm/glm.hpp>
+#include "DynamicCollections.hpp"
 
 namespace Replica::D3D11
 {

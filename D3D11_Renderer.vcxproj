@@ -119,7 +119,7 @@
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -156,6 +156,7 @@
     <ClCompile Include="src\renderers\src\D3D11\BufferBase.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Device.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Renderer.cpp" />
+    <ClCompile Include="src\utils\src\Input.cpp" />
     <ClCompile Include="src\utils\src\RepExeption.cpp" />
     <ClCompile Include="src\utils\src\MinWindow.cpp" />
     <ClCompile Include="src\utils\src\RepWinException.cpp" />

@@ -18,6 +18,7 @@ public:
 
 Renderer::Renderer(MinWindow* window) :
 	WindowComponentBase(window),
+	input(window),
 	device(), // Create device and context
 	swap(*window, device), // Create swap chain for window
 	pBackBufView(device.GetRtView(swap.GetBuffer(0))), // Get RT view for swap chain back buf
@@ -50,6 +51,8 @@ void Renderer::Update()
 	const float sinOffset = sin(time.count() * .5f),
 		cosOffset = cos(time.count() * .5f),
 		aspectRatio = (float)wndSize.x / wndSize.y;
+	const vec2 normMousePos = input.GetNormMousePos(),
+		clipMousePos = 2.0f * normMousePos + vec2(-1, 1);
 
 	struct
 	{
@@ -64,10 +67,11 @@ void Renderer::Update()
 		proj = perspective(45.0f, aspectRatio, 0.5f, 100.0f);
 
 	model = translate(model, vec3(0.0f, 0.0f, -4.0f));
-	model = rotate(model, pi<float>() * sinOffset, normalize(vec3(1.0f, 0.5f, 0.25f)));
-	model = scale(model, vec3(.75f));
+	model = rotate(model, pi<float>(), normalize(vec3(normMousePos, 0.0f) + 0.001f));
+	//model = scale(model, vec3(.75f));
 	
-	view = rotate(view, 0.1f * pi<float>() * cosOffset, normalize(vec3(0.25f, 0.5f, 1.0f)));
+	//view = translate(view, vec3(clipMousePos, 0.0f));
+	//view = rotate(view, 0.1f * pi<float>() * cosOffset, normalize(vec3(0.25f, 0.5f, 1.0f)));
 
 	// D3D expects row major matrices
 	cBuf.mvp = transpose(proj * view * model);

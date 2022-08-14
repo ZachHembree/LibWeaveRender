@@ -5,6 +5,7 @@
 #include "RepMain.h"
 #include "RepWinException.hpp"
 #include "WindowComponentBase.hpp"
+#include "Input.hpp"
 
 #include <glm/glm.hpp>
 #include "DynamicCollections.hpp"

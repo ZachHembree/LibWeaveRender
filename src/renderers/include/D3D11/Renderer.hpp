@@ -30,6 +30,7 @@
 #include "SpriteFont.h"
 #include "VertexTypes.h"
 #include "WICTextureLoader.h"
+#include "Input.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -45,6 +46,7 @@ namespace Replica::D3D11
 		void Update() override;
 
 	private:
+		InputComponent input;
 		Device device;
 		SwapChain swap;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pBackBufView;

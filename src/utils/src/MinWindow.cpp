@@ -10,6 +10,7 @@ const long wndStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 MinWindow* MinWindow::pLastInit;
 
 MinWindow::MinWindow(const HINSTANCE hInst, const ivec2 size) :
+	components(),
 	wndMsg(MSG{}),
 	size(size),
 	hInst(hInst),

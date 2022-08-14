@@ -1,5 +1,7 @@
 #pragma once
-#include "MinWindow.hpp"
+#include "RepLeanWin.h"
+#include "RepMain.h"
+#include "RepWinException.hpp"
 
 namespace Replica
 {
@@ -13,7 +15,7 @@ namespace Replica
 	friend MinWindow;
 
 	public:
-		const MinWindow* parent;
+		MinWindow* const parent;
 
 		/// <summary>
 		/// Called after each message poll in the window class
