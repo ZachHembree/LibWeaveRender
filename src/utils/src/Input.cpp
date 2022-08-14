@@ -3,6 +3,26 @@
 
 using namespace glm;
 using namespace Replica;
+using namespace DirectX;
+
+bool InputComponent::GetIsKeyPressed(KbKey key)
+{
+	return keyboard.GetState().IsKeyDown(key);
+}
+
+ivec2 InputComponent::GetMousePos() const
+{
+	auto state = mouse.GetState();
+	return ivec2(state.x, state.y);
+}
+
+vec2 InputComponent::GetNormMousePos() const
+{
+	ivec2 vpSize = parent->GetSize(), pos = GetMousePos();
+	float aspectRatio = (float)vpSize.y / vpSize.x;
+
+	return (1.0f / vpSize.y) * vec2(pos.x * aspectRatio, pos.y);
+}
 
 void InputComponent::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -36,21 +56,9 @@ void InputComponent::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	case WM_SYSKEYDOWN:
 		keyboard.ProcessMessage(msg, wParam, lParam);
 		break;
-	}
-}
-
-ivec2 InputComponent::GetMousePos()
-{
-	auto state = mouse.GetState();
-	return ivec2(state.x, state.y);
-}
-
-vec2 InputComponent::GetNormMousePos()
-{
-	ivec2 screenSize = parent->GetSize();
-	auto state = mouse.GetState();
-	float aspectRatio = (float)screenSize.y / screenSize.x;
-	vec2 pos(state.x * aspectRatio, state.y);
-
-	return (1.0f / screenSize.y) * pos;
+	case WM_SETFOCUS:
+	case WM_KILLFOCUS:
+		keyboard.Reset();
+		break;
+	}	
 }

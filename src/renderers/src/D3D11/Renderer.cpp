@@ -2,9 +2,11 @@
 #include <math.h>
 #include <chrono>
 #include <glm/gtc/matrix_transform.hpp>
+#include <sstream>
 
 using namespace std::chrono;
 using namespace Microsoft::WRL;
+using namespace DirectX;
 using namespace glm;
 using namespace Replica;
 using namespace Replica::D3D11;
@@ -40,9 +42,7 @@ Renderer::Renderer(MinWindow* window) :
 		0, 4, 2,  2, 4, 6,
 		0, 1, 4,  1, 5, 4
 	})
-{ 
-	
-}
+{ }
 
 void Renderer::Update()
 {
@@ -51,8 +51,15 @@ void Renderer::Update()
 	const float sinOffset = sin(time.count() * .5f),
 		cosOffset = cos(time.count() * .5f),
 		aspectRatio = (float)wndSize.x / wndSize.y;
+	const ivec2 mousePos = input.GetMousePos();
 	const vec2 normMousePos = input.GetNormMousePos(),
 		clipMousePos = 2.0f * normMousePos + vec2(-1, 1);
+
+	std::wstringstream ss;
+	ss << "Space: " << input.GetIsKeyPressed(KbKey::Space)
+		<< "  Mouse: " << mousePos.x << ", " << mousePos.y
+		<< "  MouseNorm: " << normMousePos.x << ", " << normMousePos.y;
+	parent->SetWindowTitle(ss.str().c_str());
 
 	struct
 	{

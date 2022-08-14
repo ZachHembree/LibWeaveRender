@@ -58,7 +58,15 @@ namespace Replica
 			/// </summary>
 			HWND GetWndHandle() const noexcept;
 
+			/// <summary>
+			/// Returns the size of the window's body
+			/// </summary>
 			glm::ivec2 GetSize() const { return size; };
+
+			void SetWindowTitle(LPCWSTR text)
+			{
+				SetWindowTextW(hWnd, text);
+			}
 
 		protected:	
 			static MinWindow* pLastInit;
