@@ -1,3 +1,5 @@
+#include "GfxException.hpp"
+#include <d3d11.h>
 #include "D3D11/BufferBase.hpp"
 #include "D3D11/Device.hpp"
 

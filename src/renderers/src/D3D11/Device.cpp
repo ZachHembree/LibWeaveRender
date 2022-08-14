@@ -57,6 +57,22 @@ void Device::ClearRenderTarget(const ComPtr<ID3D11RenderTargetView>& rtView, vec
 }
 
 /// <summary>
+/// Binds the given viewport to the rasterizer stage
+/// </summary>
+void Device::RSSetViewport(const glm::vec2 size, const glm::vec2 offset, const glm::vec2 depth)
+{
+	D3D11_VIEWPORT vp = {};
+	vp.Width = size.x;
+	vp.Height = size.y;
+	vp.TopLeftX = offset.x;
+	vp.TopLeftY = offset.y;
+	vp.MinDepth = depth.x;
+	vp.MaxDepth = depth.y;
+
+	pContext->RSSetViewports(1, &vp);
+}
+
+/// <summary>
 /// Binds a vertex buffer to the given slot
 /// </summary>
 void Device::IASetVertexBuffer(VertexBuffer& vertBuffer, int slot)
@@ -71,6 +87,24 @@ void Device::IASetVertexBuffer(VertexBuffer& vertBuffer, int slot)
 void Device::IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topology)
 {
 	pContext->IASetPrimitiveTopology(topology);
+}
+
+/// <summary>
+/// Creates layout object that defines the layout of the input for the input 
+/// assembler.
+/// </summary>
+ComPtr<ID3D11InputLayout> Replica::D3D11::Device::CreateInputLayout(const DynamicArrayBase<D3D11_INPUT_ELEMENT_DESC>& layoutDesc, const Microsoft::WRL::ComPtr<ID3DBlob>& vsBlob) const
+{
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> pLayout;
+	pDev->CreateInputLayout(
+		layoutDesc.GetPtr(),
+		(UINT)layoutDesc.GetLength(),
+		vsBlob->GetBufferPointer(),
+		(UINT)vsBlob->GetBufferSize(),
+		&pLayout
+	);
+
+	return pLayout;
 }
 
 /// <summary>
@@ -114,7 +148,7 @@ void Device::VSSetShader(const ComPtr<ID3D11VertexShader>& vertexShader)
 /// Assigns given constant buffer to the given slot
 /// </summary>
 
-void Replica::D3D11::Device::VSSetConstantBuffer(ConstantBuffer& buffer, UINT slot)
+void Device::VSSetConstantBuffer(ConstantBuffer& buffer, UINT slot)
 {
 	pContext->VSSetConstantBuffers(slot, 1, buffer.GetAddressOf());
 }

@@ -1,8 +1,6 @@
 #pragma once
 #include "GfxException.hpp"
 #include <d3d11.h>
-#include <d3dcompiler.h>
-#include <dxgidebug.h>
 #include <wrl.h>
 #include <glm/glm.hpp>
 #include "DynamicCollections.hpp"
@@ -17,6 +15,9 @@ namespace Replica::D3D11
 
 	class Device
 	{
+	template <typename T>
+	using ComPtr = Microsoft::WRL::ComPtr<T>;
+
 	public:
 
 		Device();
@@ -35,28 +36,17 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Creates an RT view for accessing resource data
 		/// </summary>
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> GetRtView(const Microsoft::WRL::ComPtr<ID3D11Resource>& buffer);
+		ComPtr<ID3D11RenderTargetView> GetRtView(const ComPtr<ID3D11Resource>& buffer);
 
 		/// <summary>
 		/// Clears the given render target to the given color
 		/// </summary>
-		void ClearRenderTarget(const Microsoft::WRL::ComPtr<ID3D11RenderTargetView>& rtView, glm::vec4 color);
+		void ClearRenderTarget(const ComPtr<ID3D11RenderTargetView>& rtView, glm::vec4 color);
 
 		/// <summary>
 		/// Binds the given viewport to the rasterizer stage
 		/// </summary>
-		void RSSetViewport(const glm::vec2 size, const glm::vec2 offset = glm::vec2(0, 0), const glm::vec2 depth = glm::vec2(0, 1))
-		{
-			D3D11_VIEWPORT vp = {};
-			vp.Width = size.x;
-			vp.Height = size.y;
-			vp.TopLeftX = offset.x;
-			vp.TopLeftY = offset.y;
-			vp.MinDepth = depth.x;
-			vp.MaxDepth = depth.y;
-
-			pContext->RSSetViewports(1, &vp);
-		}
+		void RSSetViewport(const glm::vec2 size, const glm::vec2 offset = glm::vec2(0, 0), const glm::vec2 depth = glm::vec2(0, 1));
 
 		/// <summary>
 		/// Binds a vertex buffer to the given slot
@@ -72,26 +62,14 @@ namespace Replica::D3D11
 		/// Creates layout object that defines the layout of the input for the input 
 		/// assembler.
 		/// </summary>
-		Microsoft::WRL::ComPtr<ID3D11InputLayout> CreateInputLayout(
+		ComPtr<ID3D11InputLayout> CreateInputLayout(
 			const DynamicArrayBase<D3D11_INPUT_ELEMENT_DESC>& layoutDesc,
-			const Microsoft::WRL::ComPtr<ID3DBlob>& vsBlob) const
-		{
-			Microsoft::WRL::ComPtr<ID3D11InputLayout> pLayout;
-			pDev->CreateInputLayout(
-				layoutDesc.GetPtr(), 
-				layoutDesc.GetLength(), 
-				vsBlob->GetBufferPointer(),
-				vsBlob->GetBufferSize(),
-				&pLayout
-			);
-
-			return pLayout;
-		}
+			const ComPtr<ID3DBlob>& vsBlob) const;
 
 		/// <summary>
 		/// Binds the given input layout to the input assembler
 		/// </summary>
-		void IASetInputLayout(const Microsoft::WRL::ComPtr<ID3D11InputLayout>& vsLayout)
+		void IASetInputLayout(const ComPtr<ID3D11InputLayout>& vsLayout)
 		{
 			pContext->IASetInputLayout(vsLayout.Get());
 		}
@@ -109,12 +87,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Creates a vertex shader object from compiled shader
 		/// </summary>
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> CreateVertexShader(const Microsoft::WRL::ComPtr<ID3DBlob>& vsBlob);
+		ComPtr<ID3D11VertexShader> CreateVertexShader(const ComPtr<ID3DBlob>& vsBlob);
 
 		/// <summary>
 		/// Binds vertex shader to the device 
 		/// </summary>
-		void VSSetShader(const Microsoft::WRL::ComPtr <ID3D11VertexShader>& vertexShader);
+		void VSSetShader(const ComPtr <ID3D11VertexShader>& vertexShader);
 
 		/// <summary>
 		/// Assigns given constant buffer to the given slot
@@ -124,17 +102,17 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Creates a pixel shader object from a compiled shader
 		/// </summary>
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> CreatePixelShader(const Microsoft::WRL::ComPtr<ID3DBlob>& psBlob);
+		ComPtr<ID3D11PixelShader> CreatePixelShader(const ComPtr<ID3DBlob>& psBlob);
 
 		/// <summary>
 		/// Binds pixel shader to the device
 		/// </summary>
-		void PSSetShader(const Microsoft::WRL::ComPtr<ID3D11PixelShader>& pPS);
+		void PSSetShader(const ComPtr<ID3D11PixelShader>& pPS);
 
 		/// <summary>
 		/// Binds the given render target to the output merger
 		/// </summary>
-		void OMSetRenderTarget(Microsoft::WRL::ComPtr<ID3D11RenderTargetView>& pRT);
+		void OMSetRenderTarget(ComPtr<ID3D11RenderTargetView>& pRT);
 
 		/// <summary>
 		/// Draw indexed, non-instanced primitives
@@ -142,8 +120,8 @@ namespace Replica::D3D11
 		void DrawIndexed(UINT length, UINT start = 0, UINT baseVertexLocation = 0);
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D11Device> pDev;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
+		ComPtr<ID3D11Device> pDev;
+		ComPtr<ID3D11DeviceContext> pContext;
 
 	};
 }

@@ -4,8 +4,6 @@
 #include "RepLeanWin.h"
 #include "RepMain.h"
 #include "RepWinException.hpp"
-#include "WindowComponentBase.hpp"
-#include "Input.hpp"
 
 #include <glm/glm.hpp>
 #include "DynamicCollections.hpp"
@@ -13,7 +11,6 @@
 namespace Replica
 {
 	class WindowComponentBase;
-	class MinWindow;
 
 	/// <summary>
 	/// Minimal wrapper class for windows

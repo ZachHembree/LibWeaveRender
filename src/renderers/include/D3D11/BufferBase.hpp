@@ -1,11 +1,7 @@
 #pragma once
-#include "MinWindow.hpp"
-#include "GfxException.hpp"
 #include <d3d11.h>
-#include <d3dcompiler.h>
-#include <dxgidebug.h>
 #include <wrl.h>
-#include <math.h>
+#include "DynamicCollections.hpp"
 
 namespace Replica::D3D11
 {
@@ -84,7 +80,7 @@ namespace Replica::D3D11
 			BufferAccessFlags cpuAccess, 
 			const Device& device, 
 			const DynamicArrayBase<T>& data) :
-			BufferBase(type, usage, cpuAccess, device, data.GetPtr(), data.GetSize())
+			BufferBase(type, usage, cpuAccess, device, data.GetPtr(), (UINT)data.GetSize())
 		{ }
 
 		template<typename T>
@@ -93,7 +89,7 @@ namespace Replica::D3D11
 			BufferAccessFlags cpuAccess,
 			const Device& device, 
 			const std::vector<T>& data) :
-			BufferBase(type, usage, cpuAccess, device, data.data(), data.size() * sizeof(T))
+			BufferBase(type, usage, cpuAccess, device, data.data(), (UINT)(data.size() * sizeof(T)))
 		{ }
 
 		BufferBase(const BufferBase&) = delete;

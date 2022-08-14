@@ -1,4 +1,5 @@
 #include "MinWindow.hpp"
+#include "WindowComponentBase.hpp"
 #include "resource.h"
 
 using namespace glm;

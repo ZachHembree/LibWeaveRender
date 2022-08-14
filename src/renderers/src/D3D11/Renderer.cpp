@@ -1,8 +1,17 @@
-#include "D3D11/Renderer.hpp"
 #include <math.h>
 #include <chrono>
+#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <sstream>
+#include <d3dcompiler.h>
+#include <dxgidebug.h>
+
+#include "DirectXHelpers.h"
+#include "DDSTextureLoader.h"
+#include "WICTextureLoader.h"
+
+#include "MinWindow.hpp"
+#include "D3D11/Renderer.hpp"
 
 using namespace std::chrono;
 using namespace Microsoft::WRL;
