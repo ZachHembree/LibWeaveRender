@@ -7,28 +7,19 @@ using namespace Replica;
 // Has title bar | Has minimize button | Has window menu on its title bar
 const long wndStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 
-HWND InitWindow(const HINSTANCE hInst, const ivec2 size, WNDPROC procPtr, MinWindow* windowPtr);
+MinWindow* MinWindow::pLastInit;
 
 MinWindow::MinWindow(const HINSTANCE hInst, const ivec2 size) :
-	hInst(hInst),
-	hWnd(InitWindow(hInst, size, &HandleWindowSetup, this)),
 	wndMsg(MSG{}),
-	size(size)
-{
-	// Make the window visible
-	ShowWindow(hWnd, SW_SHOW);
-}
-
-/// <summary>
-/// Initialize window registered to this process with the given size and event callback
-/// </summary>
-HWND InitWindow(const HINSTANCE hInst, const ivec2 size, WNDPROC procPtr, MinWindow* windowPtr)
+	size(size),
+	hInst(hInst),
+	hWnd(nullptr)
 {
 	// Setup window descriptor
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_OWNDC; // Own device context
-	wc.lpfnWndProc = procPtr;
+	wc.lpfnWndProc = &HandleWindowSetup;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInst;
@@ -56,9 +47,10 @@ HWND InitWindow(const HINSTANCE hInst, const ivec2 size, WNDPROC procPtr, MinWin
 	if (!AdjustWindowRect(&wr, wndStyle, FALSE))
 		throw REP_EXCEPT_LAST();
 
+	pLastInit = this;
+
 	// Create window instance
-	HWND hWnd = CreateWindowEx(
-		0,
+	hWnd = CreateWindowW(
 		g_Name,
 		g_Name,
 		wndStyle,
@@ -69,20 +61,22 @@ HWND InitWindow(const HINSTANCE hInst, const ivec2 size, WNDPROC procPtr, MinWin
 		wr.bottom - wr.top,
 		nullptr, nullptr,
 		hInst,
-		windowPtr
+		this
 	);
 
 	// Check if window creation failed
 	if (hWnd == NULL)
 		throw REP_EXCEPT_LAST();
 
-	return hWnd;
+	// Make the window visible
+	ShowWindow(hWnd, SW_SHOW);
 }
 
 MinWindow::MinWindow(MinWindow&& other) noexcept :
 	hInst(other.hInst),
 	hWnd(other.hWnd),
-	wndMsg(other.wndMsg)
+	wndMsg(other.wndMsg),
+	size(0)
 {
 	other.hInst = nullptr;
 	other.hWnd = nullptr;
@@ -170,16 +164,22 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		break;
 	}
 
+	for (auto component : components)
+	{
+		component->OnWndMessage(hWnd, msg, wParam, lParam);
+	}
+
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 LRESULT CALLBACK MinWindow::HandleWindowSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (WM_NCCREATE)
+	if (WM_CREATE)
 	{
+		// **BROKEN**
 		// Retrieve custom window pointer from create data
-		const CREATESTRUCT* const data = reinterpret_cast<CREATESTRUCT*>(lParam);
-		MinWindow* wndPtr = static_cast<MinWindow*>(data->lpCreateParams);
+		const CREATESTRUCTW* const pData = reinterpret_cast<CREATESTRUCTW*>(lParam);
+		MinWindow* wndPtr = pLastInit;//static_cast<MinWindow*>(pData->lpCreateParams);
 
 		// Add pointer to user data field
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(wndPtr));

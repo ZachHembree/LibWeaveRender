@@ -20,6 +20,14 @@ namespace Replica
 		/// </summary>
 		virtual void Update() { }
 
+		/// <summary>
+		/// Invoked on WndProc callback
+		/// </summary>
+		virtual void OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { }
+
+		/// <summary>
+		/// Returns true if the component has been registered to a window
+		/// </summary>
 		bool GetIsRegistered();
 
 	protected:

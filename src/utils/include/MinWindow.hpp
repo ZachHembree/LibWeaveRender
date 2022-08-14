@@ -59,7 +59,9 @@ namespace Replica
 
 			glm::ivec2 GetSize() const { return size; };
 
-		protected:		
+		protected:	
+			static MinWindow* pLastInit;
+
 			HINSTANCE hInst;
 			HWND hWnd;
 			MSG wndMsg;
