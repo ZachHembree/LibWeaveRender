@@ -4,6 +4,8 @@
 #include <wrl.h>
 #include <glm/glm.hpp>
 #include "DynamicCollections.hpp"
+#include "D3D11/dev/Formats.hpp"
+#include "UniqueObj.hpp"
 
 namespace Replica::D3D11
 {
@@ -12,13 +14,16 @@ namespace Replica::D3D11
 	class IndexBuffer;
 	class ConstantBuffer;
 	class SwapChain;
+	class InputLayout;
+	struct IAElement;
 
-	class Device
+	class Device : protected UniqueObjBase
 	{
-	template <typename T>
-	using ComPtr = Microsoft::WRL::ComPtr<T>;
-
 	public:
+		template <typename T>
+		using ComPtr = Microsoft::WRL::ComPtr<T>;
+
+		class Child;
 
 		Device();
 
@@ -63,16 +68,13 @@ namespace Replica::D3D11
 		/// assembler.
 		/// </summary>
 		ComPtr<ID3D11InputLayout> CreateInputLayout(
-			const DynamicArrayBase<D3D11_INPUT_ELEMENT_DESC>& layoutDesc,
+			const DynamicArrayBase<IAElement>& layoutDesc,
 			const ComPtr<ID3DBlob>& vsBlob) const;
 
 		/// <summary>
 		/// Binds the given input layout to the input assembler
 		/// </summary>
-		void IASetInputLayout(const ComPtr<ID3D11InputLayout>& vsLayout)
-		{
-			pContext->IASetInputLayout(vsLayout.Get());
-		}
+		void IASetInputLayout(const InputLayout& vsLayout);
 
 		/// <summary>
 		/// Binds an array of buffers starting at the given slot
@@ -92,7 +94,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Binds vertex shader to the device 
 		/// </summary>
-		void VSSetShader(const ComPtr <ID3D11VertexShader>& vertexShader);
+		void VSSetShader(const ComPtr<ID3D11VertexShader>& vertexShader);
 
 		/// <summary>
 		/// Assigns given constant buffer to the given slot

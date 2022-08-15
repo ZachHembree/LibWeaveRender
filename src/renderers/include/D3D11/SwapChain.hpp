@@ -1,6 +1,6 @@
 #pragma once
 #include <dxgi1_2.h>
-#include "D3D11/Device.hpp"
+#include "D3D11/dev/Device.hpp"
 
 namespace Replica
 {

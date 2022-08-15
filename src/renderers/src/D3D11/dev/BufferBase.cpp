@@ -1,11 +1,18 @@
 #include "GfxException.hpp"
 #include <d3d11.h>
-#include "D3D11/BufferBase.hpp"
-#include "D3D11/Device.hpp"
+#include "D3D11/dev/BufferBase.hpp"
+#include "D3D11/dev/Device.hpp"
 
 using namespace Replica::D3D11;
 
-Replica::D3D11::BufferBase::BufferBase(BufferTypes type, BufferUsages usage, BufferAccessFlags cpuAccess, const Device& device, const void* data, const UINT byteSize) :
+Replica::D3D11::BufferBase::BufferBase(
+	BufferTypes type, 
+	BufferUsages usage, 
+	BufferAccessFlags cpuAccess, 
+	const Device& device, 
+	const void* data, 
+	const UINT byteSize
+) :
 	type(type),
 	usage(usage),
 	cpuAccess(cpuAccess)

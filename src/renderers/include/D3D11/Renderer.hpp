@@ -4,11 +4,11 @@
 #include <wrl.h>
 #include "WindowComponentBase.hpp"
 #include "Input.hpp"
-#include "D3D11/VertexBuffer.hpp"
-#include "D3D11/IndexBuffer.hpp"
-#include "D3D11/ConstantBuffer.hpp"
+#include "D3D11/dev/VertexBuffer.hpp"
+#include "D3D11/dev/IndexBuffer.hpp"
+#include "D3D11/dev/ConstantBuffer.hpp"
 #include "D3D11/SwapChain.hpp"
-#include "D3D11/Device.hpp"
+#include "D3D11/dev/Device.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")

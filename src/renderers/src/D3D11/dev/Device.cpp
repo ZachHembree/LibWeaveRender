@@ -1,7 +1,8 @@
-#include "D3D11/Device.hpp"
-#include "D3D11/VertexBuffer.hpp"
-#include "D3D11/IndexBuffer.hpp"
-#include "D3D11/ConstantBuffer.hpp"
+#include "D3D11/dev/Device.hpp"
+#include "D3D11/dev/VertexBuffer.hpp"
+#include "D3D11/dev/IndexBuffer.hpp"
+#include "D3D11/dev/ConstantBuffer.hpp"
+#include "D3D11/dev/InputLayout.hpp"
 #include "D3D11/SwapChain.hpp"
 
 using namespace Microsoft::WRL;
@@ -93,11 +94,14 @@ void Device::IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topology)
 /// Creates layout object that defines the layout of the input for the input 
 /// assembler.
 /// </summary>
-ComPtr<ID3D11InputLayout> Replica::D3D11::Device::CreateInputLayout(const DynamicArrayBase<D3D11_INPUT_ELEMENT_DESC>& layoutDesc, const Microsoft::WRL::ComPtr<ID3DBlob>& vsBlob) const
+ComPtr<ID3D11InputLayout> Device::CreateInputLayout(
+	const DynamicArrayBase<IAElement>& layoutDesc,
+	const Microsoft::WRL::ComPtr<ID3DBlob>& vsBlob
+) const
 {
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> pLayout;
 	pDev->CreateInputLayout(
-		layoutDesc.GetPtr(),
+		reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(layoutDesc.GetPtr()),
 		(UINT)layoutDesc.GetLength(),
 		vsBlob->GetBufferPointer(),
 		(UINT)vsBlob->GetBufferSize(),
@@ -105,6 +109,14 @@ ComPtr<ID3D11InputLayout> Replica::D3D11::Device::CreateInputLayout(const Dynami
 	);
 
 	return pLayout;
+}
+
+/// <summary>
+/// Binds the given input layout to the input assembler
+/// </summary>
+void Device::IASetInputLayout(const InputLayout& vsLayout)
+{
+	pContext->IASetInputLayout(vsLayout.Get());
 }
 
 /// <summary>

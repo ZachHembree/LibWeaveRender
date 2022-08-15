@@ -2,6 +2,7 @@
 #include "RepLeanWin.h"
 #include "RepMain.h"
 #include "RepWinException.hpp"
+#include "UniqueObj.hpp"
 
 namespace Replica
 {
@@ -10,7 +11,7 @@ namespace Replica
 	/// <summary>
 	/// Base class for window components
 	/// </summary>
-	class WindowComponentBase
+	class WindowComponentBase : protected UniqueObjBase
 	{
 	friend MinWindow;
 
@@ -38,13 +39,5 @@ namespace Replica
 
 	private:
 		bool isRegistered;
-
-		WindowComponentBase(const WindowComponentBase&) = delete;
-
-		WindowComponentBase(WindowComponentBase&&) = delete;
-
-		WindowComponentBase& operator=(const WindowComponentBase&) = delete;
-
-		WindowComponentBase& operator=(WindowComponentBase&&) = delete;
 	};
 }

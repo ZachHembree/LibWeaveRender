@@ -33,16 +33,19 @@
     <ClCompile Include="src\renderers\src\D3D11\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderers\src\D3D11\Device.cpp">
+    <ClCompile Include="src\renderers\src\D3D11\dev\Device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderers\src\D3D11\BufferBase.cpp">
+    <ClCompile Include="src\renderers\src\D3D11\dev\BufferBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utils\src\Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\renderers\src\D3D11\SwapChain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderers\src\D3D11\dev\InputLayout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,22 +83,34 @@
     <ClInclude Include="src\utils\include\GfxException.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderers\include\D3D11\BufferBase.hpp">
+    <ClInclude Include="src\renderers\include\D3D11\dev\BufferBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderers\include\D3D11\VertexBuffer.hpp">
+    <ClInclude Include="src\renderers\include\D3D11\dev\VertexBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderers\include\D3D11\IndexBuffer.hpp">
+    <ClInclude Include="src\renderers\include\D3D11\dev\IndexBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderers\include\D3D11\Device.hpp">
+    <ClInclude Include="src\renderers\include\D3D11\dev\Device.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\renderers\include\D3D11\SwapChain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderers\include\D3D11\ConstantBuffer.hpp">
+    <ClInclude Include="src\renderers\include\D3D11\dev\ConstantBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\dev\DeviceChild.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\dev\InputLayout.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\dev\Formats.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\include\UniqueObj.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

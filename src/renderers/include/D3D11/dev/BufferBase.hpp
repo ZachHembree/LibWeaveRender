@@ -2,11 +2,10 @@
 #include <d3d11.h>
 #include <wrl.h>
 #include "DynamicCollections.hpp"
+#include "D3D11/dev/DeviceChild.hpp"
 
 namespace Replica::D3D11
 {
-	class Device;
-
 	/// <summary>
 	/// Specifies how a buffer will be used
 	/// </summary>
@@ -53,7 +52,7 @@ namespace Replica::D3D11
 		Read = D3D11_CPU_ACCESS_READ
 	};
 
-	class BufferBase
+	class BufferBase : public Device::Child
 	{
 	public:
 		const BufferTypes type;
@@ -91,11 +90,6 @@ namespace Replica::D3D11
 			const std::vector<T>& data) :
 			BufferBase(type, usage, cpuAccess, device, data.data(), (UINT)(data.size() * sizeof(T)))
 		{ }
-
-		BufferBase(const BufferBase&) = delete;
-		BufferBase(BufferBase&&) = delete;
-		BufferBase& operator=(const BufferBase&) = delete;
-		BufferBase& operator=(BufferBase&&) = delete;
 
 		void CreateBuffer(const void* data, const UINT byteSize, ID3D11Device* pDevice);
 

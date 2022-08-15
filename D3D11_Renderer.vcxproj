@@ -71,6 +71,14 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -129,6 +137,9 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -139,7 +150,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -151,11 +162,17 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+      <DisableOptimizations>false</DisableOptimizations>
+      <EnableDebuggingInformation>false</EnableDebuggingInformation>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\renderers\src\D3D11\dev\InputLayout.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\SwapChain.cpp" />
-    <ClCompile Include="src\renderers\src\D3D11\BufferBase.cpp" />
-    <ClCompile Include="src\renderers\src\D3D11\Device.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\dev\BufferBase.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\dev\Device.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Renderer.cpp" />
     <ClCompile Include="src\utils\src\Input.cpp" />
     <ClCompile Include="src\utils\src\RepExeption.cpp" />
@@ -165,12 +182,16 @@
     <ClCompile Include="src\utils\src\WindowComponentBase.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\renderers\include\D3D11\BufferBase.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\ConstantBuffer.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\Device.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\dev\BufferBase.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\dev\ConstantBuffer.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\dev\Device.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\dev\DeviceChild.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\dev\Formats.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\dev\InputLayout.hpp" />
+    <ClInclude Include="src\utils\include\UniqueObj.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\SwapChain.hpp" />
     <ClInclude Include="src\utils\include\GfxException.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\IndexBuffer.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\dev\IndexBuffer.hpp" />
     <ClInclude Include="src\utils\include\Input.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Renderer.hpp" />
     <ClInclude Include="src\utils\include\RepLeanWin.h" />
@@ -180,7 +201,7 @@
     <ClInclude Include="src\utils\include\RepWinException.hpp" />
     <ClInclude Include="RepMain.h" />
     <ClInclude Include="src\utils\include\DynamicCollections.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\VertexBuffer.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\dev\VertexBuffer.hpp" />
     <ClInclude Include="src\utils\include\WindowComponentBase.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -196,6 +217,7 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjDir)%(Filename).cso</ObjectFileOutput>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="src\renderers\src\D3D11\shaders\DefaultVertShader.hlsl">
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjDir)%(Filename).cso</ObjectFileOutput>
@@ -203,6 +225,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

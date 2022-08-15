@@ -13,6 +13,7 @@
 
 #include "MinWindow.hpp"
 #include "D3D11/Renderer.hpp"
+#include "D3D11/dev/InputLayout.hpp"
 
 using namespace std::chrono;
 using namespace Microsoft::WRL;
@@ -101,10 +102,6 @@ void Renderer::Update()
 	fquat rot = QuatFromAxis(vec3(0, 1, 0), pi<float>() * normMousePos.x);
 	rot = QuatFromAxis(vec3(0, 0, 1), pi<float>() * normMousePos.y) * rot;
 	model *= toMat4(rot);
-	//model = scale(model, vec3(.75f));
-	
-	//view = translate(view, vec3(clipMousePos, 0.0f));
-	//view = rotate(view, 0.1f * pi<float>() * cosOffset, normalize(vec3(0.25f, 0.5f, 1.0f)));
 
 	// D3D expects row major matrices
 	cBuf.mvp = transpose(proj * view * model);
@@ -127,13 +124,11 @@ void Renderer::Update()
 	device.VSSetShader(device.CreateVertexShader(pBlob));
 
 	// Define position semantic
-	const UniqueArray<D3D11_INPUT_ELEMENT_DESC> layoutDesc =
-	{
-		{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{"Color", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, sizeof(vec3), D3D11_INPUT_PER_VERTEX_DATA, 0}
-	};
-	const ComPtr<ID3D11InputLayout> pIALayout = device.CreateInputLayout(layoutDesc, pBlob);
-	device.IASetInputLayout(pIALayout);
+	const InputLayout layout(device, pBlob, {
+		{ "Position", Formats::R32G32B32_FLOAT },
+		{ "Color", Formats::R8G8B8A8_UNORM },
+	});
+	device.IASetInputLayout(layout);
 
 	// Compile and assign PS
 	D3DReadFileToBlob(L"DefaultPixShader.cso", &pBlob);
