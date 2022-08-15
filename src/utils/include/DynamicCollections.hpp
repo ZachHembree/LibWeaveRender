@@ -87,16 +87,27 @@ namespace Replica
 		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
-		explicit DynamicArrayBase(size_t length) :
+		DynamicArrayBase(size_t length) :
 			length(length),
 			data((length > 0) ? new T[length] : nullptr)
 		{ }
 
 		/// <summary>
 		/// Initializes a new dynamic array object using the given pointer and length.
+		/// Creates a copy.
+		/// </summary>
+		DynamicArrayBase(const T* data, const size_t length) :
+			length(new T[length]),
+			data(data)
+		{ 
+			memcpy(this->data, data, length * sizeof(T));
+		}
+
+		/// <summary>
+		/// Initializes a new dynamic array object using the given pointer and length.
 		/// Takes ownership of the pointer.
 		/// </summary>
-		explicit DynamicArrayBase(T* data, size_t length) :
+		DynamicArrayBase(T*&& data, const size_t length) :
 			length(length),
 			data(data)
 		{ }
@@ -242,16 +253,24 @@ namespace Replica
 		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
-		explicit DynamicArray(size_t length) : 
+		DynamicArray(size_t length) : 
 			DynamicArrayBase<T>(length) 
+		{ }
+
+		/// <summary>
+		/// Initializes a new dynamic array object using the given pointer and length.
+		/// Creates a copy.
+		/// </summary>
+		DynamicArray(const T* data, const size_t length) :
+			DynamicArrayBase<T>(data, length)
 		{ }
 
 		/// <summary>
 		/// Initializes a new dynamic array object using the given pointer and length.
 		/// Takes ownership of the pointer.
 		/// </summary>
-		explicit DynamicArray(T* data, size_t length) : 
-			DynamicArrayBase<T>(data, length) 
+		DynamicArray(T*&& data, const size_t length) :
+			DynamicArrayBase<T>(std::move(data), length) 
 		{ }
 
 		/// <summary>
@@ -327,15 +346,24 @@ namespace Replica
 		/// <summary>
 		/// Initializes a unique array with the given length.
 		/// </summary>
-		explicit UniqueArray(size_t length) :
+		UniqueArray(size_t length) :
 			DynamicArrayBase<T>(length) 
 		{ }
 
 		/// <summary>
-		/// Creates a new unique array using the given pointer and length.
+		/// Initializes a new unique array object using the given pointer and length.
+		/// Creates a copy.
 		/// </summary>
-		explicit UniqueArray(T* data, size_t length) :
-			DynamicArrayBase<T>(data, length) 
+		UniqueArray(const T* data, const size_t length) :
+			DynamicArrayBase<T>(data, length)
+		{ }
+
+		/// <summary>
+		/// Creates a new unique array using the given pointer and length.
+		/// Takes ownership of the pointer.
+		/// </summary>
+		UniqueArray(T*&& data, const size_t length) :
+			DynamicArrayBase<T>(std::move(data), length) 
 		{ }
 
 		/// <summary>

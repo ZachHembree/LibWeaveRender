@@ -95,11 +95,11 @@ void Device::IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topology)
 /// assembler.
 /// </summary>
 ComPtr<ID3D11InputLayout> Device::CreateInputLayout(
-	const DynamicArrayBase<IAElement>& layoutDesc,
-	const Microsoft::WRL::ComPtr<ID3DBlob>& vsBlob
+	const IDynamicCollection<IAElement>& layoutDesc,
+	const ComPtr<ID3DBlob>& vsBlob
 ) const
 {
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> pLayout;
+	ComPtr<ID3D11InputLayout> pLayout;
 	pDev->CreateInputLayout(
 		reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(layoutDesc.GetPtr()),
 		(UINT)layoutDesc.GetLength(),
@@ -122,7 +122,7 @@ void Device::IASetInputLayout(const InputLayout& vsLayout)
 /// <summary>
 /// Binds an array of buffers starting at the given slot
 /// </summary>
-void Device::IASetVertexBuffers(DynamicArrayBase<VertexBuffer>& vertBuffers, int startSlot)
+void Device::IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, int startSlot)
 {
 	for (int i = 0; i < vertBuffers.GetLength(); i++)
 	{

@@ -67,7 +67,7 @@ namespace Replica::D3D11
 		/// assembler.
 		/// </summary>
 		ComPtr<ID3D11InputLayout> CreateInputLayout(
-			const DynamicArrayBase<IAElement>& layoutDesc,
+			const IDynamicCollection<IAElement>& layoutDesc,
 			const ComPtr<ID3DBlob>& vsBlob) const;
 
 		/// <summary>
@@ -78,7 +78,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Binds an array of buffers starting at the given slot
 		/// </summary>
-		void IASetVertexBuffers(DynamicArrayBase<VertexBuffer>& vertBuffers, int startSlot = 0);
+		void IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, int startSlot = 0);
 
 		/// <summary>
 		/// Binds an index buffer to the input assembler. Used with DrawIndexed().
