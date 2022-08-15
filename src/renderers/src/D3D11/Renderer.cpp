@@ -4,8 +4,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <sstream>
-#include <d3dcompiler.h>
-#include <dxgidebug.h>
 
 #include "DirectXHelpers.h"
 #include "DDSTextureLoader.h"
@@ -14,6 +12,8 @@
 #include "MinWindow.hpp"
 #include "D3D11/Renderer.hpp"
 #include "D3D11/dev/InputLayout.hpp"
+#include "D3D11/dev/VertexShader.hpp"
+#include "D3D11/dev/PixelShader.hpp"
 
 using namespace std::chrono;
 using namespace Microsoft::WRL;
@@ -119,20 +119,18 @@ void Renderer::Update()
 	device.IASetIndexBuffer(iBuf);
 
 	// Compile and assign VS
-	ComPtr<ID3DBlob> pBlob;
-	GFX_THROW_FAILED(D3DReadFileToBlob(L"DefaultVertShader.cso", &pBlob));
-	device.VSSetShader(device.CreateVertexShader(pBlob));
-
-	// Define position semantic
-	const InputLayout layout(device, pBlob, {
+	VertexShader vs(device, L"DefaultVertShader.cso", 
+	{
 		{ "Position", Formats::R32G32B32_FLOAT },
 		{ "Color", Formats::R8G8B8A8_UNORM },
 	});
-	device.IASetInputLayout(layout);
+
+	device.VSSetShader(vs);
+	device.IASetInputLayout(vs.GetLayout());
 
 	// Compile and assign PS
-	D3DReadFileToBlob(L"DefaultPixShader.cso", &pBlob);
-	device.PSSetShader(device.CreatePixelShader(pBlob));
+	PixelShader ps(device, L"DefaultPixShader.cso");
+	device.PSSetShader(ps.Get());
 	
 	// Set viewport bounds
 	device.RSSetViewport(ivec2(640, 480));

@@ -14,6 +14,7 @@ namespace Replica::D3D11
 	class ConstantBuffer;
 	class SwapChain;
 	class InputLayout;
+	class VertexShader;
 	struct IAElement;
 
 	class Device : protected UniqueObjBase
@@ -63,14 +64,6 @@ namespace Replica::D3D11
 		void IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topology);
 
 		/// <summary>
-		/// Creates layout object that defines the layout of the input for the input 
-		/// assembler.
-		/// </summary>
-		ComPtr<ID3D11InputLayout> CreateInputLayout(
-			const IDynamicCollection<IAElement>& layoutDesc,
-			const ComPtr<ID3DBlob>& vsBlob) const;
-
-		/// <summary>
 		/// Binds the given input layout to the input assembler
 		/// </summary>
 		void IASetInputLayout(const InputLayout& vsLayout);
@@ -86,24 +79,14 @@ namespace Replica::D3D11
 		void IASetIndexBuffer(IndexBuffer& idxBuf);
 
 		/// <summary>
-		/// Creates a vertex shader object from compiled shader
-		/// </summary>
-		ComPtr<ID3D11VertexShader> CreateVertexShader(const ComPtr<ID3DBlob>& vsBlob);
-
-		/// <summary>
 		/// Binds vertex shader to the device 
 		/// </summary>
-		void VSSetShader(const ComPtr<ID3D11VertexShader>& vertexShader);
+		void VSSetShader(const VertexShader& vs);
 
 		/// <summary>
 		/// Assigns given constant buffer to the given slot
 		/// </summary>
 		void VSSetConstantBuffer(ConstantBuffer& buffer, UINT slot = 0);
-
-		/// <summary>
-		/// Creates a pixel shader object from a compiled shader
-		/// </summary>
-		ComPtr<ID3D11PixelShader> CreatePixelShader(const ComPtr<ID3DBlob>& psBlob);
 
 		/// <summary>
 		/// Binds pixel shader to the device

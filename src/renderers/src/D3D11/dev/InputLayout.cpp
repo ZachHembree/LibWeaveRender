@@ -3,12 +3,32 @@
 using namespace Replica::D3D11;
 using namespace Microsoft::WRL;
 
+InputLayout::InputLayout() noexcept { }
+
+InputLayout::InputLayout(InputLayout&& other) noexcept :
+	pLayout(std::move(other.pLayout))
+{ }
+
+InputLayout& InputLayout::operator=(InputLayout&& other) noexcept
+{
+	this->pLayout = std::move(other.pLayout);
+	return *this;
+}
+
 InputLayout::InputLayout(const Device& dev, 
 	const ComPtr<ID3DBlob>& vsBlob, 
 	const std::initializer_list<IAElement>& layout
-) :
-	pLayout(dev.CreateInputLayout(UniqueArray(layout), vsBlob))
-{ }
+)
+{ 
+	UniqueArray desc(layout);
+	dev.Get()->CreateInputLayout(
+		reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(desc.GetPtr()),
+		(UINT)desc.GetLength(),
+		vsBlob->GetBufferPointer(),
+		(UINT)vsBlob->GetBufferSize(),
+		&pLayout
+	);
+}
 
 ID3D11InputLayout* InputLayout::Get() const { return pLayout.Get(); };
 

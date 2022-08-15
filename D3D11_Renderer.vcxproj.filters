@@ -48,6 +48,12 @@
     <ClCompile Include="src\renderers\src\D3D11\dev\InputLayout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\renderers\src\D3D11\dev\VertexShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderers\src\D3D11\dev\PixelShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\utils\include\RepLeanWin.h">
@@ -111,6 +117,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utils\include\UniqueObj.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\dev\VertexShader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\dev\PixelShader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

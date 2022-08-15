@@ -3,6 +3,7 @@
 #include "D3D11/dev/IndexBuffer.hpp"
 #include "D3D11/dev/ConstantBuffer.hpp"
 #include "D3D11/dev/InputLayout.hpp"
+#include "D3D11/dev/VertexShader.hpp"
 #include "D3D11/SwapChain.hpp"
 
 using namespace Microsoft::WRL;
@@ -91,27 +92,6 @@ void Device::IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topology)
 }
 
 /// <summary>
-/// Creates layout object that defines the layout of the input for the input 
-/// assembler.
-/// </summary>
-ComPtr<ID3D11InputLayout> Device::CreateInputLayout(
-	const IDynamicCollection<IAElement>& layoutDesc,
-	const ComPtr<ID3DBlob>& vsBlob
-) const
-{
-	ComPtr<ID3D11InputLayout> pLayout;
-	pDev->CreateInputLayout(
-		reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(layoutDesc.GetPtr()),
-		(UINT)layoutDesc.GetLength(),
-		vsBlob->GetBufferPointer(),
-		(UINT)vsBlob->GetBufferSize(),
-		&pLayout
-	);
-
-	return pLayout;
-}
-
-/// <summary>
 /// Binds the given input layout to the input assembler
 /// </summary>
 void Device::IASetInputLayout(const InputLayout& vsLayout)
@@ -139,21 +119,11 @@ void Device::IASetIndexBuffer(IndexBuffer& idxBuf)
 }
 
 /// <summary>
-/// Creates a vertex shader object from compiled shader
-/// </summary>
-ComPtr<ID3D11VertexShader> Device::CreateVertexShader(const ComPtr<ID3DBlob>& vsBlob)
-{
-	ComPtr<ID3D11VertexShader> pVS;
-	GFX_THROW_FAILED(pDev->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &pVS));
-	return pVS;
-}
-
-/// <summary>
 /// Binds vertex shader to the device 
 /// </summary>
-void Device::VSSetShader(const ComPtr<ID3D11VertexShader>& vertexShader)
+void Device::VSSetShader(const VertexShader& vs)
 {
-	pContext->VSSetShader(vertexShader.Get(), nullptr, 0);
+	pContext->VSSetShader(vs.Get(), nullptr, 0);
 }
 
 /// <summary>
@@ -163,16 +133,6 @@ void Device::VSSetShader(const ComPtr<ID3D11VertexShader>& vertexShader)
 void Device::VSSetConstantBuffer(ConstantBuffer& buffer, UINT slot)
 {
 	pContext->VSSetConstantBuffers(slot, 1, buffer.GetAddressOf());
-}
-
-/// <summary>
-/// Creates a pixel shader object from a compiled shader
-/// </summary>
-ComPtr<ID3D11PixelShader> Device::CreatePixelShader(const ComPtr<ID3DBlob>& psBlob)
-{
-	ComPtr<ID3D11PixelShader> pPS;
-	GFX_THROW_FAILED(pDev->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pPS));
-	return pPS;
 }
 
 /// <summary>

@@ -10,15 +10,24 @@ namespace Replica::D3D11
 	class InputLayout : public Device::Child
 	{
 	public:
+		/// <summary>
+		/// Constructs layout definition associated with given shader bytecode
+		/// </summary>
 		InputLayout(const Device& dev, 
 			const Microsoft::WRL::ComPtr<ID3DBlob>& vsBlob,
 			const std::initializer_list<IAElement>& layout
 		);
 
 		/// <summary>
-		/// Returns pointer to COM layout interface
+		/// Returns pointer to COM layout interface. Null if uninitialized.
 		/// </summary>
 		ID3D11InputLayout* Get() const;
+
+		InputLayout() noexcept;
+
+		InputLayout(InputLayout&& other) noexcept;
+
+		InputLayout& operator=(InputLayout&& other) noexcept;
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> pLayout;
