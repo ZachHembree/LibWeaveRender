@@ -9,15 +9,16 @@ Replica::D3D11::BufferBase::BufferBase(
 	BufferTypes type, 
 	BufferUsages usage, 
 	BufferAccessFlags cpuAccess, 
-	const Device& device, 
+	const Device& dev, 
 	const void* data, 
 	const UINT byteSize
 ) :
+	Child(&dev),
 	type(type),
 	usage(usage),
 	cpuAccess(cpuAccess)
 {
-	CreateBuffer(data, byteSize, device.Get());
+	CreateBuffer(data, byteSize, dev.Get());
 }
 
 void Replica::D3D11::BufferBase::CreateBuffer(const void* data, const UINT byteSize, ID3D11Device* pDevice)

@@ -3,7 +3,6 @@
 #include "MinWindow.hpp"
 #include "D3D11/SwapChain.hpp"
 
-using namespace Microsoft::WRL;
 using namespace Replica::D3D11;
 
 SwapChain::SwapChain(const MinWindow& wnd, Device& dev)

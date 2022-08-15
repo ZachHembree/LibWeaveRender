@@ -5,7 +5,7 @@ using namespace Replica::D3D11;
 using namespace Microsoft::WRL;
 
 VertexShader::VertexShader(const Device& dev, const LPCWSTR file, const std::initializer_list<IAElement>& layout) :
-	pDev(&dev)
+	Child(&dev)
 {
 	ComPtr<ID3DBlob> vsBlob;
 	GFX_THROW_FAILED(D3DReadFileToBlob(file, &vsBlob));

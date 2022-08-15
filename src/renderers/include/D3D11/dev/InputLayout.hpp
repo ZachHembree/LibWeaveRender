@@ -36,7 +36,6 @@ namespace Replica::D3D11
 		void Bind();
 
 	private:
-		const Device* pDev;
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> pLayout;
 	};
 

@@ -110,12 +110,9 @@ void Renderer::Update()
 
 	// Create and assign constant bufer
 	ConstantBuffer cb(device, cBuf);
-	device.VSSetConstantBuffer(cb);
-
-	// Assign vertex buffer to first slot
-	device.IASetVertexBuffer(vBuf);
-	// Assign index buffer
-	device.IASetIndexBuffer(iBuf);
+	cb.Bind();
+	vBuf.Bind();
+	iBuf.Bind();
 
 	// Compile and assign VS
 	VertexShader vs(device, L"DefaultVertShader.cso", 

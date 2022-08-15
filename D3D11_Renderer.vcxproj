@@ -169,6 +169,9 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\renderers\src\D3D11\dev\ConstantBuffer.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\dev\VertexBuffer.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\dev\IndexBuffer.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\PixelShader.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\VertexShader.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\InputLayout.cpp" />

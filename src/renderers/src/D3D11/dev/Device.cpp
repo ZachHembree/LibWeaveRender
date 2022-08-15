@@ -6,7 +6,6 @@
 #include "D3D11/dev/VertexShader.hpp"
 #include "D3D11/SwapChain.hpp"
 
-using namespace Microsoft::WRL;
 using namespace glm;
 using namespace Replica;
 using namespace Replica::D3D11;
@@ -26,7 +25,7 @@ Device::Device()
 		&pContext
 	));
 
-	IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	IASetPrimitiveTopology(PrimTopology::TRIANGLELIST);
 }
 
 /// <summary>
@@ -61,7 +60,7 @@ void Device::ClearRenderTarget(const ComPtr<ID3D11RenderTargetView>& rtView, vec
 /// <summary>
 /// Binds the given viewport to the rasterizer stage
 /// </summary>
-void Device::RSSetViewport(const glm::vec2 size, const glm::vec2 offset, const glm::vec2 depth)
+void Device::RSSetViewport(const vec2 size, const vec2 offset, const vec2 depth)
 {
 	D3D11_VIEWPORT vp = {};
 	vp.Width = size.x;
@@ -86,9 +85,9 @@ void Device::IASetVertexBuffer(VertexBuffer& vertBuffer, int slot)
 /// <summary>
 /// Determines how vertices are interpreted by the input assembler
 /// </summary>
-void Device::IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topology)
+void Device::IASetPrimitiveTopology(PrimTopology topology)
 {
-	pContext->IASetPrimitiveTopology(topology);
+	pContext->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)topology);
 }
 
 /// <summary>
@@ -100,23 +99,6 @@ void Device::IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, i
 	{
 		IASetVertexBuffer(vertBuffers[i], startSlot + i);
 	}
-}
-
-/// <summary>
-/// Binds an index buffer to the input assembler. Used with DrawIndexed().
-/// </summary>
-void Device::IASetIndexBuffer(IndexBuffer& idxBuf)
-{
-	pContext->IASetIndexBuffer(idxBuf.Get(), DXGI_FORMAT_R16_UINT, 0);
-}
-
-/// <summary>
-/// Assigns given constant buffer to the given slot
-/// </summary>
-
-void Device::VSSetConstantBuffer(ConstantBuffer& buffer, UINT slot)
-{
-	pContext->VSSetConstantBuffers(slot, 1, buffer.GetAddressOf());
 }
 
 /// <summary>

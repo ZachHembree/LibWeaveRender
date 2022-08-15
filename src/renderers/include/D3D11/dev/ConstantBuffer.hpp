@@ -13,7 +13,12 @@ namespace Replica::D3D11
 			BufferBase(BufferTypes::Constant, BufferUsages::Dynamic, BufferAccessFlags::Write, device, &data, (UINT)sizeof(T))
 		{ }
 
-	private:
+		/// <summary>
+		/// Assigns the constant buffer to the given slot
+		/// </summary>
+		void Bind(UINT slot = 0);
 
+	private:
+		
 	};
 }

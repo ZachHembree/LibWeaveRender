@@ -11,12 +11,18 @@ namespace Replica::D3D11
 			const Device& device,
 			const IDynamicCollection<USHORT>& data,
 			BufferUsages usage = BufferUsages::Default,
-			BufferAccessFlags cpuAccess = BufferAccessFlags::None) :
-			count((UINT)data.GetLength()),
-			BufferBase(BufferTypes::Index, usage, cpuAccess, device, data)
-		{ }
+			BufferAccessFlags cpuAccess = BufferAccessFlags::None
+		);
 
-		UINT GetLength() { return count; }
+		/// <summary>
+		/// Returns the number of elements in the buffer
+		/// </summary>
+		UINT GetLength() const;
+
+		/// <summary>
+		/// Binds an index buffer to the input assembler. Used with DrawIndexed().
+		/// </summary>
+		void Bind(UINT offset = 0);
 
 	private:
 		UINT count;
