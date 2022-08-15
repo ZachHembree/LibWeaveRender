@@ -11,10 +11,13 @@ namespace Replica::D3D11
 
 		ID3D11VertexShader* Get() const;
 
+		void Bind();
+
 		const InputLayout& GetLayout() const;
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> pVS;
+		const Device* pDev;
 		InputLayout layout;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> pVS;
 	};
 }

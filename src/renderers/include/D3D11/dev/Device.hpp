@@ -64,11 +64,6 @@ namespace Replica::D3D11
 		void IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topology);
 
 		/// <summary>
-		/// Binds the given input layout to the input assembler
-		/// </summary>
-		void IASetInputLayout(const InputLayout& vsLayout);
-
-		/// <summary>
 		/// Binds an array of buffers starting at the given slot
 		/// </summary>
 		void IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, int startSlot = 0);
@@ -79,19 +74,9 @@ namespace Replica::D3D11
 		void IASetIndexBuffer(IndexBuffer& idxBuf);
 
 		/// <summary>
-		/// Binds vertex shader to the device 
-		/// </summary>
-		void VSSetShader(const VertexShader& vs);
-
-		/// <summary>
 		/// Assigns given constant buffer to the given slot
 		/// </summary>
 		void VSSetConstantBuffer(ConstantBuffer& buffer, UINT slot = 0);
-
-		/// <summary>
-		/// Binds pixel shader to the device
-		/// </summary>
-		void PSSetShader(const ComPtr<ID3D11PixelShader>& pPS);
 
 		/// <summary>
 		/// Binds the given render target to the output merger

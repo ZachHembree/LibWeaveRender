@@ -10,6 +10,13 @@ namespace Replica::D3D11
 	class InputLayout : public Device::Child
 	{
 	public:
+
+		InputLayout() noexcept;
+
+		InputLayout(InputLayout&& other) noexcept;
+
+		InputLayout& operator=(InputLayout&& other) noexcept;
+
 		/// <summary>
 		/// Constructs layout definition associated with given shader bytecode
 		/// </summary>
@@ -23,13 +30,13 @@ namespace Replica::D3D11
 		/// </summary>
 		ID3D11InputLayout* Get() const;
 
-		InputLayout() noexcept;
-
-		InputLayout(InputLayout&& other) noexcept;
-
-		InputLayout& operator=(InputLayout&& other) noexcept;
+		/// <summary>
+		/// Binds the layout to the input assembler for the associated context
+		/// </summary>
+		void Bind();
 
 	private:
+		const Device* pDev;
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> pLayout;
 	};
 

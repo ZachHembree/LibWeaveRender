@@ -4,7 +4,8 @@
 using namespace Replica::D3D11;
 using namespace Microsoft::WRL;
 
-VertexShader::VertexShader(const Device& dev, const LPCWSTR file, const std::initializer_list<IAElement>& layout)
+VertexShader::VertexShader(const Device& dev, const LPCWSTR file, const std::initializer_list<IAElement>& layout) :
+	pDev(&dev)
 {
 	ComPtr<ID3DBlob> vsBlob;
 	GFX_THROW_FAILED(D3DReadFileToBlob(file, &vsBlob));
@@ -16,3 +17,9 @@ VertexShader::VertexShader(const Device& dev, const LPCWSTR file, const std::ini
 ID3D11VertexShader* VertexShader::Get() const { return pVS.Get(); }
 
 const InputLayout& VertexShader::GetLayout() const { return layout; }
+
+void VertexShader::Bind()
+{
+	pDev->GetContext()->VSSetShader(Get(), nullptr, 0);
+	layout.Bind();
+}

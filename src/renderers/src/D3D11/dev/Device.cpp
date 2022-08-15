@@ -92,14 +92,6 @@ void Device::IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topology)
 }
 
 /// <summary>
-/// Binds the given input layout to the input assembler
-/// </summary>
-void Device::IASetInputLayout(const InputLayout& vsLayout)
-{
-	pContext->IASetInputLayout(vsLayout.Get());
-}
-
-/// <summary>
 /// Binds an array of buffers starting at the given slot
 /// </summary>
 void Device::IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, int startSlot)
@@ -119,28 +111,12 @@ void Device::IASetIndexBuffer(IndexBuffer& idxBuf)
 }
 
 /// <summary>
-/// Binds vertex shader to the device 
-/// </summary>
-void Device::VSSetShader(const VertexShader& vs)
-{
-	pContext->VSSetShader(vs.Get(), nullptr, 0);
-}
-
-/// <summary>
 /// Assigns given constant buffer to the given slot
 /// </summary>
 
 void Device::VSSetConstantBuffer(ConstantBuffer& buffer, UINT slot)
 {
 	pContext->VSSetConstantBuffers(slot, 1, buffer.GetAddressOf());
-}
-
-/// <summary>
-/// Binds pixel shader to the device
-/// </summary>
-void Device::PSSetShader(const ComPtr<ID3D11PixelShader>& pPS)
-{
-	pContext->PSSetShader(pPS.Get(), nullptr, 0);
 }
 
 /// <summary>

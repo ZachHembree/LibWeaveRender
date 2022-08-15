@@ -11,7 +11,6 @@
 
 #include "MinWindow.hpp"
 #include "D3D11/Renderer.hpp"
-#include "D3D11/dev/InputLayout.hpp"
 #include "D3D11/dev/VertexShader.hpp"
 #include "D3D11/dev/PixelShader.hpp"
 
@@ -124,13 +123,11 @@ void Renderer::Update()
 		{ "Position", Formats::R32G32B32_FLOAT },
 		{ "Color", Formats::R8G8B8A8_UNORM },
 	});
-
-	device.VSSetShader(vs);
-	device.IASetInputLayout(vs.GetLayout());
+	vs.Bind();
 
 	// Compile and assign PS
 	PixelShader ps(device, L"DefaultPixShader.cso");
-	device.PSSetShader(ps.Get());
+	ps.Bind();
 	
 	// Set viewport bounds
 	device.RSSetViewport(ivec2(640, 480));

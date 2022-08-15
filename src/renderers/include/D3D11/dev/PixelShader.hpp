@@ -10,7 +10,13 @@ namespace Replica::D3D11
 
 		ID3D11PixelShader* Get() const;
 
+		/// <summary>
+		/// Binds the pixel shader to the context associated with the device
+		/// </summary>
+		void Bind();
+
 	private:
+		const Device* pDev;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> pPS;
 	};
 }
