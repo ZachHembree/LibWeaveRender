@@ -1,27 +1,32 @@
+#include "DynamicCollections.hpp"
 #include "D3D11/dev/InputLayout.hpp"
+#include "D3D11/dev/Device.hpp"
 
 using namespace Replica::D3D11;
 using namespace Microsoft::WRL;
 
-InputLayout::InputLayout() noexcept : Child(nullptr) { }
+InputLayout::InputLayout() noexcept : DeviceChild(nullptr) { }
 
 InputLayout::InputLayout(InputLayout&& other) noexcept :
-	Child(other.pDev),
+	DeviceChild(other.pDev),
 	pLayout(std::move(other.pLayout))
-{ }
+{
+	other.pDev = nullptr;
+}
 
 InputLayout& InputLayout::operator=(InputLayout&& other) noexcept
 {
 	this->pLayout = std::move(other.pLayout);
 	this->pDev = other.pDev;
+	other.pDev = nullptr;
 
 	return *this;
 }
 
-InputLayout::InputLayout(const Device& dev, 
+InputLayout::InputLayout(Device& dev, 
 	const ComPtr<ID3DBlob>& vsBlob, 
 	const std::initializer_list<IAElement>& layout
-) : Child(&dev)
+) : DeviceChild(&dev)
 { 
 	UniqueArray desc(layout);
 	dev.Get()->CreateInputLayout(
@@ -37,7 +42,7 @@ ID3D11InputLayout* InputLayout::Get() const { return pLayout.Get(); };
 
 void InputLayout::Bind()
 {
-	pDev->GetContext()->IASetInputLayout(Get());
+	pDev->GetContext().Get()->IASetInputLayout(Get());
 }
 
 IAElement::IAElement(LPCSTR semantic,

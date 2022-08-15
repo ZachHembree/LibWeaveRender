@@ -8,7 +8,7 @@ namespace Replica::D3D11
 	public:
 
 		IndexBuffer(
-			const Device& device,
+			Device& device,
 			const IDynamicCollection<USHORT>& data,
 			BufferUsages usage = BufferUsages::Default,
 			BufferAccessFlags cpuAccess = BufferAccessFlags::None

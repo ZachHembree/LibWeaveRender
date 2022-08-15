@@ -4,10 +4,10 @@
 
 namespace Replica::D3D11
 { 
-	class VertexShader : public Device::Child
+	class VertexShader : public DeviceChild
 	{
 	public:
-		VertexShader(const Device& dev, const LPCWSTR file, const std::initializer_list<IAElement>& layout);
+		VertexShader(Device& dev, const LPCWSTR file, const std::initializer_list<IAElement>& layout);
 
 		ID3D11VertexShader* Get() const;
 

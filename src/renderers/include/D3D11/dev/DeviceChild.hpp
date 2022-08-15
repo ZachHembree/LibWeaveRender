@@ -1,10 +1,12 @@
 #pragma once
-#include "D3D11/dev/Device.hpp"
-#include "UniqueObj.hpp"
+#include "D3D11/D3DUtils.hpp"
+#include <d3d11.h>
 
 namespace Replica::D3D11
 {
-	class Device::Child : protected UniqueObjBase
+	class Device;
+
+	class DeviceChild : protected UniqueObjBase
 	{
 	public:
 		/// <summary>
@@ -13,9 +15,9 @@ namespace Replica::D3D11
 		const Device* GetDevice() { return pDev; }
 
 	protected:
-		const Device* pDev;
+		Device* pDev;
 
-		Child(const Device* pDev) : pDev(pDev) { }
+		DeviceChild(Device* pDev) : pDev(pDev) { }
 
 	};
 }

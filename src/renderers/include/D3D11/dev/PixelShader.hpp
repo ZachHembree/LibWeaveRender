@@ -3,10 +3,10 @@
 
 namespace Replica::D3D11
 {
-	class PixelShader : public Device::Child
+	class PixelShader : public DeviceChild
 	{
 	public:
-		PixelShader(const Device& dev, const LPCWSTR file);
+		PixelShader(Device& dev, const LPCWSTR file);
 
 		ID3D11PixelShader* Get() const;
 

@@ -1,4 +1,4 @@
-#include "GfxException.hpp"
+#include "D3D11/D3DUtils.hpp"
 #include <d3d11.h>
 #include "D3D11/dev/BufferBase.hpp"
 #include "D3D11/dev/Device.hpp"
@@ -9,11 +9,11 @@ Replica::D3D11::BufferBase::BufferBase(
 	BufferTypes type, 
 	BufferUsages usage, 
 	BufferAccessFlags cpuAccess, 
-	const Device& dev, 
+	Device& dev, 
 	const void* data, 
 	const UINT byteSize
 ) :
-	Child(&dev),
+	DeviceChild(&dev),
 	type(type),
 	usage(usage),
 	cpuAccess(cpuAccess)

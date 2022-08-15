@@ -1,6 +1,5 @@
 #pragma once
 #include <d3d11.h>
-#include <wrl.h>
 #include "DynamicCollections.hpp"
 #include "D3D11/dev/DeviceChild.hpp"
 
@@ -52,7 +51,7 @@ namespace Replica::D3D11
 		Read = D3D11_CPU_ACCESS_READ
 	};
 
-	class BufferBase : public Device::Child
+	class BufferBase : public DeviceChild
 	{
 	public:
 		const BufferTypes type;
@@ -69,7 +68,7 @@ namespace Replica::D3D11
 		BufferBase(BufferTypes type, 
 			BufferUsages usage, 
 			BufferAccessFlags cpuAccess, 
-			const Device& device, 
+			Device& device, 
 			const void* data, 
 			const UINT byteSize);
 
@@ -77,7 +76,7 @@ namespace Replica::D3D11
 		BufferBase(BufferTypes type, 
 			BufferUsages usage, 
 			BufferAccessFlags cpuAccess, 
-			const Device& device, 
+			Device& device, 
 			const IDynamicCollection<T>& data) :
 			BufferBase(type, usage, cpuAccess, device, data.GetPtr(), (UINT)data.GetSize())
 		{ }

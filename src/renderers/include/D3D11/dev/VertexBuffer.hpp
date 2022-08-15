@@ -10,7 +10,7 @@ namespace Replica::D3D11
 
 		template<typename T>
 		VertexBuffer(
-			const Device& device,
+			Device& device,
 			const IDynamicCollection<T>& data,
 			BufferUsages usage = BufferUsages::Default, 
 			BufferAccessFlags cpuAccess = BufferAccessFlags::None) :

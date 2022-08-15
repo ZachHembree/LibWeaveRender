@@ -1,13 +1,16 @@
 #pragma once
 #include "D3D11/dev/DeviceChild.hpp"
 #include "D3D11/dev/Formats.hpp"
+#include "DynamicCollections.hpp"
 
 namespace Replica::D3D11
 {
+	struct IAElement;
+
 	/// <summary>
 	/// Defines the layout of vertex data supplied to the input-assembler
 	/// </summary>
-	class InputLayout : public Device::Child
+	class InputLayout : public DeviceChild
 	{
 	public:
 
@@ -20,7 +23,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Constructs layout definition associated with given shader bytecode
 		/// </summary>
-		InputLayout(const Device& dev, 
+		InputLayout(Device& dev, 
 			const Microsoft::WRL::ComPtr<ID3DBlob>& vsBlob,
 			const std::initializer_list<IAElement>& layout
 		);

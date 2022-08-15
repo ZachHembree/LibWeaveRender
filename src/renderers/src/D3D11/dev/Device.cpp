@@ -1,10 +1,4 @@
 #include "D3D11/dev/Device.hpp"
-#include "D3D11/dev/VertexBuffer.hpp"
-#include "D3D11/dev/IndexBuffer.hpp"
-#include "D3D11/dev/ConstantBuffer.hpp"
-#include "D3D11/dev/InputLayout.hpp"
-#include "D3D11/dev/VertexShader.hpp"
-#include "D3D11/SwapChain.hpp"
 
 using namespace glm;
 using namespace Replica;
@@ -12,6 +6,7 @@ using namespace Replica::D3D11;
 
 Device::Device()
 {
+	ComPtr<ID3D11DeviceContext> pContext;
 	GFX_THROW_FAILED(D3D11CreateDevice(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
@@ -25,18 +20,19 @@ Device::Device()
 		&pContext
 	));
 
-	IASetPrimitiveTopology(PrimTopology::TRIANGLELIST);
+	context = Context(this, pContext);
+	context.IASetPrimitiveTopology(PrimTopology::TRIANGLELIST);
 }
 
 /// <summary>
 /// Returns pointer to COM device interface
 /// </summary>
-ID3D11Device* Device::Get() const { return pDev.Get(); }
+ID3D11Device* Device::Get() { return pDev.Get(); }
 
 /// <summary>
-/// Returns pointer to COM device context interface
+/// Returns reference to device context
 /// </summary>
-ID3D11DeviceContext* Device::GetContext() const { return pContext.Get(); }
+Context& Device::GetContext() { return this->context; }
 
 /// <summary>
 /// Creates an RT view for accessing resource data
@@ -47,72 +43,4 @@ ComPtr<ID3D11RenderTargetView> Device::GetRtView(const ComPtr<ID3D11Resource>& b
 	GFX_THROW_FAILED(pDev->CreateRenderTargetView(buffer.Get(), nullptr, &pRtView));
 
 	return pRtView;
-}
-
-/// <summary>
-/// Clears the given render target to the given color
-/// </summary>
-void Device::ClearRenderTarget(const ComPtr<ID3D11RenderTargetView>& rtView, vec4 color)
-{
-	pContext->ClearRenderTargetView(rtView.Get(), reinterpret_cast<float*>(&color));
-}
-
-/// <summary>
-/// Binds the given viewport to the rasterizer stage
-/// </summary>
-void Device::RSSetViewport(const vec2 size, const vec2 offset, const vec2 depth)
-{
-	D3D11_VIEWPORT vp = {};
-	vp.Width = size.x;
-	vp.Height = size.y;
-	vp.TopLeftX = offset.x;
-	vp.TopLeftY = offset.y;
-	vp.MinDepth = depth.x;
-	vp.MaxDepth = depth.y;
-
-	pContext->RSSetViewports(1, &vp);
-}
-
-/// <summary>
-/// Binds a vertex buffer to the given slot
-/// </summary>
-void Device::IASetVertexBuffer(VertexBuffer& vertBuffer, int slot)
-{
-	UINT offset = 0;
-	pContext->IASetVertexBuffers(slot, 1, vertBuffer.GetAddressOf(), &vertBuffer.stride, &offset);
-}
-
-/// <summary>
-/// Determines how vertices are interpreted by the input assembler
-/// </summary>
-void Device::IASetPrimitiveTopology(PrimTopology topology)
-{
-	pContext->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)topology);
-}
-
-/// <summary>
-/// Binds an array of buffers starting at the given slot
-/// </summary>
-void Device::IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, int startSlot)
-{
-	for (int i = 0; i < vertBuffers.GetLength(); i++)
-	{
-		IASetVertexBuffer(vertBuffers[i], startSlot + i);
-	}
-}
-
-/// <summary>
-/// Binds the given render target to the output merger
-/// </summary>
-void Device::OMSetRenderTarget(ComPtr<ID3D11RenderTargetView>& pRT)
-{
-	pContext->OMSetRenderTargets(1, pRT.GetAddressOf(), nullptr);
-}
-
-/// <summary>
-/// Draw indexed, non-instanced primitives
-/// </summary>
-void Device::DrawIndexed(UINT length, UINT start, UINT baseVertexLocation)
-{
-	pContext->DrawIndexed(length, start, baseVertexLocation);
 }

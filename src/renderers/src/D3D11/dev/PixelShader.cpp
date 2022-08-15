@@ -1,11 +1,12 @@
-#include "D3D11/dev/PixelShader.hpp"
 #include <d3dcompiler.h>
+#include "D3D11/dev/PixelShader.hpp"
+#include "D3D11/dev/Device.hpp"
 
 using namespace Replica::D3D11;
 using namespace Microsoft::WRL;
 
-PixelShader::PixelShader(const Device& dev, const LPCWSTR file) :
-	Child(&dev)
+PixelShader::PixelShader(Device& dev, const LPCWSTR file) :
+	DeviceChild(&dev)
 {
 	ComPtr<ID3DBlob> psBlob;
 	GFX_THROW_FAILED(D3DReadFileToBlob(file, &psBlob));
@@ -19,5 +20,5 @@ ID3D11PixelShader* PixelShader::Get() const
 
 void PixelShader::Bind()
 {
-	pDev->GetContext()->PSSetShader(Get(), nullptr, 0);
+	pDev->GetContext().Get()->PSSetShader(Get(), nullptr, 0);
 }

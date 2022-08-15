@@ -1,4 +1,5 @@
 #include "D3D11/dev/ConstantBuffer.hpp"
+#include "D3D11/dev/Device.hpp"
 
 using namespace Replica::D3D11;
 
@@ -7,5 +8,5 @@ using namespace Replica::D3D11;
 /// </summary>
 void ConstantBuffer::Bind(UINT slot)
 {
-	pDev->GetContext()->VSSetConstantBuffers(slot, 1, pBuf.GetAddressOf());
+	pDev->GetContext().Get()->VSSetConstantBuffers(slot, 1, pBuf.GetAddressOf());
 }

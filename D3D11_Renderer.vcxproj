@@ -169,6 +169,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\renderers\src\D3D11\dev\Context.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\ConstantBuffer.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\VertexBuffer.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\IndexBuffer.cpp" />
@@ -187,8 +188,10 @@
     <ClCompile Include="src\utils\src\WindowComponentBase.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\renderers\include\D3D11\D3DUtils.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\BufferBase.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\ConstantBuffer.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\dev\Context.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\Device.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\DeviceChild.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\Formats.hpp" />

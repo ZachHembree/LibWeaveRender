@@ -77,6 +77,7 @@ void Renderer::Update()
 	const ivec2 mousePos = input.GetMousePos();
 	const vec2 normMousePos = input.GetNormMousePos(),
 		clipMousePos = 2.0f * normMousePos + vec2(-1, 1);
+	Context& ctx = device.GetContext();
 
 	std::wstringstream ss;
 	ss << "Space: " << input.GetIsKeyPressed(KbKey::Space)
@@ -106,7 +107,7 @@ void Renderer::Update()
 	cBuf.mvp = transpose(proj * view * model);
 
 	// Clear back buffer to color specified
-	device.ClearRenderTarget(pBackBufView, vec4(0));
+	ctx.ClearRenderTarget(pBackBufView, vec4(0));
 
 	// Create and assign constant bufer
 	ConstantBuffer cb(device, cBuf);
@@ -127,12 +128,12 @@ void Renderer::Update()
 	ps.Bind();
 	
 	// Set viewport bounds
-	device.RSSetViewport(ivec2(640, 480));
+	ctx.RSSetViewport(ivec2(640, 480));
 
 	// Bind back buffer as render target
-	device.OMSetRenderTarget(pBackBufView);
+	ctx.OMSetRenderTarget(pBackBufView);
 
-	device.DrawIndexed((UINT)iBuf.GetLength());
+	ctx.DrawIndexed((UINT)iBuf.GetLength());
 
 	// Present frame
 	swap.Present(1u, 0);
