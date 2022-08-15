@@ -10,11 +10,8 @@ namespace Replica::D3D11
 	class InputLayout : public Device::Child
 	{
 	public:
-		template <typename T>
-		using ComPtr = Microsoft::WRL::ComPtr<T>;
-
 		InputLayout(const Device& dev, 
-			const ComPtr<ID3DBlob>& vsBlob, 
+			const Microsoft::WRL::ComPtr<ID3DBlob>& vsBlob,
 			const std::initializer_list<IAElement>& layout
 		);
 
@@ -24,7 +21,7 @@ namespace Replica::D3D11
 		ID3D11InputLayout* Get() const;
 
 	private:
-		ComPtr<ID3D11InputLayout> pLayout;
+		Microsoft::WRL::ComPtr<ID3D11InputLayout> pLayout;
 	};
 
 	/// <summary>

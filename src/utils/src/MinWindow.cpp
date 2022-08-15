@@ -133,7 +133,7 @@ MSG MinWindow::RunMessageLoop()
 {
 	while (PollWindowMessages())
 	{
-		for (int i = 0; i < components.size(); i++)
+		for (int i = 0; i < components.GetLength(); i++)
 		{
 			components[i]->Update();
 		}

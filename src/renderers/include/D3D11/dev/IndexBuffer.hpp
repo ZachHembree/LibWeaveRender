@@ -9,19 +9,10 @@ namespace Replica::D3D11
 
 		IndexBuffer(
 			const Device& device,
-			const DynamicArrayBase<USHORT>& data,
+			const IDynamicCollection<USHORT>& data,
 			BufferUsages usage = BufferUsages::Default,
 			BufferAccessFlags cpuAccess = BufferAccessFlags::None) :
 			count((UINT)data.GetLength()),
-			BufferBase(BufferTypes::Index, usage, cpuAccess, device, data)
-		{ }
-
-		IndexBuffer(
-			const Device& device,
-			const std::vector<USHORT>& data,
-			BufferUsages usage = BufferUsages::Default,
-			BufferAccessFlags cpuAccess = BufferAccessFlags::None) :
-			count((UINT)data.size()),
 			BufferBase(BufferTypes::Index, usage, cpuAccess, device, data)
 		{ }
 

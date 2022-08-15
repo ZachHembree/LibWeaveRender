@@ -11,21 +11,10 @@ namespace Replica::D3D11
 		template<typename T>
 		VertexBuffer(
 			const Device& device,
-			const DynamicArrayBase<T>& data,
+			const IDynamicCollection<T>& data,
 			BufferUsages usage = BufferUsages::Default, 
 			BufferAccessFlags cpuAccess = BufferAccessFlags::None) :
 			count((UINT)data.GetLength()),
-			stride((UINT)sizeof(T)),
-			BufferBase(BufferTypes::Vertex, usage, cpuAccess, device, data)
-		{ }
-
-		template<typename T>
-		VertexBuffer(
-			const Device& device,
-			const std::vector<T>& data,
-			BufferUsages usage = BufferUsages::Default,
-			BufferAccessFlags cpuAccess = BufferAccessFlags::None) :
-			count((UINT)data.size()),
 			stride((UINT)sizeof(T)),
 			BufferBase(BufferTypes::Vertex, usage, cpuAccess, device, data)
 		{ }

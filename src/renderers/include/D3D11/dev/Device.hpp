@@ -4,7 +4,6 @@
 #include <wrl.h>
 #include <glm/glm.hpp>
 #include "DynamicCollections.hpp"
-#include "D3D11/dev/Formats.hpp"
 #include "UniqueObj.hpp"
 
 namespace Replica::D3D11

@@ -78,17 +78,8 @@ namespace Replica::D3D11
 			BufferUsages usage, 
 			BufferAccessFlags cpuAccess, 
 			const Device& device, 
-			const DynamicArrayBase<T>& data) :
+			const IDynamicCollection<T>& data) :
 			BufferBase(type, usage, cpuAccess, device, data.GetPtr(), (UINT)data.GetSize())
-		{ }
-
-		template<typename T>
-		BufferBase(BufferTypes type, 
-			BufferUsages usage, 
-			BufferAccessFlags cpuAccess,
-			const Device& device, 
-			const std::vector<T>& data) :
-			BufferBase(type, usage, cpuAccess, device, data.data(), (UINT)(data.size() * sizeof(T)))
 		{ }
 
 		void CreateBuffer(const void* data, const UINT byteSize, ID3D11Device* pDevice);

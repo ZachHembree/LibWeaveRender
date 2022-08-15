@@ -12,10 +12,48 @@ namespace Replica
 	template<typename T> class UniqueArray;
 
 	/// <summary>
+	/// Interface template for dynamic arrays/vectors
+	/// </summary>
+	template<typename T>
+	class IDynamicCollection
+	{
+	public:
+		/// <summary>
+		/// Returns the length of the array.
+		/// </summary>
+		virtual size_t GetLength() const = 0;
+
+		/// <summary>
+		/// Returns the size of the array in bytes
+		/// </summary>
+		virtual size_t GetSize() const = 0;
+
+		/// <summary>
+		/// Provides indexed access to array member references.
+		/// </summary>
+		virtual T& operator[](size_t index) = 0;
+
+		/// <summary>
+		/// Provides indexed access to array members using constant references.
+		/// </summary>
+		virtual const T& operator[](size_t index) const = 0;
+
+		/// <summary>
+		/// Returns a copy of the pointer to the backing the array.
+		/// </summary>
+		virtual T* GetPtr() = 0;
+
+		/// <summary>
+		/// Returns a const copy of the pointer to the backing the array.
+		/// </summary>
+		virtual const T* GetPtr() const = 0;
+	};
+
+	/// <summary>
 	/// Dynamically allocated array with members of type T and a fixed length.
 	/// </summary>
 	template<typename T>
-	class DynamicArrayBase
+	class DynamicArrayBase : public IDynamicCollection<T>
 	{
 	protected:
 		/// <summary>
@@ -51,11 +89,12 @@ namespace Replica
 		/// </summary>
 		explicit DynamicArrayBase(size_t length) :
 			length(length),
-			data(new T[length])
+			data((length > 0) ? new T[length] : nullptr)
 		{ }
 
 		/// <summary>
 		/// Initializes a new dynamic array object using the given pointer and length.
+		/// Takes ownership of the pointer.
 		/// </summary>
 		explicit DynamicArrayBase(T* data, size_t length) :
 			length(length),
@@ -127,17 +166,17 @@ namespace Replica
 		/// <summary>
 		/// Returns the length of the array.
 		/// </summary>
-		size_t GetLength() const { return length; }
+		size_t GetLength() const override { return length; }
 
 		/// <summary>
 		/// Returns the size of the array in bytes
 		/// </summary>
-		size_t GetSize() const { return length * sizeof(T); }
+		size_t GetSize() const override { return length * sizeof(T); }
 
 		/// <summary>
 		/// Provides indexed access to array member references.
 		/// </summary>
-		T& operator[](size_t index)
+		T& operator[](size_t index) override
 		{
 	#if _CONTAINER_DEBUG_LEVEL > 0
 			if (index >= length)
@@ -155,7 +194,7 @@ namespace Replica
 		/// <summary>
 		/// Provides indexed access to array members using constant references.
 		/// </summary>
-		const T& operator[](size_t index) const
+		const T& operator[](size_t index) const override
 		{
 	#if _CONTAINER_DEBUG_LEVEL > 0
 			if (index >= length)
@@ -173,12 +212,12 @@ namespace Replica
 		/// <summary>
 		/// Returns a copy of the pointer to the backing the array.
 		/// </summary>
-		T* GetPtr() { return data; }
+		T* GetPtr() override { return data; }
 
 		/// <summary>
 		/// Returns a const copy of the pointer to the backing the array.
 		/// </summary>
-		const T* GetPtr() const { return data; }
+		const T* GetPtr() const override { return data; }
 	};
 
 	/// <summary>
@@ -209,6 +248,7 @@ namespace Replica
 
 		/// <summary>
 		/// Initializes a new dynamic array object using the given pointer and length.
+		/// Takes ownership of the pointer.
 		/// </summary>
 		explicit DynamicArray(T* data, size_t length) : 
 			DynamicArrayBase<T>(data, length) 
@@ -338,65 +378,115 @@ namespace Replica
 	};
 
 	/// <summary>
-	/// Move-only wrapper for std::vector(T)
+	/// Vector{T} implementing IDynamicCollection{T}
 	/// </summary>
 	template<typename T>
-	class UniqueVector : public std::vector<T>
+	class Vector : public IDynamicCollection<T>, private std::vector<T>
+	{
+	public:
+		using std::vector<T>::push_back;
+		using std::vector<T>::emplace_back;
+		using std::vector<T>::pop_back;
+		using std::vector<T>::begin;
+		using std::vector<T>::end;
+		using std::vector<T>::max_size;
+		using std::vector<T>::resize;
+		using std::vector<T>::capacity;
+		using std::vector<T>::empty;
+		using std::vector<T>::reserve;
+		using std::vector<T>::shrink_to_fit;
+
+		/// <summary>
+		/// Returns the length of the vector.
+		/// </summary>
+		size_t GetLength() const override { return this->size(); }
+
+		/// <summary>
+		/// Returns the size of the vector in bytes
+		/// </summary>
+		size_t GetSize() const override { return this->size() * sizeof(T); }
+
+		/// <summary>
+		/// Returns a copy of the pointer to the backing the vector.
+		/// </summary>
+		T* GetPtr() override { return this->data(); }
+
+		/// <summary>
+		/// Returns a const copy of the pointer to the backing the vector.
+		/// </summary>
+		const T* GetPtr() const override { return this->data(); }
+
+		/// <summary>
+		/// Provides indexed access to vector member references.
+		/// </summary>
+		T& operator[](size_t index) override { return this->at(index); }
+
+		/// <summary>
+		/// Provides indexed access to vector members using constant references.
+		/// </summary>
+		const T& operator[](size_t index) const override { return this->at(index); }
+	};
+
+	/// <summary>
+	/// Move-only wrapper for Replica::Vector(T)
+	/// </summary>
+	template<typename T>
+	class UniqueVector : public Vector<T>
 	{
 	private:
 		/// <summary>
 		/// Initializes a new copy of the given unique vector.
 		/// </summary>
 		UniqueVector(const UniqueVector& rhs) : 
-			std::vector<T>(rhs) 
+			Vector<T>(rhs)
 		{ };
-
-	public:
-		/// <summary>
-		/// Initializes a new unique vector.
-		/// </summary>
-		UniqueVector() : 
-			std::vector<T>() 
-		{ }
-
-		/// <summary>
-		/// Initializes a new unique vector from an initializer list.
-		/// </summary>
-		UniqueVector(const std::initializer_list<T>& initializerList) noexcept :
-			std::vector<T>(initializerList)
-		{ }
-
-		/// <summary>
-		/// Initializes a new unique vector with the given capacity.
-		/// </summary>
-		explicit UniqueVector(size_t capacity) : 
-			std::vector<T>(capacity) 
-		{ }
-
-		/// <summary>
-		/// Initializes a new vector by moving the contents the given vector into itself.
-		/// </summary>
-		UniqueVector(UniqueVector&& rhs) noexcept :
-			std::vector<T>(std::move(rhs))
-		{ }
-
-		/// <summary>
-		/// Initializes a new unique vector by moving the contents the given std::vector into itself.
-		/// </summary>
-		explicit UniqueVector(std::vector<T>&& rhs) noexcept :
-			std::vector<T>(std::move(rhs)) 
-		{ }
 
 		/// <summary>
 		/// Copy assignment operator. Disabled.
 		/// </summary>
 		UniqueVector& operator=(const UniqueVector& rhs) = delete;
 
+	public:
+		/// <summary>
+		/// Initializes a new unique vector.
+		/// </summary>
+		UniqueVector() : 
+			Vector<T>() 
+		{ }
+
+		/// <summary>
+		/// Initializes a new unique vector from an initializer list.
+		/// </summary>
+		UniqueVector(const std::initializer_list<T>& initializerList) noexcept :
+			Vector<T>(initializerList)
+		{ }
+
+		/// <summary>
+		/// Initializes a new unique vector with the given capacity.
+		/// </summary>
+		explicit UniqueVector(size_t capacity) : 
+			Vector<T>(capacity)
+		{ }
+
+		/// <summary>
+		/// Initializes a new vector by moving the contents the given vector into itself.
+		/// </summary>
+		UniqueVector(UniqueVector&& rhs) noexcept :
+			Vector<T>(std::move(rhs))
+		{ }
+
+		/// <summary>
+		/// Initializes a new unique vector by moving the contents the given Vector into itself.
+		/// </summary>
+		explicit UniqueVector(Vector<T>&& rhs) noexcept :
+			Vector<T>(std::move(rhs))
+		{ }
+
 		/// <summary>
 		/// Move assignment operator.
 		/// </summary>
 		UniqueVector& operator=(UniqueVector&& rhs) noexcept
-		{ return static_cast<UniqueVector&>(std::vector<T>::operator=(std::move(rhs))); }
+		{ return static_cast<UniqueVector&>(Vector<T>::operator=(std::move(rhs))); }
 
 		/// <summary>
 		/// Returns a new copy of the unique vector.
