@@ -16,7 +16,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Assigns the constant buffer to the given slot
 		/// </summary>
-		void Bind(UINT slot = 0);
+		void Bind(Context& ctx, UINT slot = 0);
 
 	private:
 		

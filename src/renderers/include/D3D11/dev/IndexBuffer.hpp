@@ -22,7 +22,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Binds an index buffer to the input assembler. Used with DrawIndexed().
 		/// </summary>
-		void Bind(UINT offset = 0);
+		void Bind(Context& ctx, UINT offset = 0);
 
 	private:
 		UINT count;

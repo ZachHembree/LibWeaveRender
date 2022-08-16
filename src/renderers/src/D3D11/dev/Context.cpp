@@ -40,14 +40,6 @@ Context& Context::operator=(Context&& other) noexcept
 ID3D11DeviceContext* Context::Get() const { return pContext.Get(); }
 
 /// <summary>
-/// Clears the given render target to the given color
-/// </summary>
-void Context::ClearRenderTarget(const ComPtr<ID3D11RenderTargetView>& rtView, vec4 color)
-{
-	pContext->ClearRenderTargetView(rtView.Get(), reinterpret_cast<float*>(&color));
-}
-
-/// <summary>
 /// Binds the given viewport to the rasterizer stage
 /// </summary>
 void Context::RSSetViewport(const vec2 size, const vec2 offset, const vec2 depth)
@@ -89,14 +81,6 @@ void Context::IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, 
 	{
 		IASetVertexBuffer(vertBuffers[i], startSlot + i);
 	}
-}
-
-/// <summary>
-/// Binds the given render target to the output merger
-/// </summary>
-void Context::OMSetRenderTarget(ComPtr<ID3D11RenderTargetView>& pRT)
-{
-	pContext->OMSetRenderTargets(1, pRT.GetAddressOf(), nullptr);
 }
 
 /// <summary>

@@ -6,7 +6,7 @@ using namespace Replica::D3D11;
 /// <summary>
 /// Assigns the constant buffer to the given slot
 /// </summary>
-void ConstantBuffer::Bind(UINT slot)
+void ConstantBuffer::Bind(Context& ctx, UINT slot)
 {
-	pDev->GetContext().Get()->VSSetConstantBuffers(slot, 1, pBuf.GetAddressOf());
+	ctx.Get()->VSSetConstantBuffers(slot, 1, GetAddressOf());
 }

@@ -2,12 +2,14 @@
 #include <wrl.h>
 #include "MinWindow.hpp"
 #include "D3D11/SwapChain.hpp"
+#include "D3D11/dev/RenderTarget.hpp"
 
 using namespace Replica::D3D11;
 
-SwapChain::SwapChain(const MinWindow& wnd, Device& dev)
+SwapChain::SwapChain(const MinWindow& wnd, Device* pDev) :
+	pDev(pDev)
 {
-	Microsoft::WRL::ComPtr<IDXGIFactory2> dxgiFactory;
+	ComPtr<IDXGIFactory2> dxgiFactory;
 	GFX_THROW_FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory2), &dxgiFactory));
 
 	DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsDesc = {};
@@ -32,7 +34,7 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev)
 	swapDesc.Flags = 0;
 
 	GFX_THROW_FAILED(dxgiFactory->CreateSwapChainForHwnd(
-		dev.Get(),
+		pDev->Get(),
 		wnd.GetWndHandle(),
 		&swapDesc,
 		&fsDesc,
@@ -44,12 +46,12 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev)
 /// <summary>
 /// Returns interface to swap chain buffer at the given index
 /// </summary>
-ComPtr<ID3D11Resource> SwapChain::GetBuffer(int index)
+RenderTarget SwapChain::GetBuffer(int index)
 {
-	Microsoft::WRL::ComPtr<ID3D11Resource> buf;
-	GFX_THROW_FAILED(pSwap->GetBuffer(index, __uuidof(ID3D11Resource), &buf));
+	ID3D11Resource* pRes;
+	GFX_THROW_FAILED(pSwap->GetBuffer(index, __uuidof(ID3D11Resource), (void**)&pRes));
 
-	return buf;
+	return RenderTarget(pDev, pRes);
 }
 
 /// <summary>

@@ -18,7 +18,7 @@ ID3D11PixelShader* PixelShader::Get() const
 	return pPS.Get();
 }
 
-void PixelShader::Bind()
+void PixelShader::Bind(Context& ctx)
 {
-	pDev->GetContext().Get()->PSSetShader(Get(), nullptr, 0);
+	ctx.Get()->PSSetShader(Get(), nullptr, 0);
 }

@@ -169,6 +169,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\renderers\include\D3D11\dev\RenderTarget.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\Context.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\ConstantBuffer.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\VertexBuffer.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="src\renderers\include\D3D11\dev\Formats.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\InputLayout.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\PixelShader.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\dev\RenderTarget.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\VertexShader.hpp" />
     <ClInclude Include="src\utils\include\UniqueObj.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\SwapChain.hpp" />

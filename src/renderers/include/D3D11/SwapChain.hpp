@@ -9,10 +9,12 @@ namespace Replica
 
 namespace Replica::D3D11
 {
+	class RenderTarget;
+
 	class SwapChain
 	{
 	public:
-		SwapChain(const MinWindow& wnd, Device& dev);
+		SwapChain(const MinWindow& wnd, Device* dev);
 
 		IDXGISwapChain1* Get() { return pSwap.Get(); }
 
@@ -21,7 +23,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns interface to swap chain buffer at the given index
 		/// </summary>
-		Microsoft::WRL::ComPtr<ID3D11Resource> GetBuffer(int index);
+		RenderTarget GetBuffer(int index);
 
 		/// <summary>
 		/// Presents rendered image with the given synchronization settings
@@ -29,7 +31,8 @@ namespace Replica::D3D11
 		void Present(UINT syncInterval, UINT flags);
 
 	private:
-		Microsoft::WRL::ComPtr<IDXGISwapChain1> pSwap;
+		Device* pDev;
+		ComPtr<IDXGISwapChain1> pSwap;
 
 	};
 }

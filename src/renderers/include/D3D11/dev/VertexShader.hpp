@@ -11,8 +11,14 @@ namespace Replica::D3D11
 
 		ID3D11VertexShader* Get() const;
 
-		void Bind();
+		/// <summary>
+		/// Binds the vertex shader to the given context
+		/// </summary>
+		void Bind(Context& ctx);
 
+		/// <summary>
+		/// Returns reference to vertex input layout
+		/// </summary>
 		const InputLayout& GetLayout() const;
 
 	private:

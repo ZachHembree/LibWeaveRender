@@ -19,8 +19,8 @@ ID3D11VertexShader* VertexShader::Get() const { return pVS.Get(); }
 
 const InputLayout& VertexShader::GetLayout() const { return layout; }
 
-void VertexShader::Bind()
+void VertexShader::Bind(Context& ctx)
 {
-	pDev->GetContext().Get()->VSSetShader(Get(), nullptr, 0);
+	ctx.Get()->VSSetShader(Get(), nullptr, 0);
 	layout.Bind();
 }

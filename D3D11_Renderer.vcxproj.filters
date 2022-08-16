@@ -66,6 +66,9 @@
     <ClCompile Include="src\renderers\src\D3D11\dev\Context.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\renderers\include\D3D11\dev\RenderTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\utils\include\RepLeanWin.h">
@@ -141,6 +144,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\renderers\include\D3D11\D3DUtils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\dev\RenderTarget.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

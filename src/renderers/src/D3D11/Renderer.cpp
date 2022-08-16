@@ -24,8 +24,8 @@ using namespace Replica::D3D11;
 struct Vertex
 {
 public:
-	vec3 pos;
-	tvec4<byte> color;
+	D3D11::vec3 pos;
+	D3D11::tvec4<byte> color;
 };
 
 fquat QuatFromAxis(vec3 axis, float rad)
@@ -45,8 +45,8 @@ Renderer::Renderer(MinWindow* window) :
 	WindowComponentBase(window),
 	input(window),
 	device(), // Create device and context
-	swap(*window, device), // Create swap chain for window
-	pBackBufView(device.GetRtView(swap.GetBuffer(0))), // Get RT view for swap chain back buf
+	swap(*window, &device), // Create swap chain for window
+	backBuf(swap.GetBuffer(0)), // Get RT view for swap chain back buf
 	vBuf(device, UniqueArray<Vertex>{
 		{ { -1.0, -1.0, -1.0 }, { 255, 0, 0, 255 } },
 		{ { 1.0, -1.0, -1.0 }, { 0, 255, 0, 255 } },
@@ -78,7 +78,7 @@ void Renderer::Update()
 	const vec2 normMousePos = input.GetNormMousePos(),
 		clipMousePos = 2.0f * normMousePos + vec2(-1, 1);
 	Context& ctx = device.GetContext();
-
+	
 	std::wstringstream ss;
 	ss << "Space: " << input.GetIsKeyPressed(KbKey::Space)
 		<< "  Mouse: " << mousePos.x << ", " << mousePos.y
@@ -106,14 +106,14 @@ void Renderer::Update()
 	// D3D expects row major matrices
 	cBuf.mvp = transpose(proj * view * model);
 
-	// Clear back buffer to color specified
-	ctx.ClearRenderTarget(pBackBufView, vec4(0));
+	// Clear back buffer
+	backBuf.Clear(ctx);
 
 	// Create and assign constant bufer
 	ConstantBuffer cb(device, cBuf);
-	cb.Bind();
-	vBuf.Bind();
-	iBuf.Bind();
+	cb.Bind(ctx);
+	vBuf.Bind(ctx);
+	iBuf.Bind(ctx);
 
 	// Compile and assign VS
 	VertexShader vs(device, L"DefaultVertShader.cso", 
@@ -121,17 +121,17 @@ void Renderer::Update()
 		{ "Position", Formats::R32G32B32_FLOAT },
 		{ "Color", Formats::R8G8B8A8_UNORM },
 	});
-	vs.Bind();
+	vs.Bind(ctx);
 
 	// Compile and assign PS
 	PixelShader ps(device, L"DefaultPixShader.cso");
-	ps.Bind();
+	ps.Bind(ctx);
 	
 	// Set viewport bounds
 	ctx.RSSetViewport(ivec2(640, 480));
 
 	// Bind back buffer as render target
-	ctx.OMSetRenderTarget(pBackBufView);
+	backBuf.Bind(ctx);
 
 	ctx.DrawIndexed((UINT)iBuf.GetLength());
 

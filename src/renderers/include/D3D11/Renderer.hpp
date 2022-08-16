@@ -9,6 +9,7 @@
 #include "D3D11/dev/ConstantBuffer.hpp"
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/dev/Device.hpp"
+#include "D3D11/dev/RenderTarget.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -39,7 +40,7 @@ namespace Replica::D3D11
 		InputComponent input;
 		Device device;
 		SwapChain swap;
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pBackBufView;
+		RenderTarget backBuf;
 
 		VertexBuffer vBuf;
 		IndexBuffer iBuf;

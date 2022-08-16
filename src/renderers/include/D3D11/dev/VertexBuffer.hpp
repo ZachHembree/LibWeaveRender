@@ -27,7 +27,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Binds the vertex buffer to the given slot
 		/// </summary>
-		void Bind(UINT slot = 0u, UINT offset = 0u);
+		void Bind(Context& ctx, UINT slot = 0u, UINT offset = 0u);
 
 	private:
 		const UINT count;

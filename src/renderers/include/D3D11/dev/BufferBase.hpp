@@ -58,12 +58,12 @@ namespace Replica::D3D11
 		const BufferUsages usage;
 		const BufferAccessFlags cpuAccess;
 
-		ID3D11Buffer* Get() const { return pBuf.Get(); }
+		ID3D11Buffer* Get() { return pBuf.Get(); };
 
-		ID3D11Buffer** GetAddressOf() { return pBuf.GetAddressOf(); }
+		ID3D11Buffer** GetAddressOf() { return pBuf.GetAddressOf(); };
 
 	protected:
-		Microsoft::WRL::ComPtr<ID3D11Buffer> pBuf;
+		ComPtr<ID3D11Buffer> pBuf;
 
 		BufferBase(BufferTypes type, 
 			BufferUsages usage, 

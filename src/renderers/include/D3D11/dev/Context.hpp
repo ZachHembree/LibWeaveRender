@@ -1,6 +1,7 @@
 #pragma once
 #include "D3D11/D3DUtils.hpp"
 #include "D3D11/dev/DeviceChild.hpp"
+#include "DynamicCollections.hpp"
 
 namespace Replica::D3D11
 {
@@ -81,11 +82,6 @@ namespace Replica::D3D11
 		ID3D11DeviceContext* Get() const;
 
 		/// <summary>
-		/// Clears the given render target to the given color
-		/// </summary>
-		void ClearRenderTarget(const ComPtr<ID3D11RenderTargetView>& rtView, vec4 color);
-
-		/// <summary>
 		/// Binds the given viewport to the rasterizer stage
 		/// </summary>
 		void RSSetViewport(const vec2 size, const vec2 offset = vec2(0, 0), const vec2 depth = vec2(0, 1));
@@ -104,11 +100,6 @@ namespace Replica::D3D11
 		/// Binds an array of buffers starting at the given slot
 		/// </summary>
 		void IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, int startSlot = 0);
-
-		/// <summary>
-		/// Binds the given render target to the output merger
-		/// </summary>
-		void OMSetRenderTarget(ComPtr<ID3D11RenderTargetView>& pRT);
 
 		/// <summary>
 		/// Draw indexed, non-instanced primitives

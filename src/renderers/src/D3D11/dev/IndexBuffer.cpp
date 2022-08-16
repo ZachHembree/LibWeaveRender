@@ -21,7 +21,7 @@ UINT IndexBuffer::GetLength() const { return count; }
 /// <summary>
 /// Binds an index buffer to the input assembler. Used with DrawIndexed().
 /// </summary>
-void IndexBuffer::Bind(UINT offset)
+void IndexBuffer::Bind(Context& ctx, UINT offset)
 {
-	pDev->GetContext().Get()->IASetIndexBuffer(pBuf.Get(), (DXGI_FORMAT)Formats::R16_UINT, offset);
+	ctx.Get()->IASetIndexBuffer(Get(), (DXGI_FORMAT)Formats::R16_UINT, offset);
 }
