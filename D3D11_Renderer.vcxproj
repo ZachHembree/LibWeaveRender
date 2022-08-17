@@ -131,11 +131,12 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)src\renderers\include;$(ProjectDir)src\utils\include;$(ProjectDir);$(ProjectDir)src;$(ProjectDir)src\libs;%(AdditionalIncludeDirectories);$(ProjectDir)src\libs;$(ProjectDir)src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)src\renderers\include;$(ProjectDir)src\utils\include;$(ProjectDir);$(ProjectDir)src;$(ProjectDir)src\libs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -161,6 +162,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -169,9 +171,11 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\renderers\include\D3D11\dev\RenderTarget.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\dev\RenderTarget.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\Context.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\ConstantBuffer.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\dev\Sampler.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\dev\Texture2D.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\VertexBuffer.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\IndexBuffer.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\PixelShader.cpp" />
@@ -199,6 +203,8 @@
     <ClInclude Include="src\renderers\include\D3D11\dev\InputLayout.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\PixelShader.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\RenderTarget.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\dev\Sampler.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\dev\Texture2D.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\VertexShader.hpp" />
     <ClInclude Include="src\utils\include\UniqueObj.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\SwapChain.hpp" />
@@ -218,6 +224,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon.ico" />
+    <Image Include="lena_color_512.png" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ReplicaRenderer.rc" />
@@ -247,6 +254,7 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\Microsoft.XAudio2.Redist.1.2.9\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('..\packages\Microsoft.XAudio2.Redist.1.2.9\build\native\Microsoft.XAudio2.Redist.targets')" />
     <Import Project="..\packages\directxtk_desktop_2019.2022.7.30.1\build\native\directxtk_desktop_2019.targets" Condition="Exists('..\packages\directxtk_desktop_2019.2022.7.30.1\build\native\directxtk_desktop_2019.targets')" />
+    <Import Project="..\packages\directxtex_desktop_2019.2022.7.30.1\build\native\directxtex_desktop_2019.targets" Condition="Exists('..\packages\directxtex_desktop_2019.2022.7.30.1\build\native\directxtex_desktop_2019.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -254,5 +262,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.XAudio2.Redist.1.2.9\build\native\Microsoft.XAudio2.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.XAudio2.Redist.1.2.9\build\native\Microsoft.XAudio2.Redist.targets'))" />
     <Error Condition="!Exists('..\packages\directxtk_desktop_2019.2022.7.30.1\build\native\directxtk_desktop_2019.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2019.2022.7.30.1\build\native\directxtk_desktop_2019.targets'))" />
+    <Error Condition="!Exists('..\packages\directxtex_desktop_2019.2022.7.30.1\build\native\directxtex_desktop_2019.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtex_desktop_2019.2022.7.30.1\build\native\directxtex_desktop_2019.targets'))" />
   </Target>
 </Project>

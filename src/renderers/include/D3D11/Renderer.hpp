@@ -10,10 +10,13 @@
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/dev/Device.hpp"
 #include "D3D11/dev/RenderTarget.hpp"
+#include "D3D11/dev/Texture2D.hpp"
+#include "D3D11/dev/Sampler.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
 #pragma comment(lib, "Dxgi.lib")
+#pragma comment(lib, "runtimeobject.lib")
 
 namespace Replica
 {
@@ -44,5 +47,7 @@ namespace Replica::D3D11
 
 		VertexBuffer vBuf;
 		IndexBuffer iBuf;
+		Texture2D testTex;
+		Sampler testSamp;
 	};
 }

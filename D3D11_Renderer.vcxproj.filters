@@ -66,7 +66,13 @@
     <ClCompile Include="src\renderers\src\D3D11\dev\Context.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderers\include\D3D11\dev\RenderTarget.cpp">
+    <ClCompile Include="src\renderers\src\D3D11\dev\RenderTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderers\src\D3D11\dev\Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderers\src\D3D11\dev\Sampler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -149,9 +155,18 @@
     <ClInclude Include="src\renderers\include\D3D11\dev\RenderTarget.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\dev\Texture2D.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\dev\Sampler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="lena_color_512.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

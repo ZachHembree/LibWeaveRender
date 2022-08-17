@@ -6,11 +6,16 @@
 using namespace glm;
 using namespace Replica;
 using namespace Replica::D3D11;
+using namespace Microsoft::WRL;
 
 int CALLBACK WinMain(HINSTANCE hInst, HINSTANCE, LPSTR lpCMdLine, int nCmdShow)
 {
 	try
 	{
+		// Initialize Windows runtime
+		Wrappers::RoInitializeWrapper initialize(RO_INIT_MULTITHREADED);
+		THROW_FAILED(initialize);
+
 		MinWindow repWindow(hInst, ivec2(640, 480));
 		Renderer renderer(&repWindow);
 

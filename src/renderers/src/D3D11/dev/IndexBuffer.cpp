@@ -6,11 +6,11 @@ using namespace Replica::D3D11;
 
 IndexBuffer::IndexBuffer(Device& device, 
 	const IDynamicCollection<USHORT>& data, 
-	BufferUsages usage, 
-	BufferAccessFlags cpuAccess
+	ResourceUsages usage, 
+	ResourceAccessFlags cpuAccess
 ) :
 	count((UINT)data.GetLength()),
-	BufferBase(BufferTypes::Index, usage, cpuAccess, device, data)
+	BufferBase(ResourceTypes::Index, usage, cpuAccess, device, data)
 { }
 
 /// <summary>

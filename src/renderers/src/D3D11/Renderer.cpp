@@ -5,19 +5,17 @@
 #include <glm/gtx/quaternion.hpp>
 #include <sstream>
 
-#include "DirectXHelpers.h"
-#include "DDSTextureLoader.h"
-#include "WICTextureLoader.h"
-
 #include "MinWindow.hpp"
+
 #include "D3D11/Renderer.hpp"
 #include "D3D11/dev/VertexShader.hpp"
 #include "D3D11/dev/PixelShader.hpp"
+#include "D3D11/dev/Texture2D.hpp"
 
+using namespace glm;
 using namespace std::chrono;
 using namespace Microsoft::WRL;
 using namespace DirectX;
-using namespace glm;
 using namespace Replica;
 using namespace Replica::D3D11;
 
@@ -25,7 +23,7 @@ struct Vertex
 {
 public:
 	D3D11::vec3 pos;
-	D3D11::tvec4<byte> color;
+	D3D11::vec2 uv;
 };
 
 fquat QuatFromAxis(vec3 axis, float rad)
@@ -48,14 +46,14 @@ Renderer::Renderer(MinWindow* window) :
 	swap(*window, &device), // Create swap chain for window
 	backBuf(swap.GetBuffer(0)), // Get RT view for swap chain back buf
 	vBuf(device, UniqueArray<Vertex>{
-		{ { -1.0, -1.0, -1.0 }, { 255, 0, 0, 255 } },
-		{ { 1.0, -1.0, -1.0 }, { 0, 255, 0, 255 } },
-		{ { -1.0, 1.0, -1.0 }, { 0, 0, 255, 255  } },
-		{ { 1.0, 1.0, -1.0 }, { 0, 255, 0, 255 } }, // 3
-		{ { -1.0, -1.0, 1.0 }, { 255, 0, 0, 255 } },
-		{ { 1.0, -1.0, 1.0 }, { 255, 0, 0, 255 } },
-		{ { -1.0, 1.0, 1.0 }, { 0, 255, 0, 255 } },
-		{ { 1.0, 1.0, 1.0 }, { 0, 0, 255, 255  } },
+		{ { -1.0, -1.0, -1.0 }, { 0.0, 0.0 } },
+		{ { 1.0, -1.0, -1.0 }, { 1.0, 0.0 } },
+		{ { -1.0, 1.0, -1.0 }, { 0.0, 1.0 } },
+		{ { 1.0, 1.0, -1.0 }, { 1.0, 1.0 } }, // 3
+		{ { -1.0, -1.0, 1.0 }, { 0.0, 0.0 } },
+		{ { 1.0, -1.0, 1.0 }, { 1.0, 0.0 } },
+		{ { -1.0, 1.0, 1.0 }, { 0.0, 1.0 } },
+		{ { 1.0, 1.0, 1.0 }, { 1.0, 1.0 } },
 	}),
 	iBuf(device, UniqueArray<USHORT>{
 		0, 2, 1,  2, 3, 1,
@@ -64,7 +62,9 @@ Renderer::Renderer(MinWindow* window) :
 		4, 5, 7,  4, 7, 6,
 		0, 4, 2,  2, 4, 6,
 		0, 1, 4,  1, 5, 4
-	})
+	}),
+	testTex(&device, L"lena_color_512.png"),
+	testSamp(&device, TexFilterMode::LINEAR, TexClampMode::MIRROR)
 { }
 
 void Renderer::Update()
@@ -85,14 +85,6 @@ void Renderer::Update()
 		<< "  MouseNorm: " << normMousePos.x << ", " << normMousePos.y;
 	parent->SetWindowTitle(ss.str().c_str());
 
-	struct
-	{
-		vec4 tint;
-		mat4 mvp;
-	} cBuf{};
-	
-	cBuf.tint = vec4(std::abs(sinOffset), std::abs(cosOffset), std::abs(sinOffset + cosOffset), 1.0f);
-
 	mat4 model = identity<mat4>(),
 		view = identity<mat4>(),
 		proj = perspectiveLH(45.0f, aspectRatio, 0.5f, 100.0f);
@@ -104,13 +96,13 @@ void Renderer::Update()
 	model *= toMat4(rot);
 
 	// D3D expects row major matrices
-	cBuf.mvp = transpose(proj * view * model);
+	const mat4 mvp = transpose(proj * view * model);
 
 	// Clear back buffer
 	backBuf.Clear(ctx);
 
 	// Create and assign constant bufer
-	ConstantBuffer cb(device, cBuf);
+	ConstantBuffer cb(device, mvp);
 	cb.Bind(ctx);
 	vBuf.Bind(ctx);
 	iBuf.Bind(ctx);
@@ -119,7 +111,7 @@ void Renderer::Update()
 	VertexShader vs(device, L"DefaultVertShader.cso", 
 	{
 		{ "Position", Formats::R32G32B32_FLOAT },
-		{ "Color", Formats::R8G8B8A8_UNORM },
+		{ "TexCoord", Formats::R32G32_FLOAT },
 	});
 	vs.Bind(ctx);
 
@@ -132,6 +124,9 @@ void Renderer::Update()
 
 	// Bind back buffer as render target
 	backBuf.Bind(ctx);
+
+	testTex.Bind(ctx);
+	testSamp.Bind(ctx);
 
 	ctx.DrawIndexed((UINT)iBuf.GetLength());
 

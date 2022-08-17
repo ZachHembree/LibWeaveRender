@@ -17,6 +17,8 @@ MinWindow::MinWindow(const HINSTANCE hInst, const ivec2 size) :
 	hInst(hInst),
 	hWnd(nullptr)
 {
+	const wchar_t* iconFile = MAKEINTRESOURCE(IDI_ICON1);
+
 	// Setup window descriptor
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
@@ -25,12 +27,12 @@ MinWindow::MinWindow(const HINSTANCE hInst, const ivec2 size) :
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInst;
-	wc.hIcon = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 64, 64, 0);
+	wc.hIcon = (HICON)LoadImage(hInst, iconFile, IMAGE_ICON, 64, 64, 0);
 	wc.hCursor = nullptr;
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = g_Name;
-	wc.hIconSm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, 0);
+	wc.hIconSm = (HICON)LoadImage(hInst, iconFile, IMAGE_ICON, 32, 32, 0);
 
 	// Register window class
 	const ATOM classID = RegisterClassEx(&wc);

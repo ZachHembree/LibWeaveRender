@@ -6,9 +6,9 @@
 using namespace Replica::D3D11;
 
 Replica::D3D11::BufferBase::BufferBase(
-	BufferTypes type, 
-	BufferUsages usage, 
-	BufferAccessFlags cpuAccess, 
+	ResourceTypes type, 
+	ResourceUsages usage, 
+	ResourceAccessFlags cpuAccess, 
 	Device& dev, 
 	const void* data, 
 	const UINT byteSize
@@ -30,7 +30,8 @@ void Replica::D3D11::BufferBase::CreateBuffer(const void* data, const UINT byteS
 	GFX_THROW_FAILED(pDevice->CreateBuffer(&desc, &resDesc, &pBuf));
 }
 
-void Replica::D3D11::BufferBase::GetBufferDesc(const void* data, const UINT byteSize, D3D11_BUFFER_DESC& desc, D3D11_SUBRESOURCE_DATA& resDesc)
+void Replica::D3D11::BufferBase::GetBufferDesc(const void* data, const UINT byteSize, 
+	D3D11_BUFFER_DESC& desc, D3D11_SUBRESOURCE_DATA& resDesc)
 {
 	desc = {};
 	desc.Usage = (D3D11_USAGE)usage;

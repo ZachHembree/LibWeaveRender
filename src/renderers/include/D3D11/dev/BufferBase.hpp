@@ -8,7 +8,7 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Specifies how a buffer will be used
 	/// </summary>
-	enum class BufferUsages
+	enum class ResourceUsages
 	{
 		/// <summary>
 		/// R/W Access required for GPU
@@ -34,17 +34,24 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Supported buffer types
 	/// </summary>
-	enum class BufferTypes
+	enum class ResourceTypes
 	{
 		Vertex = D3D11_BIND_VERTEX_BUFFER, 
 		Index = D3D11_BIND_INDEX_BUFFER,
-		Constant = D3D11_BIND_CONSTANT_BUFFER
+		Constant = D3D11_BIND_CONSTANT_BUFFER,
+		ShaderResource = D3D11_BIND_SHADER_RESOURCE,
+		StreamOutput = D3D11_BIND_STREAM_OUTPUT,
+		RenderTarget = D3D11_BIND_RENDER_TARGET,
+		DepthStencil = D3D11_BIND_DEPTH_STENCIL,
+		UnorderedAccess = D3D11_BIND_UNORDERED_ACCESS,
+		Decoder = D3D11_BIND_DECODER,
+		VideoEncoder = D3D11_BIND_VIDEO_ENCODER,
 	};
 
 	/// <summary>
 	/// Specifies types of CPU access allowed for a resource
 	/// </summary>
-	enum class BufferAccessFlags
+	enum class ResourceAccessFlags
 	{
 		None = 0u,
 		Write = D3D11_CPU_ACCESS_WRITE,
@@ -54,9 +61,9 @@ namespace Replica::D3D11
 	class BufferBase : public DeviceChild
 	{
 	public:
-		const BufferTypes type;
-		const BufferUsages usage;
-		const BufferAccessFlags cpuAccess;
+		const ResourceTypes type;
+		const ResourceUsages usage;
+		const ResourceAccessFlags cpuAccess;
 
 		ID3D11Buffer* Get() { return pBuf.Get(); };
 
@@ -65,17 +72,17 @@ namespace Replica::D3D11
 	protected:
 		ComPtr<ID3D11Buffer> pBuf;
 
-		BufferBase(BufferTypes type, 
-			BufferUsages usage, 
-			BufferAccessFlags cpuAccess, 
+		BufferBase(ResourceTypes type, 
+			ResourceUsages usage, 
+			ResourceAccessFlags cpuAccess, 
 			Device& device, 
 			const void* data, 
 			const UINT byteSize);
 
 		template<typename T>
-		BufferBase(BufferTypes type, 
-			BufferUsages usage, 
-			BufferAccessFlags cpuAccess, 
+		BufferBase(ResourceTypes type, 
+			ResourceUsages usage, 
+			ResourceAccessFlags cpuAccess, 
 			Device& device, 
 			const IDynamicCollection<T>& data) :
 			BufferBase(type, usage, cpuAccess, device, data.GetPtr(), (UINT)data.GetSize())
