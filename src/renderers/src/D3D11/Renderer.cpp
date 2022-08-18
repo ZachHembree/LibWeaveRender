@@ -12,12 +12,17 @@
 #include "D3D11/dev/PixelShader.hpp"
 #include "D3D11/dev/Texture2D.hpp"
 
+#include <imgui_impl_win32.h>
+#include <imgui_impl_dx11.h>
+
 using namespace glm;
 using namespace std::chrono;
 using namespace Microsoft::WRL;
 using namespace DirectX;
 using namespace Replica;
 using namespace Replica::D3D11;
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 struct Vertex
 {
@@ -65,6 +70,11 @@ Renderer::Renderer(MinWindow* window) :
 	}),
 	testTex(&device, L"lena_color_512.png"),
 	testSamp(&device, TexFilterMode::LINEAR, TexClampMode::MIRROR)
+{
+	ImGui_ImplDX11_Init(device.Get(), device.GetContext().Get());
+}
+
+Renderer::~Renderer()
 { }
 
 void Renderer::Update()
@@ -107,6 +117,9 @@ void Renderer::Update()
 	vBuf.Bind(ctx);
 	iBuf.Bind(ctx);
 
+	testSamp.Bind(ctx);
+	testTex.Bind(ctx);
+
 	// Compile and assign VS
 	VertexShader vs(device, L"DefaultVertShader.cso", 
 	{
@@ -125,11 +138,23 @@ void Renderer::Update()
 	// Bind back buffer as render target
 	backBuf.Bind(ctx);
 
-	testTex.Bind(ctx);
-	testSamp.Bind(ctx);
-
 	ctx.DrawIndexed((UINT)iBuf.GetLength());
+
+	// IMGUI Test
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::ShowDemoWindow();
+
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 	// Present frame
 	swap.Present(1u, 0);
+}
+
+void Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 }

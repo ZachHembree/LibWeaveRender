@@ -131,7 +131,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)src\renderers\include;$(ProjectDir)src\utils\include;$(ProjectDir);$(ProjectDir)src;$(ProjectDir)src\libs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)src\renderers\include;$(ProjectDir)src\utils\include;$(ProjectDir);$(ProjectDir)src;$(ProjectDir)src\libs;%(AdditionalIncludeDirectories);$(ProjectDir)src\libs\imgui;$(ProjectDir)src\libs\imgui\backends</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,7 +155,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)src\renderers\include;$(ProjectDir)src\utils\include;$(ProjectDir);;$(ProjectDir)src\libs;$(ProjectDir)src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\renderers\include;$(ProjectDir)src\utils\include;$(ProjectDir);;$(ProjectDir)src\libs;$(ProjectDir)src;$(ProjectDir)src\libs\imgui</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -171,6 +171,15 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\libs\imgui\backends\imgui_impl_dx11.cpp" />
+    <ClCompile Include="src\libs\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="src\libs\imgui\imgui.cpp" />
+    <ClCompile Include="src\libs\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\libs\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\libs\imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\libs\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\libs\imgui\misc\cpp\imgui_stdlib.cpp" />
+    <ClCompile Include="src\libs\imgui\misc\fonts\binary_to_compressed_c.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\RenderTarget.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\Context.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\ConstantBuffer.cpp" />
@@ -193,6 +202,15 @@
     <ClCompile Include="src\utils\src\WindowComponentBase.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\libs\imgui\backends\imgui_impl_dx11.h" />
+    <ClInclude Include="src\libs\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="src\libs\imgui\imconfig.h" />
+    <ClInclude Include="src\libs\imgui\imgui.h" />
+    <ClInclude Include="src\libs\imgui\imgui_internal.h" />
+    <ClInclude Include="src\libs\imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\libs\imgui\imstb_textedit.h" />
+    <ClInclude Include="src\libs\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\libs\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="src\renderers\include\D3D11\D3DUtils.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\BufferBase.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\ConstantBuffer.hpp" />

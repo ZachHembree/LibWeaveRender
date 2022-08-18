@@ -18,11 +18,6 @@
 #pragma comment(lib, "Dxgi.lib")
 #pragma comment(lib, "runtimeobject.lib")
 
-namespace Replica
-{
-	class InputComponent;
-}
-
 namespace Replica::D3D11
 { 
 	class Device;
@@ -37,7 +32,11 @@ namespace Replica::D3D11
 	public:
 		Renderer(MinWindow* window);
 
+		~Renderer();
+
 		void Update() override;
+
+		void OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 	private:
 		InputComponent input;
