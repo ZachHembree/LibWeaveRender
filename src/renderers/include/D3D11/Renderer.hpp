@@ -12,6 +12,8 @@
 #include "D3D11/dev/RenderTarget.hpp"
 #include "D3D11/dev/Texture2D.hpp"
 #include "D3D11/dev/Sampler.hpp"
+#include "D3D11/dev/VertexShader.hpp"
+#include "D3D11/dev/PixelShader.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -48,5 +50,8 @@ namespace Replica::D3D11
 		IndexBuffer iBuf;
 		Texture2D testTex;
 		Sampler testSamp;
+		ConstantBuffer cb;
+		VertexShader vs;
+		PixelShader ps;
 	};
 }

@@ -69,7 +69,14 @@ Renderer::Renderer(MinWindow* window) :
 		0, 1, 4,  1, 5, 4
 	}),
 	testTex(Texture2D::FromImageWIC(& device, L"lena_color_512.png")),
-	testSamp(&device, TexFilterMode::LINEAR, TexClampMode::MIRROR)
+	testSamp(&device, TexFilterMode::LINEAR, TexClampMode::MIRROR),
+	cb(device, sizeof(mat4)),
+	vs(device, L"DefaultVertShader.cso", 
+	{
+		{ "Position", Formats::R32G32B32_FLOAT },
+		{ "TexCoord", Formats::R32G32_FLOAT },
+	}),
+	ps(device, L"DefaultPixShader.cso")
 {
 	ImGui_ImplDX11_Init(device.Get(), device.GetContext().Get());
 }
@@ -87,15 +94,19 @@ void Renderer::Update()
 	const ivec2 mousePos = input.GetMousePos();
 	const vec2 normMousePos = input.GetNormMousePos(),
 		clipMousePos = 2.0f * normMousePos + vec2(-1, 1);
+
+	// Reset binds
 	Context& ctx = device.GetContext();
 	ctx.Reset();
 
+	// Write debug info to window header
 	std::wstringstream ss;
 	ss << "Space: " << input.GetIsKeyPressed(KbKey::Space)
 		<< "  Mouse: " << mousePos.x << ", " << mousePos.y
 		<< "  MouseNorm: " << normMousePos.x << ", " << normMousePos.y;
 	parent->SetWindowTitle(ss.str().c_str());
 
+	// Generate draw matrix for test cube
 	mat4 model = identity<mat4>(),
 		view = identity<mat4>(),
 		proj = perspectiveLH(45.0f, aspectRatio, 0.5f, 100.0f);
@@ -112,19 +123,14 @@ void Renderer::Update()
 	// Clear back buffer
 	backBuf.Clear(ctx);
 
-	// Create VS constant bufer
-	ConstantBuffer cb(device, mvp);
-	// Compile and assign VS
-	VertexShader vs(device, L"DefaultVertShader.cso", 
-	{
-		{ "Position", Formats::R32G32B32_FLOAT },
-		{ "TexCoord", Formats::R32G32_FLOAT },
-	});
+	// Update VS constant bufer
+	cb.SetData(&mvp,ctx);
+
+	// Assign VS
 	vs.Bind();
 	vs.SetConstants(cb);
 
-	// Compile and assign PS
-	PixelShader ps(device, L"DefaultPixShader.cso");
+	// Assign PS
 	ps.Bind();
 	ps.SetSampler(testSamp);
 	ps.SetTexture(testTex);

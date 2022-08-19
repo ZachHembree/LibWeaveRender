@@ -19,8 +19,14 @@ namespace Replica::D3D11
 
 		ID3D11Resource** GetResAddress() { return reinterpret_cast<ID3D11Resource**>(GetAddressOf()); };
 
+		/// <summary>
+		/// Returns the size of the buffer in bytes
+		/// </summary>
+		UINT GetSize() { return byteSize; }
+
 	protected:
 		ComPtr<ID3D11Buffer> pBuf;
+		UINT byteSize;
 
 		BufferBase(ResourceTypes type, 
 			ResourceUsages usage, 
@@ -39,7 +45,7 @@ namespace Replica::D3D11
 		{ }
 
 		void CreateBuffer(const void* data, const UINT byteSize, ID3D11Device* pDevice);
-
-		void GetBufferDesc(const void* data, const UINT byteSize, D3D11_BUFFER_DESC& desc, D3D11_SUBRESOURCE_DATA& resDesc);
+	
+		void UpdateMapUnmap(const void* data, Context& ctx);
 	};
 }
