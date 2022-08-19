@@ -40,9 +40,9 @@ InputLayout::InputLayout(Device& dev,
 
 ID3D11InputLayout* InputLayout::Get() const { return pLayout.Get(); };
 
-void InputLayout::Bind()
+void InputLayout::Bind(Context& ctx)
 {
-	pDev->GetContext().Get()->IASetInputLayout(Get());
+	ctx.Get()->IASetInputLayout(Get());
 }
 
 IAElement::IAElement(LPCSTR semantic,

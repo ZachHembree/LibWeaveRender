@@ -1,10 +1,10 @@
 #pragma once
-#include "D3D11/dev/DeviceChild.hpp"
+#include "D3D11/dev/ResourceBase.hpp"
 #include "D3D11/dev/Formats.hpp"
 
 namespace Replica::D3D11
 {
-	class Texture2D : public DeviceChild
+	class Texture2D : public ResourceBase
 	{
 	public:
 		Texture2D(Device* pDev, 
@@ -13,10 +13,6 @@ namespace Replica::D3D11
 			UINT stride, 
 			Formats format = Formats::R8G8B8A8_UNORM, 
 			UINT mipLevels = 1u
-		);
-
-		Texture2D(Device* pDev,
-			const wchar_t* file
 		);
 
 		template<typename T>
@@ -36,7 +32,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns interface to resource
 		/// </summary>
-		ID3D11Resource* Get();
+		ID3D11Resource* GetResource() { return pRes.Get(); }
+
+		/// <summary>
+		/// Returns pointer to interface pointer field
+		/// </summary>
+		ID3D11Resource** GetResAddress() { return reinterpret_cast<ID3D11Resource**>(pRes.GetAddressOf()); }
 
 		/// <summary>
 		/// Returns interface to resource view
@@ -48,8 +49,15 @@ namespace Replica::D3D11
 		/// </summary>
 		void Bind(Context& ctx, UINT slot = 0u);
 
+		/// <summary>
+		/// Initializes new Texture2D from WIC-compatible image 
+		/// (BMP, GIF, ICO, JPEG, PNG, TIFF)
+		/// </summary>
+		static Texture2D FromImageWIC(Device* pDev, const wchar_t* file);
+
 	private:
 		ComPtr<ID3D11Texture2D> pRes;
 		ComPtr<ID3D11ShaderResourceView> pView;
+
 	};
 }

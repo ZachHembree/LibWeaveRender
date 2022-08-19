@@ -36,7 +36,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Binds the layout to the input assembler for the associated context
 		/// </summary>
-		void Bind();
+		void Bind(Context& ctx);
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> pLayout;

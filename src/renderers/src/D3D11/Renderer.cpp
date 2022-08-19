@@ -68,7 +68,7 @@ Renderer::Renderer(MinWindow* window) :
 		0, 4, 2,  2, 4, 6,
 		0, 1, 4,  1, 5, 4
 	}),
-	testTex(&device, L"lena_color_512.png"),
+	testTex(Texture2D::FromImageWIC(& device, L"lena_color_512.png")),
 	testSamp(&device, TexFilterMode::LINEAR, TexClampMode::MIRROR)
 {
 	ImGui_ImplDX11_Init(device.Get(), device.GetContext().Get());
@@ -127,13 +127,13 @@ void Renderer::Update()
 		{ "TexCoord", Formats::R32G32_FLOAT },
 	});
 	vs.Bind(ctx);
-
+	
 	// Compile and assign PS
 	PixelShader ps(device, L"DefaultPixShader.cso");
 	ps.Bind(ctx);
 	
 	// Set viewport bounds
-	ctx.RSSetViewport(ivec2(640, 480));
+	ctx.RSSetViewport(parent->GetSize());
 
 	// Bind back buffer as render target
 	backBuf.Bind(ctx);

@@ -22,5 +22,5 @@ const InputLayout& VertexShader::GetLayout() const { return layout; }
 void VertexShader::Bind(Context& ctx)
 {
 	ctx.Get()->VSSetShader(Get(), nullptr, 0);
-	layout.Bind();
+	layout.Bind(ctx);
 }

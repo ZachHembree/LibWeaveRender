@@ -215,6 +215,9 @@
     <ClInclude Include="src\libs\imgui\misc\cpp\imgui_stdlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\dev\ResourceBase.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon.ico">

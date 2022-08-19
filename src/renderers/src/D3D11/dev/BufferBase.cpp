@@ -13,7 +13,7 @@ Replica::D3D11::BufferBase::BufferBase(
 	const void* data, 
 	const UINT byteSize
 ) :
-	DeviceChild(&dev),
+	ResourceBase(&dev),
 	type(type),
 	usage(usage),
 	cpuAccess(cpuAccess)

@@ -5,14 +5,14 @@
 using namespace Replica::D3D11;
 
 RenderTarget::RenderTarget(Device* pDev, ID3D11Resource* pRes) :
-	DeviceChild(pDev),
+	ResourceBase(pDev),
 	pRes(pRes)
 {
 	GFX_THROW_FAILED(pDev->Get()->CreateRenderTargetView(pRes, nullptr, &pView));
 }
 
 RenderTarget::RenderTarget(RenderTarget&& other) noexcept :
-	DeviceChild(other.pDev),
+	ResourceBase(other.pDev),
 	pRes(std::move(pRes)),
 	pView(std::move(pView))
 {
@@ -28,8 +28,6 @@ RenderTarget& RenderTarget::operator=(RenderTarget&& other) noexcept
 
 	return *this;
 }
-
-ID3D11Resource* RenderTarget::Get() { return pRes.Get(); }
 
 ID3D11RenderTargetView* RenderTarget::GetView() { return pView.Get(); }
 

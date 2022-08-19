@@ -1,9 +1,9 @@
 #pragma once
-#include "D3D11/dev/DeviceChild.hpp"
+#include "D3D11/dev/ResourceBase.hpp"
 
 namespace Replica::D3D11
 {
-	class RenderTarget : public DeviceChild
+	class RenderTarget : public ResourceBase
 	{
 	public:
 		RenderTarget(Device* pDev, ID3D11Resource* pRes);
@@ -12,10 +12,9 @@ namespace Replica::D3D11
 
 		RenderTarget& operator=(RenderTarget&& other) noexcept;
 
-		/// <summary>
-		/// Returns interface to resource
-		/// </summary>
-		ID3D11Resource* Get();
+		ID3D11Resource* GetResource() { return pRes.Get(); }
+
+		ID3D11Resource** GetResAddress() { return pRes.GetAddressOf(); }
 
 		/// <summary>
 		/// Returns interface to resource view
