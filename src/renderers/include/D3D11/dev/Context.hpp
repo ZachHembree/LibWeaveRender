@@ -12,6 +12,7 @@ namespace Replica::D3D11
 	class SwapChain;
 	class InputLayout;
 	class VertexShader;
+	class PixelShader;
 
 	/// <summary>
 	/// Determines how vertex topology is interpreted by the input assembler
@@ -77,10 +78,35 @@ namespace Replica::D3D11
 		Context& operator=(Context&& other) noexcept;
 
 		/// <summary>
+		/// Binds the given vertex shader
+		/// </summary>
+		void SetVS(VertexShader* vs);
+
+		/// <summary>
+		/// Binds the given pixel shader
+		/// </summary>
+		void SetPS(PixelShader* ps);
+
+		/// <summary>
+		/// Removes the given vertex shader, if bound
+		/// </summary>
+		void RemoveVS(VertexShader* vs);
+
+		/// <summary>
+		/// Removes the given pixel shader, if bound
+		/// </summary>
+		void RemovePS(PixelShader* ps);
+
+		/// <summary>
+		/// Unbinds all resources
+		/// </summary>
+		void Reset();
+
+		/// <summary>
 		/// Returns pointer to context interface
 		/// </summary>
 		ID3D11DeviceContext* Get() const;
-
+		
 		/// <summary>
 		/// Binds the given viewport to the rasterizer stage
 		/// </summary>
@@ -108,5 +134,7 @@ namespace Replica::D3D11
 
 	private:
 		ComPtr<ID3D11DeviceContext> pContext;
+		VertexShader* currentVS;
+		PixelShader* currentPS;
 	};
 }

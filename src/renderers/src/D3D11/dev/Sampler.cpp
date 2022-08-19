@@ -24,7 +24,4 @@ Sampler::Sampler(Device* pDev,
 
 ID3D11SamplerState* Sampler::Get() { return pSamp.Get(); }
 
-void Sampler::Bind(Context& ctx, UINT slot)
-{
-	ctx.Get()->PSSetSamplers(slot, 1u, pSamp.GetAddressOf());
-}
+ID3D11SamplerState** Sampler::GetAddressOf() { return pSamp.GetAddressOf(); }

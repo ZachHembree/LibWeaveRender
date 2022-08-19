@@ -3,6 +3,7 @@
 #include "D3D11/dev/ConstantBuffer.hpp"
 #include "D3D11/dev/InputLayout.hpp"
 #include "D3D11/dev/VertexShader.hpp"
+#include "D3D11/dev/PixelShader.hpp"
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/dev/Context.hpp"
 
@@ -12,15 +13,22 @@ using namespace Replica::D3D11;
 
 Context::Context(Device* pDev, ComPtr<ID3D11DeviceContext>& pContext) :
 	DeviceChild(pDev),
-	pContext(pContext)
+	pContext(pContext),
+	currentVS(nullptr),
+	currentPS(nullptr)
 { }
 
-Context::Context() : DeviceChild(nullptr)
+Context::Context() : 
+	DeviceChild(nullptr),
+	currentVS(nullptr),
+	currentPS(nullptr)
 { }
 
 Context::Context(Context&& other) noexcept :
 	DeviceChild(other.pDev),
-	pContext(other.pContext)
+	pContext(other.pContext),
+	currentVS(nullptr),
+	currentPS(nullptr)
 {
 	other.pDev = nullptr;
 }
@@ -32,6 +40,52 @@ Context& Context::operator=(Context&& other) noexcept
 	other.pDev = nullptr;
 
 	return *this;
+}
+
+void Context::SetVS(VertexShader* vs)
+{
+	if (vs != nullptr && (vs != currentVS || currentPS != nullptr))
+	{
+		if (currentVS != nullptr)
+			currentVS->Unbind();
+
+		Get()->VSSetShader(vs->Get(), nullptr, 0);
+	}
+}
+
+void Context::SetPS(PixelShader* ps)
+{
+	if (ps != nullptr && (ps != currentPS || currentPS != nullptr))
+	{ 
+		if (currentPS != nullptr)
+			currentPS->Unbind();
+
+		Get()->PSSetShader(ps->Get(), nullptr, 0);
+	}
+}
+
+void Context::RemoveVS(VertexShader* vs)
+{
+	if (vs == currentVS)
+	{
+		Get()->VSSetShader(nullptr, nullptr, 0);
+		currentVS = nullptr;
+	}
+}
+
+void Context::RemovePS(PixelShader* ps)
+{
+	if (ps == currentPS)
+	{
+		Get()->PSSetShader(nullptr, nullptr, 0);
+		currentPS = nullptr;
+	}
+}
+
+void Context::Reset()
+{
+	currentVS = nullptr;
+	currentPS = nullptr;
 }
 
 /// <summary>

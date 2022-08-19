@@ -30,7 +30,7 @@ Device::Device()
 ID3D11Device* Device::Get() { return pDev.Get(); }
 
 /// <summary>
-/// Returns reference to device context
+/// Returns reference to main device context
 /// </summary>
 Context& Device::GetContext() { return this->context; }
 

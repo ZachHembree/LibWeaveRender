@@ -91,9 +91,6 @@ Texture2D& Texture2D::operator=(Texture2D&& other) noexcept
 /// <summary>
 /// Returns interface to resource view
 /// </summary>
-ID3D11ShaderResourceView* Texture2D::GetView() { return pView.Get(); }
+ID3D11ShaderResourceView* Texture2D::GetSRV() { return pView.Get(); }
 
-void Texture2D::Bind(Context& ctx, UINT slot)
-{
-	ctx.Get()->PSSetShaderResources(slot, 1u, pView.GetAddressOf());	
-}
+ID3D11ShaderResourceView** Texture2D::GetSRVAddress() { return pView.GetAddressOf(); }

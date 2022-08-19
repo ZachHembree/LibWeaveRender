@@ -95,9 +95,9 @@ namespace Replica::D3D11
         ID3D11SamplerState* Get();
 
         /// <summary>
-        /// Binds the sampler to the pixel shader stage
+        /// Returns pointer to COM interface pointer
         /// </summary>
-        void Bind(Context& ctx, UINT slot = 0u);
+        ID3D11SamplerState** GetAddressOf();
 
 	private:
 		ComPtr<ID3D11SamplerState> pSamp;

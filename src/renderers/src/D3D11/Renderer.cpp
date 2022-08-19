@@ -88,7 +88,8 @@ void Renderer::Update()
 	const vec2 normMousePos = input.GetNormMousePos(),
 		clipMousePos = 2.0f * normMousePos + vec2(-1, 1);
 	Context& ctx = device.GetContext();
-	
+	ctx.Reset();
+
 	std::wstringstream ss;
 	ss << "Space: " << input.GetIsKeyPressed(KbKey::Space)
 		<< "  Mouse: " << mousePos.x << ", " << mousePos.y
@@ -111,33 +112,31 @@ void Renderer::Update()
 	// Clear back buffer
 	backBuf.Clear(ctx);
 
-	// Create and assign constant bufer
+	// Create VS constant bufer
 	ConstantBuffer cb(device, mvp);
-	cb.Bind(ctx);
-	vBuf.Bind(ctx);
-	iBuf.Bind(ctx);
-
-	testSamp.Bind(ctx);
-	testTex.Bind(ctx);
-
 	// Compile and assign VS
 	VertexShader vs(device, L"DefaultVertShader.cso", 
 	{
 		{ "Position", Formats::R32G32B32_FLOAT },
 		{ "TexCoord", Formats::R32G32_FLOAT },
 	});
-	vs.Bind(ctx);
-	
+	vs.Bind();
+	vs.SetConstants(cb);
+
 	// Compile and assign PS
 	PixelShader ps(device, L"DefaultPixShader.cso");
-	ps.Bind(ctx);
-	
+	ps.Bind();
+	ps.SetSampler(testSamp);
+	ps.SetTexture(testTex);
+
 	// Set viewport bounds
 	ctx.RSSetViewport(parent->GetSize());
-
 	// Bind back buffer as render target
 	backBuf.Bind(ctx);
 
+	// Bind and draw mesh data
+	vBuf.Bind(ctx);
+	iBuf.Bind(ctx);
 	ctx.DrawIndexed((UINT)iBuf.GetLength());
 
 	// IMGUI Test

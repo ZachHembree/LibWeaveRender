@@ -42,12 +42,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns interface to resource view
 		/// </summary>
-		ID3D11ShaderResourceView* GetView();
+		ID3D11ShaderResourceView* GetSRV();
 
 		/// <summary>
-		/// Binds the texture to the pixel shader stage
+		/// Returns interface to resource view
 		/// </summary>
-		void Bind(Context& ctx, UINT slot = 0u);
+		ID3D11ShaderResourceView** GetSRVAddress();
 
 		/// <summary>
 		/// Initializes new Texture2D from WIC-compatible image 
