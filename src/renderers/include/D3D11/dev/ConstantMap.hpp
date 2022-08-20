@@ -1,4 +1,5 @@
 #pragma once
+#include "D3D11/D3DUtils.hpp"
 #include "DynamicCollections.hpp"
 #include <unordered_map>
 #include <typeinfo>
@@ -7,6 +8,7 @@ namespace Replica::D3D11
 {
 	struct ConstantDef;
 	class ConstantMapDef;
+	class ConstantBuffer;
 
 	/// <summary>
 	/// Metadata object used to define a constant buffer whose size and layout are determined
@@ -15,7 +17,13 @@ namespace Replica::D3D11
 	class ConstantMap : UniqueObjBase
 	{
 	public:		
+		ConstantMap();
+
 		ConstantMap(const ConstantMapDef& layout);
+
+		ConstantMap(ConstantMap&& other);
+
+		ConstantMap& operator=(ConstantMap&& other);
 
 		/// <summary>
 		/// Writes contents of the constant map to the given constant buffer
@@ -59,6 +67,10 @@ namespace Replica::D3D11
 		std::unordered_map<WSTR, MapEntry> defMap;
 		size_t stride;
 
+		ConstantMap(const ConstantMap& other);
+
+		ConstantMap& operator=(const ConstantMap& other);
+
 		void SetMember(WSTR name, const byte* src, const type_info& type);
 	};
 
@@ -69,6 +81,10 @@ namespace Replica::D3D11
 	{
 	public:
 		ConstantMapDef();
+
+		ConstantMapDef(ConstantMapDef&& other) noexcept;
+
+		ConstantMapDef& operator=(ConstantMapDef&& other) noexcept;
 
 		/// <summary>
 		/// Adds a new constant entry with the given name and type to the end

@@ -1,10 +1,11 @@
-#include "D3D11/dev/DeviceChild.hpp"
-#include "D3D11/dev/InputLayout.hpp"
 #include "D3D11/dev/ConstantBuffer.hpp"
 #include "D3D11/dev/ConstantMap.hpp"
 
 using namespace Replica;
 using namespace Replica::D3D11;
+
+ConstantMap::ConstantMap() : stride(0)
+{ }
 
 ConstantMap::ConstantMap(const ConstantMapDef& layout) :
 	stride(layout.GetStride()),
@@ -22,6 +23,36 @@ ConstantMap::ConstantMap(const ConstantMapDef& layout) :
 		defMap.emplace(member.name, entry);
 		offset += member.stride;
 	}
+}
+
+ConstantMap::ConstantMap(ConstantMap&& other) :
+	data(std::move(other.data)),
+	defMap(std::move(other.defMap)),
+	stride(other.stride)
+{ }
+
+ConstantMap& ConstantMap::operator=(ConstantMap&& other)
+{
+	this->data = std::move(other.data);
+	this->defMap = std::move(other.defMap);
+	this->stride = other.stride;
+
+	return *this;
+}
+
+ConstantMap::ConstantMap(const ConstantMap& other) :
+	data(other.data.GetCopy()),
+	defMap(other.defMap),
+	stride(other.stride)
+{ }
+
+ConstantMap& ConstantMap::operator=(const ConstantMap& other)
+{
+	this->data = other.data.GetCopy();
+	this->defMap = std::unordered_map<WSTR, MapEntry>(other.defMap);
+	this->stride = other.stride;
+
+	return *this;
 }
 
 /// <summary>
@@ -64,6 +95,19 @@ ConstantMapDef::ConstantMapDef() :
 	stride(0)
 {
 	members.reserve(10);
+}
+
+ConstantMapDef::ConstantMapDef(ConstantMapDef&& other) noexcept :
+	members(std::move(other.members)),
+	stride(other.stride)
+{ }
+
+ConstantMapDef& ConstantMapDef::operator=(ConstantMapDef&& other) noexcept
+{
+	this->members = std::move(other.members);
+	this->stride = other.stride;
+
+	return *this;
 }
 
 /// <summary>

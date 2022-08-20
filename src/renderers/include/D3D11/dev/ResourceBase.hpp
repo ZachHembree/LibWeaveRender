@@ -65,6 +65,8 @@ namespace Replica::D3D11
 		virtual ID3D11Resource** GetResAddress() = 0;
 
 	protected:
+		ResourceBase() { }
+
 		ResourceBase(Device* pDev) : DeviceChild(pDev) {}
 
 	};

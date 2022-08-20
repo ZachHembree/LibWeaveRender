@@ -6,6 +6,13 @@
 
 using namespace Replica::D3D11;
 
+BufferBase::BufferBase() :
+	byteSize(0),
+	type(ResourceTypes::Constant),
+	usage(ResourceUsages::Immutable),
+	cpuAccess(ResourceAccessFlags::None)
+{ }
+
 BufferBase::BufferBase(
 	ResourceTypes type, 
 	ResourceUsages usage, 
@@ -21,6 +28,27 @@ BufferBase::BufferBase(
 	byteSize(byteSize)
 {
 	CreateBuffer(data, byteSize, dev.Get());
+}
+
+BufferBase::BufferBase(BufferBase&& other) noexcept :
+	ResourceBase(other.pDev),
+	type(other.type),
+	usage(other.usage),
+	cpuAccess(other.cpuAccess),
+	pBuf(std::move(other.pBuf)),
+	byteSize(other.byteSize)
+{ }
+
+BufferBase& BufferBase::operator=(BufferBase&& other) noexcept
+{
+	this->pDev = pDev;
+	this->type = other.type;
+	this->usage = other.usage;
+	this->cpuAccess = other.cpuAccess;
+	pBuf = std::move(other.pBuf);
+	this->byteSize = other.byteSize;
+
+	return *this;
 }
 
 void BufferBase::CreateBuffer(const void* data, const UINT byteSize, ID3D11Device* pDevice)

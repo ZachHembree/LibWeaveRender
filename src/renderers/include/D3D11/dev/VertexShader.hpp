@@ -9,7 +9,12 @@ namespace Replica::D3D11
 	public:
 		using ShaderBase::Bind;
 
-		VertexShader(Device& dev, const LPCWSTR file, const std::initializer_list<IAElement>& layout);
+		VertexShader(
+			Device& dev, 
+			WSTR file, 
+			const std::initializer_list<IAElement>& layout,
+			const ConstantMapDef& cDef
+		);
 
 		ID3D11VertexShader* Get() const;
 

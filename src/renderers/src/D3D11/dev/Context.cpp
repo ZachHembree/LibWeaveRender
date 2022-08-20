@@ -44,48 +44,38 @@ Context& Context::operator=(Context&& other) noexcept
 
 void Context::SetVS(VertexShader* vs)
 {
-	if (vs != nullptr && (vs != currentVS || currentPS != nullptr))
+	if (vs != currentVS || currentVS == nullptr)
 	{
-		if (currentVS != nullptr)
-			currentVS->Unbind();
-
-		Get()->VSSetShader(vs->Get(), nullptr, 0);
+		ID3D11VertexShader* pVs = vs != nullptr ? vs->Get() : nullptr;
+		Get()->VSSetShader(pVs, nullptr, 0);
+		currentVS = vs;
 	}
 }
 
 void Context::SetPS(PixelShader* ps)
 {
-	if (ps != nullptr && (ps != currentPS || currentPS != nullptr))
+	if (ps != currentPS || currentPS == nullptr)
 	{ 
-		if (currentPS != nullptr)
-			currentPS->Unbind();
-
-		Get()->PSSetShader(ps->Get(), nullptr, 0);
+		ID3D11PixelShader* pPs = ps != nullptr ? ps->Get() : nullptr;
+		Get()->PSSetShader(pPs, nullptr, 0);
+		currentPS = ps;
 	}
 }
 
-void Context::RemoveVS(VertexShader* vs)
+bool Context::GetIsVsBound(VertexShader* vs)
 {
-	if (vs == currentVS)
-	{
-		Get()->VSSetShader(nullptr, nullptr, 0);
-		currentVS = nullptr;
-	}
+	return currentVS != nullptr && vs == currentVS;
 }
 
-void Context::RemovePS(PixelShader* ps)
+bool Context::GetIsPsBound(PixelShader* ps)
 {
-	if (ps == currentPS)
-	{
-		Get()->PSSetShader(nullptr, nullptr, 0);
-		currentPS = nullptr;
-	}
+	return currentPS != nullptr && ps == currentPS;
 }
 
 void Context::Reset()
 {
-	currentVS = nullptr;
-	currentPS = nullptr;
+	SetVS(nullptr);
+	SetPS(nullptr);
 }
 
 /// <summary>

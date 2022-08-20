@@ -21,6 +21,8 @@ namespace Replica::D3D11
 	protected:
 		Device* pDev;
 
+		DeviceChild() : pDev(nullptr) { }
+
 		DeviceChild(Device* pDev) : pDev(pDev) { }
 
 	};

@@ -404,7 +404,7 @@ namespace Replica
 		/// <summary>
 		/// Returns a new copy of the array.
 		/// </summary>
-		UniqueArray GetCopy() 
+		UniqueArray GetCopy() const
 		{ return UniqueArray(*this); }
 	};
 

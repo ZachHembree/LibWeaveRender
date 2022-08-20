@@ -1,34 +1,20 @@
 #pragma once
 #include "D3D11/dev/DeviceChild.hpp"
 #include "D3D11/dev/InputLayout.hpp"
+#include "D3D11/dev/ConstantBuffer.hpp"
+#include "D3D11/dev/ConstantMap.hpp"
 
 namespace Replica::D3D11
 {
 	class Sampler;
 	class Texture2D;
 	class ConstantBuffer;
+	class ConstantMap;
+	class ConstantMapDef;
 
 	class ShaderBase : public DeviceChild
 	{
 	public:
-		/*void SetScalar(const wchar_t* name, float v);
-
-		void SetVector(const wchar_t* name, vec2 v);
-
-		void SetVector(const wchar_t* name, vec3 v);
-
-		void SetVector(const wchar_t* name, vec4 v);
-
-		void SetScalar(const wchar_t* name, int v);
-
-		void SetVector(const wchar_t* name, ivec2 v);
-
-		void SetVector(const wchar_t* name, ivec3 v);
-
-		void SetVector(const wchar_t* name, ivec4 v);
-
-		void SetMatrix(const wchar_t* name, mat4 v);*/
-
 		/// <summary>
 		/// Returns true if the shader is bound
 		/// </summary>
@@ -55,6 +41,16 @@ namespace Replica::D3D11
 		virtual void SetConstants(ConstantBuffer& cb) = 0;
 
 		/// <summary>
+		/// Sets the value corresponding to the given name to the
+		/// given value.
+		/// </summary>
+		template<typename T>
+		void SetConstant(WSTR name, const T& value)
+		{
+			constants.SetMember(name, value);
+		}
+
+		/// <summary>
 		/// Sets sampler using last context
 		/// </summary>
 		virtual void SetSampler(Sampler& samp) = 0;
@@ -65,10 +61,13 @@ namespace Replica::D3D11
 		virtual void SetTexture(Texture2D& tex) = 0;
 
 	protected:
+		ConstantMap constants;
+		ConstantBuffer cBuf;
 		Context* pCtx;
 		bool isBound;
 
 		ShaderBase(Device& dev);
 
+		ShaderBase(Device& dev, const ConstantMapDef& cDef);
 	};
 }

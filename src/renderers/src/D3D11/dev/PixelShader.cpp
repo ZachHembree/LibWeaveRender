@@ -41,7 +41,7 @@ void PixelShader::SetTexture(Texture2D& tex)
 
 void PixelShader::Bind(Context& ctx)
 {
-	if (!isBound)
+	if (!ctx.GetIsPsBound(this))
 	{ 
 		this->pCtx = &ctx;
 		ctx.SetPS(this);
@@ -51,9 +51,10 @@ void PixelShader::Bind(Context& ctx)
 
 void PixelShader::Unbind()
 {
-	if (isBound)
+	if (isBound && pCtx->GetIsPsBound(this))
 	{ 
-		pCtx->RemovePS(this);
+		pCtx->SetPS(nullptr);
 		isBound = false;
-	}
+		pCtx = nullptr;
+	}	
 }

@@ -6,7 +6,6 @@
 #include "Input.hpp"
 #include "D3D11/dev/VertexBuffer.hpp"
 #include "D3D11/dev/IndexBuffer.hpp"
-#include "D3D11/dev/ConstantBuffer.hpp"
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/dev/Device.hpp"
 #include "D3D11/dev/RenderTarget.hpp"
@@ -50,7 +49,6 @@ namespace Replica::D3D11
 		IndexBuffer iBuf;
 		Texture2D testTex;
 		Sampler testSamp;
-		ConstantBuffer cb;
 		VertexShader vs;
 		PixelShader ps;
 	};

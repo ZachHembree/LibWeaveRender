@@ -45,6 +45,14 @@ fquat QuatFromAxis(vec3 axis, float rad)
 	);
 }
 
+ConstantMapDef GetConstantMapDefVS()
+{
+	ConstantMapDef cDef;
+	cDef.Add<mat4>(L"mvp");
+
+	return cDef;
+}
+
 Renderer::Renderer(MinWindow* window) :
 	WindowComponentBase(window),
 	input(window),
@@ -71,12 +79,15 @@ Renderer::Renderer(MinWindow* window) :
 	}),
 	testTex(Texture2D::FromImageWIC(& device, L"lena_color_512.png")),
 	testSamp(&device, TexFilterMode::LINEAR, TexClampMode::MIRROR),
-	cb(device, sizeof(mat4)),
-	vs(device, L"DefaultVertShader.cso", 
-	{
-		{ "Position", Formats::R32G32B32_FLOAT },
-		{ "TexCoord", Formats::R32G32_FLOAT },
-	}),
+	vs(
+		device, 
+		L"DefaultVertShader.cso", 
+		{
+			{ "Position", Formats::R32G32B32_FLOAT },
+			{ "TexCoord", Formats::R32G32_FLOAT },
+		}, 
+		GetConstantMapDefVS()
+	),
 	ps(device, L"DefaultPixShader.cso")
 {
 	ImGui_ImplDX11_Init(device.Get(), device.GetContext().Get());
@@ -125,18 +136,12 @@ void Renderer::Update()
 	backBuf.Clear(ctx);
 
 	// Update VS constant bufer
-	ConstantMapDef mapDef;
-	mapDef.Add<mat4>(L"mvp");
-
-	ConstantMap cMap(mapDef);
-	cMap.SetMember(L"mvp", mvp);
-	cMap.UpdateConstantBuffer(cb, ctx);
-
+	vs.SetConstant(L"mvp", mvp);
 	//cb.SetData(&mvp,ctx);
 
 	// Assign VS
 	vs.Bind();
-	vs.SetConstants(cb);
+	//vs.SetConstants(cb);
 
 	// Assign PS
 	ps.Bind();

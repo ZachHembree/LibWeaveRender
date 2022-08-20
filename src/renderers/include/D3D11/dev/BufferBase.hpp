@@ -7,10 +7,6 @@ namespace Replica::D3D11
 	class BufferBase : public ResourceBase
 	{
 	public:
-		const ResourceTypes type;
-		const ResourceUsages usage;
-		const ResourceAccessFlags cpuAccess;
-
 		ID3D11Buffer* Get() { return pBuf.Get(); };
 
 		ID3D11Buffer** GetAddressOf() { return pBuf.GetAddressOf(); };
@@ -25,8 +21,22 @@ namespace Replica::D3D11
 		UINT GetSize() { return byteSize; }
 
 	protected:
+		ResourceTypes type;
+		ResourceUsages usage;
+		ResourceAccessFlags cpuAccess;
 		ComPtr<ID3D11Buffer> pBuf;
 		UINT byteSize;
+
+		template<typename T>
+		BufferBase(ResourceTypes type,
+			ResourceUsages usage,
+			ResourceAccessFlags cpuAccess,
+			Device& device,
+			const IDynamicCollection<T>& data) :
+			BufferBase(type, usage, cpuAccess, device, data.GetPtr(), (UINT)data.GetSize())
+		{ }
+
+		BufferBase();
 
 		BufferBase(ResourceTypes type, 
 			ResourceUsages usage, 
@@ -35,14 +45,9 @@ namespace Replica::D3D11
 			const void* data, 
 			const UINT byteSize);
 
-		template<typename T>
-		BufferBase(ResourceTypes type, 
-			ResourceUsages usage, 
-			ResourceAccessFlags cpuAccess, 
-			Device& device, 
-			const IDynamicCollection<T>& data) :
-			BufferBase(type, usage, cpuAccess, device, data.GetPtr(), (UINT)data.GetSize())
-		{ }
+		BufferBase(BufferBase&& other) noexcept;
+
+		BufferBase& operator=(BufferBase&& other) noexcept;
 
 		void CreateBuffer(const void* data, const UINT byteSize, ID3D11Device* pDevice);
 	

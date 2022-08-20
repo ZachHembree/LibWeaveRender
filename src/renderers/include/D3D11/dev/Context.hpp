@@ -87,15 +87,9 @@ namespace Replica::D3D11
 		/// </summary>
 		void SetPS(PixelShader* ps);
 
-		/// <summary>
-		/// Removes the given vertex shader, if bound
-		/// </summary>
-		void RemoveVS(VertexShader* vs);
+		bool GetIsVsBound(VertexShader* vs);
 
-		/// <summary>
-		/// Removes the given pixel shader, if bound
-		/// </summary>
-		void RemovePS(PixelShader* ps);
+		bool GetIsPsBound(PixelShader* ps);
 
 		/// <summary>
 		/// Unbinds all resources
