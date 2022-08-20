@@ -11,6 +11,7 @@
 #include "D3D11/dev/VertexShader.hpp"
 #include "D3D11/dev/PixelShader.hpp"
 #include "D3D11/dev/Texture2D.hpp"
+#include "D3D11/dev/ConstantMap.hpp"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
@@ -124,7 +125,14 @@ void Renderer::Update()
 	backBuf.Clear(ctx);
 
 	// Update VS constant bufer
-	cb.SetData(&mvp,ctx);
+	ConstantMapDef mapDef;
+	mapDef.Add<mat4>(L"mvp");
+
+	ConstantMap cMap(mapDef);
+	cMap.SetMember(L"mvp", mvp);
+	cMap.UpdateConstantBuffer(cb, ctx);
+
+	//cb.SetData(&mvp,ctx);
 
 	// Assign VS
 	vs.Bind();

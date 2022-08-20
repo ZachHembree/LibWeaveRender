@@ -31,4 +31,7 @@ namespace Replica::D3D11
 	using mat3x3 = glm::mat3x3;
 	using mat4 = glm::mat4;
 	using mat4x4 = glm::mat4x4;
+
+	typedef const wchar_t* WSTR;
+	typedef const char* STR;
 }

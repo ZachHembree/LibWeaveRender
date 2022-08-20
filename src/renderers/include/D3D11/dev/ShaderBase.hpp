@@ -11,17 +11,23 @@ namespace Replica::D3D11
 	class ShaderBase : public DeviceChild
 	{
 	public:
-		/* To-Do
-		void SetScalar(float v);
+		/*void SetScalar(const wchar_t* name, float v);
 
-		void SetVector(vec2);
+		void SetVector(const wchar_t* name, vec2 v);
 
-		void SetVector(vec4);
+		void SetVector(const wchar_t* name, vec3 v);
 
-		void SetVector(vec4);
+		void SetVector(const wchar_t* name, vec4 v);
 
-		void SetMatrix(mat4);
-		*/
+		void SetScalar(const wchar_t* name, int v);
+
+		void SetVector(const wchar_t* name, ivec2 v);
+
+		void SetVector(const wchar_t* name, ivec3 v);
+
+		void SetVector(const wchar_t* name, ivec4 v);
+
+		void SetMatrix(const wchar_t* name, mat4 v);*/
 
 		/// <summary>
 		/// Returns true if the shader is bound

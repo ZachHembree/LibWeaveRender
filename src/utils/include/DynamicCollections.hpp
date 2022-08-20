@@ -140,10 +140,13 @@ namespace Replica
 		{
 			if (this != &rhs)
 			{
-				delete[] data;
+				if (length != rhs.length)
+				{ 
+					delete[] data;
+					data = new T[rhs.length];
+				}
 
 				length = rhs.length;
-				data = new T[length];
 				memcpy(data, rhs.data, length * sizeof(T));
 			}
 
@@ -417,6 +420,7 @@ namespace Replica
 		using std::vector<T>::pop_back;
 		using std::vector<T>::begin;
 		using std::vector<T>::end;
+		using std::vector<T>::erase;
 		using std::vector<T>::max_size;
 		using std::vector<T>::resize;
 		using std::vector<T>::capacity;
