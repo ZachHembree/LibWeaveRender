@@ -10,17 +10,17 @@ using namespace Microsoft::WRL;
 
 VertexShader::VertexShader(
 	Device& dev, 
-	wstring_view file,
-	const IDynamicCollection<IAElement>& inputDef,
-	const ConstantMapDef& cDef
+	const VertexShaderDef& vsDef
 ) :
-	ShaderBase(dev, cDef)
+	ShaderBase(dev, vsDef.constMap),
+	samplers(vsDef.samplerMap),
+	textures(vsDef.textureMap)
 {
 	ComPtr<ID3DBlob> vsBlob;
-	GFX_THROW_FAILED(D3DReadFileToBlob(file.data(), &vsBlob));
+	GFX_THROW_FAILED(D3DReadFileToBlob(vsDef.file.data(), &vsBlob));
 	GFX_THROW_FAILED(dev.Get()->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &pVS));
 
-	this->layout = InputLayout(dev, vsBlob, inputDef);
+	this->layout = InputLayout(dev, vsBlob, vsDef.iaLayout);
 }
 
 VertexShader::VertexShader(VertexShader&& other) noexcept :
@@ -42,6 +42,16 @@ ID3D11VertexShader* VertexShader::Get() const { return pVS.Get(); }
 
 const InputLayout& VertexShader::GetLayout() const { return layout; }
 
+void VertexShader::SetSampler(wstring_view name, Sampler& samp)
+{
+	samplers.SetResource(name, samp.Get());
+}
+
+void VertexShader::SetTexture(wstring_view name, Texture2D& tex)
+{
+	textures.SetResource(name, tex.GetSRV());
+}
+
 void VertexShader::Bind(Context& ctx)
 {
 	if (!ctx.GetIsVsBound(this))
@@ -49,8 +59,15 @@ void VertexShader::Bind(Context& ctx)
 		ctx.SetVS(this);
 		this->pCtx = &ctx;
 
+		ID3D11DeviceContext* cur = ctx.Get();
+		IDynamicCollection<ID3D11SamplerState*>& ss = samplers.GetResources();
+		IDynamicCollection<ID3D11ShaderResourceView*>& tex = textures.GetResources();
+
+		cur->VSSetSamplers(0, (UINT)ss.GetLength(), ss.GetPtr());
+		cur->VSSetShaderResources(0, (UINT)tex.GetLength(), tex.GetPtr());
+
 		constants.UpdateConstantBuffer(cBuf, ctx);
-		ctx.Get()->VSSetConstantBuffers(0u, 1, cBuf.GetAddressOf());
+		cur->VSSetConstantBuffers(0u, 1, cBuf.GetAddressOf());
 		layout.Bind(ctx);
 
 		isBound = true;
@@ -66,14 +83,3 @@ void VertexShader::Unbind()
 		pCtx = nullptr;
 	}	
 }
-
-void VertexShader::SetSampler(Sampler& samp)
-{
-	pCtx->Get()->VSSetSamplers(0u, 1u, samp.GetAddressOf());
-}
-
-void VertexShader::SetTexture(Texture2D& tex)
-{
-	pCtx->Get()->VSSetShaderResources(0u, 1u, tex.GetSRVAddress());
-}
-

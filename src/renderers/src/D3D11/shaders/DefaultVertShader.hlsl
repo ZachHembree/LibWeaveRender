@@ -12,7 +12,6 @@ struct VertOut
 
 cbuffer _
 {
-	float test;
 	float4x4 mvp;
 };
 

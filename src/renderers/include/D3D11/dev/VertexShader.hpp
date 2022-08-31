@@ -1,9 +1,19 @@
 #pragma once
 #include "D3D11/dev/ShaderBase.hpp"
 #include "D3D11/dev/InputLayout.hpp"
+#include "D3D11/ResourceMap.hpp"
 
 namespace Replica::D3D11
 { 
+	struct VertexShaderDef
+	{
+		wstring_view file;
+		UniqueArray<IAElement> iaLayout;
+		ConstantMapDef constMap;
+		ResourceMap<ID3D11SamplerState> samplerMap;
+		ResourceMap<ID3D11ShaderResourceView> textureMap;
+	};
+
 	class VertexShader : public ShaderBase
 	{
 	public:
@@ -11,19 +21,8 @@ namespace Replica::D3D11
 
 		VertexShader(
 			Device& dev,
-			wstring_view file,
-			const IDynamicCollection<IAElement>& layout,
-			const ConstantMapDef& cDef
+			const VertexShaderDef& vsDef
 		);
-
-		VertexShader(
-			Device& dev, 
-			wstring_view file,
-			const std::initializer_list<IAElement>& layout,
-			const ConstantMapDef& cDef
-		) : 
-			VertexShader(dev, file, UniqueArray(layout), cDef)
-		{ };
 
 		VertexShader(VertexShader&& other) noexcept;
 
@@ -49,15 +48,17 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Sets sampler using last context
 		/// </summary>
-		void SetSampler(Sampler& samp) override;
+		void SetSampler(wstring_view name, Sampler& samp) override;
 
 		/// <summary>
 		/// Sets Texture2D using last context
 		/// </summary>
-		void SetTexture(Texture2D& tex) override;
+		void SetTexture(wstring_view name, Texture2D& tex) override;
 
 	private:
 		InputLayout layout;
 		ComPtr<ID3D11VertexShader> pVS;
+		ResourceMap<ID3D11SamplerState> samplers;
+		ResourceMap<ID3D11ShaderResourceView> textures;
 	};
 }

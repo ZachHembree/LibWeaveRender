@@ -27,6 +27,7 @@ BufferBase::BufferBase(
 	cpuAccess(cpuAccess),
 	byteSize(byteSize)
 {
+	GFX_ASSERT(byteSize > 0, "Buffer size cannot be 0.");
 	CreateBuffer(data, byteSize, dev.Get());
 }
 

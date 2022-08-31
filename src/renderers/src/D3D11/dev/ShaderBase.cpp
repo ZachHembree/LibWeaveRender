@@ -14,8 +14,11 @@ ShaderBase::ShaderBase(Device& dev) :
 ShaderBase::ShaderBase(Device& dev, const ConstantMapDef& cDef) :
 	ShaderBase(dev)
 {
-	constants = ConstantMap(cDef);
-	cBuf = ConstantBuffer(dev, constants.GetStride());
+	if (cDef.GetStride() > 0)
+	{ 
+		constants = ConstantMap(cDef);
+		cBuf = ConstantBuffer(dev, constants.GetStride());
+	}
 }
 
 ShaderBase::ShaderBase(ShaderBase&& other) noexcept :

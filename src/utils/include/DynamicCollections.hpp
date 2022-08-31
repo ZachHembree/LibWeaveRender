@@ -92,7 +92,7 @@ namespace Replica
 		/// </summary>
 		DynamicArrayBase(size_t length) :
 			length(length),
-			data((length > 0) ? new T[length] : nullptr)
+			data((length > 0) ? new T[length]() : nullptr)
 		{ }
 
 		/// <summary>

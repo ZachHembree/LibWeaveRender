@@ -19,8 +19,6 @@
 
 using namespace glm;
 using namespace std::chrono;
-using namespace Microsoft::WRL;
-using namespace DirectX;
 using namespace Replica;
 using namespace Replica::D3D11;
 
@@ -29,17 +27,29 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 struct Vertex
 {
 public:
-	D3D11::vec3 pos;
-	D3D11::vec2 uv;
+	vec3 pos;
+	vec2 uv;
 };
 
-ConstantMapDef GetConstantMapDefVS()
+const VertexShaderDef g_DefaultVS = 
 {
-	ConstantMapDef cDef;
-	cDef.Add<mat4>(L"mvp");
+	L"DefaultVertShader.cso",
+	{
+		{ "Position", Formats::R32G32B32_FLOAT },
+		{ "TexCoord", Formats::R32G32_FLOAT },
+	},
+	{
+		ConstantDef::Get<mat4>(L"mvp"),
+	}
+};
 
-	return cDef;
-}
+const PixelShaderDef g_DefaultPS = 
+{
+	L"DefaultPixShader.cso",
+	{ },
+	{ L"samp" },
+	{ L"tex" }
+};
 
 Renderer::Renderer(MinWindow* window) :
 	WindowComponentBase(window),
@@ -49,25 +59,8 @@ Renderer::Renderer(MinWindow* window) :
 	backBuf(swap.GetBuffer(0)), // Get RT view for swap chain back buf
 	testTex(Texture2D::FromImageWIC(& device, L"lena_color_512.png")),
 	testSamp(&device, TexFilterMode::LINEAR, TexClampMode::MIRROR),
-	vs(
-		device, 
-		L"DefaultVertShader.cso", 
-		{
-			{ "Position", Formats::R32G32B32_FLOAT },
-			{ "TexCoord", Formats::R32G32_FLOAT },
-		}, 
-		{
-			ConstantDef::Get<float>(L"test"),
-			ConstantDef::Get<mat4>(L"mvp")
-		}
-	),
-	ps(
-		device, 
-		L"DefaultPixShader.cso",
-		{
-			ConstantDef::Get<float>(L"none")
-		}
-	)
+	vs(device, g_DefaultVS),
+	ps(device, g_DefaultPS)
 {
 	ImGui_ImplDX11_Init(device.Get(), device.GetContext().Get());
 
@@ -147,9 +140,9 @@ void Renderer::Update()
 		vs.Bind();
 
 		// Assign PS
+		ps.SetSampler(L"samp", testSamp);
+		ps.SetTexture(L"tex", testTex);
 		ps.Bind();
-		ps.SetSampler(testSamp);
-		ps.SetTexture(testTex);
 
 		mesh.Setup(ctx, vp);
 		mesh.Draw(ctx);

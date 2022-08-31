@@ -68,12 +68,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Sets sampler using last context
 		/// </summary>
-		virtual void SetSampler(Sampler& samp) = 0;
+		virtual void SetSampler(wstring_view name, Sampler& samp) = 0;
 
 		/// <summary>
 		/// Sets Texture2D using last context
 		/// </summary>
-		virtual void SetTexture(Texture2D& tex) = 0;
+		virtual void SetTexture(wstring_view name, Texture2D& tex) = 0;
 
 	protected:
 		ConstantMap constants;

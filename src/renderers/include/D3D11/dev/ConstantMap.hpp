@@ -139,16 +139,16 @@ namespace Replica::D3D11
 
 		ConstantDef();
 
-		template<typename T>
-		static ConstantDef Get(wstring_view name)
-		{ 
-			return ConstantDef(name, typeid(T), sizeof(T));
-		}
-
 		ConstantDef(wstring_view name, const type_info& type, const size_t stride);
 
 		ConstantDef(const ConstantDef& other);
 
 		ConstantDef& operator=(const ConstantDef& other);
+
+		template<typename T>
+		static ConstantDef Get(wstring_view name)
+		{
+			return ConstantDef(name, typeid(T), sizeof(T));
+		}
 	};
 }
