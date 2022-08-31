@@ -9,9 +9,7 @@ using namespace Replica::D3D11;
 using namespace Microsoft::WRL;
 
 PixelShader::PixelShader(Device& dev, const PixelShaderDef& psDef) :
-	ShaderBase(dev, psDef.constMap),
-	samplers(psDef.samplerMap),
-	textures(psDef.textureMap)
+	ShaderBase(dev, reinterpret_cast<const ShaderDefBase&>(psDef))
 {
 	ComPtr<ID3DBlob> psBlob;
 	GFX_THROW_FAILED(D3DReadFileToBlob(psDef.file.data(), &psBlob));

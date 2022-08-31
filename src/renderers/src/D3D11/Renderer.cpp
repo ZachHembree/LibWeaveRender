@@ -33,22 +33,26 @@ public:
 
 const VertexShaderDef g_DefaultVS = 
 {
+	ShaderDefBase
+	{
+		{ ConstantDef::Get<mat4>(L"mvp"), }
+	},
 	L"DefaultVertShader.cso",
 	{
 		{ "Position", Formats::R32G32B32_FLOAT },
 		{ "TexCoord", Formats::R32G32_FLOAT },
 	},
-	{
-		ConstantDef::Get<mat4>(L"mvp"),
-	}
 };
 
 const PixelShaderDef g_DefaultPS = 
 {
+	ShaderDefBase
+	{
+		{ },
+		{ L"samp" },
+		{ L"tex" }
+	},
 	L"DefaultPixShader.cso",
-	{ },
-	{ L"samp" },
-	{ L"tex" }
 };
 
 const EffectDef g_DefaultEffect =

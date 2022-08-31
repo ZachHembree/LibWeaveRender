@@ -3,6 +3,7 @@
 #include "D3D11/dev/InputLayout.hpp"
 #include "D3D11/dev/ConstantBuffer.hpp"
 #include "D3D11/dev/ConstantMap.hpp"
+#include "D3D11/ResourceMap.hpp"
 
 namespace Replica::D3D11
 {
@@ -11,6 +12,13 @@ namespace Replica::D3D11
 	class ConstantBuffer;
 	class ConstantMap;
 	class ConstantMapDef;
+
+	struct ShaderDefBase
+	{
+		ConstantMapDef constMap;
+		ResourceMap<ID3D11SamplerState> samplerMap;
+		ResourceMap<ID3D11ShaderResourceView> textureMap;
+	};
 
 	class ShaderBase : public DeviceChild
 	{
@@ -77,13 +85,16 @@ namespace Replica::D3D11
 
 	protected:
 		ConstantMap constants;
+		ResourceMap<ID3D11SamplerState> samplers;
+		ResourceMap<ID3D11ShaderResourceView> textures;
+
 		ConstantBuffer cBuf;
 		Context* pCtx;
 		bool isBound;
 
 		ShaderBase(Device& dev);
 
-		ShaderBase(Device& dev, const ConstantMapDef& cDef);
+		ShaderBase(Device& dev, const ShaderDefBase& def);
 
 		ShaderBase(ShaderBase&& other) noexcept;
 

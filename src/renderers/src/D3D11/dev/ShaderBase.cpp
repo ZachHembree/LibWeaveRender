@@ -11,12 +11,16 @@ ShaderBase::ShaderBase(Device& dev) :
 	isBound(false)
 { }
 
-ShaderBase::ShaderBase(Device& dev, const ConstantMapDef& cDef) :
-	ShaderBase(dev)
+ShaderBase::ShaderBase(Device& dev, const ShaderDefBase& def) :
+	DeviceChild(&dev),
+	pCtx(&dev.GetContext()),
+	isBound(false),
+	samplers(def.samplerMap),
+	textures(def.textureMap)
 {
-	if (cDef.GetStride() > 0)
+	if (def.constMap.GetStride() > 0)
 	{ 
-		constants = ConstantMap(cDef);
+		constants = ConstantMap(def.constMap);
 		cBuf = ConstantBuffer(dev, constants.GetStride());
 	}
 }
@@ -24,6 +28,8 @@ ShaderBase::ShaderBase(Device& dev, const ConstantMapDef& cDef) :
 ShaderBase::ShaderBase(ShaderBase&& other) noexcept :
 	DeviceChild(std::move(other)),
 	constants(std::move(other.constants)),
+	samplers(std::move(other.samplers)),
+	textures(std::move(other.textures)),
 	cBuf(std::move(other.cBuf)),
 	pCtx(other.pCtx),
 	isBound(other.isBound)
@@ -35,6 +41,8 @@ ShaderBase& ShaderBase::operator=(ShaderBase&& other) noexcept
 {
 	DeviceChild::operator=(std::move(other));
 	this->constants = std::move(other.constants);
+	this->samplers = std::move(other.samplers);
+	this->textures = std::move(other.textures);
 	this->cBuf = std::move(other.cBuf);
 	this->pCtx = other.pCtx;
 	this->isBound = other.isBound;

@@ -11,6 +11,8 @@ namespace Replica::D3D11
 		ResourceMap() = default;
 		ResourceMap(const ResourceMap&) = default;
 		ResourceMap(ResourceMap&&) = default;
+		ResourceMap& operator=(const ResourceMap& other) = default;
+		ResourceMap& operator=(ResourceMap&& other) = default;
 
 		ResourceMap(const IDynamicCollection<wstring_view>& def) :
 			resources(def.GetLength())

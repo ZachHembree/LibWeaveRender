@@ -34,7 +34,7 @@ namespace Replica::D3D11
 		}
 
 		/// <summary>
-		/// Sets sampler using last context
+		/// Sets sampler 
 		/// </summary>
 		void SetSampler(wstring_view name, Sampler& samp)
 		{
@@ -43,7 +43,7 @@ namespace Replica::D3D11
 		}
 
 		/// <summary>
-		/// Sets Texture2D using last context
+		/// Sets Texture2D
 		/// </summary>
 		void SetTexture(wstring_view name, Texture2D& tex)
 		{
@@ -53,8 +53,8 @@ namespace Replica::D3D11
 
 		void Setup(Context& ctx) override
 		{
-			vs.Bind();
-			ps.Bind();
+			vs.Bind(ctx);
+			ps.Bind(ctx);
 		}
 
 	private:

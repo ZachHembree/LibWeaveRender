@@ -7,12 +7,9 @@ namespace Replica::D3D11
 	class Texture2D;
 	class Sampler;
 
-	struct PixelShaderDef
+	struct PixelShaderDef : public ShaderDefBase
 	{
 		wstring_view file;
-		ConstantMapDef constMap;
-		ResourceMap<ID3D11SamplerState> samplerMap;
-		ResourceMap<ID3D11ShaderResourceView> textureMap;
 	};
 
 	class PixelShader : public ShaderBase
@@ -48,18 +45,17 @@ namespace Replica::D3D11
 		void Unbind() override;
 
 		/// <summary>
-		/// Sets sampler using last context
+		/// Sets sampler
 		/// </summary>
 		void SetSampler(wstring_view name, Sampler& samp) override;
 
 		/// <summary>
-		/// Sets Texture2D using last context
+		/// Sets Texture2D
 		/// </summary>
 		void SetTexture(wstring_view name, Texture2D& tex) override;
 
 	private:
 		ComPtr<ID3D11PixelShader> pPS;
-		ResourceMap<ID3D11SamplerState> samplers;
-		ResourceMap<ID3D11ShaderResourceView> textures;
+
 	};
 }

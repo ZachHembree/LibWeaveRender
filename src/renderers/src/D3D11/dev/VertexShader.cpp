@@ -12,9 +12,7 @@ VertexShader::VertexShader(
 	Device& dev, 
 	const VertexShaderDef& vsDef
 ) :
-	ShaderBase(dev, vsDef.constMap),
-	samplers(vsDef.samplerMap),
-	textures(vsDef.textureMap)
+	ShaderBase(dev, reinterpret_cast<const ShaderDefBase&>(vsDef))
 {
 	ComPtr<ID3DBlob> vsBlob;
 	GFX_THROW_FAILED(D3DReadFileToBlob(vsDef.file.data(), &vsBlob));
