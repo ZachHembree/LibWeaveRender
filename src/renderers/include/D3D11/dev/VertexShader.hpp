@@ -8,7 +8,7 @@ namespace Replica::D3D11
 	struct VertexShaderDef
 	{
 		wstring_view file;
-		UniqueArray<IAElement> iaLayout;
+		DynamicArray<IAElement> iaLayout;
 		ConstantMapDef constMap;
 		ResourceMap<ID3D11SamplerState> samplerMap;
 		ResourceMap<ID3D11ShaderResourceView> textureMap;

@@ -118,10 +118,23 @@ ConstantMapDef::ConstantMapDef(const std::initializer_list<ConstantDef>& definit
 	ConstantMapDef(UniqueArray(definition))
 { }
 
+ConstantMapDef::ConstantMapDef(const ConstantMapDef& other) noexcept :
+	members(other.members.GetCopy()),
+	stride(other.stride)
+{ }
+
 ConstantMapDef::ConstantMapDef(ConstantMapDef&& other) noexcept :
 	members(std::move(other.members)),
 	stride(other.stride)
 { }
+
+ConstantMapDef& ConstantMapDef::operator=(const ConstantMapDef& other) noexcept
+{
+	this->members = other.members.GetCopy();
+	this->stride = other.stride;
+
+	return *this;
+}
 
 ConstantMapDef& ConstantMapDef::operator=(ConstantMapDef&& other) noexcept
 {

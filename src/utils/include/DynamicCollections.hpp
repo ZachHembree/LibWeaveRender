@@ -540,13 +540,14 @@ namespace Replica
 		/// </summary>
 		UniqueVector& operator=(UniqueVector&& rhs) noexcept
 		{
-			return static_cast<UniqueVector&>(Vector<T>::operator=(std::move(rhs)));
+			Vector<T>::operator=(std::move(rhs));
+			return *this;
 		}
 
 		/// <summary>
 		/// Returns a new copy of the unique vector.
 		/// </summary>
-		UniqueVector GetCopy()
+		UniqueVector GetCopy() const
 		{
 			return UniqueVector(*this);
 		}

@@ -91,6 +91,10 @@ namespace Replica::D3D11
 
 		ConstantMapDef(const std::initializer_list<ConstantDef>& definition);
 
+		ConstantMapDef(const ConstantMapDef& other) noexcept;
+
+		ConstantMapDef& operator=(const ConstantMapDef& other) noexcept;
+
 		ConstantMapDef(ConstantMapDef&& other) noexcept;
 
 		ConstantMapDef& operator=(ConstantMapDef&& other) noexcept;

@@ -11,8 +11,7 @@
 #include "D3D11/dev/RenderTarget.hpp"
 #include "D3D11/dev/Texture2D.hpp"
 #include "D3D11/dev/Sampler.hpp"
-#include "D3D11/dev/VertexShader.hpp"
-#include "D3D11/dev/PixelShader.hpp"
+#include "D3D11/Effect.hpp"
 #include "D3D11/Mesh.hpp"
 
 #pragma comment(lib, "d3d11.lib")
@@ -49,7 +48,6 @@ namespace Replica::D3D11
 		UniqueVector<Mesh> scene;
 		Texture2D testTex;
 		Sampler testSamp;
-		VertexShader vs;
-		PixelShader ps;
+		Effect testEffect;
 	};
 }

@@ -22,7 +22,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Updates any resources needed prior to drawing
 		/// </summary>
-		void Setup(Context& ctx, const mat4& vp) override
+		void Setup(Context& ctx) override
 		{
 			vBuf.Bind(ctx);
 			iBuf.Bind(ctx);

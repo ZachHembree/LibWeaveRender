@@ -51,6 +51,12 @@ const PixelShaderDef g_DefaultPS =
 	{ L"tex" }
 };
 
+const EffectDef g_DefaultEffect =
+{
+	g_DefaultVS,
+	g_DefaultPS
+};
+
 Renderer::Renderer(MinWindow* window) :
 	WindowComponentBase(window),
 	input(window),
@@ -59,8 +65,7 @@ Renderer::Renderer(MinWindow* window) :
 	backBuf(swap.GetBuffer(0)), // Get RT view for swap chain back buf
 	testTex(Texture2D::FromImageWIC(& device, L"lena_color_512.png")),
 	testSamp(&device, TexFilterMode::LINEAR, TexClampMode::MIRROR),
-	vs(device, g_DefaultVS),
-	ps(device, g_DefaultPS)
+	testEffect(device, g_DefaultEffect)
 {
 	ImGui_ImplDX11_Init(device.Get(), device.GetContext().Get());
 
@@ -135,16 +140,12 @@ void Renderer::Update()
 		mesh.SetRotation(rot);
 
 		mat4 model = mesh.GetModelMatrix();
-		vs.SetConstant(L"mvp", vp * model);
-		// Assign VS
-		vs.Bind();
+		testEffect.SetConstant(L"mvp", vp * model);
+		testEffect.SetSampler(L"samp", testSamp);
+		testEffect.SetTexture(L"tex", testTex);
 
-		// Assign PS
-		ps.SetSampler(L"samp", testSamp);
-		ps.SetTexture(L"tex", testTex);
-		ps.Bind();
-
-		mesh.Setup(ctx, vp);
+		testEffect.Setup(ctx);
+		mesh.Setup(ctx);
 		mesh.Draw(ctx);
 	}
 

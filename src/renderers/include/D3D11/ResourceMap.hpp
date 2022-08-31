@@ -36,7 +36,7 @@ namespace Replica::D3D11
 			}
 		}
 
-		bool Validate() 
+		void Validate() 
 		{ 
 			for (int i = 0; i < resources.GetLength(); i++) 
 				GFX_ASSERT(resources[i] != nullptr, "Cannot get null resources.");
