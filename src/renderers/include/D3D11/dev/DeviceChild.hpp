@@ -25,5 +25,17 @@ namespace Replica::D3D11
 
 		DeviceChild(Device* pDev) : pDev(pDev) { }
 
+		DeviceChild(DeviceChild&& other) noexcept : pDev(other.pDev) 
+		{
+			other.pDev = nullptr;
+		}
+
+		DeviceChild& operator=(DeviceChild&& other) noexcept
+		{
+			this->pDev = other.pDev;
+			other.pDev = nullptr;
+
+			return *this;
+		}
 	};
 }

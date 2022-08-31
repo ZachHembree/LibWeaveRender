@@ -11,6 +11,9 @@ namespace Replica
 	template<typename T> class DynamicArray;
 	template<typename T> class UniqueArray;
 
+	template<class T>
+	using DynIterator = std::reverse_iterator<T>;
+
 	/// <summary>
 	/// Interface template for dynamic arrays/vectors
 	/// </summary>
@@ -105,7 +108,7 @@ namespace Replica
 
 		/// <summary>
 		/// Initializes a new dynamic array object using the given pointer and length.
-		/// Takes ownership of the pointer.
+		/// Takes ownership of the pointer's content.
 		/// </summary>
 		DynamicArrayBase(T*&& data, const size_t length) :
 			length(length),
@@ -308,13 +311,19 @@ namespace Replica
 		/// Copy assignment operator.
 		/// </summary>
 		DynamicArray& operator=(const DynamicArray& rhs)
-		{ return static_cast<DynamicArray&>(DynamicArrayBase<T>::operator=(rhs)); }
+		{
+			DynamicArrayBase<T>::operator=(rhs); 
+			return *this;
+		}
 
 		/// <summary>
 		/// Move assignment operator.
 		/// </summary>
 		DynamicArray& operator=(DynamicArray&& rhs) noexcept 
-		{ return static_cast<DynamicArray&>(DynamicArrayBase<T>::operator=(std::move(rhs))); }
+		{
+			DynamicArrayBase<T>::operator=(std::move(rhs)); 
+			return *this;
+		}
 	};
 
 	/// <summary>
@@ -399,7 +408,10 @@ namespace Replica
 		/// Move assignment operator.
 		/// </summary>
 		UniqueArray& operator=(UniqueArray&& rhs) noexcept 
-		{ return static_cast<UniqueArray&>(DynamicArrayBase<T>::operator=(std::move(rhs))); }
+		{ 
+			DynamicArrayBase<T>::operator=(std::move(rhs)); 
+			return *this;
+		}
 
 		/// <summary>
 		/// Returns a new copy of the array.
@@ -415,6 +427,7 @@ namespace Replica
 	class Vector : public IDynamicCollection<T>, private std::vector<T>
 	{
 	public:
+		using std::vector<T>::vector;
 		using std::vector<T>::push_back;
 		using std::vector<T>::emplace_back;
 		using std::vector<T>::pop_back;
@@ -427,6 +440,10 @@ namespace Replica
 		using std::vector<T>::empty;
 		using std::vector<T>::reserve;
 		using std::vector<T>::shrink_to_fit;
+
+		Vector(const IDynamicCollection<T>& other) :
+			Vector(other.GetPtr(), other.GetPtr() + other.GetLength())
+		{ }
 
 		/// <summary>
 		/// Returns the length of the vector.
@@ -469,7 +486,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a new copy of the given unique vector.
 		/// </summary>
-		UniqueVector(const UniqueVector& rhs) : 
+		UniqueVector(const UniqueVector& rhs) :
 			Vector<T>(rhs)
 		{ };
 
@@ -482,8 +499,12 @@ namespace Replica
 		/// <summary>
 		/// Initializes a new unique vector.
 		/// </summary>
-		UniqueVector() : 
-			Vector<T>() 
+		UniqueVector() :
+			Vector<T>()
+		{ }
+
+		UniqueVector(const IDynamicCollection<T>& other) :
+			Vector<T>(other.GetPtr(), other.GetPtr() + other.GetLength())
 		{ }
 
 		/// <summary>
@@ -496,7 +517,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a new unique vector with the given capacity.
 		/// </summary>
-		explicit UniqueVector(size_t capacity) : 
+		explicit UniqueVector(size_t capacity) :
 			Vector<T>(capacity)
 		{ }
 
@@ -518,13 +539,17 @@ namespace Replica
 		/// Move assignment operator.
 		/// </summary>
 		UniqueVector& operator=(UniqueVector&& rhs) noexcept
-		{ return static_cast<UniqueVector&>(Vector<T>::operator=(std::move(rhs))); }
+		{
+			return static_cast<UniqueVector&>(Vector<T>::operator=(std::move(rhs)));
+		}
 
 		/// <summary>
 		/// Returns a new copy of the unique vector.
 		/// </summary>
-		UniqueVector GetCopy() 
-		{ return UniqueVector(*this); }
+		UniqueVector GetCopy()
+		{
+			return UniqueVector(*this);
+		}
 	};
 
 }

@@ -13,6 +13,7 @@
 #include "D3D11/dev/Sampler.hpp"
 #include "D3D11/dev/VertexShader.hpp"
 #include "D3D11/dev/PixelShader.hpp"
+#include "D3D11/Mesh.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -45,8 +46,7 @@ namespace Replica::D3D11
 		SwapChain swap;
 		RenderTarget backBuf;
 
-		VertexBuffer vBuf;
-		IndexBuffer iBuf;
+		UniqueVector<Mesh> scene;
 		Texture2D testTex;
 		Sampler testSamp;
 		VertexShader vs;

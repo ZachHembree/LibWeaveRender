@@ -12,6 +12,7 @@
 #include "D3D11/dev/PixelShader.hpp"
 #include "D3D11/dev/Texture2D.hpp"
 #include "D3D11/dev/ConstantMap.hpp"
+#include "D3D11/Mesh.hpp"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
@@ -32,19 +33,6 @@ public:
 	D3D11::vec2 uv;
 };
 
-fquat QuatFromAxis(vec3 axis, float rad)
-{
-	rad *= 0.5f;
-	float a = sin(rad);
-
-	return fquat(
-		a * axis.x,
-		a * axis.y,
-		a * axis.z,
-		cos(rad)
-	);
-}
-
 ConstantMapDef GetConstantMapDefVS()
 {
 	ConstantMapDef cDef;
@@ -59,24 +47,6 @@ Renderer::Renderer(MinWindow* window) :
 	device(), // Create device and context
 	swap(*window, &device), // Create swap chain for window
 	backBuf(swap.GetBuffer(0)), // Get RT view for swap chain back buf
-	vBuf(device, UniqueArray<Vertex>{
-		{ { -1.0, -1.0, -1.0 }, { 0.0, 0.0 } },
-		{ { 1.0, -1.0, -1.0 }, { 1.0, 0.0 } },
-		{ { -1.0, 1.0, -1.0 }, { 0.0, 1.0 } },
-		{ { 1.0, 1.0, -1.0 }, { 1.0, 1.0 } }, // 3
-		{ { -1.0, -1.0, 1.0 }, { 0.0, 0.0 } },
-		{ { 1.0, -1.0, 1.0 }, { 1.0, 0.0 } },
-		{ { -1.0, 1.0, 1.0 }, { 0.0, 1.0 } },
-		{ { 1.0, 1.0, 1.0 }, { 1.0, 1.0 } },
-	}),
-	iBuf(device, UniqueArray<USHORT>{
-		0, 2, 1,  2, 3, 1,
-		1, 3, 5,  3, 7, 5,
-		2, 6, 3,  3, 6, 7,
-		4, 5, 7,  4, 7, 6,
-		0, 4, 2,  2, 4, 6,
-		0, 1, 4,  1, 5, 4
-	}),
 	testTex(Texture2D::FromImageWIC(& device, L"lena_color_512.png")),
 	testSamp(&device, TexFilterMode::LINEAR, TexClampMode::MIRROR),
 	vs(
@@ -86,11 +56,42 @@ Renderer::Renderer(MinWindow* window) :
 			{ "Position", Formats::R32G32B32_FLOAT },
 			{ "TexCoord", Formats::R32G32_FLOAT },
 		}, 
-		GetConstantMapDefVS()
+		{
+			ConstantDef::Get<float>(L"test"),
+			ConstantDef::Get<mat4>(L"mvp")
+		}
 	),
-	ps(device, L"DefaultPixShader.cso")
+	ps(
+		device, 
+		L"DefaultPixShader.cso",
+		{
+			ConstantDef::Get<float>(L"none")
+		}
+	)
 {
 	ImGui_ImplDX11_Init(device.Get(), device.GetContext().Get());
+
+	scene.emplace_back(Mesh(
+		device,
+		UniqueArray<Vertex>{
+			{ { -1.0, -1.0, -1.0 }, { 0.0, 0.0 } },
+			{ { 1.0, -1.0, -1.0 }, { 1.0, 0.0 } },
+			{ { -1.0, 1.0, -1.0 }, { 0.0, 1.0 } },
+			{ { 1.0, 1.0, -1.0 }, { 1.0, 1.0 } }, // 3
+			{ { -1.0, -1.0, 1.0 }, { 0.0, 0.0 } },
+			{ { 1.0, -1.0, 1.0 }, { 1.0, 0.0 } },
+			{ { -1.0, 1.0, 1.0 }, { 0.0, 1.0 } },
+			{ { 1.0, 1.0, 1.0 }, { 1.0, 1.0 } },
+		},
+		UniqueArray<USHORT>{
+			0, 2, 1, 2, 3, 1,
+			1, 3, 5, 3, 7, 5,
+			2, 6, 3, 3, 6, 7,
+			4, 5, 7, 4, 7, 6,
+			0, 4, 2, 2, 4, 6,
+			0, 1, 4, 1, 5, 4
+		}
+	));
 }
 
 Renderer::~Renderer()
@@ -118,45 +119,41 @@ void Renderer::Update()
 		<< "  MouseNorm: " << normMousePos.x << ", " << normMousePos.y;
 	parent->SetWindowTitle(ss.str().c_str());
 
-	// Generate draw matrix for test cube
-	mat4 model = identity<mat4>(),
-		view = identity<mat4>(),
+	mat4 view = identity<mat4>(),
 		proj = perspectiveLH(45.0f, aspectRatio, 0.5f, 100.0f);
-
-	model = translate(model, vec3(0.0f, 0.0f, 4.0f));
 
 	fquat rot = QuatFromAxis(vec3(0, 1, 0), pi<float>() * normMousePos.x);
 	rot = QuatFromAxis(vec3(0, 0, 1), pi<float>() * normMousePos.y) * rot;
-	model *= toMat4(rot);
 
-	// D3D expects row major matrices
-	const mat4 mvp = transpose(proj * view * model);
+	const mat4 vp = (proj * view);
 
 	// Clear back buffer
 	backBuf.Clear(ctx);
-
-	// Update VS constant bufer
-	vs.SetConstant(L"mvp", mvp);
-	//cb.SetData(&mvp,ctx);
-
-	// Assign VS
-	vs.Bind();
-	//vs.SetConstants(cb);
-
-	// Assign PS
-	ps.Bind();
-	ps.SetSampler(testSamp);
-	ps.SetTexture(testTex);
 
 	// Set viewport bounds
 	ctx.RSSetViewport(parent->GetSize());
 	// Bind back buffer as render target
 	backBuf.Bind(ctx);
 
-	// Bind and draw mesh data
-	vBuf.Bind(ctx);
-	iBuf.Bind(ctx);
-	ctx.DrawIndexed((UINT)iBuf.GetLength());
+	for (int i = 0; i < scene.GetLength(); i++)
+	{
+		Mesh& mesh = scene[i];
+		mesh.SetTranslation(vec3(0, 0, 4));
+		mesh.SetRotation(rot);
+
+		mat4 model = mesh.GetModelMatrix();
+		vs.SetConstant(L"mvp", vp * model);
+		// Assign VS
+		vs.Bind();
+
+		// Assign PS
+		ps.Bind();
+		ps.SetSampler(testSamp);
+		ps.SetTexture(testTex);
+
+		mesh.Setup(ctx, vp);
+		mesh.Draw(ctx);
+	}
 
 	// IMGUI Test
 	ImGui_ImplDX11_NewFrame();

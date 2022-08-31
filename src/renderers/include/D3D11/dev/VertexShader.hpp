@@ -10,11 +10,24 @@ namespace Replica::D3D11
 		using ShaderBase::Bind;
 
 		VertexShader(
-			Device& dev, 
-			WSTR file, 
-			const std::initializer_list<IAElement>& layout,
+			Device& dev,
+			wstring_view file,
+			const IDynamicCollection<IAElement>& layout,
 			const ConstantMapDef& cDef
 		);
+
+		VertexShader(
+			Device& dev, 
+			wstring_view file,
+			const std::initializer_list<IAElement>& layout,
+			const ConstantMapDef& cDef
+		) : 
+			VertexShader(dev, file, UniqueArray(layout), cDef)
+		{ };
+
+		VertexShader(VertexShader&& other) noexcept;
+
+		VertexShader& operator=(VertexShader&& other) noexcept;
 
 		ID3D11VertexShader* Get() const;
 
@@ -32,11 +45,6 @@ namespace Replica::D3D11
 		/// Unbinds vertex shader;
 		/// </summary>
 		void Unbind() override;
-
-		/// <summary>
-		/// Sets constant buffer using last context
-		/// </summary>
-		void SetConstants(ConstantBuffer& cb) override;
 
 		/// <summary>
 		/// Sets sampler using last context

@@ -12,7 +12,7 @@ ConstantBuffer::ConstantBuffer(Device& device,
 		ResourceAccessFlags::Write,
 		device,
 		data,
-		(UINT)size
+		(uint)size
 	) 
 { }
 

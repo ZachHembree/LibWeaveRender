@@ -36,18 +36,33 @@ namespace Replica::D3D11
 		virtual void Unbind() = 0;
 
 		/// <summary>
-		/// Sets constant buffer using last context
+		/// Sets the value corresponding to the given name to the
+		/// given value.
 		/// </summary>
-		virtual void SetConstants(ConstantBuffer& cb) = 0;
+		template<typename T>
+		void SetConstant(wstring_view name, const T& value)
+		{
+			constants.SetMember(name, value);
+		}
 
 		/// <summary>
 		/// Sets the value corresponding to the given name to the
 		/// given value.
 		/// </summary>
-		template<typename T>
-		void SetConstant(WSTR name, const T& value)
+		template<>
+		void SetConstant<mat4>(wstring_view name, const mat4& value)
 		{
-			constants.SetMember(name, value);
+			constants.SetMember(name, transpose(value));
+		}
+
+		/// <summary>
+		/// Sets the value corresponding to the given name to the
+		/// given value.
+		/// </summary>
+		template<>
+		void SetConstant<mat3>(wstring_view name, const mat3& value)
+		{
+			constants.SetMember(name, transpose(value));
 		}
 
 		/// <summary>
@@ -69,5 +84,9 @@ namespace Replica::D3D11
 		ShaderBase(Device& dev);
 
 		ShaderBase(Device& dev, const ConstantMapDef& cDef);
+
+		ShaderBase(ShaderBase&& other) noexcept;
+
+		ShaderBase& operator=(ShaderBase&& other) noexcept;
 	};
 }

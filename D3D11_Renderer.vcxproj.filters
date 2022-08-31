@@ -111,6 +111,9 @@
     <ClCompile Include="src\renderers\src\D3D11\dev\ConstantMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\renderers\src\D3D11\D3DUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\utils\include\RepLeanWin.h">
@@ -231,6 +234,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\renderers\include\D3D11\dev\ConstantMap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\Material.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\Effect.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\IDrawable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\Mesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\IResource.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderers\include\D3D11\ResourceMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

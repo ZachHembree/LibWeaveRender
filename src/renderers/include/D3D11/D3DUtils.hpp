@@ -1,11 +1,17 @@
 #pragma once
+#include <string_view>
 #include "GfxException.hpp"
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <wrl.h>
 #include "UniqueObj.hpp"
+#include "DynamicCollections.hpp"
 
 namespace Replica::D3D11
 {
+	using std::string_view;
+	using std::wstring_view;
+
 	template <typename T>
 	using ComPtr = Microsoft::WRL::ComPtr<T>;
 
@@ -34,4 +40,9 @@ namespace Replica::D3D11
 
 	typedef const wchar_t* WSTR;
 	typedef const char* STR;
+	typedef unsigned long ulong;
+	typedef unsigned int uint;
+
+	fquat QuatFromAxis(vec3 axis, float rad);
+	size_t GetAlignedByteSize(size_t size, size_t alignment);
 }

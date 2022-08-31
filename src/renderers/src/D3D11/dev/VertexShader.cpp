@@ -10,17 +10,32 @@ using namespace Microsoft::WRL;
 
 VertexShader::VertexShader(
 	Device& dev, 
-	WSTR file, 
-	const std::initializer_list<IAElement>& inputDef,
+	wstring_view file,
+	const IDynamicCollection<IAElement>& inputDef,
 	const ConstantMapDef& cDef
 ) :
 	ShaderBase(dev, cDef)
 {
 	ComPtr<ID3DBlob> vsBlob;
-	GFX_THROW_FAILED(D3DReadFileToBlob(file, &vsBlob));
+	GFX_THROW_FAILED(D3DReadFileToBlob(file.data(), &vsBlob));
 	GFX_THROW_FAILED(dev.Get()->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &pVS));
 
 	this->layout = InputLayout(dev, vsBlob, inputDef);
+}
+
+VertexShader::VertexShader(VertexShader&& other) noexcept :
+	ShaderBase(std::move(other)),
+	layout(std::move(other.layout)),
+	pVS(std::move(other.pVS))
+{ }
+
+VertexShader& VertexShader::operator=(VertexShader&& other) noexcept
+{
+	ShaderBase::operator=(std::move(other));
+	this->layout = std::move(other.layout);
+	this->pVS = std::move(other.pVS);
+
+	return *this;
 }
 
 ID3D11VertexShader* VertexShader::Get() const { return pVS.Get(); }
@@ -52,21 +67,13 @@ void VertexShader::Unbind()
 	}	
 }
 
-void VertexShader::SetConstants(ConstantBuffer& cb)
-{
-	assert(isBound);
-	pCtx->Get()->VSSetConstantBuffers(0u, 1, cb.GetAddressOf());
-}
-
 void VertexShader::SetSampler(Sampler& samp)
 {
-	assert(isBound);
 	pCtx->Get()->VSSetSamplers(0u, 1u, samp.GetAddressOf());
 }
 
 void VertexShader::SetTexture(Texture2D& tex)
 {
-	assert(isBound);
 	pCtx->Get()->VSSetShaderResources(0u, 1u, tex.GetSRVAddress());
 }
 

@@ -25,17 +25,16 @@ InputLayout& InputLayout::operator=(InputLayout&& other) noexcept
 
 InputLayout::InputLayout(Device& dev, 
 	const ComPtr<ID3DBlob>& vsBlob, 
-	const std::initializer_list<IAElement>& layout
+	const IDynamicCollection<IAElement>& description
 ) : DeviceChild(&dev)
 { 
-	UniqueArray desc(layout);
-	dev.Get()->CreateInputLayout(
-		reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(desc.GetPtr()),
-		(UINT)desc.GetLength(),
+	GFX_THROW_FAILED(dev.Get()->CreateInputLayout(
+		reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(description.GetPtr()),
+		(UINT)description.GetLength(),
 		vsBlob->GetBufferPointer(),
 		(UINT)vsBlob->GetBufferSize(),
 		&pLayout
-	);
+	));
 }
 
 ID3D11InputLayout* InputLayout::Get() const { return pLayout.Get(); };
@@ -45,7 +44,7 @@ void InputLayout::Bind(Context& ctx)
 	ctx.Get()->IASetInputLayout(Get());
 }
 
-IAElement::IAElement(LPCSTR semantic,
+IAElement::IAElement(string_view semantic,
 	Formats format,
 	UINT semanticIndex,
 	UINT iaSlot,
@@ -53,7 +52,7 @@ IAElement::IAElement(LPCSTR semantic,
 	UINT instStepRate,
 	UINT offset
 ) :
-	SemanticName(semantic),
+	SemanticName(semantic.data()),
 	SemanticIndex(semanticIndex),
 	Format(format),
 	InputSlot(iaSlot),
@@ -62,7 +61,7 @@ IAElement::IAElement(LPCSTR semantic,
 	InstanceDataStepRate(instStepRate)
 { }
 
-IAElement::IAElement(LPCSTR semantic,
+IAElement::IAElement(string_view semantic,
 	UINT semanticIndex,
 	Formats format,
 	UINT iaSlot,
@@ -70,7 +69,7 @@ IAElement::IAElement(LPCSTR semantic,
 	UINT instStepRate,
 	UINT offset
 ) :
-	SemanticName(semantic),
+	SemanticName(semantic.data()),
 	SemanticIndex(semanticIndex),
 	Format(format),
 	InputSlot(iaSlot),

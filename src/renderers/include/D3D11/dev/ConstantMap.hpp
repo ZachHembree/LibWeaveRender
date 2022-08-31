@@ -1,6 +1,5 @@
 #pragma once
 #include "D3D11/D3DUtils.hpp"
-#include "DynamicCollections.hpp"
 #include <unordered_map>
 #include <typeinfo>
 
@@ -21,9 +20,9 @@ namespace Replica::D3D11
 
 		ConstantMap(const ConstantMapDef& layout);
 
-		ConstantMap(ConstantMap&& other);
+		ConstantMap(ConstantMap&& other) noexcept;
 
-		ConstantMap& operator=(ConstantMap&& other);
+		ConstantMap& operator=(ConstantMap&& other) noexcept;
 
 		/// <summary>
 		/// Writes contents of the constant map to the given constant buffer
@@ -31,12 +30,18 @@ namespace Replica::D3D11
 		void UpdateConstantBuffer(ConstantBuffer& cb, Context& ctx);
 
 		/// <summary>
+		/// Returns true if a member with the given name is registered to the map
+		/// </summary>
+		bool GetMemberExists(wstring_view name);
+
+		/// <summary>
 		/// Sets member with the given name to the value given
 		/// </summary>
 		template<typename T>
-		void SetMember(WSTR name, const T& value)
+		void SetMember(wstring_view name, const T& value)
 		{
-			SetMember(name, reinterpret_cast<const byte*>(&value), typeid(T));
+			if (GetMemberExists(name))
+				SetMember(name, reinterpret_cast<const byte*>(&value), typeid(T));
 		}
 		
 		/// <summary>
@@ -64,14 +69,14 @@ namespace Replica::D3D11
 
 	private:
 		UniqueArray<byte> data;
-		std::unordered_map<WSTR, MapEntry> defMap;
+		std::unordered_map<wstring_view, MapEntry> defMap;
 		size_t stride;
 
 		ConstantMap(const ConstantMap& other);
 
 		ConstantMap& operator=(const ConstantMap& other);
 
-		void SetMember(WSTR name, const byte* src, const type_info& type);
+		void SetMember(wstring_view name, const byte* src, const type_info& type);
 	};
 
 	/// <summary>
@@ -82,6 +87,10 @@ namespace Replica::D3D11
 	public:
 		ConstantMapDef();
 
+		ConstantMapDef(const IDynamicCollection<ConstantDef>& definition);;
+
+		ConstantMapDef(const std::initializer_list<ConstantDef>& definition);
+
 		ConstantMapDef(ConstantMapDef&& other) noexcept;
 
 		ConstantMapDef& operator=(ConstantMapDef&& other) noexcept;
@@ -91,7 +100,7 @@ namespace Replica::D3D11
 		/// of the map definition.
 		/// </summary>
 		template<typename T>
-		void Add(WSTR name) { Add(name, typeid(T), sizeof(T)); }
+		void Add(wstring_view name) { Add(name, typeid(T), sizeof(T)); }
 
 		/// <summary>
 		/// Clears the contents of the initializer
@@ -116,7 +125,7 @@ namespace Replica::D3D11
 		/// Adds a new constant entry with the given name and type to the end
 		/// of the map definition.
 		/// </summary>
-		void Add(WSTR name, const type_info& type, const size_t stride);
+		void Add(wstring_view name, const type_info& type, const size_t stride);
 	};
 
 	/// <summary>
@@ -124,13 +133,19 @@ namespace Replica::D3D11
 	/// </summary>
 	struct ConstantDef
 	{
-		WSTR name;
+		wstring_view name;
 		const type_info& type;
 		const size_t stride;
 
 		ConstantDef();
 
-		ConstantDef(WSTR name, const type_info& type, const size_t stride);
+		template<typename T>
+		static ConstantDef Get(wstring_view name)
+		{ 
+			return ConstantDef(name, typeid(T), sizeof(T));
+		}
+
+		ConstantDef(wstring_view name, const type_info& type, const size_t stride);
 
 		ConstantDef(const ConstantDef& other);
 

@@ -11,7 +11,20 @@ namespace Replica::D3D11
 	public:
 		using ShaderBase::Bind;
 
-		PixelShader(Device& dev, const LPCWSTR file);
+		PixelShader(Device& dev, const wstring_view file, const ConstantMapDef& cDefPS);
+
+		PixelShader(PixelShader&& other) noexcept :
+			ShaderBase(std::move(other)),
+			pPS(std::move(other.pPS))
+		{ }
+
+		PixelShader& operator=(PixelShader&& other) noexcept
+		{
+			ShaderBase::operator=(std::move(other));
+			this->pPS = std::move(other.pPS);
+
+			return *this;
+		}
 
 		ID3D11PixelShader* Get() const;
 
@@ -24,11 +37,6 @@ namespace Replica::D3D11
 		/// Unbinds pixel shader
 		/// </summary>
 		void Unbind() override;
-
-		/// <summary>
-		/// Sets constant buffer using last context
-		/// </summary>
-		void SetConstants(ConstantBuffer& cb) override;
 
 		/// <summary>
 		/// Sets sampler using last context

@@ -180,6 +180,7 @@
     <ClCompile Include="src\libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\libs\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="src\libs\imgui\misc\fonts\binary_to_compressed_c.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\D3DUtils.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\ConstantMap.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\ConstantBuffer.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\ShaderBase.cpp" />
@@ -223,6 +224,7 @@
     <ClInclude Include="src\renderers\include\D3D11\dev\DeviceChild.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\Formats.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\InputLayout.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\IResource.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\ResourceBase.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\PixelShader.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\RenderTarget.hpp" />
@@ -230,6 +232,11 @@
     <ClInclude Include="src\renderers\include\D3D11\dev\ShaderBase.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\Texture2D.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\dev\VertexShader.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\IDrawable.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Effect.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Material.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Mesh.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\ResourceMap.hpp" />
     <ClInclude Include="src\utils\include\UniqueObj.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\SwapChain.hpp" />
     <ClInclude Include="src\utils\include\GfxException.hpp" />

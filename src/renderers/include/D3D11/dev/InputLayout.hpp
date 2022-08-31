@@ -24,8 +24,8 @@ namespace Replica::D3D11
 		/// Constructs layout definition associated with given shader bytecode
 		/// </summary>
 		InputLayout(Device& dev, 
-			const Microsoft::WRL::ComPtr<ID3DBlob>& vsBlob,
-			const std::initializer_list<IAElement>& layout
+			const ComPtr<ID3DBlob>& vsBlob,
+			const IDynamicCollection<IAElement>& layout
 		);
 
 		/// <summary>
@@ -39,7 +39,7 @@ namespace Replica::D3D11
 		void Bind(Context& ctx);
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D11InputLayout> pLayout;
+		ComPtr<ID3D11InputLayout> pLayout;
 	};
 
 	/// <summary>
@@ -83,7 +83,7 @@ namespace Replica::D3D11
 		/// </summary>
 		UINT InstanceDataStepRate;
 
-		IAElement(LPCSTR semantic = "UNKNOWN",
+		IAElement(string_view semantic = "UNKNOWN",
 			Formats format = Formats::UNKNOWN,
 			UINT semanticIndex = 0u,
 			UINT iaSlot = 0u,
@@ -92,7 +92,7 @@ namespace Replica::D3D11
 			UINT offset = D3D11_APPEND_ALIGNED_ELEMENT
 		);
 
-		IAElement(LPCSTR semantic,
+		IAElement(string_view semantic,
 			UINT semanticIndex,
 			Formats format,
 			UINT iaSlot = 0u,
