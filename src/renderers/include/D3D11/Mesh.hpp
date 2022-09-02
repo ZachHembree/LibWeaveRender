@@ -1,8 +1,14 @@
 #pragma once
-#include "IDrawable.hpp"
+#include "D3D11/IDrawable.hpp"
+#include "D3D11/dev/VertexBuffer.hpp"
+#include "D3D11/dev/IndexBuffer.hpp"
+#include <math.h>
 
 namespace Replica::D3D11
 {
+	class Device;
+	class Context;
+
 	class Mesh : public IDrawable
 	{
 	public:
@@ -22,63 +28,48 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Updates any resources needed prior to drawing
 		/// </summary>
-		void Setup(Context& ctx) override
-		{
-			vBuf.Bind(ctx);
-			iBuf.Bind(ctx);
-		}
+		void Setup(Context& ctx) override;
 
 		/// <summary>
 		/// Draws the object
 		/// </summary>
-		void Draw(Context& ctx) override
-		{
-			ctx.DrawIndexed((UINT)iBuf.GetLength());
-		}
+		void Draw(Context& ctx) override;
 
 		/// <summary>
 		/// Retrieves the model matrix representing the translation, rotation and
 		/// scale of the object
 		/// </summary>
-		mat4 GetModelMatrix()
-		{
-			mat4 model = glm::identity<mat4>();
-			model *= glm::scale(model, scale);
-			model *= glm::toMat4(rotation);
-			model[3] = vec4(translation, 1.0f);
-
-			return model;
-		}
+		mat4 GetModelMatrix();
 
 		/// <summary>
 		/// Sets the position or translation of the mesh
 		/// </summary>
-		void SetTranslation(vec3 translation) { this->translation = translation; }
+		void SetTranslation(vec3 translation);
 
 		/// <summary>
 		/// Returns the position or translation of the mesh
 		/// </summary>
-		vec3 GetTranslation() { return translation; }
+		vec3 GetTranslation();
 
 		/// <summary>
 		/// Sets the rotation of the mesh about its center
 		/// </summary>
-		void SetRotation(fquat rotation) { this->rotation = rotation; }
+		void SetRotation(fquat rotation);
 
 		/// <summary>
 		/// Returns the rotation of the mesh about its center
 		/// </summary>
-		fquat GetRotation() { return rotation; }
+		fquat GetRotation();
 
 		/// <summary>
 		/// Returns the size or scale of the mesh
 		/// </summary>
-		vec3 GetScale() { return scale; }
+		vec3 GetScale();
 
 		/// <summary>
 		/// Sets the size or scale of the mesh
 		/// </summary>
-		vec3 SetScale(vec3 scale) { this->scale = scale; }
+		void SetScale(vec3 scale);
 
 	protected:
 		VertexBuffer vBuf;

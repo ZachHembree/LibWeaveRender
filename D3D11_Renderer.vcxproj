@@ -193,6 +193,7 @@
     <ClCompile Include="src\renderers\src\D3D11\dev\PixelShader.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\VertexShader.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\InputLayout.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Mesh.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\SwapChain.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\BufferBase.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\dev\Device.cpp" />
@@ -236,6 +237,7 @@
     <ClInclude Include="src\renderers\include\D3D11\Effect.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Material.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Mesh.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Primitives.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ResourceMap.hpp" />
     <ClInclude Include="src\utils\include\UniqueObj.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\SwapChain.hpp" />

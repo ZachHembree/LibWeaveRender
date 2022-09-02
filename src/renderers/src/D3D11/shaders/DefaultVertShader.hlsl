@@ -20,7 +20,7 @@ VertOut main(VertIn i)
 	VertOut o;
 
 	o.pos = mul(float4(i.pos, 1.0f), mvp);
-	o.uv = i.uv;
+	o.uv = o.pos.xy;
 
 	return o;
 }

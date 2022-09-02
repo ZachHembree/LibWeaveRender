@@ -13,6 +13,7 @@
 #include "D3D11/dev/Texture2D.hpp"
 #include "D3D11/dev/ConstantMap.hpp"
 #include "D3D11/Mesh.hpp"
+#include "D3D11/Primitives.hpp"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
@@ -48,7 +49,9 @@ const PixelShaderDef g_DefaultPS =
 {
 	ShaderDefBase
 	{
-		{ },
+		{
+			{ ConstantDef::Get<vec4>(L"DstTexelSize"), }
+		},
 		{ L"samp" },
 		{ L"tex" }
 	},
@@ -73,27 +76,7 @@ Renderer::Renderer(MinWindow* window) :
 {
 	ImGui_ImplDX11_Init(device.Get(), device.GetContext().Get());
 
-	scene.emplace_back(Mesh(
-		device,
-		UniqueArray<Vertex>{
-			{ { -1.0, -1.0, -1.0 }, { 0.0, 0.0 } },
-			{ { 1.0, -1.0, -1.0 }, { 1.0, 0.0 } },
-			{ { -1.0, 1.0, -1.0 }, { 0.0, 1.0 } },
-			{ { 1.0, 1.0, -1.0 }, { 1.0, 1.0 } }, // 3
-			{ { -1.0, -1.0, 1.0 }, { 0.0, 0.0 } },
-			{ { 1.0, -1.0, 1.0 }, { 1.0, 0.0 } },
-			{ { -1.0, 1.0, 1.0 }, { 0.0, 1.0 } },
-			{ { 1.0, 1.0, 1.0 }, { 1.0, 1.0 } },
-		},
-		UniqueArray<USHORT>{
-			0, 2, 1, 2, 3, 1,
-			1, 3, 5, 3, 7, 5,
-			2, 6, 3, 3, 6, 7,
-			4, 5, 7, 4, 7, 6,
-			0, 4, 2, 2, 4, 6,
-			0, 1, 4, 1, 5, 4
-		}
-	));
+	scene.emplace_back(Primitives::GenerateCylinder<Vertex>(device, 8));
 }
 
 Renderer::~Renderer()
@@ -124,8 +107,8 @@ void Renderer::Update()
 	mat4 view = identity<mat4>(),
 		proj = perspectiveLH(45.0f, aspectRatio, 0.5f, 100.0f);
 
-	fquat rot = QuatFromAxis(vec3(0, 1, 0), pi<float>() * normMousePos.x);
-	rot = QuatFromAxis(vec3(0, 0, 1), pi<float>() * normMousePos.y) * rot;
+	fquat rot = QuatFromAxis(vec3(0, 1, 0), 2 * pi<float>() * normMousePos.x);
+	rot = QuatFromAxis(vec3(0, 0, 1), 2 * pi<float>() * normMousePos.y) * rot;
 
 	const mat4 vp = (proj * view);
 
@@ -140,13 +123,14 @@ void Renderer::Update()
 	for (int i = 0; i < scene.GetLength(); i++)
 	{
 		Mesh& mesh = scene[i];
-		mesh.SetTranslation(vec3(0, 0, 4));
+		mesh.SetTranslation(vec3(0, 0, 3));
 		mesh.SetRotation(rot);
 
 		mat4 model = mesh.GetModelMatrix();
 		testEffect.SetConstant(L"mvp", vp * model);
 		testEffect.SetSampler(L"samp", testSamp);
 		testEffect.SetTexture(L"tex", testTex);
+		testEffect.SetConstant(L"DstTexelSize", vec4(1.0f / vec2(wndSize), vec2(wndSize)));
 
 		testEffect.Setup(ctx);
 		mesh.Setup(ctx);

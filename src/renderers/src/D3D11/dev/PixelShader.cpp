@@ -42,6 +42,9 @@ void PixelShader::Bind(Context& ctx)
 		cur->PSSetSamplers(0, (UINT)ss.GetLength(), ss.GetPtr());
 		cur->PSSetShaderResources(0, (UINT)tex.GetLength(), tex.GetPtr());
 
+		constants.UpdateConstantBuffer(cBuf, ctx);
+		cur->PSSetConstantBuffers(0u, 1, cBuf.GetAddressOf());
+
 		this->pCtx = &ctx;
 		ctx.SetPS(this);
 		isBound = true;
