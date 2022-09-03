@@ -52,7 +52,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON1               ICON                    "icon.ico"
+IDI_ICON1               ICON                    "ReplicaRenderer\\res\\icon.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ IDI_ICON1               ICON                    "icon.ico"
 // PNG
 //
 
-IDB_PNG1                PNG                     "lena_color_512.png"
+IDB_PNG1                PNG                     "ReplicaRenderer\\res\\lena_color_512.png"
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
