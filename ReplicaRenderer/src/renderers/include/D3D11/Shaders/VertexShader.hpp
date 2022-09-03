@@ -21,10 +21,6 @@ namespace Replica::D3D11
 			const VertexShaderDef& vsDef
 		);
 
-		VertexShader(VertexShader&& other) noexcept;
-
-		VertexShader& operator=(VertexShader&& other) noexcept;
-
 		ID3D11VertexShader* Get() const;
 
 		/// <summary>

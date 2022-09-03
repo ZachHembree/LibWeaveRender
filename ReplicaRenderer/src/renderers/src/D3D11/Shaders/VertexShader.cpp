@@ -21,21 +21,6 @@ VertexShader::VertexShader(
 	this->layout = InputLayout(dev, vsBlob, vsDef.iaLayout);
 }
 
-VertexShader::VertexShader(VertexShader&& other) noexcept :
-	ShaderBase(std::move(other)),
-	layout(std::move(other.layout)),
-	pVS(std::move(other.pVS))
-{ }
-
-VertexShader& VertexShader::operator=(VertexShader&& other) noexcept
-{
-	ShaderBase::operator=(std::move(other));
-	this->layout = std::move(other.layout);
-	this->pVS = std::move(other.pVS);
-
-	return *this;
-}
-
 ID3D11VertexShader* VertexShader::Get() const { return pVS.Get(); }
 
 const InputLayout& VertexShader::GetLayout() const { return layout; }
