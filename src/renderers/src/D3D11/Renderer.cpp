@@ -29,7 +29,6 @@ struct Vertex
 {
 public:
 	vec3 pos;
-	vec2 uv;
 };
 
 const VertexShaderDef g_DefaultVS = 
@@ -41,7 +40,6 @@ const VertexShaderDef g_DefaultVS =
 	L"DefaultVertShader.cso",
 	{
 		{ "Position", Formats::R32G32B32_FLOAT },
-		{ "TexCoord", Formats::R32G32_FLOAT },
 	},
 };
 
@@ -75,14 +73,23 @@ Renderer::Renderer(MinWindow* window) :
 	testEffect(device, g_DefaultEffect)
 {
 	ImGui_ImplDX11_Init(device.Get(), device.GetContext().Get());
-	MeshDef<Vertex> sphere = Primitives::GenerateSphere<Vertex>(ivec2(36));
-	MeshDef<Vertex> cube = Primitives::GenerateCube<Vertex>(ivec2(36));
+	const MeshDef<Vertex> sphere = Primitives::GenerateSphere<Vertex>(ivec2(36)),
+		cube = Primitives::GenerateCube<Vertex>(ivec2(36)),
+		cone = Primitives::GenerateCone<Vertex>(36),
+		cylinder = Primitives::GenerateCylinder<Vertex>(36),
+		plane = Primitives::GeneratePlane<Vertex>(ivec2(36));
 
-	scene.emplace_back(device, cube);
 	scene.emplace_back(device, sphere);
+	scene.emplace_back(device, cube);
+	scene.emplace_back(device, cone);
+	scene.emplace_back(device, cylinder);
+	scene.emplace_back(device, plane);
 
-	scene[0].SetTranslation(vec3(0.1f, 0, 3));
-	scene[1].SetTranslation(vec3(0, 0, 3));
+	scene[0].SetTranslation(vec3(0, 0, 3));
+	scene[1].SetTranslation(vec3(-1.0f, 0.7, 3));
+	scene[2].SetTranslation(vec3(-1.0f, -0.7, 3));
+	scene[3].SetTranslation(vec3(1.0f, 0.7, 3));
+	scene[4].SetTranslation(vec3(1.0f, -0.7, 3));
 }
 
 Renderer::~Renderer()
@@ -136,8 +143,8 @@ void Renderer::Update()
 		testEffect.SetSampler(L"samp", testSamp);
 		testEffect.SetTexture(L"tex", testTex);
 		testEffect.SetConstant(L"DstTexelSize", vec4(1.0f / vec2(wndSize), vec2(wndSize)));
-
 		testEffect.Setup(ctx);
+
 		mesh.Setup(ctx);
 		mesh.Draw(ctx);
 	}

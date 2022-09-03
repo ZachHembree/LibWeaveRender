@@ -1,7 +1,6 @@
 struct VertIn
 {
 	float3 pos : Position;
-	float2 uv : TexCoord;
 };
 
 struct VertOut

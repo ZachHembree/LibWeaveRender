@@ -44,7 +44,7 @@ Context& Context::operator=(Context&& other) noexcept
 
 void Context::SetVS(VertexShader* vs)
 {
-	if (vs != currentVS || currentVS == nullptr)
+	if (vs != currentVS || currentVS == nullptr || vs == nullptr)
 	{
 		ID3D11VertexShader* pVs = vs != nullptr ? vs->Get() : nullptr;
 		Get()->VSSetShader(pVs, nullptr, 0);
@@ -54,7 +54,7 @@ void Context::SetVS(VertexShader* vs)
 
 void Context::SetPS(PixelShader* ps)
 {
-	if (ps != currentPS || currentPS == nullptr)
+	if (ps != currentPS || currentPS == nullptr || ps == nullptr)
 	{ 
 		ID3D11PixelShader* pPs = ps != nullptr ? ps->Get() : nullptr;
 		Get()->PSSetShader(pPs, nullptr, 0);

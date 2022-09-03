@@ -62,13 +62,16 @@ void VertexShader::Bind(Context& ctx)
 		IDynamicCollection<ID3D11ShaderResourceView*>& tex = textures.GetResources();
 
 		cur->VSSetSamplers(0, (UINT)ss.GetLength(), ss.GetPtr());
-		cur->VSSetShaderResources(0, (UINT)tex.GetLength(), tex.GetPtr());
-
-		constants.UpdateConstantBuffer(cBuf, ctx);
+		cur->VSSetShaderResources(0, (UINT)tex.GetLength(), tex.GetPtr());		
 		cur->VSSetConstantBuffers(0u, 1, cBuf.GetAddressOf());
 		layout.Bind(ctx);
 
 		isBound = true;
+	}
+
+	if (ctx.GetIsVsBound(this))
+	{
+		constants.UpdateConstantBuffer(cBuf, ctx);
 	}
 }
 
