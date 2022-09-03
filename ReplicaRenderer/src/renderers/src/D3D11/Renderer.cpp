@@ -89,20 +89,16 @@ Renderer::Renderer(MinWindow* window) :
 	scene.emplace_back(device, cylinder);
 	scene.emplace_back(device, plane);
 
-	scene[0].SetTranslation(vec3(0, 0, 3));
-	scene[1].SetTranslation(vec3(-1.0f, 0.7, 3));
-	scene[2].SetTranslation(vec3(-1.0f, -0.7, 3));
-	scene[3].SetTranslation(vec3(1.0f, 0.7, 3));
-	scene[4].SetTranslation(vec3(1.0f, -0.7, 3));
+	scene[0].SetTranslation(vec3(0, 0, 0));
+	scene[1].SetTranslation(vec3(-1.0f, 0.7, 0));
+	scene[2].SetTranslation(vec3(-1.0f, -0.7, 0));
+	scene[3].SetTranslation(vec3(1.0f, 0.7, 0));
+	scene[4].SetTranslation(vec3(1.0f, -0.7, 0));
 }
 
 void Renderer::Update()
 {
-	const duration<float> time = duration_cast<duration<float>>(steady_clock::now().time_since_epoch());
 	const ivec2 wndSize = parent->GetSize();
-	const float sinOffset = sin(time.count() * .5f),
-		cosOffset = cos(time.count() * .5f),
-		aspectRatio = (float)wndSize.x / wndSize.y;
 	const ivec2 mousePos = input.GetMousePos();
 	const vec2 normMousePos = input.GetNormMousePos(),
 		clipMousePos = 2.0f * normMousePos + vec2(-1, 1);
@@ -118,12 +114,13 @@ void Renderer::Update()
 		<< "  MouseNorm: " << normMousePos.x << ", " << normMousePos.y;
 	parent->SetWindowTitle(ss.str().c_str());
 
-	mat4 view = identity<mat4>(),
-		proj = perspectiveLH(45.0f, aspectRatio, 0.5f, 100.0f);
+	fquat camRot = QuatFromAxis(vec3(0, 0, 1), -0.4f * pi<float>());
+	mat4 view = identity<mat4>();
+	view = translate(view, vec3(0.0f, 0.0f, 5.0f));
+	view *= toMat4(camRot);
 
-	fquat rot = QuatFromAxis(vec3(0, 1, 0), 2 * pi<float>() * normMousePos.x);
-	rot = QuatFromAxis(vec3(0, 0, 1), 2 * pi<float>() * normMousePos.y) * rot;
-
+	const float aspectRatio = (float)wndSize.x / wndSize.y;
+	const mat4 proj = perspectiveLH(45.0f, aspectRatio, 0.5f, 100.0f);
 	const mat4 vp = (proj * view);
 
 	// Clear back buffer
@@ -134,18 +131,26 @@ void Renderer::Update()
 	// Bind back buffer as render target
 	backBuf.Bind(ctx);
 
+	const duration<double> time = duration_cast<duration<double>>(steady_clock::now().time_since_epoch());
+	fquat meshRot = QuatFromAxis(vec3(0, 1, 0), 2 * pi<float>() * normMousePos.x);
+	meshRot = QuatFromAxis(vec3(0, 0, 1), 2 * pi<float>() * normMousePos.y) * meshRot;
+
 	for (int i = 0; i < scene.GetLength(); i++)
 	{
 		Mesh& mesh = scene[i];
-		mesh.SetRotation(rot);
+		mesh.SetRotation(meshRot);
+		
+		float phaseOffset = (i * 2.0f * glm::pi<float>()) / (float)scene.GetLength();
+		vec2 animOffset(sin(time.count() + phaseOffset), cos(time.count() + phaseOffset));
+		mesh.SetTranslation(vec3(2.0f * animOffset, 0.0f));
 
 		mat4 model = mesh.GetModelMatrix();
 		testEffect.SetConstant(L"mvp", vp * model);
 		testEffect.SetSampler(L"samp", testSamp);
 		testEffect.SetTexture(L"tex", testTex);
 		testEffect.SetConstant(L"DstTexelSize", vec4(1.0f / vec2(wndSize), vec2(wndSize)));
-		testEffect.Setup(ctx);
 
+		testEffect.Setup(ctx);
 		mesh.Setup(ctx);
 		mesh.Draw(ctx);
 	}
