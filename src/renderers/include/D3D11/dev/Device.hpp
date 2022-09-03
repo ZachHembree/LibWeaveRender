@@ -6,7 +6,7 @@
 
 namespace Replica::D3D11
 {	
-	class Device : protected UniqueObjBase
+	class Device : protected MoveOnlyObjBase
 	{
 	public:
 		Device();

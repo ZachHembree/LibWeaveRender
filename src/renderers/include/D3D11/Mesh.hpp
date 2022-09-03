@@ -9,13 +9,43 @@ namespace Replica::D3D11
 	class Device;
 	class Context;
 
-	class Mesh : public IDrawable
+	/// <summary>
+	/// Contains vertex and index data needed to instantiate a new mesh
+	/// </summary>
+	template<typename Vert_T>
+	struct MeshDef
+	{
+		UniqueArray<Vert_T> vertices;
+		UniqueArray<USHORT> indices;
+
+		MeshDef(UniqueArray<Vert_T>&& vertices, UniqueArray<USHORT>&& indices) :
+			vertices(std::move(vertices)),
+			indices(std::move(indices))
+		{ }
+	};
+
+	/// <summary>
+	/// Contains an instance of a drawable mesh
+	/// </summary>
+	class Mesh : public IDrawable, public MoveOnlyObjBase
 	{
 	public:
-		template <typename Vert_t>
+		template <typename Vert_T>
 		Mesh(
 			Device& device,
-			const IDynamicCollection<Vert_t>& vertices,
+			const MeshDef<Vert_T>& def
+		) :
+			vBuf(device, def.vertices),
+			iBuf(device, def.indices),
+			translation(0),
+			rotation(1, 0, 0, 0),
+			scale(1)
+		{ }
+
+		template <typename Vert_T>
+		Mesh(
+			Device& device,
+			const IDynamicCollection<Vert_T>& vertices,
 			const IDynamicCollection<USHORT>& indices
 		) : 
 			vBuf(device, vertices),
@@ -24,6 +54,11 @@ namespace Replica::D3D11
 			rotation(1, 0, 0, 0),
 			scale(1)
 		{ }
+
+		Mesh() : translation(0), rotation(0, 0, 0, 0), scale(0) {}
+
+		Mesh(Mesh&&) = default;
+		Mesh& operator=(Mesh&&) = default;
 
 		/// <summary>
 		/// Updates any resources needed prior to drawing

@@ -15,9 +15,9 @@ namespace Replica::D3D11
 
 		ConstantBuffer(Device& device, size_t size, const void* data = nullptr);
 
-		ConstantBuffer(ConstantBuffer&& other) noexcept;
+		ConstantBuffer(ConstantBuffer&& other) = default;
 
-		ConstantBuffer& operator=(ConstantBuffer&& other) noexcept;
+		ConstantBuffer& operator=(ConstantBuffer&& other) = default;
 
 		void SetData(const void* data, Context& ctx);
 

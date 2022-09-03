@@ -104,8 +104,8 @@ void Context::RSSetViewport(const vec2 size, const vec2 offset, const vec2 depth
 /// </summary>
 void Context::IASetVertexBuffer(VertexBuffer& vertBuffer, int slot)
 {
-	UINT offset = 0;
-	pContext->IASetVertexBuffers(slot, 1, vertBuffer.GetAddressOf(), &vertBuffer.stride, &offset);
+	UINT offset = 0, stride = vertBuffer.GetStride();
+	pContext->IASetVertexBuffers(slot, 1, vertBuffer.GetAddressOf(), &stride, &offset);
 }
 
 /// <summary>

@@ -31,27 +31,6 @@ BufferBase::BufferBase(
 	CreateBuffer(data, byteSize, dev.Get());
 }
 
-BufferBase::BufferBase(BufferBase&& other) noexcept :
-	ResourceBase(other.pDev),
-	type(other.type),
-	usage(other.usage),
-	cpuAccess(other.cpuAccess),
-	pBuf(std::move(other.pBuf)),
-	byteSize(other.byteSize)
-{ }
-
-BufferBase& BufferBase::operator=(BufferBase&& other) noexcept
-{
-	this->pDev = pDev;
-	this->type = other.type;
-	this->usage = other.usage;
-	this->cpuAccess = other.cpuAccess;
-	pBuf = std::move(other.pBuf);
-	this->byteSize = other.byteSize;
-
-	return *this;
-}
-
 void BufferBase::CreateBuffer(const void* data, const UINT byteSize, ID3D11Device* pDevice)
 {
 	D3D11_BUFFER_DESC desc = {};

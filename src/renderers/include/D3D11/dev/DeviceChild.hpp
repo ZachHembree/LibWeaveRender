@@ -10,7 +10,7 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Base class for types representing interfaces to device resources
 	/// </summary>
-	class DeviceChild : protected UniqueObjBase
+	class DeviceChild : protected MoveOnlyObjBase
 	{
 	public:
 		/// <summary>

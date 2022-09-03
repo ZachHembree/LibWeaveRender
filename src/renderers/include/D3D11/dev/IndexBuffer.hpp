@@ -14,6 +14,12 @@ namespace Replica::D3D11
 			ResourceAccessFlags cpuAccess = ResourceAccessFlags::None
 		);
 
+		IndexBuffer() : count(0) {}
+
+		IndexBuffer(IndexBuffer&&) = default;
+
+		IndexBuffer& operator=(IndexBuffer&&) = default;
+
 		/// <summary>
 		/// Returns the number of elements in the buffer
 		/// </summary>

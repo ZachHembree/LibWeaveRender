@@ -3,13 +3,14 @@
 /// <summary>
 /// Base class for objects that cannot be moved or copied, by default.
 /// </summary>
-class UniqueObjBase
+class MoveOnlyObjBase
 {
 protected:
-	UniqueObjBase() { };
+	MoveOnlyObjBase() { };
 
-	UniqueObjBase(const UniqueObjBase&) = delete;
-	UniqueObjBase(UniqueObjBase&&) = delete;
-	UniqueObjBase& operator=(const UniqueObjBase&) = delete;
-	UniqueObjBase& operator=(UniqueObjBase&&) = delete;
+	MoveOnlyObjBase(const MoveOnlyObjBase&) = delete;
+	MoveOnlyObjBase& operator=(const MoveOnlyObjBase&) = delete;
+
+	MoveOnlyObjBase(MoveOnlyObjBase&&) = default;
+	MoveOnlyObjBase& operator=(MoveOnlyObjBase&&) = default;
 };

@@ -11,7 +11,7 @@ namespace Replica
 	/// <summary>
 	/// Base class for window components
 	/// </summary>
-	class WindowComponentBase : protected UniqueObjBase
+	class WindowComponentBase : protected MoveOnlyObjBase
 	{
 	friend MinWindow;
 

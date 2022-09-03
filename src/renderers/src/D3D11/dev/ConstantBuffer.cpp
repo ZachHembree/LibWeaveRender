@@ -16,15 +16,6 @@ ConstantBuffer::ConstantBuffer(Device& device,
 	) 
 { }
 
-ConstantBuffer::ConstantBuffer(ConstantBuffer&& other) noexcept :
-	BufferBase(std::move(other))
-{ }
-
-ConstantBuffer& ConstantBuffer::operator=(ConstantBuffer&& other) noexcept
-{
-	return static_cast<ConstantBuffer&>(BufferBase::operator=(std::move(other)));
-}
-
 void ConstantBuffer::SetData(const void* data, Context & ctx)
 {
 	UpdateMapUnmap(data, ctx);

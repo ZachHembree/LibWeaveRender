@@ -1,8 +1,10 @@
 #pragma once
+
 #include <string_view>
 #include "GfxException.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <wrl.h>
 #include "UniqueObj.hpp"
 #include "DynamicCollections.hpp"

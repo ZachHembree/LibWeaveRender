@@ -75,8 +75,14 @@ Renderer::Renderer(MinWindow* window) :
 	testEffect(device, g_DefaultEffect)
 {
 	ImGui_ImplDX11_Init(device.Get(), device.GetContext().Get());
+	MeshDef<Vertex> sphere = Primitives::GenerateSphere<Vertex>(ivec2(36));
+	MeshDef<Vertex> cube = Primitives::GenerateCube<Vertex>(ivec2(36));
 
-	scene.emplace_back(Primitives::GenerateCylinder<Vertex>(device, 8));
+	scene.emplace_back(device, cube);
+	scene.emplace_back(device, sphere);
+
+	scene[0].SetTranslation(vec3(0.1f, 0, 3));
+	scene[1].SetTranslation(vec3(0, 0, 3));
 }
 
 Renderer::~Renderer()
@@ -123,7 +129,6 @@ void Renderer::Update()
 	for (int i = 0; i < scene.GetLength(); i++)
 	{
 		Mesh& mesh = scene[i];
-		mesh.SetTranslation(vec3(0, 0, 3));
 		mesh.SetRotation(rot);
 
 		mat4 model = mesh.GetModelMatrix();

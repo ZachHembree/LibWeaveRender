@@ -6,8 +6,6 @@ namespace Replica::D3D11
 	class VertexBuffer : public BufferBase
 	{
 	public:
-		const UINT stride;
-
 		template<typename T>
 		VertexBuffer(
 			Device& device,
@@ -19,10 +17,18 @@ namespace Replica::D3D11
 			BufferBase(ResourceTypes::Vertex, usage, cpuAccess, device, data)
 		{ }
 
+		VertexBuffer() : count(0), stride(0) { }
+
+		VertexBuffer(VertexBuffer&&) = default;
+
+		VertexBuffer& operator=(VertexBuffer&&) = default;
+
 		/// <summary>
 		/// Returns the number of elements in the buffer
 		/// </summary>
 		UINT GetLength() const;
+
+		UINT GetStride() const { return stride; }
 
 		/// <summary>
 		/// Binds the vertex buffer to the given slot
@@ -30,7 +36,7 @@ namespace Replica::D3D11
 		void Bind(Context& ctx, UINT slot = 0u, UINT offset = 0u);
 
 	private:
-		const UINT count;
-
+		UINT count;
+		UINT stride;
 	};
 }
