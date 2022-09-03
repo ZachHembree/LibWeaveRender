@@ -8,10 +8,6 @@ namespace Replica::D3D11
 	public:
 		RenderTarget(Device* pDev, ID3D11Resource* pRes);
 
-		RenderTarget(RenderTarget&& other) noexcept;
-
-		RenderTarget& operator=(RenderTarget&& other) noexcept;
-
 		ID3D11Resource* GetResource() { return pRes.Get(); }
 
 		ID3D11Resource** GetResAddress() { return pRes.GetAddressOf(); }

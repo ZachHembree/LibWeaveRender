@@ -19,19 +19,6 @@ namespace Replica::D3D11
 
 		PixelShader(Device& dev, const PixelShaderDef& psDef);
 
-		PixelShader(PixelShader&& other) noexcept :
-			ShaderBase(std::move(other)),
-			pPS(std::move(other.pPS))
-		{ }
-
-		PixelShader& operator=(PixelShader&& other) noexcept
-		{
-			ShaderBase::operator=(std::move(other));
-			this->pPS = std::move(other.pPS);
-
-			return *this;
-		}
-
 		ID3D11PixelShader* Get() const;
 
 		/// <summary>

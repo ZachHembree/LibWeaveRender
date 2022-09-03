@@ -10,7 +10,7 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Base class for types representing interfaces to device resources
 	/// </summary>
-	class DeviceChild : protected MoveOnlyObjBase
+	class DeviceChild : public MoveOnlyObjBase
 	{
 	public:
 		/// <summary>
@@ -24,18 +24,5 @@ namespace Replica::D3D11
 		DeviceChild() : pDev(nullptr) { }
 
 		DeviceChild(Device* pDev) : pDev(pDev) { }
-
-		DeviceChild(DeviceChild&& other) noexcept : pDev(other.pDev) 
-		{
-			other.pDev = nullptr;
-		}
-
-		DeviceChild& operator=(DeviceChild&& other) noexcept
-		{
-			this->pDev = other.pDev;
-			other.pDev = nullptr;
-
-			return *this;
-		}
 	};
 }

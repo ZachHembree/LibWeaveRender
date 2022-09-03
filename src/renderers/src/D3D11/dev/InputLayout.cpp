@@ -7,22 +7,6 @@ using namespace Microsoft::WRL;
 
 InputLayout::InputLayout() noexcept : DeviceChild(nullptr) { }
 
-InputLayout::InputLayout(InputLayout&& other) noexcept :
-	DeviceChild(other.pDev),
-	pLayout(std::move(other.pLayout))
-{
-	other.pDev = nullptr;
-}
-
-InputLayout& InputLayout::operator=(InputLayout&& other) noexcept
-{
-	this->pLayout = std::move(other.pLayout);
-	this->pDev = other.pDev;
-	other.pDev = nullptr;
-
-	return *this;
-}
-
 InputLayout::InputLayout(Device& dev, 
 	const ComPtr<ID3DBlob>& vsBlob, 
 	const IDynamicCollection<IAElement>& description

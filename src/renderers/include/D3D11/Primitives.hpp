@@ -17,7 +17,7 @@ namespace Replica::D3D11::Primitives
 		UniqueArray<Vert_T> vertices(vertCount);
 		UniqueArray<USHORT> indices(3 * 2 * vertCount + 3);
 
-		for (int i = 0; i < vertices.GetLength() - 2; i++)
+		for (int i = 0; i < (int)vertices.GetLength() - 2; i++)
 		{
 			vertices[i].pos = 0.5f * vec3(cos(rad), sin(rad), -1.0f);
 			rad += inc;
@@ -30,7 +30,7 @@ namespace Replica::D3D11::Primitives
 		vertices[p0].pos = vec3(0, 0, -0.5f);
 		vertices[p1].pos = vec3(0, 0, +0.5);
 
-		for (int i = 0; i < vertices.GetLength(); i++)
+		for (int i = 0; i < (int)vertices.GetLength(); i++)
 		{
 			int start = 3 * i;
 			indices[start + 0] = p0;
@@ -40,7 +40,7 @@ namespace Replica::D3D11::Primitives
 
 		int h2 = indices.GetLength() / 2 + 2;
 
-		for (int i = 0; i < vertices.GetLength(); i++)
+		for (int i = 0; i < (int)vertices.GetLength(); i++)
 		{
 			int start = h2 + 3 * i;
 			indices[start + 2] = p1;

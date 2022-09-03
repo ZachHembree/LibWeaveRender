@@ -24,24 +24,6 @@ Context::Context() :
 	currentPS(nullptr)
 { }
 
-Context::Context(Context&& other) noexcept :
-	DeviceChild(other.pDev),
-	pContext(other.pContext),
-	currentVS(nullptr),
-	currentPS(nullptr)
-{
-	other.pDev = nullptr;
-}
-
-Context& Context::operator=(Context&& other) noexcept
-{
-	this->pDev = other.pDev;
-	this->pContext = std::move(other.pContext);
-	other.pDev = nullptr;
-
-	return *this;
-}
-
 void Context::SetVS(VertexShader* vs)
 {
 	if (vs != currentVS || currentVS == nullptr || vs == nullptr)

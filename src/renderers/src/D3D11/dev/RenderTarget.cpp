@@ -11,24 +11,6 @@ RenderTarget::RenderTarget(Device* pDev, ID3D11Resource* pRes) :
 	GFX_THROW_FAILED(pDev->Get()->CreateRenderTargetView(pRes, nullptr, &pView));
 }
 
-RenderTarget::RenderTarget(RenderTarget&& other) noexcept :
-	ResourceBase(other.pDev),
-	pRes(std::move(pRes)),
-	pView(std::move(pView))
-{
-	other.pDev = nullptr;
-}
-
-RenderTarget& RenderTarget::operator=(RenderTarget&& other) noexcept
-{
-	this->pRes = std::move(other.pRes);
-	this->pView = std::move(other.pView);
-	this->pDev = other.pDev;
-	other.pDev = nullptr;
-
-	return *this;
-}
-
 ID3D11RenderTargetView* RenderTarget::GetView() { return pView.Get(); }
 
 void RenderTarget::Bind(Context& ctx)

@@ -73,10 +73,6 @@ namespace Replica::D3D11
 
 		Context();
 
-		Context(Context&& other) noexcept;
-
-		Context& operator=(Context&& other) noexcept;
-
 		/// <summary>
 		/// Binds the given vertex shader
 		/// </summary>

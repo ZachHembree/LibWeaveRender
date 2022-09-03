@@ -12,7 +12,7 @@ ConstantBuffer::ConstantBuffer(Device& device,
 		ResourceAccessFlags::Write,
 		device,
 		data,
-		(uint)size
+		(uint)GetAlignedByteSize(size, 16)
 	) 
 { }
 

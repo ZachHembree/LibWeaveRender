@@ -16,10 +16,6 @@ namespace Replica::D3D11
 
 		InputLayout() noexcept;
 
-		InputLayout(InputLayout&& other) noexcept;
-
-		InputLayout& operator=(InputLayout&& other) noexcept;
-
 		/// <summary>
 		/// Constructs layout definition associated with given shader bytecode
 		/// </summary>

@@ -25,10 +25,6 @@ namespace Replica::D3D11
 			: Texture2D(pDev, dim, data.GetPtr(), sizeof(T), format, mipLevels)
 		{ }
 
-		Texture2D(Texture2D&& other) noexcept;
-
-		Texture2D& operator=(Texture2D&& other) noexcept;
-
 		/// <summary>
 		/// Returns interface to resource
 		/// </summary>

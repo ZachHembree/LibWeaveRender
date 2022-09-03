@@ -25,21 +25,6 @@ ConstantMap::ConstantMap(const ConstantMapDef& layout) :
 	}
 }
 
-ConstantMap::ConstantMap(ConstantMap&& other) noexcept :
-	data(std::move(other.data)),
-	defMap(std::move(other.defMap)),
-	stride(other.stride)
-{ }
-
-ConstantMap& ConstantMap::operator=(ConstantMap&& other) noexcept
-{
-	this->data = std::move(other.data);
-	this->defMap = std::move(other.defMap);
-	this->stride = other.stride;
-
-	return *this;
-}
-
 ConstantMap::ConstantMap(const ConstantMap& other) :
 	data(other.data.GetCopy()),
 	defMap(other.defMap),

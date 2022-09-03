@@ -15,27 +15,31 @@ int CALLBACK WinMain(HINSTANCE hInst, HINSTANCE, LPSTR lpCMdLine, int nCmdShow)
 {
 	try
 	{
-		// Initialize Windows runtime
-		Wrappers::RoInitializeWrapper initialize(RO_INIT_MULTITHREADED);
-		THROW_FAILED(initialize);
+		MSG lastMsg;
 
-		MinWindow repWindow(hInst, ivec2(1280, 800));
+		{
+			// Initialize Windows runtime
+			Wrappers::RoInitializeWrapper initialize(RO_INIT_MULTITHREADED);
+			THROW_FAILED(initialize);
 
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		ImGui::StyleColorsDark();
+			MinWindow repWindow(hInst, ivec2(1280, 800));
 
-		ImGui_ImplWin32_Init(repWindow.GetWndHandle());
+			IMGUI_CHECKVERSION();
+			ImGui::CreateContext();
+			ImGuiIO& io = ImGui::GetIO(); (void)io;
+			ImGui::StyleColorsDark();
 
-		Renderer renderer(&repWindow);
+			ImGui_ImplWin32_Init(repWindow.GetWndHandle());
 
-		// Start main loop
-		const MSG lastMsg = repWindow.RunMessageLoop();
+			Renderer renderer(&repWindow);
 
-		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
+			// Start main loop
+			lastMsg = repWindow.RunMessageLoop();
+
+			ImGui_ImplDX11_Shutdown();
+			ImGui_ImplWin32_Shutdown();
+			ImGui::DestroyContext();
+		}
 
 		return (int)lastMsg.wParam;
 	}

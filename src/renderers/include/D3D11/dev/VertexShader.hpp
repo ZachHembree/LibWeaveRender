@@ -9,16 +9,6 @@ namespace Replica::D3D11
 	{
 		wstring_view file;
 		DynamicArray<IAElement> iaLayout;
-
-		/*VertexShaderDef(wstring_view file,
-			DynamicArray<IAElement>& iaLayout,
-			ConstantMapDef& constMap,
-			ResourceMap<ID3D11SamplerState>& samplerMap,
-			ResourceMap<ID3D11ShaderResourceView>& textureMap
-		) :
-			file(file),
-			ShaderDefBase(constMap, samplerMap, textureMap)
-		{ }*/
 	};
 
 	class VertexShader : public ShaderBase

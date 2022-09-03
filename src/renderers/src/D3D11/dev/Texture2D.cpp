@@ -70,24 +70,6 @@ Texture2D Texture2D::FromImageWIC(Device* pDev, const wchar_t* file)
 	);
 }
 
-Texture2D::Texture2D(Texture2D&& other) noexcept :
-	ResourceBase(other.pDev),
-	pRes(std::move(other.pRes)),
-	pView(std::move(other.pView))
-{
-	other.pDev = nullptr;
-}
-
-Texture2D& Texture2D::operator=(Texture2D&& other) noexcept
-{
-	this->pDev = other.pDev;
-	pRes = std::move(other.pRes);
-	pView = std::move(other.pView);
-	other.pDev = nullptr;
-
-	return *this;
-}
-
 /// <summary>
 /// Returns interface to resource view
 /// </summary>

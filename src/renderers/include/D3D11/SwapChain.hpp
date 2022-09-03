@@ -11,10 +11,13 @@ namespace Replica::D3D11
 {
 	class RenderTarget;
 
-	class SwapChain
+	class SwapChain : public MoveOnlyObjBase
 	{
 	public:
 		SwapChain(const MinWindow& wnd, Device* dev);
+
+		SwapChain(SwapChain&&) = default;
+		SwapChain& operator=(SwapChain&&) = default;
 
 		IDXGISwapChain1* Get() { return pSwap.Get(); }
 

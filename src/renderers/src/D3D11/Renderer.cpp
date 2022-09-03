@@ -79,6 +79,9 @@ Renderer::Renderer(MinWindow* window) :
 		cylinder = Primitives::GenerateCylinder<Vertex>(36),
 		plane = Primitives::GeneratePlane<Vertex>(ivec2(36));
 
+	ConstantBuffer a(device, 1), b;
+	b = std::move(a);
+
 	scene.emplace_back(device, sphere);
 	scene.emplace_back(device, cube);
 	scene.emplace_back(device, cone);
@@ -91,9 +94,6 @@ Renderer::Renderer(MinWindow* window) :
 	scene[3].SetTranslation(vec3(1.0f, 0.7, 3));
 	scene[4].SetTranslation(vec3(1.0f, -0.7, 3));
 }
-
-Renderer::~Renderer()
-{ }
 
 void Renderer::Update()
 {
