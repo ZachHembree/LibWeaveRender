@@ -125,7 +125,7 @@ namespace Replica::D3D11::Primitives
 		const ivec2 vDim = subdiv + 1;
 		const vec2 inc = pi / vec2(subdiv);
 		UniqueArray<Vert_T> vertices(vDim.x * vDim.y);
-		UniqueArray<USHORT> indices(3 * 2 * subdiv.x * subdiv.y);
+		UniqueArray<USHORT> indices(3 * 2 * subdiv.x * (subdiv.y - 1));
 
 		for (int i = 0; i < vDim.x; i++)
 		{
@@ -144,18 +144,19 @@ namespace Replica::D3D11::Primitives
 		for (int i = 0; i < subdiv.x; i++)
 		{
 			int j = 0;
-			int tStart = 6 * (i * subdiv.y + j);
+			int tStart = 6 * i * (subdiv.y - 1);
 			ivec2 ll(i, j),
 				ur(ll + 1);
 
-			// The odd-number triangles are degenerate at the poles
-			indices[tStart] = ll.x * vDim.y + ll.y;
+			// Half of the triangles are degenerate at the poles
 			indices[tStart + 1] = ll.x * vDim.y + ur.y;
-			indices[tStart + 2] = ur.x * vDim.y + ll.y;
+			indices[tStart + 2] = ur.x * vDim.y + ur.y;
+			indices[tStart + 3] = ur.x * vDim.y + ll.y;
+			tStart += 3;
+			j++;
 
 			for (; j < subdiv.y - 1; j++)
 			{
-				tStart = 6 * (i * subdiv.y + j);
 				ll = ivec2(i, j);
 				ur = ivec2(ll + 1);
 
@@ -166,9 +167,9 @@ namespace Replica::D3D11::Primitives
 				indices[tStart + 3] = ll.x * vDim.y + ur.y;
 				indices[tStart + 4] = ur.x * vDim.y + ur.y;
 				indices[tStart + 5] = ur.x * vDim.y + ll.y;
+				tStart += 6;
 			}
 
-			tStart = 6 * (i * subdiv.y + j);
 			ll = ivec2(i, j);
 			ur = ivec2(ll + 1);
 
