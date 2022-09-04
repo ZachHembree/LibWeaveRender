@@ -15,6 +15,7 @@ namespace Replica::D3D11
 	class SwapChain : public MoveOnlyObjBase
 	{
 	public:
+		SwapChain();
 		SwapChain(const MinWindow& wnd, Device* dev);
 
 		SwapChain(SwapChain&&) = default;

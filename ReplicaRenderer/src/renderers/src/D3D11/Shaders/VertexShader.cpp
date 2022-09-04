@@ -8,6 +8,9 @@
 using namespace Replica::D3D11;
 using namespace Microsoft::WRL;
 
+VertexShader::VertexShader()
+{ }
+
 VertexShader::VertexShader(
 	Device& dev, 
 	const VertexShaderDef& vsDef

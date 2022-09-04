@@ -6,7 +6,10 @@ namespace Replica::D3D11
 	class RenderTarget : public ResourceBase
 	{
 	public:
+		RenderTarget();
 		RenderTarget(Device* pDev, ID3D11Resource* pRes, ID3D11DepthStencilView* pDSV = nullptr);
+
+		~RenderTarget();
 
 		ID3D11Resource* GetResource() { return pRes.Get(); }
 

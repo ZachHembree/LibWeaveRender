@@ -9,12 +9,11 @@
 #include "MinWindow.hpp"
 
 #include "D3D11/Renderer.hpp"
-#include "D3D11/Shaders/VertexShader.hpp"
-#include "D3D11/Shaders/PixelShader.hpp"
 #include "D3D11/Resources/Texture2D.hpp"
-#include "D3D11/Resources/ConstantMap.hpp"
+#include "D3D11/Effect.hpp"
 #include "D3D11/Mesh.hpp"
 #include "D3D11/Primitives.hpp"
+#include "D3D11/Shaders/BuiltInShaders.hpp"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
@@ -30,33 +29,6 @@ struct Vertex
 {
 public:
 	vec3 pos;
-};
-
-const VertexShaderDef g_DefaultVS = 
-{
-	{
-		{ ConstantDef::Get<mat4>(L"mvp"), }
-	},
-	L"DefaultVertShader.cso",
-	{
-		{ "Position", Formats::R32G32B32_FLOAT },
-	},
-};
-
-const PixelShaderDef g_DefaultPS = 
-{
-	{
-		{ ConstantDef::Get<vec4>(L"DstTexelSize"), },
-		{ L"samp" },
-		{ L"tex" },
-	},
-	L"DefaultPixShader.cso",
-};
-
-const EffectDef g_DefaultEffect =
-{
-	g_DefaultVS,
-	g_DefaultPS
 };
 
 Renderer::Renderer(MinWindow* window) :
@@ -75,9 +47,6 @@ Renderer::Renderer(MinWindow* window) :
 		cone = Primitives::GenerateCone<Vertex>(36),
 		cylinder = Primitives::GenerateCylinder<Vertex>(36),
 		plane = Primitives::GeneratePlane<Vertex>(ivec2(36));
-
-	ConstantBuffer a(device, 1), b;
-	b = std::move(a);
 
 	scene.emplace_back(device, sphere);
 	scene.emplace_back(device, cube);

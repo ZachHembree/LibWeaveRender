@@ -4,12 +4,20 @@
 
 using namespace Replica::D3D11;
 
+RenderTarget::RenderTarget() : pDSView(nullptr)
+{ }
+
 RenderTarget::RenderTarget(Device* pDev, ID3D11Resource* pRes, ID3D11DepthStencilView* pDSV) :
 	ResourceBase(pDev),
 	pRes(pRes),
 	pDSView(pDSV)
 {
 	GFX_THROW_FAILED(pDev->Get()->CreateRenderTargetView(pRes, nullptr, &pView));
+}
+
+RenderTarget::~RenderTarget()
+{
+	pRes->Release();
 }
 
 ID3D11RenderTargetView* RenderTarget::GetView() { return pView.Get(); }

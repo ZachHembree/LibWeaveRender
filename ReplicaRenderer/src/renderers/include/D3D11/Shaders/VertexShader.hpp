@@ -16,10 +16,9 @@ namespace Replica::D3D11
 	public:
 		using ShaderBase::Bind;
 
-		VertexShader(
-			Device& dev,
-			const VertexShaderDef& vsDef
-		);
+		VertexShader();
+
+		VertexShader(Device& dev, const VertexShaderDef& vsDef );
 
 		ID3D11VertexShader* Get() const;
 

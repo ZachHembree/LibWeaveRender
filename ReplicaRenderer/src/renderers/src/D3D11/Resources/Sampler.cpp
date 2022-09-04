@@ -3,6 +3,9 @@
 
 using namespace Replica::D3D11;
 
+Sampler::Sampler()
+{ }
+
 Sampler::Sampler(Device* pDev, TexFilterMode filter, TexClampMode u, TexClampMode v, TexClampMode w) :
 	DeviceChild(pDev)
 {

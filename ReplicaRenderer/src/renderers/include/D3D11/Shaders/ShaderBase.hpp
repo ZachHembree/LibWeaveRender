@@ -92,6 +92,8 @@ namespace Replica::D3D11
 		Context* pCtx;
 		bool isBound;
 
+		ShaderBase();
+
 		ShaderBase(Device& dev);
 
 		ShaderBase(Device& dev, const ShaderDefBase& def);

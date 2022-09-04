@@ -77,6 +77,8 @@ namespace Replica::D3D11
 	class Sampler : public DeviceChild
 	{
 	public:
+        Sampler();
+
 		Sampler(Device* pDev, 
             TexFilterMode filter, 
             TexClampMode u, 

@@ -5,6 +5,11 @@
 
 using namespace Replica::D3D11;
 
+ShaderBase::ShaderBase() : 
+	DeviceChild(),
+	isBound(false)
+{ }
+
 ShaderBase::ShaderBase(Device& dev) :
 	DeviceChild(&dev),
 	pCtx(&dev.GetContext()),

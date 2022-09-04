@@ -17,6 +17,8 @@ namespace Replica::D3D11
 	public:
 		using ShaderBase::Bind;
 
+		PixelShader();
+
 		PixelShader(Device& dev, const PixelShaderDef& psDef);
 
 		ID3D11PixelShader* Get() const;

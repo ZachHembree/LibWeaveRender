@@ -14,6 +14,8 @@ namespace Replica::D3D11
 	class Effect : public IResource
 	{
 	public:
+		Effect() {}
+
 		Effect(
 			Device& dev, 
 			const EffectDef& effectDef

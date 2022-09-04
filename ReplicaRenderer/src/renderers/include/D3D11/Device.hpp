@@ -11,6 +11,9 @@ namespace Replica::D3D11
 	public:
 		Device();
 
+		Device(Device&&) = default;
+		Device& operator=(Device&&) = default;
+
 		/// <summary>
 		/// Returns pointer to COM device interface
 		/// </summary>

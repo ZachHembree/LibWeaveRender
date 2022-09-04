@@ -8,6 +8,9 @@
 using namespace Replica::D3D11;
 using namespace Microsoft::WRL;
 
+PixelShader::PixelShader()
+{ }
+
 PixelShader::PixelShader(Device& dev, const PixelShaderDef& psDef) :
 	ShaderBase(dev, reinterpret_cast<const ShaderDefBase&>(psDef))
 {

@@ -4,8 +4,6 @@
 #include <wrl.h>
 #include "WindowComponentBase.hpp"
 #include "Input.hpp"
-#include "D3D11/Resources/VertexBuffer.hpp"
-#include "D3D11/Resources/IndexBuffer.hpp"
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/Device.hpp"
 #include "D3D11/Resources/RenderTarget.hpp"

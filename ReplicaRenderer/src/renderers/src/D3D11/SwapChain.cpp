@@ -7,6 +7,9 @@
 
 using namespace Replica::D3D11;
 
+SwapChain::SwapChain() : pDev(nullptr)
+{ }
+
 SwapChain::SwapChain(const MinWindow& wnd, Device* pDev) :
 	pDev(pDev)
 {
@@ -70,7 +73,7 @@ RenderTarget SwapChain::GetBuffer(int index)
 {
 	ID3D11Resource* pRes;
 	GFX_THROW_FAILED(pSwap->GetBuffer(index, __uuidof(ID3D11Resource), (void**)&pRes));
-
+	
 	return RenderTarget(pDev, pRes, depthStencil.GetDSV());
 }
 

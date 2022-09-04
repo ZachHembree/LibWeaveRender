@@ -73,6 +73,9 @@ namespace Replica::D3D11
 
 		Context();
 
+		Context(Context&&) = default;
+		Context& operator=(Context&&) = default;
+
 		/// <summary>
 		/// Binds the given vertex shader
 		/// </summary>

@@ -246,6 +246,7 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\InputLayout.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\IResource.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\ResourceBase.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\BuiltInShaders.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\PixelShader.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RenderTarget.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\Sampler.hpp" />
