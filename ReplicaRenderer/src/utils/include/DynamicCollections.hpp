@@ -11,8 +11,37 @@ namespace Replica
 	template<typename T> class DynamicArray;
 	template<typename T> class UniqueArray;
 
-	template<class T>
-	using DynIterator = std::reverse_iterator<T>;
+	/// <summary>
+	/// Basic iterator template for contiguous collections
+	/// </summary>
+	template<typename ValueType>
+	class DynIterator
+	{
+	public:
+		DynIterator(ValueType* pData) : pData(pData)
+		{ }
+
+		DynIterator& operator++()
+		{
+			pData++;
+			return *this;
+		}
+
+		DynIterator operator++(int) { return DynIterator(pData + 1); }
+
+		ValueType* operator->() { return pData; }
+
+		ValueType& operator*() { return *pData; }
+
+		const DynIterator operator++(int) const { return DynIterator(pData + 1); }
+
+		const ValueType* operator->() const { return pData; }
+
+		const ValueType& operator*() const { return *pData; }
+
+	protected:
+		ValueType* pData;
+	};
 
 	/// <summary>
 	/// Interface template for dynamic arrays/vectors
@@ -58,6 +87,9 @@ namespace Replica
 	template<typename T>
 	class DynamicArrayBase : public IDynamicCollection<T>
 	{
+	public:
+		using Iterator = DynIterator<T>;
+
 	protected:
 		/// <summary>
 		/// Array length
@@ -135,6 +167,26 @@ namespace Replica
 			rhs.data = nullptr;
 			rhs.length = -1;
 		}
+
+		/// <summary>
+		/// Returns iterator pointing to the start of the collection
+		/// </summary>
+		Iterator begin() { return Iterator(data); }
+
+		/// <summary>
+		/// Returns iterator pointing to the end of the collection
+		/// </summary>
+		Iterator end() { return Iterator(data + length); }
+
+		/// <summary>
+		/// Returns iterator pointing to the start of the collection
+		/// </summary>
+		const Iterator begin() const { return Iterator(data); }
+
+		/// <summary>
+		/// Returns iterator pointing to the end of the collection
+		/// </summary>
+		const Iterator end() const { return Iterator(data + length); }
 
 		/// <summary>
 		/// Copy assignment operator.

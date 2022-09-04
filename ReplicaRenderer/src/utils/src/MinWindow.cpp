@@ -168,7 +168,7 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		break;
 	}
 
-	for (auto component : components)
+	for (WindowComponentBase* component : components)
 	{
 		component->OnWndMessage(hWnd, msg, wParam, lParam);
 	}
