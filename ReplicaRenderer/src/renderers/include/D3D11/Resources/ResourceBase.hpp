@@ -47,15 +47,19 @@ namespace Replica::D3D11
 		VideoEncoder = D3D11_BIND_VIDEO_ENCODER,
 	};
 
+	BITWISE_ALL(ResourceTypes, UINT)
+
 	/// <summary>
 	/// Specifies types of CPU access allowed for a resource
 	/// </summary>
-	enum class ResourceAccessFlags
+	enum class ResourceAccessFlags : UINT
 	{
 		None = 0u,
 		Write = D3D11_CPU_ACCESS_WRITE,
 		Read = D3D11_CPU_ACCESS_READ
 	};
+
+	BITWISE_ALL(ResourceAccessFlags, UINT)
 
 	class ResourceBase : public DeviceChild
 	{

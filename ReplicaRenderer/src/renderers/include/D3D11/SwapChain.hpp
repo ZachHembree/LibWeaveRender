@@ -1,6 +1,7 @@
 #pragma once
 #include <dxgi1_2.h>
 #include "D3D11/Device.hpp"
+#include "D3D11/Resources/Texture2D.hpp"
 
 namespace Replica
 {
@@ -36,6 +37,6 @@ namespace Replica::D3D11
 	private:
 		Device* pDev;
 		ComPtr<IDXGISwapChain1> pSwap;
-
+		Texture2D depthStencil;
 	};
 }

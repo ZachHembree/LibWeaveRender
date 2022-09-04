@@ -3,6 +3,7 @@
 #include "MinWindow.hpp"
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/Resources/RenderTarget.hpp"
+#include "D3D11/Resources/Texture2D.hpp"
 
 using namespace Replica::D3D11;
 
@@ -41,6 +42,25 @@ SwapChain::SwapChain(const MinWindow& wnd, Device* pDev) :
 		NULL,
 		&pSwap
 	));
+
+	// Depth-Stencil buffer setup
+	ID3D11DeviceContext* pCon = pDev->GetContext().Get();
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	ComPtr<ID3D11DepthStencilState> pDsState;
+	GFX_THROW_FAILED( pDev->Get()->CreateDepthStencilState(&dsDesc, &pDsState));
+	pCon->OMSetDepthStencilState(pDsState.Get(), 1);
+
+	depthStencil = Texture2D(
+		pDev, 
+		wnd.GetSize(),
+		Formats::D32_FLOAT, 
+		ResourceUsages::Default, 
+		ResourceTypes::DepthStencil
+	);
 }
 
 /// <summary>
@@ -51,7 +71,7 @@ RenderTarget SwapChain::GetBuffer(int index)
 	ID3D11Resource* pRes;
 	GFX_THROW_FAILED(pSwap->GetBuffer(index, __uuidof(ID3D11Resource), (void**)&pRes));
 
-	return RenderTarget(pDev, pRes);
+	return RenderTarget(pDev, pRes, depthStencil.GetDSV());
 }
 
 /// <summary>
