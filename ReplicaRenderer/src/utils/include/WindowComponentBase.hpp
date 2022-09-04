@@ -2,7 +2,7 @@
 #include "RepLeanWin.h"
 #include "RepMain.h"
 #include "RepWinException.hpp"
-#include "UniqueObj.hpp"
+#include "MoveOnlyBase.hpp"
 
 namespace Replica
 {

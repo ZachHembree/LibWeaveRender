@@ -34,7 +34,6 @@ public:
 
 const VertexShaderDef g_DefaultVS = 
 {
-	ShaderDefBase
 	{
 		{ ConstantDef::Get<mat4>(L"mvp"), }
 	},
@@ -46,13 +45,10 @@ const VertexShaderDef g_DefaultVS =
 
 const PixelShaderDef g_DefaultPS = 
 {
-	ShaderDefBase
 	{
-		{
-			{ ConstantDef::Get<vec4>(L"DstTexelSize"), }
-		},
+		{ ConstantDef::Get<vec4>(L"DstTexelSize"), },
 		{ L"samp" },
-		{ L"tex" }
+		{ L"tex" },
 	},
 	L"DefaultPixShader.cso",
 };
@@ -114,7 +110,7 @@ void Renderer::Update()
 		<< "  MouseNorm: " << normMousePos.x << ", " << normMousePos.y;
 	parent->SetWindowTitle(ss.str().c_str());
 
-	fquat camRot = QuatFromAxis(vec3(0, 0, 1), -0.4f * pi<float>());
+	fquat camRot = QuatFromAxis(vec3(0, 0, 1), -0.4f * g_Pi);
 	mat4 view = identity<mat4>();
 	view = translate(view, vec3(0.0f, 0.0f, 5.0f));
 	view *= toMat4(camRot);
@@ -132,16 +128,16 @@ void Renderer::Update()
 	backBuf.Bind(ctx);
 
 	const duration<double> time = duration_cast<duration<double>>(steady_clock::now().time_since_epoch());
-	fquat meshRot = QuatFromAxis(vec3(0, 1, 0), 2 * pi<float>() * normMousePos.x);
-	meshRot = QuatFromAxis(vec3(0, 0, 1), 2 * pi<float>() * normMousePos.y) * meshRot;
+	fquat meshRot = QuatFromAxis(vec3(0, 1, 0), g_Tau * normMousePos.x);
+	meshRot = QuatFromAxis(vec3(0, 0, 1), g_Tau * normMousePos.y) * meshRot;
 
 	for (int i = 0; i < scene.GetLength(); i++)
 	{
 		Mesh& mesh = scene[i];
 		mesh.SetRotation(meshRot);
 		
-		float phaseOffset = (i * 2.0f * glm::pi<float>()) / (float)scene.GetLength();
-		vec2 animOffset(sin(time.count() + phaseOffset), cos(time.count() + phaseOffset));
+		float phaseOffset = i * g_Tau / (float)scene.GetLength();
+		vec2 animOffset(cos(time.count() + phaseOffset), sin(time.count() + phaseOffset));
 		mesh.SetTranslation(vec3(2.0f * animOffset, 0.0f));
 
 		mat4 model = mesh.GetModelMatrix();

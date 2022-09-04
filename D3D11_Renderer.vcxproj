@@ -99,7 +99,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)libs;%(AdditionalIncludeDirectories);$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)libs;%(AdditionalIncludeDirectories);$(ProjectDir)$(ProjectDir)ReplicaRenderer\src\utils\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -148,7 +148,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)ReplicaRenderer\src\renderers\include;$(ProjectDir)ReplicaRenderer\utils\include;$(ProjectDir)ReplicaRenderer\res;$(ProjectDir)ReplicaRenderer;$(ProjectDir)ReplicaRenderer\src\;$(ProjectDir)ReplicaRenderer\libs;%(AdditionalIncludeDirectories);$(ProjectDir)ReplicaRenderer\libs\imgui;$(ProjectDir)ReplicaRenderer\libs\imgui\backends;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)ReplicaRenderer\src\renderers\include;$(ProjectDir)ReplicaRenderer\src\utils\include;$(ProjectDir)ReplicaRenderer\res;$(ProjectDir)ReplicaRenderer;$(ProjectDir)ReplicaRenderer\src\;$(ProjectDir)ReplicaRenderer\libs;%(AdditionalIncludeDirectories);$(ProjectDir)ReplicaRenderer\libs\imgui;$(ProjectDir)ReplicaRenderer\libs\imgui\backends;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -217,13 +217,13 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\BufferBase.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Device.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Renderer.cpp" />
-    <ClCompile Include="ReplicaRenderer\utils\src\GfxException.cpp" />
-    <ClCompile Include="ReplicaRenderer\utils\src\Input.cpp" />
-    <ClCompile Include="ReplicaRenderer\utils\src\RepExeption.cpp" />
-    <ClCompile Include="ReplicaRenderer\utils\src\MinWindow.cpp" />
-    <ClCompile Include="ReplicaRenderer\utils\src\RepWinException.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\utils\src\GfxException.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\utils\src\Input.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\utils\src\RepExeption.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\utils\src\MinWindow.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\utils\src\RepWinException.cpp" />
     <ClCompile Include="ReplicaRenderer\src\RepMain.cpp" />
-    <ClCompile Include="ReplicaRenderer\utils\src\WindowComponentBase.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\utils\src\WindowComponentBase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplicaRenderer\libs\imgui\backends\imgui_impl_dx11.h" />
@@ -258,20 +258,20 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Mesh.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Primitives.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ResourceMap.hpp" />
-    <ClInclude Include="ReplicaRenderer\utils\include\UniqueObj.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\MoveOnlyBase.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\SwapChain.hpp" />
-    <ClInclude Include="ReplicaRenderer\utils\include\GfxException.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\GfxException.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\IndexBuffer.hpp" />
-    <ClInclude Include="ReplicaRenderer\utils\include\Input.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\Input.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Renderer.hpp" />
-    <ClInclude Include="ReplicaRenderer\utils\include\RepLeanWin.h" />
-    <ClInclude Include="ReplicaRenderer\utils\include\RepException.hpp" />
-    <ClInclude Include="ReplicaRenderer\utils\include\MinWindow.hpp" />
-    <ClInclude Include="ReplicaRenderer\utils\include\RepWinException.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\RepLeanWin.h" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\RepException.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\MinWindow.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\RepWinException.hpp" />
     <ClInclude Include="ReplicaRenderer\src\RepMain.h" />
-    <ClInclude Include="ReplicaRenderer\utils\include\DynamicCollections.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\DynamicCollections.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\VertexBuffer.hpp" />
-    <ClInclude Include="ReplicaRenderer\utils\include\WindowComponentBase.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\WindowComponentBase.hpp" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

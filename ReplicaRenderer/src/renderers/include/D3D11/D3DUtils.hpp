@@ -6,7 +6,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <wrl.h>
-#include "UniqueObj.hpp"
+#include "MoveOnlyBase.hpp"
 #include "DynamicCollections.hpp"
 
 namespace Replica::D3D11
@@ -44,6 +44,11 @@ namespace Replica::D3D11
 	typedef const char* STR;
 	typedef unsigned long ulong;
 	typedef unsigned int uint;
+
+	constexpr double g_TauD = 2.0 * glm::pi<double>();
+	constexpr double g_PiD = glm::pi<double>();
+	constexpr float g_Tau = 2.0f * glm::pi<float>();
+	constexpr float g_Pi = glm::pi<float>();
 
 	fquat QuatFromAxis(vec3 axis, float rad);
 	size_t GetAlignedByteSize(size_t size, size_t alignment);

@@ -18,16 +18,16 @@
     <ClCompile Include="ReplicaRenderer\src\RepMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\utils\src\MinWindow.cpp">
+    <ClCompile Include="ReplicaRenderer\src\utils\src\MinWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\utils\src\RepExeption.cpp">
+    <ClCompile Include="ReplicaRenderer\src\utils\src\RepExeption.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\utils\src\RepWinException.cpp">
+    <ClCompile Include="ReplicaRenderer\src\utils\src\RepWinException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\utils\src\WindowComponentBase.cpp">
+    <ClCompile Include="ReplicaRenderer\src\utils\src\WindowComponentBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Renderer.cpp">
@@ -39,7 +39,7 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\BufferBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\utils\src\Input.cpp">
+    <ClCompile Include="ReplicaRenderer\src\utils\src\Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\SwapChain.cpp">
@@ -105,7 +105,7 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\utils\src\GfxException.cpp">
+    <ClCompile Include="ReplicaRenderer\src\utils\src\GfxException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantMap.cpp">
@@ -119,34 +119,34 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ReplicaRenderer\utils\include\RepLeanWin.h">
+    <ClInclude Include="ReplicaRenderer\src\utils\include\RepLeanWin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\utils\include\MinWindow.hpp">
+    <ClInclude Include="ReplicaRenderer\src\utils\include\MinWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\RepMain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\utils\include\RepException.hpp">
+    <ClInclude Include="ReplicaRenderer\src\utils\include\RepException.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\utils\include\RepWinException.hpp">
+    <ClInclude Include="ReplicaRenderer\src\utils\include\RepWinException.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\utils\include\DynamicCollections.hpp">
+    <ClInclude Include="ReplicaRenderer\src\utils\include\DynamicCollections.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Renderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\utils\include\WindowComponentBase.hpp">
+    <ClInclude Include="ReplicaRenderer\src\utils\include\WindowComponentBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\utils\include\Input.hpp">
+    <ClInclude Include="ReplicaRenderer\src\utils\include\Input.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\utils\include\GfxException.hpp">
+    <ClInclude Include="ReplicaRenderer\src\utils\include\GfxException.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\BufferBase.hpp">
@@ -176,7 +176,7 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\Formats.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\utils\include\UniqueObj.hpp">
+    <ClInclude Include="ReplicaRenderer\src\utils\include\MoveOnlyBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\VertexShader.hpp">
