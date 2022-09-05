@@ -7,7 +7,7 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Updates any resources needed prior to drawing
 	/// </summary>
-	void Mesh::Setup(Context& ctx)
+	void Mesh::Update(Context& ctx)
 	{
 		vBuf.Bind(ctx);
 		iBuf.Bind(ctx);

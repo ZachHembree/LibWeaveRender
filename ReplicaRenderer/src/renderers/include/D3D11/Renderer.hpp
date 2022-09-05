@@ -1,16 +1,8 @@
 #pragma once
-#include "GfxException.hpp"
-#include <d3d11.h>
-#include <wrl.h>
 #include "WindowComponentBase.hpp"
-#include "Input.hpp"
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/Device.hpp"
 #include "D3D11/Resources/RenderTarget.hpp"
-#include "D3D11/Resources/Texture2D.hpp"
-#include "D3D11/Resources/Sampler.hpp"
-#include "D3D11/Effect.hpp"
-#include "D3D11/Mesh.hpp"
 #include "D3D11/RenderComponent.hpp"
 
 #pragma comment(lib, "d3d11.lib")
@@ -58,17 +50,10 @@ namespace Replica::D3D11
 		bool UnregisterComponent(RenderComponentBase& component);
 
 	private:
-		InputComponent input;
 		Device device;
 		SwapChain swap;
 		RenderTarget backBuf;
-
-		UniqueVector<Mesh> scene;
 		UniqueVector<RenderComponentBase*> pComponents;
-
-		Texture2D testTex;
-		Sampler testSamp;
-		Effect testEffect;
 
 		void BeforeDraw(Context& ctx);
 

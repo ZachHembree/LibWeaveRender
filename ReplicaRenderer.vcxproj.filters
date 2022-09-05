@@ -126,6 +126,9 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\DebugScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplicaRenderer\src\utils\include\RepLeanWin.h">
@@ -279,6 +282,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiHandler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\DebugScene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

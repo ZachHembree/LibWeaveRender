@@ -11,6 +11,6 @@ namespace Replica::D3D11
 	class IResource
 	{
 	public:
-		virtual void Setup(Context& ctx) = 0;
+		virtual void Update(Context& ctx) = 0;
 	};
 }

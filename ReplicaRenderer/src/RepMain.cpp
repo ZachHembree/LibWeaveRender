@@ -1,8 +1,10 @@
 #include "RepMain.h"
 #include "RepLeanWin.h"
 #include "MinWindow.hpp"
+#include "Input.hpp"
 #include "D3D11/Renderer.hpp"
 #include "D3D11/ImguiHandler.hpp"
+#include "D3D11/DebugScene.hpp"
 
 using namespace glm;
 using namespace Replica;
@@ -21,8 +23,11 @@ int CALLBACK WinMain(HINSTANCE hInst, HINSTANCE, LPSTR lpCMdLine, int nCmdShow)
 			THROW_FAILED(initialize);
 
 			MinWindow repWindow(hInst, ivec2(1280, 800));
+			InputComponent input(repWindow);
+
 			Renderer renderer(repWindow);
 			ImguiHandler imgui(repWindow, renderer);
+			DebugScene debugScene(renderer, input);
 
 			// Start main loop
 			lastMsg = repWindow.RunMessageLoop();

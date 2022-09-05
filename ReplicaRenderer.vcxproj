@@ -199,6 +199,7 @@
     <ClCompile Include="ReplicaRenderer\libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ReplicaRenderer\libs\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="ReplicaRenderer\libs\imgui\misc\fonts\binary_to_compressed_c.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\DebugScene.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiHandler.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\RenderComponent.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\D3DUtils.cpp" />
@@ -251,6 +252,7 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\InputLayout.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\IResource.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\ResourceBase.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\DebugScene.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\BuiltInShaders.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\PixelShader.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RenderTarget.hpp" />

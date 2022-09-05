@@ -53,7 +53,7 @@ namespace Replica::D3D11
 			ps.SetTexture(name, tex);
 		}
 
-		void Setup(Context& ctx) override
+		void Update(Context& ctx) override
 		{
 			vs.Bind(ctx);
 			ps.Bind(ctx);

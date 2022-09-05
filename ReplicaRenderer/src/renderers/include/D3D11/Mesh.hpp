@@ -63,7 +63,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Updates any resources needed prior to drawing
 		/// </summary>
-		void Setup(Context& ctx) override;
+		void Update(Context& ctx) override;
 
 		/// <summary>
 		/// Draws the object
