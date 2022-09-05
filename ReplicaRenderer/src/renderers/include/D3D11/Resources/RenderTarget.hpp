@@ -7,7 +7,8 @@ namespace Replica::D3D11
 	{
 	public:
 		RenderTarget();
-		RenderTarget(Device* pDev, ID3D11Resource* pRes, ID3D11DepthStencilView* pDSV = nullptr);
+
+		RenderTarget(Device& dev, ID3D11Resource* pRes, ID3D11DepthStencilView* pDSV = nullptr);
 
 		~RenderTarget();
 

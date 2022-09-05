@@ -8,7 +8,8 @@
 using namespace DirectX;
 using namespace Replica::D3D11;
 
-Texture2D::Texture2D(Device* pDev,
+Texture2D::Texture2D(
+	Device& dev,
 	ivec2 dim,
 	Formats format,
 	ResourceUsages usage,
@@ -19,7 +20,7 @@ Texture2D::Texture2D(Device* pDev,
 	void* data,
 	UINT stride
 ) :
-	ResourceBase(pDev)
+	ResourceBase(dev)
 {
 	D3D11_TEXTURE2D_DESC desc = {};
 	desc.Width = dim.x;
@@ -73,7 +74,7 @@ Texture2D::Texture2D(Device* pDev,
 }
 
 Texture2D::Texture2D(
-	Device* pDev,
+	Device& dev,
 	ivec2 dim,
 	void* data,
 	UINT stride,
@@ -81,7 +82,7 @@ Texture2D::Texture2D(
 	UINT mipLevels
 ) : 
 	Texture2D(
-		pDev, 
+		dev, 
 		dim, 
 		format, 
 		ResourceUsages::Default, 
@@ -96,7 +97,7 @@ Texture2D::Texture2D(
 
 Texture2D::Texture2D() {}
 
-Texture2D Texture2D::FromImageWIC(Device* pDev, const wchar_t* file)
+Texture2D Texture2D::FromImageWIC(Device& dev, const wchar_t* file)
 {
 	ScratchImage buf;
 	GFX_THROW_FAILED(LoadFromWICFile(
@@ -108,7 +109,7 @@ Texture2D Texture2D::FromImageWIC(Device* pDev, const wchar_t* file)
 
 	const Image* img = buf.GetImage(0, 0, 0);
 
-	return Texture2D(pDev, 
+	return Texture2D(dev, 
 		ivec2(img->width, img->height),
 		img->pixels,
 		4 * sizeof(uint8_t),

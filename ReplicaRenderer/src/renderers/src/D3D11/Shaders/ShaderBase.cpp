@@ -11,13 +11,13 @@ ShaderBase::ShaderBase() :
 { }
 
 ShaderBase::ShaderBase(Device& dev) :
-	DeviceChild(&dev),
+	DeviceChild(dev),
 	pCtx(&dev.GetContext()),
 	isBound(false)
 { }
 
 ShaderBase::ShaderBase(Device& dev, const ShaderDefBase& def) :
-	DeviceChild(&dev),
+	DeviceChild(dev),
 	pCtx(&dev.GetContext()),
 	isBound(false),
 	samplers(def.samplerMap),

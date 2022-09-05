@@ -69,7 +69,7 @@ namespace Replica::D3D11
 	class Context : public DeviceChild
 	{
 	public:
-		Context(Device* pDev, ComPtr<ID3D11DeviceContext>& pContext);
+		Context(Device& dev, ComPtr<ID3D11DeviceContext>& pContext);
 
 		Context();
 

@@ -10,17 +10,17 @@ namespace Replica::D3D11
 
 		template<typename T>
 		Texture2D(
-			Device* pDev,
+			Device& dev,
 			ivec2 dim,
 			IDynamicCollection<T> data,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			UINT mipLevels = 1u
 		)
-			: Texture2D(pDev, dim, data.GetPtr(), sizeof(T), format, mipLevels)
+			: Texture2D(dev, dim, data.GetPtr(), sizeof(T), format, mipLevels)
 		{ }
 
 		Texture2D(
-			Device* pDev,
+			Device& dev,
 			ivec2 dim,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			ResourceUsages usage = ResourceUsages::Default,
@@ -33,7 +33,7 @@ namespace Replica::D3D11
 		);
 
 		Texture2D(
-			Device* pDev, 
+			Device& dev,
 			ivec2 dim, 
 			void* data, 
 			UINT stride, 
@@ -77,7 +77,7 @@ namespace Replica::D3D11
 		/// Initializes new Texture2D from WIC-compatible image 
 		/// (BMP, GIF, ICO, JPEG, PNG, TIFF)
 		/// </summary>
-		static Texture2D FromImageWIC(Device* pDev, const wchar_t* file);
+		static Texture2D FromImageWIC(Device& dev, const wchar_t* file);
 
 	private:
 		ComPtr<ID3D11Texture2D> pRes;

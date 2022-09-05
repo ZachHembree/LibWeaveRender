@@ -1,6 +1,7 @@
 #include "MinWindow.hpp"
 #include "D3D11/Renderer.hpp"
 #include "D3D11/ImguiHandler.hpp"
+#include "D3D11/ImguiRenderComponent.hpp"
 
 #include <imgui.h>
 #include <imgui_impl_win32.h>

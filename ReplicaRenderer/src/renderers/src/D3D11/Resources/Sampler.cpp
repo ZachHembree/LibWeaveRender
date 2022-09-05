@@ -6,8 +6,8 @@ using namespace Replica::D3D11;
 Sampler::Sampler()
 { }
 
-Sampler::Sampler(Device* pDev, TexFilterMode filter, TexClampMode u, TexClampMode v, TexClampMode w) :
-	DeviceChild(pDev)
+Sampler::Sampler(Device& dev, TexFilterMode filter, TexClampMode u, TexClampMode v, TexClampMode w) :
+	DeviceChild(dev)
 {
 	D3D11_SAMPLER_DESC desc = {};
 	desc.Filter = (D3D11_FILTER)filter;
@@ -18,11 +18,11 @@ Sampler::Sampler(Device* pDev, TexFilterMode filter, TexClampMode u, TexClampMod
 	GFX_THROW_FAILED(pDev->Get()->CreateSamplerState(&desc, &pSamp));
 }
 
-Sampler::Sampler(Device* pDev,
+Sampler::Sampler(Device& dev,
 	TexFilterMode filter,
 	TexClampMode mode
 ) :
-	Sampler(pDev, filter, mode, mode, mode)
+	Sampler(dev, filter, mode, mode, mode)
 { }
 
 ID3D11SamplerState* Sampler::Get() { return pSamp.Get(); }

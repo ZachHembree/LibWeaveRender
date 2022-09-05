@@ -23,6 +23,6 @@ namespace Replica::D3D11
 
 		DeviceChild() : pDev(nullptr) { }
 
-		DeviceChild(Device* pDev) : pDev(pDev) { }
+		DeviceChild(Device& dev) : pDev(&dev) { }
 	};
 }

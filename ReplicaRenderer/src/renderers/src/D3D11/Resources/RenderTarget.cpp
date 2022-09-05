@@ -7,8 +7,8 @@ using namespace Replica::D3D11;
 RenderTarget::RenderTarget() : pDSView(nullptr)
 { }
 
-RenderTarget::RenderTarget(Device* pDev, ID3D11Resource* pRes, ID3D11DepthStencilView* pDSV) :
-	ResourceBase(pDev),
+RenderTarget::RenderTarget(Device& dev, ID3D11Resource* pRes, ID3D11DepthStencilView* pDSV) :
+	ResourceBase(dev),
 	pRes(pRes),
 	pDSView(pDSV)
 {

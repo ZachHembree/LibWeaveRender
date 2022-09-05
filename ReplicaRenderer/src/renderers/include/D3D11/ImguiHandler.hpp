@@ -1,9 +1,10 @@
 #pragma once
 #include "WindowComponentBase.hpp"
-#include "D3D11/ImguiRenderComponent.hpp"
 
 namespace Replica::D3D11
 {
+	class ImguiRenderComponent;
+
 	/// <summary>
 	/// Manages initialization and cleanup of Imgui
 	/// </summary>

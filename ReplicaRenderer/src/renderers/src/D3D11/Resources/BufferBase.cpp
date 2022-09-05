@@ -21,7 +21,7 @@ BufferBase::BufferBase(
 	const void* data, 
 	const UINT byteSize
 ) :
-	ResourceBase(&dev),
+	ResourceBase(dev),
 	type(type),
 	usage(usage),
 	cpuAccess(cpuAccess),

@@ -5,12 +5,12 @@
 using namespace Replica::D3D11;
 using namespace Microsoft::WRL;
 
-InputLayout::InputLayout() noexcept : DeviceChild(nullptr) { }
+InputLayout::InputLayout() noexcept : DeviceChild() { }
 
 InputLayout::InputLayout(Device& dev, 
 	const ComPtr<ID3DBlob>& vsBlob, 
 	const IDynamicCollection<IAElement>& description
-) : DeviceChild(&dev)
+) : DeviceChild(dev)
 { 
 	GFX_THROW_FAILED(dev.Get()->CreateInputLayout(
 		reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(description.GetPtr()),

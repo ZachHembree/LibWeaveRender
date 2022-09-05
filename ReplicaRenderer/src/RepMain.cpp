@@ -1,5 +1,3 @@
-#include "RepMain.h"
-#include "RepLeanWin.h"
 #include "MinWindow.hpp"
 #include "Input.hpp"
 #include "D3D11/Renderer.hpp"

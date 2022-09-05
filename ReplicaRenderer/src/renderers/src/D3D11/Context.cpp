@@ -11,15 +11,15 @@ using namespace glm;
 using namespace Replica;
 using namespace Replica::D3D11;
 
-Context::Context(Device* pDev, ComPtr<ID3D11DeviceContext>& pContext) :
-	DeviceChild(pDev),
+Context::Context(Device& dev, ComPtr<ID3D11DeviceContext>& pContext) :
+	DeviceChild(dev),
 	pContext(pContext),
 	currentVS(nullptr),
 	currentPS(nullptr)
 { }
 
 Context::Context() : 
-	DeviceChild(nullptr),
+	DeviceChild(),
 	currentVS(nullptr),
 	currentPS(nullptr)
 { }

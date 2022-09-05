@@ -58,7 +58,7 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	pCon->OMSetDepthStencilState(pDsState.Get(), 1);
 
 	depthStencil = Texture2D(
-		pDev, 
+		dev, 
 		wnd.GetSize(),
 		Formats::D32_FLOAT, 
 		ResourceUsages::Default, 
@@ -74,7 +74,7 @@ RenderTarget SwapChain::GetBuffer(int index)
 	ID3D11Resource* pRes;
 	GFX_THROW_FAILED(pSwap->GetBuffer(index, __uuidof(ID3D11Resource), (void**)&pRes));
 	
-	return RenderTarget(pDev, pRes, depthStencil.GetDSV());
+	return RenderTarget(*pDev, pRes, depthStencil.GetDSV());
 }
 
 /// <summary>

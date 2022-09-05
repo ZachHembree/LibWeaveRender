@@ -79,14 +79,14 @@ namespace Replica::D3D11
 	public:
         Sampler();
 
-		Sampler(Device* pDev, 
+		Sampler(Device& dev, 
             TexFilterMode filter, 
             TexClampMode u, 
             TexClampMode v, 
             TexClampMode w
         );
 
-        Sampler(Device* pDev, 
+        Sampler(Device& dev,
             TexFilterMode filter = TexFilterMode::LINEAR, 
             TexClampMode mode = TexClampMode::WRAP
         );

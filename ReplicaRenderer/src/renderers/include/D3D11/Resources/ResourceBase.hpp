@@ -71,7 +71,7 @@ namespace Replica::D3D11
 	protected:
 		ResourceBase() { }
 
-		ResourceBase(Device* pDev) : DeviceChild(pDev) {}
+		ResourceBase(Device& dev) : DeviceChild(dev) {}
 
 	};
 }

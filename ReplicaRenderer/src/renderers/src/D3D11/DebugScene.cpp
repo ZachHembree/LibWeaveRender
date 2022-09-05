@@ -25,8 +25,8 @@ public:
 
 DebugScene::DebugScene(Renderer& renderer, InputComponent& input) :
 	RenderComponentBase(renderer),
-	testTex(Texture2D::FromImageWIC(&renderer.GetDevice(), L"lena_color_512.png")),
-	testSamp(&renderer.GetDevice(), TexFilterMode::LINEAR, TexClampMode::MIRROR),
+	testTex(Texture2D::FromImageWIC(renderer.GetDevice(), L"lena_color_512.png")),
+	testSamp(renderer.GetDevice(), TexFilterMode::LINEAR, TexClampMode::MIRROR),
 	testEffect(renderer.GetDevice(), g_DefaultEffect),
 	input(input)
 {

@@ -20,7 +20,7 @@ Device::Device()
 		&pContext
 	));
 
-	context = Context(this, pContext);
+	context = Context(*this, pContext);
 	context.IASetPrimitiveTopology(PrimTopology::TRIANGLELIST);
 }
 
