@@ -486,6 +486,7 @@ namespace Replica
 		using std::vector<T>::begin;
 		using std::vector<T>::end;
 		using std::vector<T>::erase;
+		using std::vector<T>::clear;
 		using std::vector<T>::max_size;
 		using std::vector<T>::resize;
 		using std::vector<T>::capacity;
@@ -496,6 +497,14 @@ namespace Replica
 		Vector(const IDynamicCollection<T>& other) :
 			Vector(other.GetPtr(), other.GetPtr() + other.GetLength())
 		{ }
+
+		/// <summary>
+		/// Removes the member at the given index
+		/// </summary>
+		void RemoveAt(int index)
+		{
+			erase(begin() + index);
+		}
 
 		/// <summary>
 		/// Returns the length of the vector.

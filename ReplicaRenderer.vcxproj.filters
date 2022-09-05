@@ -117,6 +117,15 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\RenderComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiRenderComponent.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplicaRenderer\src\utils\include\RepLeanWin.h">
@@ -261,6 +270,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\BuiltInShaders.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\RenderComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiRenderComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiHandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

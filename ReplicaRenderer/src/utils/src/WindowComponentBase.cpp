@@ -3,17 +3,24 @@
 
 using namespace Replica;
 
-WindowComponentBase::WindowComponentBase(MinWindow* window) :
-	parent(window),
+WindowComponentBase::WindowComponentBase() :
+	pParent(nullptr),
+	isRegistered(false)
+{ }
+
+WindowComponentBase::WindowComponentBase(MinWindow& window) :
+	pParent(&window),
 	isRegistered(false)
 {
-	if (window != nullptr)
-		window->RegisterComponent(this);
-	else
-		throw std::exception("Parent window cannot be null");
+	window.RegisterComponent(this);
 }
+
+/// <summary>
+/// Returns pointer to parent window
+/// </summary>
+MinWindow& WindowComponentBase::GetParent() const { return *pParent; }
 
 bool WindowComponentBase::GetIsRegistered()
 {
-	return isRegistered && parent != nullptr;
+	return isRegistered && pParent != nullptr;
 }

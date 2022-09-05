@@ -16,7 +16,13 @@ namespace Replica
 	friend MinWindow;
 
 	public:
-		MinWindow* const parent;
+		WindowComponentBase(WindowComponentBase&&) = default;
+		WindowComponentBase& operator=(WindowComponentBase&&) = default;
+
+		/// <summary>
+		/// Returns pointer to parent window
+		/// </summary>
+		MinWindow& GetParent() const;
 
 		/// <summary>
 		/// Called after each message poll in the window class
@@ -35,9 +41,11 @@ namespace Replica
 
 	protected:
 
-		WindowComponentBase(MinWindow* window);
+		WindowComponentBase();
+		WindowComponentBase(MinWindow& window);
 
 	private:
+		MinWindow* pParent;
 		bool isRegistered;
 	};
 }

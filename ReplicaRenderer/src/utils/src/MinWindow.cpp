@@ -124,7 +124,7 @@ HWND MinWindow::GetWndHandle() const noexcept
 
 void MinWindow::RegisterComponent(WindowComponentBase* component)
 {
-	if (component != nullptr && !component->isRegistered && component->parent == this)
+	if (component != nullptr && !component->isRegistered && component->pParent == this)
 	{
 		components.push_back(component);
 		component->isRegistered = true;

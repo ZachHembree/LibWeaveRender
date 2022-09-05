@@ -199,6 +199,8 @@
     <ClCompile Include="ReplicaRenderer\libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ReplicaRenderer\libs\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="ReplicaRenderer\libs\imgui\misc\fonts\binary_to_compressed_c.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiHandler.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\RenderComponent.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\D3DUtils.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantMap.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantBuffer.cpp" />
@@ -236,6 +238,9 @@
     <ClInclude Include="ReplicaRenderer\libs\imgui\imstb_truetype.h" />
     <ClInclude Include="ReplicaRenderer\libs\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\D3DUtils.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiHandler.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiRenderComponent.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\RenderComponent.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\BufferBase.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\ConstantBuffer.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\ConstantMap.hpp" />
@@ -259,6 +264,7 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Mesh.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Primitives.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ResourceMap.hpp" />
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiRenderComponent.cpp" />
     <ClInclude Include="ReplicaRenderer\src\utils\include\MoveOnlyBase.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\SwapChain.hpp" />
     <ClInclude Include="ReplicaRenderer\src\utils\include\GfxException.hpp" />

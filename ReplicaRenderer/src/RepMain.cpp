@@ -2,9 +2,7 @@
 #include "RepLeanWin.h"
 #include "MinWindow.hpp"
 #include "D3D11/Renderer.hpp"
-#include <imgui.h>
-#include <imgui_impl_win32.h>
-#include <imgui_impl_dx11.h>
+#include "D3D11/ImguiHandler.hpp"
 
 using namespace glm;
 using namespace Replica;
@@ -23,22 +21,11 @@ int CALLBACK WinMain(HINSTANCE hInst, HINSTANCE, LPSTR lpCMdLine, int nCmdShow)
 			THROW_FAILED(initialize);
 
 			MinWindow repWindow(hInst, ivec2(1280, 800));
-
-			IMGUI_CHECKVERSION();
-			ImGui::CreateContext();
-			ImGuiIO& io = ImGui::GetIO(); (void)io;
-			ImGui::StyleColorsDark();
-
-			ImGui_ImplWin32_Init(repWindow.GetWndHandle());
-
-			Renderer renderer(&repWindow);
+			Renderer renderer(repWindow);
+			ImguiHandler imgui(repWindow, renderer);
 
 			// Start main loop
 			lastMsg = repWindow.RunMessageLoop();
-
-			ImGui_ImplDX11_Shutdown();
-			ImGui_ImplWin32_Shutdown();
-			ImGui::DestroyContext();
 		}
 
 		return (int)lastMsg.wParam;

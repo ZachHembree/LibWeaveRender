@@ -10,8 +10,8 @@ using namespace Replica::D3D11;
 SwapChain::SwapChain() : pDev(nullptr)
 { }
 
-SwapChain::SwapChain(const MinWindow& wnd, Device* pDev) :
-	pDev(pDev)
+SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
+	pDev(&dev)
 {
 	ComPtr<IDXGIFactory2> dxgiFactory;
 	GFX_THROW_FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory2), &dxgiFactory));

@@ -14,7 +14,7 @@ namespace Replica
 	using vec2 = glm::vec2;
 
 	public:
-		InputComponent(MinWindow* window) :
+		InputComponent(MinWindow& window) :
 			WindowComponentBase(window) 
 		{ }
 

@@ -11,6 +11,7 @@
 #include "D3D11/Resources/Sampler.hpp"
 #include "D3D11/Effect.hpp"
 #include "D3D11/Mesh.hpp"
+#include "D3D11/RenderComponent.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -29,11 +30,32 @@ namespace Replica::D3D11
 	class Renderer : public WindowComponentBase
 	{
 	public:
-		Renderer(MinWindow* window);
+		Renderer(MinWindow& window);
 
+		/// <summary>
+		/// Returns the interface to the device the renderer is running on
+		/// </summary>
+		Device& GetDevice() { return device; }
+
+		/// <summary>
+		/// Updates the state of the renderer
+		/// </summary>
 		void Update() override;
 
+		/// <summary>
+		/// Handles event messages from the Win32 API
+		/// </summary>
 		void OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
+
+		/// <summary>
+		/// Registers a new render component. Returns false if the component is already registered.
+		/// </summary>
+		bool RegisterComponent(RenderComponentBase& component);
+
+		/// <summary>
+		/// Unregisters the given component from the renderer. Returns false on fail.
+		/// </summary>
+		bool UnregisterComponent(RenderComponentBase& component);
 
 	private:
 		InputComponent input;
@@ -42,8 +64,20 @@ namespace Replica::D3D11
 		RenderTarget backBuf;
 
 		UniqueVector<Mesh> scene;
+		UniqueVector<RenderComponentBase*> pComponents;
+
 		Texture2D testTex;
 		Sampler testSamp;
 		Effect testEffect;
+
+		void BeforeDraw(Context& ctx);
+
+		void DrawEarly(Context& ctx);
+
+		void Draw(Context& ctx);
+
+		void DrawLate(Context& ctx);
+
+		void AfterDraw(Context& ctx);
 	};
 }
