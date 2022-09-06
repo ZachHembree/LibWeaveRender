@@ -285,21 +285,40 @@ ivec2 MinWindow::GetMonitorResolution() const
 
 LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	switch (msg)
+	try
 	{
-	case WM_CLOSE: // Window closed, normal exit
-		PostQuitMessage(0);
-		break;
-	case WM_SIZE:
-		OnResize();
-		break;
-	}
-
-	for (WindowComponentBase* component : components)
-	{
-		// Allow components to intercept messages from later components
-		if (!component->OnWndMessage(hWnd, msg, wParam, lParam))
+		switch (msg)
+		{
+		case WM_CLOSE: // Window closed, normal exit
+			PostQuitMessage(0);
 			break;
+		case WM_SIZE:
+			OnResize();
+			break;
+		}
+
+		for (WindowComponentBase* component : components)
+		{
+			// Allow components to intercept messages from later components
+			if (!component->OnWndMessage(hWnd, msg, wParam, lParam))
+				break;
+		}
+	}
+	catch (const RepWinException& e)
+	{
+		MessageBoxA(nullptr, e.what(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
+	}
+	catch (const RepException& e)
+	{
+		MessageBoxA(nullptr, e.what(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
+	}
+	catch (const std::exception& e)
+	{
+		MessageBoxA(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
+	}
+	catch (...)
+	{
+		MessageBoxA(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
