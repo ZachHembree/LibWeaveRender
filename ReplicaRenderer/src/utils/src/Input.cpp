@@ -18,7 +18,7 @@ ivec2 InputComponent::GetMousePos() const
 
 vec2 InputComponent::GetNormMousePos() const
 {
-	ivec2 vpSize = GetParent().GetSize(), pos = GetMousePos();
+	ivec2 vpSize = GetWindow().GetSize(), pos = GetMousePos();
 	float aspectRatio = (float)vpSize.y / vpSize.x;
 
 	return (1.0f / vpSize.y) * vec2(pos.x * aspectRatio, pos.y);

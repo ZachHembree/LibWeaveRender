@@ -23,13 +23,7 @@ ImguiHandler::ImguiHandler(MinWindow& window, Renderer& renderer) :
 
 	ImGui_ImplWin32_Init(window.GetWndHandle());
 	pRenderComponent = new ImguiRenderComponent(renderer);
-
-	ImGuiStyle& style = ImGui::GetStyle();
-	ImGuiIO& io = ImGui::GetIO();
-	vec2 scale = GetParent().GetNormMonitorDPI();
-
-	style.ScaleAllSizes(scale.y);
-	io.FontGlobalScale = scale.y;
+	UpdateUI();
 }
 
 ImguiHandler::~ImguiHandler()
@@ -43,7 +37,7 @@ void ImguiHandler::UpdateUI()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiStyle& style = ImGui::GetStyle();
-	vec2 scale = GetParent().GetNormMonitorDPI();
+	vec2 scale = GetWindow().GetNormMonitorDPI();
 	float scaleDelta = (float)(scale.y / (double)io.FontGlobalScale);
 
 	style.ScaleAllSizes(scaleDelta);

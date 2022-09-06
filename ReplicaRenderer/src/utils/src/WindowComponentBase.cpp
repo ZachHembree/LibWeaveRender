@@ -18,7 +18,7 @@ WindowComponentBase::WindowComponentBase(MinWindow& window) :
 /// <summary>
 /// Returns pointer to parent window
 /// </summary>
-MinWindow& WindowComponentBase::GetParent() const { return *pParent; }
+MinWindow& WindowComponentBase::GetWindow() const { return *pParent; }
 
 bool WindowComponentBase::GetIsRegistered()
 {

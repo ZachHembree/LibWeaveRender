@@ -22,7 +22,7 @@ namespace Replica
 		/// <summary>
 		/// Returns pointer to parent window
 		/// </summary>
-		MinWindow& GetParent() const;
+		MinWindow& GetWindow() const;
 
 		/// <summary>
 		/// Called after each message poll in the window class

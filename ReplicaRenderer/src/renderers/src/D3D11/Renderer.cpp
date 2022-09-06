@@ -71,7 +71,7 @@ void Renderer::Update()
 	BeforeDraw(ctx);
 
 	// Set viewport bounds
-	ctx.RSSetViewport(GetParent().GetBodySize());
+	ctx.RSSetViewport(GetWindow().GetBodySize());
 	// Bind back buffer as render target
 	backBuf.Bind(ctx);
 
