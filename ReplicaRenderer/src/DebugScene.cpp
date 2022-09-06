@@ -53,7 +53,7 @@ DebugScene::DebugScene(Renderer& renderer, InputComponent& input) :
 
 void DebugScene::Draw(Context& ctx)
 {
-	MinWindow& const window = pRenderer->GetParent();
+	MinWindow& window = pRenderer->GetParent();
 	const ivec2 mousePos = input.GetMousePos();
 	const vec2 normMousePos = input.GetNormMousePos(),
 		clipMousePos = 2.0f * normMousePos + vec2(-1, 1);
