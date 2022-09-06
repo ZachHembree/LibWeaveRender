@@ -1,6 +1,6 @@
 #pragma once
 #include "RepLeanWin.h"
-#include "RepMain.h"
+#include "DebugMain.hpp"
 #include "RepWinException.hpp"
 #include "MoveOnlyBase.hpp"
 

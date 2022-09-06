@@ -1,5 +1,5 @@
 #pragma once
-#include "D3D11/D3DUtils.hpp"
+#include "D3DUtils.hpp"
 #include <d3d11.h>
 #include "DynamicCollections.hpp"
 #include "D3D11/Context.hpp"

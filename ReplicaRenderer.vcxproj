@@ -204,7 +204,7 @@
     <ClCompile Include="ReplicaRenderer\src\DebugScene.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiHandler.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\RenderComponent.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\D3DUtils.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3DUtils.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantMap.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantBuffer.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Shaders\ShaderBase.cpp" />
@@ -240,7 +240,7 @@
     <ClInclude Include="ReplicaRenderer\libs\imgui\imstb_textedit.h" />
     <ClInclude Include="ReplicaRenderer\libs\imgui\imstb_truetype.h" />
     <ClInclude Include="ReplicaRenderer\libs\imgui\misc\cpp\imgui_stdlib.h" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\D3DUtils.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3DUtils.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiHandler.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiRenderComponent.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\RenderComponent.hpp" />
@@ -279,7 +279,7 @@
     <ClInclude Include="ReplicaRenderer\src\utils\include\RepException.hpp" />
     <ClInclude Include="ReplicaRenderer\src\utils\include\MinWindow.hpp" />
     <ClInclude Include="ReplicaRenderer\src\utils\include\RepWinException.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\RepMain.h" />
+    <ClInclude Include="ReplicaRenderer\src\DebugMain.hpp" />
     <ClInclude Include="ReplicaRenderer\src\utils\include\DynamicCollections.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\VertexBuffer.hpp" />
     <ClInclude Include="ReplicaRenderer\src\utils\include\WindowComponentBase.hpp" />

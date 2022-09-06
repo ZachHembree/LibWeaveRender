@@ -2,7 +2,6 @@
 #define REP_WIND_H
 
 #include "RepLeanWin.h"
-#include "RepMain.h"
 #include "RepWinException.hpp"
 
 #include <glm/glm.hpp>

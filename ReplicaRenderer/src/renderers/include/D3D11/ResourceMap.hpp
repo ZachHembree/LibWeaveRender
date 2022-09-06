@@ -1,5 +1,5 @@
 #pragma once
-#include "D3D11/D3DUtils.hpp"
+#include "D3DUtils.hpp"
 #include <unordered_map>
 
 namespace Replica::D3D11

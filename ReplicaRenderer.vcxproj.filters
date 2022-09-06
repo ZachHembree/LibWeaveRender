@@ -111,7 +111,7 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\D3DUtils.cpp">
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3DUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Mesh.cpp">
@@ -137,7 +137,7 @@
     <ClInclude Include="ReplicaRenderer\src\utils\include\MinWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\src\RepMain.h">
+    <ClInclude Include="ReplicaRenderer\src\DebugMain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\utils\include\RepException.hpp">
@@ -200,7 +200,7 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Context.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\D3DUtils.hpp">
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3DUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RenderTarget.hpp">

@@ -6,6 +6,7 @@
 #include <sstream>
 #include "resource.h"
 
+#include "DebugMain.hpp"
 #include "MinWindow.hpp"
 #include "Input.hpp"
 #include "D3D11/Primitives.hpp"
