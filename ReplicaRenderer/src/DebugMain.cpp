@@ -32,10 +32,9 @@ int CALLBACK WinMain(HINSTANCE hInst, HINSTANCE, LPSTR lpCMdLine, int nCmdShow)
 			WIN_THROW_HR(SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE));
 
 			MinWindow repWindow(g_Name, ivec2(1280, 800), WndStyle(wndStyle, 0L), hInst, iconFile);
-			InputComponent input(repWindow);
-
 			Renderer renderer(repWindow);
 			ImguiHandler imgui(repWindow, renderer);
+			InputComponent input(repWindow);
 			DebugScene debugScene(renderer, input);
 
 			ivec2 dpi = repWindow.GetMonitorDPI(),

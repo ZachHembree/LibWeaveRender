@@ -17,7 +17,9 @@ namespace Replica::D3D11
 
 		~ImguiHandler();
 
-		void OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
+		void UpdateUI();
+
+		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 	private:
 		ImguiRenderComponent* pRenderComponent;

@@ -39,9 +39,8 @@ ImguiHandler::~ImguiHandler()
 	ImGui::DestroyContext();
 }
 
-void ImguiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+void ImguiHandler::UpdateUI()
 {
-	ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiStyle& style = ImGui::GetStyle();
 	vec2 scale = GetParent().GetNormMonitorDPI();
@@ -49,4 +48,35 @@ void ImguiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 	style.ScaleAllSizes(scaleDelta);
 	io.FontGlobalScale = scale.y;
+}
+
+bool ImguiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	ImGuiIO& io = ImGui::GetIO();
+
+	switch (msg)
+	{
+	case WM_ACTIVATE:
+	case WM_INPUT:
+	case WM_MOUSEMOVE:
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONUP:
+	case WM_MBUTTONDOWN:
+	case WM_MBUTTONUP:
+	case WM_MOUSEWHEEL:
+	case WM_XBUTTONDOWN:
+	case WM_XBUTTONUP:
+	case WM_MOUSEHOVER:
+	case WM_KEYDOWN:
+	case WM_KEYUP:
+	case WM_SYSKEYUP:
+	case WM_SYSKEYDOWN:
+		UpdateUI();
+		ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+		return !(io.WantCaptureKeyboard || io.WantCaptureMouse);
+	}
+
+	return true;
 }

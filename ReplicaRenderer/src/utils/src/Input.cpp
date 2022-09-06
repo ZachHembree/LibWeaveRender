@@ -24,7 +24,7 @@ vec2 InputComponent::GetNormMousePos() const
 	return (1.0f / vpSize.y) * vec2(pos.x * aspectRatio, pos.y);
 }
 
-void InputComponent::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+bool InputComponent::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -61,4 +61,6 @@ void InputComponent::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		keyboard.Reset();
 		break;
 	}	
+
+	return true;
 }

@@ -37,7 +37,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Handles event messages from the Win32 API
 		/// </summary>
-		void OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
+		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 		/// <summary>
 		/// Registers a new render component. Returns false if the component is already registered.

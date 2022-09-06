@@ -11,8 +11,10 @@ Renderer::Renderer(MinWindow& window) :
 	backBuf(swap.GetBuffer(0)) // Get RT view for swap chain back buf
 { }
 
-void Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{ }
+bool Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{ 
+	return true;
+}
 
 /// <summary>
 /// Registers a new render component. Returns false if the component is already registered.

@@ -18,12 +18,12 @@ namespace Replica
 			WindowComponentBase(window) 
 		{ }
 
-		void OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
+		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 		/// <summary>
 		/// Returns true if a given keyboard key is pressed
 		/// </summary>
-		bool GetIsKeyPressed(KbKey key);;
+		bool GetIsKeyPressed(KbKey key);
 
 		/// <summary>
 		/// Returns raw, pixel-value, mouse position relative to the upper left corner

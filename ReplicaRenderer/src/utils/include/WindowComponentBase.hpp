@@ -30,9 +30,9 @@ namespace Replica
 		virtual void Update() { }
 
 		/// <summary>
-		/// Invoked on WndProc callback
+		/// Invoked on WndProc callback. Interrupts update if the component returns false.
 		/// </summary>
-		virtual void OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { }
+		virtual bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { return true; }
 
 		/// <summary>
 		/// Returns true if the component has been registered to a window

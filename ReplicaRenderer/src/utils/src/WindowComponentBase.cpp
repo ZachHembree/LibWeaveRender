@@ -12,7 +12,7 @@ WindowComponentBase::WindowComponentBase(MinWindow& window) :
 	pParent(&window),
 	isRegistered(false)
 {
-	window.RegisterComponent(this);
+	window.RegisterComponent(*this);
 }
 
 /// <summary>

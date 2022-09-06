@@ -52,7 +52,7 @@ namespace Replica
 			/// <summary>
 			/// Registers component object to the window.
 			/// </summary>
-			virtual void RegisterComponent(WindowComponentBase* component);
+			virtual void RegisterComponent(WindowComponentBase& component);
 
 			/// <summary>
 			/// Updates window message loop until the window is closed

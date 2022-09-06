@@ -203,12 +203,12 @@ void MinWindow::SetBodySize(ivec2 size)
 	SetSize(size);
 }
 
-void MinWindow::RegisterComponent(WindowComponentBase* component)
+void MinWindow::RegisterComponent(WindowComponentBase& component)
 {
-	if (component != nullptr && !component->isRegistered && component->pParent == this)
+	if (!component.isRegistered && component.pParent == this)
 	{
-		components.push_back(component);
-		component->isRegistered = true;
+		components.push_back(&component);
+		component.isRegistered = true;
 	}
 }
 
@@ -216,9 +216,9 @@ MSG MinWindow::RunMessageLoop()
 {
 	while (PollWindowMessages())
 	{
-		for (int i = 0; i < components.GetLength(); i++)
+		for (WindowComponentBase* component : components)
 		{
-			components[i]->Update();
+			component->Update();
 		}
 	}
 
@@ -297,7 +297,9 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 	for (WindowComponentBase* component : components)
 	{
-		component->OnWndMessage(hWnd, msg, wParam, lParam);
+		// Allow components to intercept messages from later components
+		if (!component->OnWndMessage(hWnd, msg, wParam, lParam))
+			break;
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
