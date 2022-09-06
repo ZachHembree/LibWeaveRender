@@ -16,6 +16,7 @@ namespace Replica::D3D11
 	{
 	public:
 		SwapChain();
+
 		SwapChain(const MinWindow& wnd, Device& dev);
 
 		SwapChain(SwapChain&&) = default;

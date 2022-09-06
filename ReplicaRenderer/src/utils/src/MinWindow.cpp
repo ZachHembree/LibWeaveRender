@@ -127,37 +127,37 @@ wstring MinWindow::GetWindowTitle() const
 {
 	size_t len = GetWindowTextLengthW(hWnd);
 	wstring title(len, '\0');
-	WIN_ASSERT_NZ_LAST(int, GetWindowTextW(hWnd, title.data(), len));
+	WIN_ASSERT_NZ_LAST(GetWindowTextW(hWnd, title.data(), len));
 
 	return title;
 }
 
 void MinWindow::SetWindowTitle(wstring_view text)
 {
-	WIN_ASSERT_NZ_LAST(BOOL, SetWindowTextW(hWnd, text.data()));
+	WIN_ASSERT_NZ_LAST(SetWindowTextW(hWnd, text.data()));
 }
 
 WndStyle MinWindow::GetStyle() const
 {
 	WndStyle style;
 	style.x = (DWORD)GetWindowLongPtr(hWnd, GWL_STYLE);
-	WIN_ASSERT_NZ_LAST(DWORD, style.x);
+	WIN_ASSERT_NZ_LAST(style.x);
 
 	style.y = (DWORD)GetWindowLongPtr(hWnd, GWL_EXSTYLE);
-	WIN_ASSERT_NZ_LAST(DWORD, style.y);
+	WIN_ASSERT_NZ_LAST(style.y);
 
 	return style;
 }
 
 void MinWindow::SetStyle(WndStyle style)
 {
-	WIN_ASSERT_NZ_LAST(LONG_PTR, SetWindowLongPtr(hWnd, GWL_STYLE, style.x));
+	WIN_ASSERT_NZ_LAST(SetWindowLongPtr(hWnd, GWL_STYLE, style.x));
 
 	if (style.y != 0L)
-		WIN_ASSERT_NZ_LAST(LONG_PTR, SetWindowLongPtr(hWnd, GWL_EXSTYLE, style.y));
+		WIN_ASSERT_NZ_LAST(SetWindowLongPtr(hWnd, GWL_EXSTYLE, style.y));
 
 	// Update to reflect changes
-	WIN_ASSERT_NZ_LAST(BOOL, SetWindowPos(
+	WIN_ASSERT_NZ_LAST(SetWindowPos(
 		hWnd,
 		HWND_TOPMOST,
 		0, 0,
@@ -169,13 +169,13 @@ void MinWindow::SetStyle(WndStyle style)
 ivec2 MinWindow::GetPos() const
 {
 	RECT rect;
-	WIN_ASSERT_NZ_LAST(BOOL, GetWindowRect(hWnd, &rect));
+	WIN_ASSERT_NZ_LAST(GetWindowRect(hWnd, &rect));
 	return ivec2(rect.left, rect.top);
 }
 
 void MinWindow::SetPos(ivec2 pos)
 {
-	WIN_ASSERT_NZ_LAST(BOOL, SetWindowPos(
+	WIN_ASSERT_NZ_LAST(SetWindowPos(
 		hWnd,
 		0,
 		pos.x, pos.y,
@@ -191,7 +191,7 @@ ivec2 MinWindow::GetSize() const
 
 void MinWindow::SetSize(ivec2 size)
 {
-	WIN_ASSERT_NZ_LAST(BOOL, SetWindowPos(
+	WIN_ASSERT_NZ_LAST(SetWindowPos(
 		hWnd, 
 		HWND_TOP, 
 		0, 0, 
@@ -250,13 +250,13 @@ void MinWindow::ResetStyle()
 	SetStyle(lastStyle);
 }
 
-ivec2 MinWindow::GetMonitorResolution()
+ivec2 MinWindow::GetMonitorResolution() const
 {
 	HMONITOR mon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
 	MONITORINFO info;
 	info.cbSize = sizeof(MONITORINFO);
 
-	WIN_ASSERT_NZ_LAST(BOOL, GetMonitorInfo(mon, &info));
+	WIN_ASSERT_NZ_LAST(GetMonitorInfo(mon, &info));
 
 	RECT rect = info.rcMonitor;
 	return ivec2(rect.right - rect.left, rect.bottom - rect.top);

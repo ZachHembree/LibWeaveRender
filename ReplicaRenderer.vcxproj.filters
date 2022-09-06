@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ReplicaRenderer\src\RepMain.cpp">
+    <ClCompile Include="ReplicaRenderer\src\DebugMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\utils\src\MinWindow.cpp">
@@ -126,7 +126,7 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\DebugScene.cpp">
+    <ClCompile Include="ReplicaRenderer\src\DebugScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -284,7 +284,7 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiHandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\DebugScene.hpp">
+    <ClInclude Include="ReplicaRenderer\src\DebugScene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

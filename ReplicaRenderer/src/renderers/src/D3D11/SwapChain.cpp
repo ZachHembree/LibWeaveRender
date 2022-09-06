@@ -23,9 +23,10 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	fsDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED; // No interlacing
 	fsDesc.Windowed = TRUE;
 
+	const ivec2 monRes = wnd.GetMonitorResolution();
 	DXGI_SWAP_CHAIN_DESC1 swapDesc = {};
-	swapDesc.Width = 0; // Use window size for buffer dimensions
-	swapDesc.Height = 0;
+	swapDesc.Width = monRes.x; // Initialize chain to active monitor resolution
+	swapDesc.Height = monRes.y;
 	swapDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	swapDesc.Stereo = FALSE;
 	swapDesc.SampleDesc.Count = 1; // No MSAA
@@ -59,7 +60,7 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 
 	depthStencil = Texture2D(
 		dev, 
-		wnd.GetSize(),
+		monRes,
 		Formats::D32_FLOAT, 
 		ResourceUsages::Default, 
 		ResourceTypes::DepthStencil

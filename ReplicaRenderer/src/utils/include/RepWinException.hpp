@@ -7,7 +7,7 @@
 #define REP_EXCEPT(hr) RepWinException(__LINE__, __FILE__, hr)
 #define REP_EXCEPT_LAST() RepWinException(__LINE__, __FILE__, GetLastError())
 #define THROW_FAILED(x) { HRESULT hr = (x); if (FAILED(hr)) { throw RepWinException(__LINE__, __FILE__, hr); } }
-#define WIN_ASSERT_NZ_LAST(TYPE, x) { const TYPE ret = (x); if (ret == 0) { REP_EXCEPT_LAST(); } }
+#define WIN_ASSERT_NZ_LAST(x) { if ((x) == 0) { REP_EXCEPT_LAST(); } }
 
 namespace Replica
 {

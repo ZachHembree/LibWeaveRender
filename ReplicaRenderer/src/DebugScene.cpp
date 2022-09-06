@@ -11,7 +11,7 @@
 #include "D3D11/Primitives.hpp"
 #include "D3D11/Shaders/BuiltInShaders.hpp"
 #include "D3D11/Renderer.hpp"
-#include "D3D11/DebugScene.hpp"
+#include "DebugScene.hpp"
 
 using namespace Replica::D3D11;
 using namespace std::chrono;

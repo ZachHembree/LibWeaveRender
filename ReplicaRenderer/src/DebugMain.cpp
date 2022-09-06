@@ -2,7 +2,7 @@
 #include "Input.hpp"
 #include "D3D11/Renderer.hpp"
 #include "D3D11/ImguiHandler.hpp"
-#include "D3D11/DebugScene.hpp"
+#include "DebugScene.hpp"
 #include "resource.h"
 #include <string_view>
 

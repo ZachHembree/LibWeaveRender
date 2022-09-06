@@ -122,7 +122,7 @@ namespace Replica
 			/// <summary>
 			/// Returns the current resolution of the monitor occupied by the window
 			/// </summary>
-			ivec2 GetMonitorResolution();
+			ivec2 GetMonitorResolution() const;
 
 		protected:	
 			static MinWindow* pLastInit;
