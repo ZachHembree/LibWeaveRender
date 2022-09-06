@@ -21,15 +21,18 @@ ImguiRenderComponent::~ImguiRenderComponent()
 	ImGui_ImplDX11_Shutdown();
 }
 
-void ImguiRenderComponent::DrawLate(Context& ctx)
+void ImguiRenderComponent::Update(Context& ctx)
 {
-	// IMGUI Test
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
+	// IMGUI Test
 	ImGui::ShowDemoWindow();
+}
 
+void ImguiRenderComponent::DrawLate(Context& ctx)
+{
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }

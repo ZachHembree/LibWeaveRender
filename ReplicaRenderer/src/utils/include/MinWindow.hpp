@@ -7,18 +7,32 @@
 
 #include <glm/glm.hpp>
 #include "DynamicCollections.hpp"
+#include <string_view>
 
 namespace Replica
 {
+	typedef glm::tvec2<DWORD> WndStyle;
+	typedef glm::ivec2 ivec2;
+	using std::string_view;
+	using std::wstring_view;
+	using std::string;
+	using std::wstring;
+
 	class WindowComponentBase;
 
 	/// <summary>
-	/// Minimal wrapper class for windows
+	/// Minimal wrapper class for Win32 Window
 	/// </summary>
 	class MinWindow
 	{
 		public:
-			MinWindow(const HINSTANCE hInst, const glm::ivec2 size);
+			MinWindow(
+				wstring_view name, 
+				ivec2 initSize, 
+				WndStyle initStyle, 
+				const HINSTANCE hInst, 
+				const wchar_t* iconRes
+			);
 
 			MinWindow(MinWindow&& other) noexcept;
 
@@ -43,7 +57,7 @@ namespace Replica
 			/// <summary>
 			/// Returns the name of the window
 			/// </summary>
-			const wchar_t* GetName() const noexcept;
+			const wstring_view GetName() const noexcept;
 
 			/// <summary>
 			/// Returns handle to executable process associated with the window
@@ -56,22 +70,69 @@ namespace Replica
 			HWND GetWndHandle() const noexcept;
 
 			/// <summary>
-			/// Returns the size of the window's body
+			/// Returns the size of the window's body in pixels.
 			/// </summary>
-			glm::ivec2 GetSize() const { return size; };
+			ivec2 GetSize() const;
+			
+			/// <summary>
+			/// Resizes the window to the given dimensions in pixels.
+			/// </summary>
+			void SetSize(ivec2 size);
 
-			void SetWindowTitle(LPCWSTR text)
-			{
-				SetWindowTextW(hWnd, text);
-			}
+			/// <summary>
+			/// Returns the position of the window's top right corner in pixels
+			/// </summary>
+			ivec2 GetPos() const;
+
+			/// <summary>
+			/// Sets the position of the window's top right corner in pixels
+			/// </summary>
+			void SetPos(ivec2 pos);
+
+			/// <summary>
+			/// Returns the contents of the titlebar
+			/// </summary>
+			wstring GetWindowTitle() const;
+
+			/// <summary>
+			/// Writes the given text to the titlebar
+			/// </summary>
+			void SetWindowTitle(wstring_view text);
+
+			/// <summary>
+			/// Returns style and extended style as a vector
+			/// </summary>
+			WndStyle GetStyle() const;
+
+			/// <summary>
+			/// Sets the style of the window. Ex-style optional.
+			/// </summary>
+			void SetStyle(WndStyle style);
+
+			/// <summary>
+			/// Hides the window's borders
+			/// </summary>
+			void SetStyleBorderless();
+
+			/// <summary>
+			/// Resets the window to its initial style
+			/// </summary>
+			void ResetStyle();
+
+			/// <summary>
+			/// Returns the current resolution of the monitor occupied by the window
+			/// </summary>
+			ivec2 GetMonitorResolution();
 
 		protected:	
 			static MinWindow* pLastInit;
 
+			const wstring_view name;
+			WndStyle lastStyle;
 			HINSTANCE hInst;
 			HWND hWnd;
 			MSG wndMsg;
-			glm::ivec2 size;
+			ivec2 size;
 
 			/// <summary>
 			/// Component objects associated with the window

@@ -149,6 +149,8 @@
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)ReplicaRenderer\src\renderers\include;$(ProjectDir)ReplicaRenderer\src\utils\include;$(ProjectDir)ReplicaRenderer\res;$(ProjectDir)ReplicaRenderer;$(ProjectDir)ReplicaRenderer\src\;$(ProjectDir)ReplicaRenderer\libs;%(AdditionalIncludeDirectories);$(ProjectDir)ReplicaRenderer\libs\imgui;$(ProjectDir)ReplicaRenderer\libs\imgui\backends;$(ProjectDir)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
