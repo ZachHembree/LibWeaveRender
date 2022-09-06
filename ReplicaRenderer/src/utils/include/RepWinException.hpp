@@ -1,13 +1,13 @@
 #pragma once
-#pragma warning(disable: 26444)
+#pragma warning(disable: 26444) // Intellisense is just helpless, sometimes
 
 #include "RepLeanWin.h"
 #include "RepException.hpp"
 
 #define REP_EXCEPT(hr) RepWinException(__LINE__, __FILE__, hr)
-#define REP_EXCEPT_LAST() RepWinException(__LINE__, __FILE__, GetLastError())
-#define THROW_FAILED(x) { HRESULT hr = (x); if (FAILED(hr)) { throw RepWinException(__LINE__, __FILE__, hr); } }
-#define WIN_ASSERT_NZ_LAST(x) { if ((x) == 0) { REP_EXCEPT_LAST(); } }
+#define WIN_THROW_LAST() RepWinException(__LINE__, __FILE__, GetLastError())
+#define WIN_THROW_HR(x) { HRESULT hr = (x); if (FAILED(hr)) { throw RepWinException(__LINE__, __FILE__, hr); } }
+#define WIN_ASSERT_NZ_LAST(x) { if ((x) == 0) { WIN_THROW_LAST(); } }
 
 namespace Replica
 {

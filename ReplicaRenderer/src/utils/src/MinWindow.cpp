@@ -1,5 +1,6 @@
 #include "MinWindow.hpp"
 #include "WindowComponentBase.hpp"
+#include <ShellScalingApi.h>
 
 using namespace glm;
 using namespace Replica;
@@ -14,8 +15,7 @@ MinWindow::MinWindow(
 	const wchar_t* iconRes
 ) :
 	name(initName),
-	size(initSize),
-	lastStyle(initStyle),
+	bodySize(initSize),
 	wndMsg(MSG{}),
 	hInst(hInst),
 	hWnd(nullptr)
@@ -36,22 +36,16 @@ MinWindow::MinWindow(
 	wc.hIconSm = (HICON)LoadImage(hInst, iconRes, IMAGE_ICON, 32, 32, 0);
 
 	// Register window class
-	const ATOM classID = RegisterClassEx(&wc);
+	WIN_ASSERT_NZ_LAST(RegisterClassEx(&wc));
 
-	if (classID == NULL)
-		throw REP_EXCEPT_LAST();
-
-	// Get window rect to set body to the size given, not including border
 	RECT wr;
-	wr.left = 100;
-	wr.right = size.x + wr.left;
-	wr.top = 100;
-	wr.bottom = size.y + wr.top;
+	wr.left = 50;
+	wr.right = bodySize.x + wr.left;
+	wr.top = 50;
+	wr.bottom = bodySize.y + wr.top;
 
-	// Check if window sizing failed
-	if (!AdjustWindowRect(&wr, initStyle.x, FALSE))
-		throw REP_EXCEPT_LAST();
-
+	// Resize body
+	WIN_ASSERT_NZ_LAST(AdjustWindowRect(&wr, initStyle.x, FALSE));
 	pLastInit = this;
 
 	// Create window instance
@@ -72,20 +66,19 @@ MinWindow::MinWindow(
 
 	// Check if window creation failed
 	if (hWnd == NULL)
-		throw REP_EXCEPT_LAST();
+		throw WIN_THROW_LAST();
 
 	// Make the window visible
 	ShowWindow(hWnd, SW_SHOW);
-	initStyle = GetStyle();
 }
 
 MinWindow::MinWindow(MinWindow&& other) noexcept :
 	name(other.name),
-	lastStyle(other.lastStyle),
 	hInst(other.hInst),
 	hWnd(other.hWnd),
 	wndMsg(other.wndMsg),
-	size(other.size)
+	bodySize(other.bodySize),
+	wndSize(other.wndSize)
 {
 	memset(&other, 0, sizeof(MinWindow));
 }
@@ -93,9 +86,7 @@ MinWindow::MinWindow(MinWindow&& other) noexcept :
 MinWindow& MinWindow::operator=(MinWindow&& rhs) noexcept
 {
 	memcpy(this, &rhs, sizeof(MinWindow));
-	rhs.hInst = nullptr;
-	rhs.hWnd = nullptr;
-
+	memset(&rhs, 0, sizeof(MinWindow));
 	return *this;
 }
 
@@ -186,18 +177,30 @@ void MinWindow::SetPos(ivec2 pos)
 
 ivec2 MinWindow::GetSize() const
 {
-	return size;
+	return wndSize;
 }
 
 void MinWindow::SetSize(ivec2 size)
 {
 	WIN_ASSERT_NZ_LAST(SetWindowPos(
-		hWnd, 
-		HWND_TOP, 
-		0, 0, 
+		hWnd,
+		HWND_TOP,
+		0, 0,
 		size.x, size.y,
 		SWP_NOREPOSITION | SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED
 	));
+}
+
+ivec2 MinWindow::GetBodySize() const
+{
+	return bodySize;
+}
+
+void MinWindow::SetBodySize(ivec2 size)
+{
+	ivec2 borderSize = wndSize - bodySize;
+	size += borderSize;
+	SetSize(size);
 }
 
 void MinWindow::RegisterComponent(WindowComponentBase* component)
@@ -237,17 +240,35 @@ bool MinWindow::PollWindowMessages()
 	return true;
 }
 
-void MinWindow::SetStyleBorderless()
+void MinWindow::SetStyleFlags(WndStyle flags)
 {
 	WndStyle style = GetStyle();
-	lastStyle = style;
-	style.x &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+	style.x |= flags.x;
+	style.y |= flags.y;
 	SetStyle(style);
 }
 
-void MinWindow::ResetStyle()
+void MinWindow::DisableStyleFlags(WndStyle flags)
 {
-	SetStyle(lastStyle);
+	WndStyle style = GetStyle();
+	style.x &= ~flags.x;
+	style.y &= ~flags.y;
+	SetStyle(style);
+}
+
+ivec2 MinWindow::GetMonitorDPI() const
+{
+	HMONITOR mon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+	uivec2 dpi;
+	WIN_THROW_HR(GetDpiForMonitor(mon, MDT_EFFECTIVE_DPI, &dpi.x, &dpi.y));
+
+	return ivec2((int)dpi.x, (int)dpi.y);
+}
+
+vec2 MinWindow::GetNormMonitorDPI() const
+{
+	ivec2 dpi = GetMonitorDPI();
+	return vec2(dpi.x / 96.0f, dpi.y / 96.0f);
 }
 
 ivec2 MinWindow::GetMonitorResolution() const
@@ -270,9 +291,7 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		PostQuitMessage(0);
 		break;
 	case WM_SIZE:
-		UINT width = LOWORD(lParam);
-		UINT height = HIWORD(lParam);
-		size = ivec2(width, height);
+		OnResize();
 		break;
 	}
 
@@ -282,6 +301,17 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+
+void MinWindow::OnResize()
+{
+	RECT clientBox, wndBox;
+
+	GetClientRect(hWnd, &clientBox);
+	GetWindowRect(hWnd, &wndBox);
+
+	bodySize = ivec2(clientBox.right - clientBox.left, clientBox.bottom - clientBox.top);
+	wndSize = ivec2(wndBox.right - wndBox.left, wndBox.bottom - wndBox.top);
 }
 
 LRESULT CALLBACK MinWindow::HandleWindowSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

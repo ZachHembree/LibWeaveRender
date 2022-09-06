@@ -5,6 +5,7 @@
 #include "DebugScene.hpp"
 #include "resource.h"
 #include <string_view>
+#include <ShellScalingApi.h>
 
 using namespace glm;
 using namespace Replica;
@@ -25,7 +26,10 @@ int CALLBACK WinMain(HINSTANCE hInst, HINSTANCE, LPSTR lpCMdLine, int nCmdShow)
 
 			// Initialize Windows runtime
 			Wrappers::RoInitializeWrapper initialize(RO_INIT_MULTITHREADED);
-			THROW_FAILED(initialize);
+			WIN_THROW_HR(initialize);
+
+			// This application will handle its own scaling
+			WIN_THROW_HR(SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE));
 
 			MinWindow repWindow(g_Name, ivec2(1280, 800), WndStyle(wndStyle, 0L), hInst, iconFile);
 			InputComponent input(repWindow);
@@ -34,12 +38,16 @@ int CALLBACK WinMain(HINSTANCE hInst, HINSTANCE, LPSTR lpCMdLine, int nCmdShow)
 			ImguiHandler imgui(repWindow, renderer);
 			DebugScene debugScene(renderer, input);
 
-			/* Fullscreen borderless window
-			ivec2 mres = repWindow.GetMonitorResolution();
-			repWindow.SetStyleBorderless();
-			repWindow.SetSize(mres);
-			repWindow.SetPos(ivec2(0));
-			*/
+			ivec2 dpi = repWindow.GetMonitorDPI(),
+				monRes = repWindow.GetMonitorResolution(),
+				scaledRes = (96 * monRes) / dpi;
+			vec2 fDpi = repWindow.GetNormMonitorDPI();
+
+			// Fullscreen borderless window
+			/*ivec2 mres = repWindow.GetMonitorResolution();
+			repWindow.DisableStyleFlags(WndStyle(wndStyle, 0));
+			repWindow.SetBodySize(mres);
+			repWindow.SetPos(ivec2(0));*/
 
 			// Start main loop
 			lastMsg = repWindow.RunMessageLoop();

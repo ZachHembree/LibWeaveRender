@@ -9,10 +9,15 @@
 #include "DynamicCollections.hpp"
 #include <string_view>
 
+#pragma comment(lib, "Shcore.lib")
+
 namespace Replica
 {
 	typedef glm::tvec2<DWORD> WndStyle;
-	typedef glm::ivec2 ivec2;
+	typedef glm::tvec2<UINT> uivec2;
+	
+	using glm::ivec2;
+	using glm::vec2;
 	using std::string_view;
 	using std::wstring_view;
 	using std::string;
@@ -70,14 +75,24 @@ namespace Replica
 			HWND GetWndHandle() const noexcept;
 
 			/// <summary>
-			/// Returns the size of the window's body in pixels.
+			/// Returns the size of the window in pixels.
 			/// </summary>
 			ivec2 GetSize() const;
-			
+
 			/// <summary>
 			/// Resizes the window to the given dimensions in pixels.
 			/// </summary>
 			void SetSize(ivec2 size);
+
+			/// <summary>
+			/// Returns the size of the window's body in pixels.
+			/// </summary>
+			ivec2 GetBodySize() const;
+			
+			/// <summary>
+			/// Resizes the window body to the given dimensions in pixels.
+			/// </summary>
+			void SetBodySize(ivec2 size);
 
 			/// <summary>
 			/// Returns the position of the window's top right corner in pixels
@@ -110,14 +125,24 @@ namespace Replica
 			void SetStyle(WndStyle style);
 
 			/// <summary>
-			/// Hides the window's borders
+			/// Adds the given style flags to the window
 			/// </summary>
-			void SetStyleBorderless();
+			void SetStyleFlags(WndStyle flags);
 
 			/// <summary>
-			/// Resets the window to its initial style
+			/// Removes the given style flags from the current style
 			/// </summary>
-			void ResetStyle();
+			void DisableStyleFlags(WndStyle flags);
+
+			/// <summary>
+			/// Returns fractional, floating-point, DPI normalized to 96 DPI
+			/// </summary>
+			vec2 GetNormMonitorDPI() const;
+
+			/// <summary>
+			/// Returns the effective DPI of the monitor occupied by the window
+			/// </summary>
+			ivec2 GetMonitorDPI() const;
 
 			/// <summary>
 			/// Returns the current resolution of the monitor occupied by the window
@@ -128,11 +153,10 @@ namespace Replica
 			static MinWindow* pLastInit;
 
 			const wstring_view name;
-			WndStyle lastStyle;
 			HINSTANCE hInst;
 			HWND hWnd;
 			MSG wndMsg;
-			ivec2 size;
+			ivec2 bodySize, wndSize;
 
 			/// <summary>
 			/// Component objects associated with the window
@@ -149,6 +173,8 @@ namespace Replica
 			/// Proceedure for processing window messages sent from Win32 API
 			/// </summary>
 			LRESULT OnWndMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
+
+			void OnResize();
 
 			/// <summary>
 			/// Handles messaging setup on creation of new windows
