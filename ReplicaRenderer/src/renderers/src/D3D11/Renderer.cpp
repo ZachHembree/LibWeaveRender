@@ -1,6 +1,5 @@
 #include "MinWindow.hpp"
 #include "D3D11/Renderer.hpp"
-#include "D3D11/Resources/Texture2D.hpp"
 
 using namespace Replica::D3D11;
 
@@ -8,7 +7,8 @@ Renderer::Renderer(MinWindow& window) :
 	WindowComponentBase(window),
 	device(), // Create device and context
 	swap(window, device), // Create swap chain for window
-	backBuf(swap.GetBuffer(0)) // Get RT view for swap chain back buf
+	defaultDS(device, swap.GetSize()),
+	backBuf(swap.GetBackBuf()) // Get RT view for swap chain back buf
 { }
 
 bool Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -39,7 +39,7 @@ bool Renderer::UnregisterComponent(RenderComponentBase& component)
 {
 	int index = -1;
 
-	for (int i = pComponents.GetLength() - 1; i >= 0; i--)
+	for (int i = (int)pComponents.GetLength() - 1; i >= 0; i--)
 	{
 		if (pComponents[i] == &component)
 		{
@@ -63,17 +63,29 @@ void Renderer::Update()
 {
 	// Reset binds
 	Context& ctx = device.GetContext();
+	const ivec2 bodySize = GetWindow().GetBodySize(),
+		lastBackSize = swap.GetSize(),
+		stencilSize = defaultDS.GetSize();
+
 	ctx.Reset();
+
+	if (bodySize.x > lastBackSize.x || bodySize.y > lastBackSize.y)
+		swap.ResizeBuffers(bodySize);
+
+	if (bodySize.x > stencilSize.x || bodySize.y > stencilSize.y)
+		defaultDS = DepthStencilTexture(device, bodySize);
 
 	// Clear back buffer
 	backBuf.Clear(ctx);
+	defaultDS.Clear(ctx);
 
 	BeforeDraw(ctx);
 
 	// Set viewport bounds
-	ctx.RSSetViewport(GetWindow().GetBodySize());
+	ctx.RSSetViewport(bodySize);
+
 	// Bind back buffer as render target
-	backBuf.Bind(ctx);
+	ctx.SetRenderTarget(backBuf, defaultDS);
 
 	DrawEarly(ctx);
 	Draw(ctx);

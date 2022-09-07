@@ -20,7 +20,8 @@ Texture2D::Texture2D(
 	void* data,
 	UINT stride
 ) :
-	ResourceBase(dev)
+	ResourceBase(dev),
+	size(dim)
 {
 	D3D11_TEXTURE2D_DESC desc = {};
 	desc.Width = dim.x;
@@ -52,24 +53,14 @@ Texture2D::Texture2D(
 	}
 
 	if ((int)(bindFlags & ResourceTypes::ShaderResource))
-	{ 
+	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC vDesc = {};
 		vDesc.Format = desc.Format;
 		vDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		vDesc.Texture2D.MostDetailedMip = 0;
 		vDesc.Texture2D.MipLevels = desc.MipLevels;
 
-		GFX_THROW_FAILED(pDev->Get()->CreateShaderResourceView(pRes.Get(), &vDesc, &pView));
-	}
-
-	if ((int)(bindFlags & ResourceTypes::DepthStencil))
-	{
-		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
-		descDSV.Format = desc.Format;
-		descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		descDSV.Texture2D.MipSlice = 0u;
-
-		GFX_THROW_FAILED(pDev->Get()->CreateDepthStencilView(pRes.Get(), &descDSV, &pDsView));
+		GFX_THROW_FAILED(pDev->Get()->CreateShaderResourceView(pRes.Get(), &vDesc, &pRTV));
 	}
 }
 
@@ -95,7 +86,17 @@ Texture2D::Texture2D(
 	)
 { }
 
-Texture2D::Texture2D() {}
+Texture2D::Texture2D() : size(0) {}
+
+ivec2 Texture2D::GetSize() const
+{
+	return size;
+}
+
+/// <summary>
+/// Returns interface to resource
+/// </summary>
+ID3D11Resource* Texture2D::GetResource() { return pRes.Get(); }
 
 Texture2D Texture2D::FromImageWIC(Device& dev, const wchar_t* file)
 {
@@ -118,10 +119,8 @@ Texture2D Texture2D::FromImageWIC(Device& dev, const wchar_t* file)
 	);
 }
 
-ID3D11ShaderResourceView* Texture2D::GetSRV() { return pView.Get(); }
+ID3D11Resource** const Texture2D::GetResAddress() { return reinterpret_cast<ID3D11Resource**>(pRes.GetAddressOf()); }
 
-ID3D11ShaderResourceView** Texture2D::GetSRVAddress() { return pView.GetAddressOf(); }
+ID3D11ShaderResourceView* Texture2D::GetSRV() { return pRTV.Get(); }
 
-ID3D11DepthStencilView* Texture2D::GetDSV() { return pDsView.Get(); }
-
-ID3D11DepthStencilView** Texture2D::GetDSVAddress() { return pDsView.GetAddressOf(); }
+ID3D11ShaderResourceView** const Texture2D::GetSRVAddress() { return pRTV.GetAddressOf(); }

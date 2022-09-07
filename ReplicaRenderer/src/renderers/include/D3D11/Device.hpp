@@ -12,6 +12,7 @@ namespace Replica::D3D11
 		Device();
 
 		Device(Device&&) = default;
+
 		Device& operator=(Device&&) = default;
 
 		/// <summary>

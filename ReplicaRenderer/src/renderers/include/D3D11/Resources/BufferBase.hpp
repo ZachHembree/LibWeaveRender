@@ -9,11 +9,11 @@ namespace Replica::D3D11
 	public:
 		ID3D11Buffer* Get() { return pBuf.Get(); };
 
-		ID3D11Buffer** GetAddressOf() { return pBuf.GetAddressOf(); };
+		ID3D11Buffer** const GetAddressOf() { return pBuf.GetAddressOf(); };
 
 		ID3D11Resource* GetResource() { return Get(); };
 
-		ID3D11Resource** GetResAddress() { return reinterpret_cast<ID3D11Resource**>(GetAddressOf()); };
+		ID3D11Resource** const GetResAddress() { return reinterpret_cast<ID3D11Resource**>(GetAddressOf()); };
 
 		/// <summary>
 		/// Returns the size of the buffer in bytes

@@ -129,6 +129,9 @@
     <ClCompile Include="ReplicaRenderer\src\DebugScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\DepthStencilTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplicaRenderer\src\utils\include\RepLeanWin.h">
@@ -285,6 +288,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\DebugScene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\DepthStencilTexture.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\TextureEnums.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

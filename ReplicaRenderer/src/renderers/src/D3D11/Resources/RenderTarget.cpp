@@ -4,31 +4,28 @@
 
 using namespace Replica::D3D11;
 
-RenderTarget::RenderTarget() : pDSView(nullptr)
+RTHandle::RTHandle()
 { }
 
-RenderTarget::RenderTarget(Device& dev, ID3D11Resource* pRes, ID3D11DepthStencilView* pDSV) :
-	ResourceBase(dev),
-	pRes(pRes),
-	pDSView(pDSV)
-{
-	GFX_THROW_FAILED(pDev->Get()->CreateRenderTargetView(pRes, nullptr, &pView));
-}
+RTHandle::RTHandle(
+	Device& dev,
+	ID3D11RenderTargetView** const ppRTV
+) :
+	DeviceChild(dev),
+	ppRTV(ppRTV)
+{ }
 
-RenderTarget::~RenderTarget()
-{
-	pRes->Release();
-}
+ID3D11RenderTargetView* RTHandle::GetRTV() { return *ppRTV; }
 
-ID3D11RenderTargetView* RenderTarget::GetView() { return pView.Get(); }
+ID3D11RenderTargetView** const RTHandle::GetAddressRTV() { return ppRTV; }
 
-void RenderTarget::Bind(Context& ctx)
+void RTHandle::Clear(
+	Context& ctx,
+	vec4 color
+)
 {
-	ctx.Get()->OMSetRenderTargets(1, pView.GetAddressOf(), pDSView);
-}
-
-void RenderTarget::Clear(Context& ctx, vec4 color)
-{
-	ctx.Get()->ClearRenderTargetView(GetView(), reinterpret_cast<float*>(&color));
-	ctx.Get()->ClearDepthStencilView(pDSView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	if (ppRTV != nullptr)
+	{ 
+		ctx.Get()->ClearRenderTargetView(*ppRTV, reinterpret_cast<float*>(&color));
+	}
 }

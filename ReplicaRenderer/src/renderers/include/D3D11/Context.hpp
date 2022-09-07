@@ -1,7 +1,6 @@
 #pragma once
 #include "D3DUtils.hpp"
 #include "D3D11/Resources/DeviceChild.hpp"
-#include "DynamicCollections.hpp"
 
 namespace Replica::D3D11
 {
@@ -13,6 +12,8 @@ namespace Replica::D3D11
 	class InputLayout;
 	class VertexShader;
 	class PixelShader;
+	class IRenderTarget;
+	class IDepthStencil;
 
 	/// <summary>
 	/// Determines how vertex topology is interpreted by the input assembler
@@ -74,6 +75,7 @@ namespace Replica::D3D11
 		Context();
 
 		Context(Context&&) = default;
+
 		Context& operator=(Context&&) = default;
 
 		/// <summary>
@@ -106,6 +108,32 @@ namespace Replica::D3D11
 		void RSSetViewport(const vec2 size, const vec2 offset = vec2(0, 0), const vec2 depth = vec2(0, 1));
 
 		/// <summary>
+		/// Binds the given buffer as the depth stencil buffer doesn't overwrite render targets. Set to nullptr
+		/// to unbind.
+		/// </summary>
+		void SetDepthStencilBuffer(IDepthStencil& depthStencil);
+
+		/// <summary>
+		/// Binds the given buffer as a render target. Doesn't unbind previously set depth-stencil buffers.
+		/// </summary>
+		void SetRenderTarget(IRenderTarget& rt, IDepthStencil& ds);
+
+		/// <summary>
+		/// Binds the given buffer as a render target. Doesn't unbind previously set depth-stencil buffers.
+		/// </summary>
+		void SetRenderTarget(IRenderTarget& rt, IDepthStencil* pDS = nullptr);
+
+		/// <summary>
+		/// Binds the given buffers as render targets. Doesn't unbind previously set depth-stencil buffers.
+		/// </summary>
+		void SetRenderTargets(const IDynamicCollection<IRenderTarget>& rts, IDepthStencil& ds);
+
+		/// <summary>
+		/// Binds the given buffers as render targets. Doesn't unbind previously set depth-stencil buffers.
+		/// </summary>
+		void SetRenderTargets(const IDynamicCollection<IRenderTarget>& rts, IDepthStencil* pDS = nullptr);
+
+		/// <summary>
 		/// Binds a vertex buffer to the given slot
 		/// </summary>
 		void IASetVertexBuffer(VertexBuffer& vertBuffer, int slot = 0);
@@ -129,5 +157,9 @@ namespace Replica::D3D11
 		ComPtr<ID3D11DeviceContext> pContext;
 		VertexShader* currentVS;
 		PixelShader* currentPS;
+		ID3D11DepthStencilState* currentDSS;
+		ID3D11DepthStencilView* currentDSV;
+		UniqueArray<ID3D11RenderTargetView*> currentRTVs;
+		uint rtvCount;
 	};
 }

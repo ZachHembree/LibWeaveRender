@@ -66,7 +66,7 @@ namespace Replica::D3D11
 	public:
 		virtual ID3D11Resource* GetResource() = 0;
 
-		virtual ID3D11Resource** GetResAddress() = 0;
+		virtual ID3D11Resource** const GetResAddress() = 0;
 
 	protected:
 		ResourceBase() { }

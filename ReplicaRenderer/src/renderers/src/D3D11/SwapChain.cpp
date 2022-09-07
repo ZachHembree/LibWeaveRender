@@ -7,11 +7,12 @@
 
 using namespace Replica::D3D11;
 
-SwapChain::SwapChain() : pDev(nullptr)
+SwapChain::SwapChain() : pDev(nullptr), desc({})
 { }
 
 SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
-	pDev(&dev)
+	pDev(&dev),
+	backBufRt(dev, &pBackBuf)
 {
 	ComPtr<IDXGIFactory2> dxgiFactory;
 	GFX_THROW_FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory2), &dxgiFactory));
@@ -24,58 +25,70 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	fsDesc.Windowed = TRUE;
 
 	const ivec2 monRes = wnd.GetMonitorResolution();
-	DXGI_SWAP_CHAIN_DESC1 swapDesc = {};
-	swapDesc.Width = monRes.x; // Initialize chain to active monitor resolution
-	swapDesc.Height = monRes.y;
-	swapDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	swapDesc.Stereo = FALSE;
-	swapDesc.SampleDesc.Count = 1; // No MSAA
-	swapDesc.SampleDesc.Quality = 0;
-	swapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapDesc.BufferCount = 2; // Triple buffered
-	swapDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED; // No blending
-	swapDesc.Scaling = DXGI_SCALING_NONE; // Native output, no scaling needed
-	swapDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-	swapDesc.Flags = 0;
+	desc.Width = monRes.x; // Initialize chain to active monitor resolution
+	desc.Height = monRes.y;
+	desc.Format = (DXGI_FORMAT)Formats::R8G8B8A8_UNORM;
+	desc.Stereo = FALSE;
+	desc.SampleDesc.Count = 1; // No MSAA
+	desc.SampleDesc.Quality = 0;
+	desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	desc.BufferCount = 2; // Triple buffered
+	desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED; // No blending
+	desc.Scaling = DXGI_SCALING_NONE; // Native output, no scaling needed
+	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+	desc.Flags = 0;
 
 	GFX_THROW_FAILED(dxgiFactory->CreateSwapChainForHwnd(
 		pDev->Get(),
 		wnd.GetWndHandle(),
-		&swapDesc,
+		&desc,
 		&fsDesc,
 		NULL,
 		&pSwap
 	));
 
-	// Depth-Stencil buffer setup
-	ID3D11DeviceContext* pCon = pDev->GetContext().Get();
-	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-	dsDesc.DepthEnable = true;
-	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	GetBuffers();
+}
 
-	ComPtr<ID3D11DepthStencilState> pDsState;
-	GFX_THROW_FAILED( pDev->Get()->CreateDepthStencilState(&dsDesc, &pDsState));
-	pCon->OMSetDepthStencilState(pDsState.Get(), 1);
+ivec2 SwapChain::GetSize() const
+{
+	ivec2 size(desc.Width, desc.Height);
+	return size;
+}
 
-	depthStencil = Texture2D(
-		dev, 
-		monRes,
-		Formats::D32_FLOAT, 
-		ResourceUsages::Default, 
-		ResourceTypes::DepthStencil
-	);
+int SwapChain::GetBufferCount() const
+{
+	return desc.BufferCount + 1;
+}
+
+Formats SwapChain::GetBufferFormat() const
+{
+	return (Formats)desc.Format;
 }
 
 /// <summary>
 /// Returns interface to swap chain buffer at the given index
 /// </summary>
-RenderTarget SwapChain::GetBuffer(int index)
+RTHandle& SwapChain::GetBackBuf()
 {
-	ID3D11Resource* pRes;
-	GFX_THROW_FAILED(pSwap->GetBuffer(index, __uuidof(ID3D11Resource), (void**)&pRes));
-	
-	return RenderTarget(*pDev, pRes, depthStencil.GetDSV());
+	return backBufRt;
+}
+
+void SwapChain::ResizeBuffers(ivec2 dim, uint count, Formats format, uint flags)
+{
+	if (count == 0)
+		count = GetBufferCount();
+
+	if (format == Formats::UNKNOWN)
+		format = GetBufferFormat();
+
+	if (flags == 0)
+		flags = desc.Flags;
+
+	pBackBuf.Reset();
+	pSwap->ResizeBuffers(count, dim.x, dim.y, (DXGI_FORMAT)format, flags);
+	pSwap->GetDesc1(&desc);
+	GetBuffers();
 }
 
 /// <summary>
@@ -84,4 +97,11 @@ RenderTarget SwapChain::GetBuffer(int index)
 void SwapChain::Present(UINT syncInterval, UINT flags)
 {
 	GFX_THROW_FAILED(pSwap->Present(syncInterval, flags));
+}
+
+void SwapChain::GetBuffers()
+{
+	ComPtr<ID3D11Resource> pRes;
+	GFX_THROW_FAILED(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&pRes));
+	GFX_THROW_FAILED(pDev->Get()->CreateRenderTargetView(pRes.Get(), nullptr, &pBackBuf));
 }

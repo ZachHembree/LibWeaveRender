@@ -3,37 +3,63 @@
 
 namespace Replica::D3D11
 {
-	class RenderTarget : public ResourceBase
+	/// <summary>
+	/// Interface for types that can be bound as Render Targets
+	/// </summary>
+	class IRenderTarget
 	{
 	public:
-		RenderTarget();
-
-		RenderTarget(Device& dev, ID3D11Resource* pRes, ID3D11DepthStencilView* pDSV = nullptr);
-
-		~RenderTarget();
-
-		ID3D11Resource* GetResource() { return pRes.Get(); }
-
-		ID3D11Resource** GetResAddress() { return pRes.GetAddressOf(); }
+		/// <summary>
+		/// Read-only pointer to pointer for Render Target view
+		/// </summary>
+		virtual ID3D11RenderTargetView** const GetAddressRTV() = 0;
 
 		/// <summary>
-		/// Returns interface to resource view
+		/// Pointer to Render Target view interface
 		/// </summary>
-		ID3D11RenderTargetView* GetView();
-
-		/// <summary>
-		/// Binds the render target to the output merger
-		/// </summary>
-		void Bind(Context& ctx);
+		virtual ID3D11RenderTargetView* GetRTV() = 0;
 
 		/// <summary>
 		/// Clears the render target to the given color
 		/// </summary>
-		void Clear(Context& ctx, vec4 color = vec4(0));
+		virtual void Clear(
+			Context& ctx, 
+			vec4 color = vec4(0)
+		) = 0;
+	};
+
+	/// <summary>
+	/// Handle to internally managed Render Texture handle
+	/// </summary>
+	class RTHandle : public DeviceChild, public IRenderTarget
+	{
+	public:
+		RTHandle();
+		
+		RTHandle(
+			Device& dev, 
+			ID3D11RenderTargetView** ppRTV
+		);
+
+		/// <summary>
+		/// Read-only pointer to pointer for Render Target view
+		/// </summary>
+		ID3D11RenderTargetView* GetRTV() override;
+
+		/// <summary>
+		/// Binds the render target to the output merger
+		/// </summary>
+		ID3D11RenderTargetView** const GetAddressRTV() override;
+
+		/// <summary>
+		/// Clears the render target to the given color
+		/// </summary>
+		void Clear(
+			Context& ctx,
+			vec4 color = vec4(0)
+		) override;
 
 	private:
-		ComPtr<ID3D11Resource> pRes;
-		ComPtr<ID3D11RenderTargetView> pView;
-		ID3D11DepthStencilView* pDSView;
+		ID3D11RenderTargetView** ppRTV;
 	};
 }

@@ -16,7 +16,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns the device associated with the child object
 		/// </summary>
-		Device* GetDevice() const { return pDev; }
+		Device& GetDevice() const { GFX_ASSERT(pDev != nullptr, "Cannot get null reference."); return *pDev; }
+
+		/// <summary>
+		/// Returns true if the object is valid and has been initialized
+		/// </summary>
+		virtual bool GetIsValid() const { return pDev != nullptr; }
 
 	protected:
 		Device* pDev;

@@ -2,8 +2,9 @@
 #include "WindowComponentBase.hpp"
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/Device.hpp"
-#include "D3D11/Resources/RenderTarget.hpp"
 #include "D3D11/RenderComponent.hpp"
+#include "D3D11/Resources/RenderTarget.hpp"
+#include "D3D11/Resources/DepthStencilTexture.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -52,7 +53,8 @@ namespace Replica::D3D11
 	private:
 		Device device;
 		SwapChain swap;
-		RenderTarget backBuf;
+		RTHandle& backBuf;
+		DepthStencilTexture defaultDS;
 		UniqueVector<RenderComponentBase*> pComponents;
 
 		void BeforeDraw(Context& ctx);

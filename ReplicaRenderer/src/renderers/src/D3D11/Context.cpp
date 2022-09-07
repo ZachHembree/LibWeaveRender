@@ -1,11 +1,13 @@
+#include "D3D11/SwapChain.hpp"
+#include "D3D11/Context.hpp"
 #include "D3D11/Resources/VertexBuffer.hpp"
 #include "D3D11/Resources/IndexBuffer.hpp"
 #include "D3D11/Resources/ConstantBuffer.hpp"
 #include "D3D11/Resources/InputLayout.hpp"
 #include "D3D11/Shaders/VertexShader.hpp"
 #include "D3D11/Shaders/PixelShader.hpp"
-#include "D3D11/SwapChain.hpp"
-#include "D3D11/Context.hpp"
+#include "D3D11/Resources/RenderTarget.hpp"
+#include "D3D11/Resources/DepthStencilTexture.hpp"
 
 using namespace glm;
 using namespace Replica;
@@ -15,13 +17,20 @@ Context::Context(Device& dev, ComPtr<ID3D11DeviceContext>& pContext) :
 	DeviceChild(dev),
 	pContext(pContext),
 	currentVS(nullptr),
-	currentPS(nullptr)
+	currentPS(nullptr),
+	currentRTVs(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT),
+	currentDSV(nullptr),
+	currentDSS(nullptr),
+	rtvCount(0)
 { }
 
 Context::Context() : 
 	DeviceChild(),
 	currentVS(nullptr),
-	currentPS(nullptr)
+	currentPS(nullptr),
+	currentDSV(nullptr),
+	currentDSS(nullptr),
+	rtvCount(0)
 { }
 
 void Context::SetVS(VertexShader* vs)
@@ -58,6 +67,13 @@ void Context::Reset()
 {
 	SetVS(nullptr);
 	SetPS(nullptr);
+	pContext->OMSetRenderTargets(0, nullptr, nullptr);
+	pContext->OMSetDepthStencilState(nullptr, 0);
+
+	currentDSV = nullptr;
+	currentDSS = nullptr;
+	memset(currentRTVs.GetPtr(), 0, sizeof(void*) * currentRTVs.GetLength());
+	rtvCount = 0;
 }
 
 /// <summary>
@@ -79,6 +95,89 @@ void Context::RSSetViewport(const vec2 size, const vec2 offset, const vec2 depth
 	vp.MaxDepth = depth.y;
 
 	pContext->RSSetViewports(1, &vp);
+}
+
+/// <summary>
+/// Binds the given buffer as the depth stencil buffer doesn't overwrite render targets. Set to nullptr
+/// to unbind.
+/// </summary>
+void Context::SetDepthStencilBuffer(IDepthStencil& depthStencil)
+{
+	if (currentDSS != depthStencil.GetState())
+	{
+		currentDSS = depthStencil.GetState();
+		pContext->OMSetDepthStencilState(currentDSS, 1);
+	}
+
+	currentDSV = depthStencil.GetDSV();
+	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
+}
+
+/// <summary>
+/// Binds the given buffer as a render target. Doesn't unbind previously set depth-stencil buffers.
+/// </summary>
+void Context::SetRenderTarget(IRenderTarget& rt, IDepthStencil& ds)
+{
+	SetRenderTarget(rt, &ds);
+}
+
+/// <summary>
+/// Binds the given buffer as a render target. Doesn't unbind previously set depth-stencil buffers.
+/// </summary>
+void Context::SetRenderTargets(const IDynamicCollection<IRenderTarget>& rtvs, IDepthStencil& ds)
+{
+	SetRenderTargets(rtvs, &ds);
+}
+
+/// <summary>
+/// Binds the given buffer as a render target. Doesn't unbind previously set depth-stencil buffers.
+/// </summary>
+void Context::SetRenderTarget(IRenderTarget& rtv, IDepthStencil* depthStencil)
+{
+	if (depthStencil != nullptr)
+	{
+		if (currentDSS != depthStencil->GetState())
+		{
+			currentDSS = depthStencil->GetState();
+			pContext->OMSetDepthStencilState(currentDSS, 1);
+		}
+
+		currentDSV = depthStencil->GetDSV();
+	}
+	else
+	{
+		currentDSV = nullptr;
+		currentDSS = nullptr;
+	}
+
+	currentRTVs[0] = rtv.GetRTV();
+	rtvCount = 1;
+	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
+}
+
+/// <summary>
+/// Binds the given buffers as render targets. Doesn't unbind previously set depth-stencil buffers.
+/// </summary>
+void Context::SetRenderTargets(const IDynamicCollection<IRenderTarget>& rtvs, IDepthStencil* depthStencil)
+{
+	if (depthStencil != nullptr)
+	{
+		if (currentDSS != depthStencil->GetState())
+		{
+			currentDSS = depthStencil->GetState();
+			pContext->OMSetDepthStencilState(currentDSS, 1);
+		}
+
+		currentDSV = depthStencil->GetDSV();
+	}
+	else
+	{
+		currentDSV = nullptr;
+		currentDSS = nullptr;
+	}
+
+	rtvCount = (uint)rtvs.GetLength();
+	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
 }
 
 /// <summary>
