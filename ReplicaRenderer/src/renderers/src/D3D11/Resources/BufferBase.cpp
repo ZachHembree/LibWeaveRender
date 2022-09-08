@@ -58,15 +58,18 @@ void BufferBase::CreateBuffer(const void* data, const UINT byteSize, ID3D11Devic
 
 void BufferBase::UpdateMapUnmap(const void* data, Context& ctx)
 {
-	D3D11_MAPPED_SUBRESOURCE msr;
-	GFX_THROW_FAILED(ctx.Get()->Map(
-		Get(),
-		0u,
-		D3D11_MAP_WRITE_DISCARD,
-		0u,
-		&msr
-	));
+	if (byteSize > 0)
+	{ 
+		D3D11_MAPPED_SUBRESOURCE msr;
+		GFX_THROW_FAILED(ctx.Get()->Map(
+			Get(),
+			0u,
+			D3D11_MAP_WRITE_DISCARD,
+			0u,
+			&msr
+		));
 
-	memcpy(msr.pData, data, byteSize);
-	ctx.Get()->Unmap(Get(), 0u);
+		memcpy(msr.pData, data, byteSize);
+		ctx.Get()->Unmap(Get(), 0u);
+	}
 }

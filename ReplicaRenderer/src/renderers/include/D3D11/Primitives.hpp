@@ -185,20 +185,21 @@ namespace Replica::D3D11::Primitives
 	/// Generates subdivided plane
 	/// </summary>
 	template<typename Vert_T>
-	MeshDef<Vert_T> GeneratePlane(ivec2 subdiv = ivec2(0))
+	MeshDef<Vert_T> GeneratePlane(ivec2 subdiv = ivec2(0), float scale = 1.0f)
 	{
 		subdiv++;
 
-		const vec2 incr(1.0f / vec2(subdiv));
+		const vec2 incr(scale / vec2(subdiv));
 		const ivec2 dim = subdiv + 1;
 		UniqueArray<Vert_T> vertices(dim.x * dim.y);
 		UniqueArray<USHORT> indices(6 * subdiv.x * subdiv.y);
+		scale *= 0.5f;
 
 		for (int i = 0; i < dim.x; i++)
 		{
 			for (int j = 0; j < dim.y; j++)
 			{
-				vertices[i * dim.y + j].pos = vec3(i * incr.x, j * incr.y, 0.5f) - 0.5f;
+				vertices[i * dim.y + j].pos = vec3(i * incr.x, j * incr.y, scale) - scale;
 			}
 		}
 

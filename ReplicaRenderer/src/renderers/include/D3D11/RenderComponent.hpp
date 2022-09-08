@@ -27,7 +27,7 @@ namespace Replica::D3D11
 
 		virtual void AfterDraw(Context& ctx) { }
 
-		Renderer* GetRenderer() { return pRenderer; }
+		Renderer& GetRenderer() { return *pRenderer; }
 
 		bool GetIsRegistered() { return isRegistered; }
 

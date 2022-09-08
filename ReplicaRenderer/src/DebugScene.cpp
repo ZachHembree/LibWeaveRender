@@ -26,9 +26,7 @@ public:
 
 DebugScene::DebugScene(Renderer& renderer, InputComponent& input) :
 	RenderComponentBase(renderer),
-	testTex(Texture2D::FromImageWIC(renderer.GetDevice(), L"lena_color_512.png")),
-	testSamp(renderer.GetDevice(), TexFilterMode::LINEAR, TexClampMode::MIRROR),
-	testEffect(renderer.GetDevice(), g_DefaultEffect),
+	testEffect(renderer.GetDevice(), g_DebugFlat3DEffect),
 	input(input)
 {
 	Device& dev = renderer.GetDevice();
@@ -70,7 +68,7 @@ void DebugScene::Draw(Context& ctx)
 	view = translate(view, vec3(0.0f, 0.0f, 5.0f));
 	view *= toMat4(camRot);
 
-	const ivec2 wndSize = window.GetSize();
+	const ivec2 wndSize = window.GetBodySize();
 	const float aspectRatio = (float)wndSize.x / wndSize.y;
 	const mat4 proj = perspectiveLH(45.0f, aspectRatio, 0.5f, 100.0f);
 	const mat4 vp = (proj * view);
@@ -90,9 +88,6 @@ void DebugScene::Draw(Context& ctx)
 
 		mat4 model = mesh.GetModelMatrix();
 		testEffect.SetConstant(L"mvp", vp * model);
-		testEffect.SetSampler(L"samp", testSamp);
-		testEffect.SetTexture(L"tex", testTex);
-		testEffect.SetConstant(L"DstTexelSize", vec4(1.0f / vec2(wndSize), vec2(wndSize)));
 
 		testEffect.Update(ctx);
 		mesh.Update(ctx);

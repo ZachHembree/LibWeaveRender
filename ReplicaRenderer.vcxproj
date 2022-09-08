@@ -99,7 +99,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)libs;%(AdditionalIncludeDirectories);$(ProjectDir)$(ProjectDir)ReplicaRenderer\src\utils\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)libs;%(AdditionalIncludeDirectories);$(ProjectDir)$(ProjectDir)ReplicaRenderer\src\utils\include;$(ProjectDir)ReplicaRenderer\libs\imgui-filebrowser</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -123,7 +123,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(ProjectDir);$(ProjectDir)ReplicaRenderer\libs\imgui-filebrowser</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -148,7 +148,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)ReplicaRenderer\src\renderers\include;$(ProjectDir)ReplicaRenderer\src\utils\include;$(ProjectDir)ReplicaRenderer\res;$(ProjectDir)ReplicaRenderer;$(ProjectDir)ReplicaRenderer\src\;$(ProjectDir)ReplicaRenderer\libs;%(AdditionalIncludeDirectories);$(ProjectDir)ReplicaRenderer\libs\imgui;$(ProjectDir)ReplicaRenderer\libs\imgui\backends;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)ReplicaRenderer\src\renderers\include;$(ProjectDir)ReplicaRenderer\src\utils\include;$(ProjectDir)ReplicaRenderer\res;$(ProjectDir)ReplicaRenderer;$(ProjectDir)ReplicaRenderer\src\;$(ProjectDir)ReplicaRenderer\libs;%(AdditionalIncludeDirectories);$(ProjectDir)ReplicaRenderer\libs\imgui;$(ProjectDir)ReplicaRenderer\libs\imgui\backends;$(ProjectDir);$(ProjectDir)ReplicaRenderer\libs\imgui-filebrowser</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
     </ClCompile>
@@ -175,7 +175,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)ReplicaRenderer\src\renderers\include;$(ProjectDir)ReplicaRenderer\src\utils\include;$(ProjectDir)ReplicaRenderer\res;$(ProjectDir)ReplicaRenderer;$(ProjectDir)ReplicaRenderer\libs;$(ProjectDir)ReplicaRenderer\src;$(ProjectDir)ReplicaRenderer\libs\imgui;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ReplicaRenderer\src\renderers\include;$(ProjectDir)ReplicaRenderer\src\utils\include;$(ProjectDir)ReplicaRenderer\res;$(ProjectDir)ReplicaRenderer;$(ProjectDir)ReplicaRenderer\libs;$(ProjectDir)ReplicaRenderer\src;$(ProjectDir)ReplicaRenderer\libs\imgui;$(ProjectDir);$(ProjectDir)ReplicaRenderer\libs\imgui-filebrowser</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -201,6 +201,7 @@
     <ClCompile Include="ReplicaRenderer\libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ReplicaRenderer\libs\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="ReplicaRenderer\libs\imgui\misc\fonts\binary_to_compressed_c.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\DebugImageViewer.cpp" />
     <ClCompile Include="ReplicaRenderer\src\DebugScene.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\DepthStencilTexture.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiHandler.cpp" />
@@ -241,6 +242,7 @@
     <ClInclude Include="ReplicaRenderer\libs\imgui\imstb_textedit.h" />
     <ClInclude Include="ReplicaRenderer\libs\imgui\imstb_truetype.h" />
     <ClInclude Include="ReplicaRenderer\libs\imgui\misc\cpp\imgui_stdlib.h" />
+    <ClInclude Include="ReplicaRenderer\src\DebugImageViewer.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\DepthStencilTexture.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\TextureEnums.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3DUtils.hpp" />
@@ -303,11 +305,14 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultPixShader.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Flat3DPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
@@ -319,9 +324,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultVertShader.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\3DVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Texture2DVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\TexturePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Texture3DVS.hlsl">
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
@@ -334,6 +348,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

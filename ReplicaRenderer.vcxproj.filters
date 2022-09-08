@@ -132,6 +132,9 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\DepthStencilTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\DebugImageViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplicaRenderer\src\utils\include\RepLeanWin.h">
@@ -296,6 +299,9 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\TextureEnums.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\DebugImageViewer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="ReplicaRenderer\res\icon.ico">
@@ -306,12 +312,17 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultVertShader.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Texture3DVS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultPixShader.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultPS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Flat3DPS.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\3DVS.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\TexturePS.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultVS.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Texture2DVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

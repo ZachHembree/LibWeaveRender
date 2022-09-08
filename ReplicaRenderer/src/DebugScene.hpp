@@ -17,8 +17,6 @@ namespace Replica::D3D11
 		void Draw(Context& ctx) override;
 
 	private:
-		Texture2D testTex;
-		Sampler testSamp;
 		Effect testEffect;
 		UniqueVector<Mesh> primitives;
 		InputComponent& input;
