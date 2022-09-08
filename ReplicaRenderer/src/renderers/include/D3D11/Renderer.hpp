@@ -3,7 +3,6 @@
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/Device.hpp"
 #include "D3D11/RenderComponent.hpp"
-#include "D3D11/Resources/RenderTarget.hpp"
 #include "D3D11/Resources/DepthStencilTexture.hpp"
 
 #pragma comment(lib, "d3d11.lib")
@@ -28,7 +27,22 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns the interface to the device the renderer is running on
 		/// </summary>
-		Device& GetDevice() { return device; }
+		Device& GetDevice();
+
+		/// <summary>
+		/// Returns reference to the swap chain interface
+		/// </summary>
+		SwapChain& GetSwapChain();
+
+		/// <summary>
+		/// Returns true if the default depth stencil buffer is enabled
+		/// </summary>
+		bool GetIsDepthStencilEnabled();
+
+		/// <summary>
+		/// Enable/disable default depth-stencil buffer
+		/// </summary>
+		void SetIsDepthStencilEnabled(bool value);
 
 		/// <summary>
 		/// Updates the state of the renderer
@@ -51,11 +65,11 @@ namespace Replica::D3D11
 		bool UnregisterComponent(RenderComponentBase& component);
 
 	private:
+		UniqueVector<RenderComponentBase*> pComponents;
 		Device device;
 		SwapChain swap;
-		RTHandle& backBuf;
 		DepthStencilTexture defaultDS;
-		UniqueVector<RenderComponentBase*> pComponents;
+		bool useDefaultDS;
 
 		void BeforeDraw(Context& ctx);
 

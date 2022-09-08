@@ -23,5 +23,5 @@ UINT IndexBuffer::GetLength() const { return count; }
 /// </summary>
 void IndexBuffer::Bind(Context& ctx, UINT offset)
 {
-	ctx.Get()->IASetIndexBuffer(Get(), (DXGI_FORMAT)Formats::R16_UINT, offset);
+	ctx->IASetIndexBuffer(Get(), (DXGI_FORMAT)Formats::R16_UINT, offset);
 }

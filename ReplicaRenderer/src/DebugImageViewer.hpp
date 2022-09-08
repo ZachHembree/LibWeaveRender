@@ -38,7 +38,7 @@ namespace Replica::D3D11
 
                 if (ImGui::Button("Enter Fullscreen"))
                 {
-                    MinWindow& win = GetRenderer().GetWindow();
+                    MinWindow& win = GetWindow();
                     ivec2 mres = win.GetMonitorResolution();
                     win.DisableStyleFlags(WndStyle(g_DefaultWndStyle, 0));
                     win.SetBodySize(mres);
@@ -47,7 +47,7 @@ namespace Replica::D3D11
 
                 if (ImGui::Button("Exit Fullscreen"))
                 {
-                    MinWindow& win = GetRenderer().GetWindow();
+                    MinWindow& win = GetWindow();
                     win.EnableStyleFlags(WndStyle(g_DefaultWndStyle, 0));
                     win.SetBodySize(vec2(1280, 800));
                 }
@@ -58,7 +58,7 @@ namespace Replica::D3D11
 
             if (fileDialog.HasSelected())
             {
-                tex = Texture2D::FromImageWIC(GetRenderer().GetDevice(), fileDialog.GetSelected().c_str());
+                tex = Texture2D::FromImageWIC(GetDevice(), fileDialog.GetSelected().c_str());
                 fileDialog.ClearSelected();
             }
         }
@@ -79,13 +79,9 @@ namespace Replica::D3D11
                 imgAspect = imgSize.x / imgSize.y;
 
             if (wndAspect >= imgAspect)
-            {
                 vpSize.x = bodySize.y * imgAspect;
-            }
             else
-            {
                 vpSize.y = bodySize.x / imgAspect;
-            }
 
             ctx.RSSetViewport(vpSize, 0.5f * (bodySize - vpSize));
         }

@@ -18,7 +18,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns pointer to COM device interface
 		/// </summary>
-		ID3D11Device* Get();
+		ID3D11Device& Get();
+
+		/// <summary>
+		/// Returns reference to COM device interface
+		/// </summary>
+		ID3D11Device* operator->();
 
 		/// <summary>
 		/// Returns pointer to COM device context interface

@@ -46,7 +46,7 @@ namespace Replica::D3D11
 
 		void SetResource(wstring_view name, ComPtr<T>& pRes) { SetResource(name, pRes.Get()); }
 
-		IDynamicCollection<T*>& GetResources() { Validate(); return resources; }
+		const IDynamicCollection<T*>& GetResources() { Validate(); return resources; }
 
 	private:
 		DynamicArray<T*> resources;

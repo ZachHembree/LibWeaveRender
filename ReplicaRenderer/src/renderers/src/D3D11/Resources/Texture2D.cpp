@@ -45,11 +45,11 @@ Texture2D::Texture2D(
 		D3D11_SUBRESOURCE_DATA initData = {};
 		initData.pSysMem = data;
 		initData.SysMemPitch = dim.x * stride;
-		GFX_THROW_FAILED(pDev->Get()->CreateTexture2D(&desc, &initData, &pRes));
+		GFX_THROW_FAILED(GetDevice()->CreateTexture2D(&desc, &initData, &pRes));
 	}
 	else
 	{
-		GFX_THROW_FAILED(pDev->Get()->CreateTexture2D(&desc, nullptr, &pRes));
+		GFX_THROW_FAILED(GetDevice()->CreateTexture2D(&desc, nullptr, &pRes));
 	}
 
 	if ((int)(bindFlags & ResourceTypes::ShaderResource))
@@ -60,7 +60,7 @@ Texture2D::Texture2D(
 		vDesc.Texture2D.MostDetailedMip = 0;
 		vDesc.Texture2D.MipLevels = desc.MipLevels;
 
-		GFX_THROW_FAILED(pDev->Get()->CreateShaderResourceView(pRes.Get(), &vDesc, &pRTV));
+		GFX_THROW_FAILED(GetDevice()->CreateShaderResourceView(pRes.Get(), &vDesc, &pRTV));
 	}
 }
 

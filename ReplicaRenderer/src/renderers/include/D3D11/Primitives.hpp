@@ -1,4 +1,6 @@
 #pragma once
+#pragma warning(disable: 4267)
+
 #include "D3D11/Mesh.hpp"
 
 namespace Replica::D3D11::Primitives

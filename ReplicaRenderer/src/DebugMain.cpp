@@ -32,8 +32,8 @@ int CALLBACK WinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE, _In_ LPSTR lpCMdL
 		ImguiHandler imgui(repWindow, renderer);
 		InputComponent input(repWindow);
 
-		//DebugScene debugScene(renderer, input);
-		DebugImageViewer viewer(renderer);
+		//DebugImageViewer viewer(renderer);
+		DebugScene debugScene(renderer, input);
 
 		// Fullscreen borderless window
 		ivec2 mres = repWindow.GetMonitorResolution();

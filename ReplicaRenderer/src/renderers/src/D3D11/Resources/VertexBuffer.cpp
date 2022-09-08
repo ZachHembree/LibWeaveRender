@@ -13,5 +13,5 @@ UINT VertexBuffer::GetLength() const { return count; }
 /// </summary>
 void VertexBuffer::Bind(Context& ctx, UINT slot, UINT offset)
 {
-	ctx.Get()->IASetVertexBuffers(slot, 1, GetAddressOf(), &stride, &offset);
+	ctx->IASetVertexBuffers(slot, 1, GetAddressOf(), &stride, &offset);
 }

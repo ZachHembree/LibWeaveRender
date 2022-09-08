@@ -12,7 +12,7 @@ InputLayout::InputLayout(Device& dev,
 	const IDynamicCollection<IAElement>& description
 ) : DeviceChild(dev)
 { 
-	GFX_THROW_FAILED(dev.Get()->CreateInputLayout(
+	GFX_THROW_FAILED(dev->CreateInputLayout(
 		reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(description.GetPtr()),
 		(UINT)description.GetLength(),
 		vsBlob->GetBufferPointer(),
@@ -25,7 +25,7 @@ ID3D11InputLayout* InputLayout::Get() const { return pLayout.Get(); };
 
 void InputLayout::Bind(Context& ctx)
 {
-	ctx.Get()->IASetInputLayout(Get());
+	ctx->IASetInputLayout(Get());
 }
 
 IAElement::IAElement(string_view semantic,

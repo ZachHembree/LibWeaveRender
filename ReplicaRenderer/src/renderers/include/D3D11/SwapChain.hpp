@@ -13,7 +13,7 @@ namespace Replica::D3D11
 {
 	class RTHandle;
 
-	class SwapChain : public MoveOnlyObjBase
+	class SwapChain : public DeviceChild
 	{
 	public:
 		SwapChain();
@@ -27,12 +27,17 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns pointer to swap chain interface
 		/// </summary>
-		IDXGISwapChain1* Get() { return pSwap.Get(); }
+		IDXGISwapChain1& Get();
 
 		/// <summary>
 		/// Returns read-only pointer to pointer for swap chain interface
 		/// </summary>
-		IDXGISwapChain1** const GetAddressOf() { return pSwap.GetAddressOf(); }
+		IDXGISwapChain1** const GetAddressOf();
+
+		/// <summary>
+		/// Returns pointer to swap chain interface
+		/// </summary>
+		IDXGISwapChain1* operator->();
 
 		/// <summary>
 		/// Returns the dimensions of the chain's buffers
@@ -73,7 +78,6 @@ namespace Replica::D3D11
 		void Present(UINT syncInterval, UINT flags);
 
 	private:
-		Device* pDev;
 		ComPtr<IDXGISwapChain1> pSwap;
 		DXGI_SWAP_CHAIN_DESC1 desc;
 		ComPtr<ID3D11RenderTargetView> pBackBuf;

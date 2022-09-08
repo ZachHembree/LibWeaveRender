@@ -38,7 +38,7 @@ void Context::SetVS(VertexShader* vs)
 	if (vs != currentVS || currentVS == nullptr || vs == nullptr)
 	{
 		ID3D11VertexShader* pVs = vs != nullptr ? vs->Get() : nullptr;
-		Get()->VSSetShader(pVs, nullptr, 0);
+		Get().VSSetShader(pVs, nullptr, 0);
 		currentVS = vs;
 	}
 }
@@ -48,7 +48,7 @@ void Context::SetPS(PixelShader* ps)
 	if (ps != currentPS || currentPS == nullptr || ps == nullptr)
 	{ 
 		ID3D11PixelShader* pPs = ps != nullptr ? ps->Get() : nullptr;
-		Get()->PSSetShader(pPs, nullptr, 0);
+		Get().PSSetShader(pPs, nullptr, 0);
 		currentPS = ps;
 	}
 }
@@ -79,7 +79,12 @@ void Context::Reset()
 /// <summary>
 /// Returns pointer to context interface
 /// </summary>
-ID3D11DeviceContext* Context::Get() const { return pContext.Get(); }
+ID3D11DeviceContext& Context::Get() const { return *pContext.Get(); }
+
+/// <summary>
+/// Returns reference to context interface
+/// </summary>
+ID3D11DeviceContext* Context::operator->() const { return pContext.Get(); }
 
 /// <summary>
 /// Binds the given viewport to the rasterizer stage

@@ -31,7 +31,7 @@ BufferBase::BufferBase(
 	CreateBuffer(data, byteSize, dev.Get());
 }
 
-void BufferBase::CreateBuffer(const void* data, const UINT byteSize, ID3D11Device* pDevice)
+void BufferBase::CreateBuffer(const void* data, const UINT byteSize, ID3D11Device& dev)
 {
 	D3D11_BUFFER_DESC desc = {};
 	D3D11_SUBRESOURCE_DATA resDesc = {};
@@ -48,11 +48,11 @@ void BufferBase::CreateBuffer(const void* data, const UINT byteSize, ID3D11Devic
 
 	if (data != nullptr)
 	{
-		GFX_THROW_FAILED(pDevice->CreateBuffer(&desc, &resDesc, &pBuf));
+		GFX_THROW_FAILED(dev.CreateBuffer(&desc, &resDesc, &pBuf));
 	}
 	else
 	{
-		GFX_THROW_FAILED(pDevice->CreateBuffer(&desc, nullptr, &pBuf));
+		GFX_THROW_FAILED(dev.CreateBuffer(&desc, nullptr, &pBuf));
 	}
 }
 
@@ -61,7 +61,7 @@ void BufferBase::UpdateMapUnmap(const void* data, Context& ctx)
 	if (byteSize > 0)
 	{ 
 		D3D11_MAPPED_SUBRESOURCE msr;
-		GFX_THROW_FAILED(ctx.Get()->Map(
+		GFX_THROW_FAILED(ctx->Map(
 			Get(),
 			0u,
 			D3D11_MAP_WRITE_DISCARD,
@@ -70,6 +70,6 @@ void BufferBase::UpdateMapUnmap(const void* data, Context& ctx)
 		));
 
 		memcpy(msr.pData, data, byteSize);
-		ctx.Get()->Unmap(Get(), 0u);
+		ctx->Unmap(Get(), 0u);
 	}
 }

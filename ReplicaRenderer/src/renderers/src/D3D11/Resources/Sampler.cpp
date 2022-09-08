@@ -15,7 +15,7 @@ Sampler::Sampler(Device& dev, TexFilterMode filter, TexClampMode u, TexClampMode
 	desc.AddressV = (D3D11_TEXTURE_ADDRESS_MODE)v;
 	desc.AddressW = (D3D11_TEXTURE_ADDRESS_MODE)w;
 
-	GFX_THROW_FAILED(pDev->Get()->CreateSamplerState(&desc, &pSamp));
+	GFX_THROW_FAILED(dev->CreateSamplerState(&desc, &pSamp));
 }
 
 Sampler::Sampler(Device& dev,

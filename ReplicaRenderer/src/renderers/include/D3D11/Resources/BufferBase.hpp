@@ -49,7 +49,7 @@ namespace Replica::D3D11
 
 		BufferBase& operator=(BufferBase&&) = default;
 
-		void CreateBuffer(const void* data, const UINT byteSize, ID3D11Device* pDevice);
+		void CreateBuffer(const void* data, const UINT byteSize, ID3D11Device& pDevice);
 	
 		void UpdateMapUnmap(const void* data, Context& ctx);
 	};

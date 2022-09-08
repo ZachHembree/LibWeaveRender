@@ -8,8 +8,28 @@ Renderer::Renderer(MinWindow& window) :
 	device(), // Create device and context
 	swap(window, device), // Create swap chain for window
 	defaultDS(device, swap.GetSize()),
-	backBuf(swap.GetBackBuf()) // Get RT view for swap chain back buf
+	useDefaultDS(true)
 { }
+
+/// <summary>
+/// Returns the interface to the device the renderer is running on
+/// </summary>
+Device& Renderer::GetDevice() { return device; }
+
+/// <summary>
+/// Returns reference to the swap chain interface
+/// </summary>
+SwapChain& Renderer::GetSwapChain() { return swap; }
+
+/// <summary>
+/// Returns true if the default depth stencil buffer is enabled
+/// </summary>
+bool Renderer::GetIsDepthStencilEnabled() { return useDefaultDS; }
+
+/// <summary>
+/// Enable/disable default depth-stencil buffer
+/// </summary>
+void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
 
 bool Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 { 
@@ -76,14 +96,19 @@ void Renderer::Update()
 		defaultDS = DepthStencilTexture(device, bodySize);
 
 	// Clear back buffer
-	backBuf.Clear(ctx);
-	defaultDS.Clear(ctx);
+	swap.GetBackBuf().Clear(ctx);
+
+	if (useDefaultDS)
+		defaultDS.Clear(ctx);
 
 	// Set viewport bounds
 	ctx.RSSetViewport(bodySize);
 
 	// Bind back buffer as render target
-	ctx.SetRenderTarget(backBuf, defaultDS);
+	if (useDefaultDS)
+		ctx.SetRenderTarget(swap.GetBackBuf(), defaultDS);
+	else
+		ctx.SetRenderTarget(swap.GetBackBuf());
 
 	BeforeDraw(ctx);
 

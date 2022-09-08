@@ -25,9 +25,14 @@ Device::Device()
 }
 
 /// <summary>
-/// Returns pointer to COM device interface
+/// Returns reference to COM device interface
 /// </summary>
-ID3D11Device* Device::Get() { return pDev.Get(); }
+ID3D11Device& Device::Get() { return *pDev.Get(); }
+
+/// <summary>
+/// Returns reference to COM device interface
+/// </summary>
+ID3D11Device* Device::operator->() { return pDev.Get(); }
 
 /// <summary>
 /// Returns reference to main device context

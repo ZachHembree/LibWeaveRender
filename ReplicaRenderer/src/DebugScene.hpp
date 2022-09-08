@@ -1,6 +1,4 @@
 #pragma once
-#include "D3D11/Resources/Texture2D.hpp"
-#include "D3D11/Resources/Sampler.hpp"
 #include "D3D11/Effect.hpp"
 #include "D3D11/Mesh.hpp"
 #include "D3D11/RenderComponent.hpp"

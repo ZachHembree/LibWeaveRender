@@ -4,7 +4,7 @@
 
 using namespace Replica::D3D11;
 
-RTHandle::RTHandle()
+RTHandle::RTHandle() : ppRTV(nullptr)
 { }
 
 RTHandle::RTHandle(
@@ -26,6 +26,6 @@ void RTHandle::Clear(
 {
 	if (ppRTV != nullptr)
 	{ 
-		ctx.Get()->ClearRenderTargetView(*ppRTV, reinterpret_cast<float*>(&color));
+		ctx->ClearRenderTargetView(*ppRTV, reinterpret_cast<float*>(&color));
 	}
 }

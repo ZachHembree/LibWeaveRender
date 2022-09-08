@@ -98,10 +98,15 @@ namespace Replica::D3D11
 		void Reset();
 
 		/// <summary>
-		/// Returns pointer to context interface
+		/// Returns reference to context interface
 		/// </summary>
-		ID3D11DeviceContext* Get() const;
+		ID3D11DeviceContext& Get() const;
 		
+		/// <summary>
+		/// Returns reference to context interface
+		/// </summary>
+		ID3D11DeviceContext* operator->() const;
+
 		/// <summary>
 		/// Binds the given viewport to the rasterizer stage
 		/// </summary>

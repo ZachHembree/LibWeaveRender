@@ -19,7 +19,7 @@ VertexShader::VertexShader(
 {
 	ComPtr<ID3DBlob> vsBlob;
 	GFX_THROW_FAILED(D3DReadFileToBlob(vsDef.file.data(), &vsBlob));
-	GFX_THROW_FAILED(dev.Get()->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &pVS));
+	GFX_THROW_FAILED(dev->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &pVS));
 
 	this->layout = InputLayout(dev, vsBlob, vsDef.iaLayout);
 }
@@ -45,13 +45,12 @@ void VertexShader::Bind(Context& ctx)
 		ctx.SetVS(this);
 		this->pCtx = &ctx;
 
-		ID3D11DeviceContext* cur = ctx.Get();
-		IDynamicCollection<ID3D11SamplerState*>& ss = samplers.GetResources();
-		IDynamicCollection<ID3D11ShaderResourceView*>& tex = textures.GetResources();
+		const auto& ss = samplers.GetResources();
+		const auto& tex = textures.GetResources();
 
-		cur->VSSetSamplers(0, (UINT)ss.GetLength(), ss.GetPtr());
-		cur->VSSetShaderResources(0, (UINT)tex.GetLength(), tex.GetPtr());		
-		cur->VSSetConstantBuffers(0u, 1, cBuf.GetAddressOf());
+		ctx->VSSetSamplers(0, (UINT)ss.GetLength(), ss.GetPtr());
+		ctx->VSSetShaderResources(0, (UINT)tex.GetLength(), tex.GetPtr());		
+		ctx->VSSetConstantBuffers(0u, 1, cBuf.GetAddressOf());
 		layout.Bind(ctx);
 
 		isBound = true;

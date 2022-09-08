@@ -16,7 +16,7 @@ PixelShader::PixelShader(Device& dev, const PixelShaderDef& psDef) :
 {
 	ComPtr<ID3DBlob> psBlob;
 	GFX_THROW_FAILED(D3DReadFileToBlob(psDef.file.data(), &psBlob));
-	GFX_THROW_FAILED(dev.Get()->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pPS));
+	GFX_THROW_FAILED(dev->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pPS));
 }
 
 ID3D11PixelShader* PixelShader::Get() const
@@ -38,13 +38,12 @@ void PixelShader::Bind(Context& ctx)
 {
 	if (!ctx.GetIsPsBound(this))
 	{ 
-		ID3D11DeviceContext* cur = ctx.Get();
-		IDynamicCollection<ID3D11SamplerState*>& ss = samplers.GetResources();
-		IDynamicCollection<ID3D11ShaderResourceView*>& tex = textures.GetResources();
+		const auto& ss = samplers.GetResources();
+		const auto& tex = textures.GetResources();
 
-		cur->PSSetSamplers(0, (UINT)ss.GetLength(), ss.GetPtr());
-		cur->PSSetShaderResources(0, (UINT)tex.GetLength(), tex.GetPtr());
-		cur->PSSetConstantBuffers(0u, 1, cBuf.GetAddressOf());
+		ctx->PSSetSamplers(0, (UINT)ss.GetLength(), ss.GetPtr());
+		ctx->PSSetShaderResources(0, (UINT)tex.GetLength(), tex.GetPtr());
+		ctx->PSSetConstantBuffers(0u, 1, cBuf.GetAddressOf());
 
 		this->pCtx = &ctx;
 		ctx.SetPS(this);

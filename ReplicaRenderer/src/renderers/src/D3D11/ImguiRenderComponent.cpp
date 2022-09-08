@@ -13,7 +13,7 @@ ImguiRenderComponent::ImguiRenderComponent(Renderer& renderer) :
 	RenderComponentBase(renderer)
 {
 	Device& dev = renderer.GetDevice();
-	ImGui_ImplDX11_Init(dev.Get(), dev.GetContext().Get());
+	ImGui_ImplDX11_Init(&dev.Get(), &dev.GetContext().Get());
 }
 
 ImguiRenderComponent::~ImguiRenderComponent()

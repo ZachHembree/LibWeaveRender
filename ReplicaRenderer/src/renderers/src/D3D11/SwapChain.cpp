@@ -7,11 +7,11 @@
 
 using namespace Replica::D3D11;
 
-SwapChain::SwapChain() : pDev(nullptr), desc({})
+SwapChain::SwapChain() : desc({})
 { }
 
 SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
-	pDev(&dev),
+	DeviceChild(dev),
 	backBufRt(dev, &pBackBuf)
 {
 	ComPtr<IDXGIFactory2> dxgiFactory;
@@ -39,7 +39,7 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	desc.Flags = 0;
 
 	GFX_THROW_FAILED(dxgiFactory->CreateSwapChainForHwnd(
-		pDev->Get(),
+		&dev.Get(),
 		wnd.GetWndHandle(),
 		&desc,
 		&fsDesc,
@@ -49,6 +49,21 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 
 	GetBuffers();
 }
+
+/// <summary>
+/// Returns pointer to swap chain interface
+/// </summary>
+IDXGISwapChain1& SwapChain::Get() { return *pSwap.Get(); }
+
+/// <summary>
+/// Returns read-only pointer to pointer for swap chain interface
+/// </summary>
+IDXGISwapChain1** const SwapChain::GetAddressOf() { return pSwap.GetAddressOf(); }
+
+/// <summary>
+/// Returns pointer to swap chain interface
+/// </summary>
+IDXGISwapChain1* SwapChain::operator->() { return pSwap.Get(); }
 
 ivec2 SwapChain::GetSize() const
 {
@@ -103,5 +118,5 @@ void SwapChain::GetBuffers()
 {
 	ComPtr<ID3D11Resource> pRes;
 	GFX_THROW_FAILED(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&pRes));
-	GFX_THROW_FAILED(pDev->Get()->CreateRenderTargetView(pRes.Get(), nullptr, &pBackBuf));
+	GFX_THROW_FAILED(GetDevice()->CreateRenderTargetView(pRes.Get(), nullptr, &pBackBuf));
 }
