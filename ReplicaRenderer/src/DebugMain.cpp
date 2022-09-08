@@ -35,16 +35,6 @@ int CALLBACK WinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE, _In_ LPSTR lpCMdL
 		DebugImageViewer viewer(renderer);
 		//DebugScene debugScene(renderer, input);
 
-		// Fullscreen borderless window
-		ivec2 mres = repWindow.GetMonitorResolution();
-		repWindow.DisableStyleFlags(WndStyle(g_DefaultWndStyle, 0));
-		repWindow.SetBodySize(mres);
-		repWindow.SetPos(ivec2(0));
-
-		// Restore window
-		repWindow.EnableStyleFlags(WndStyle(g_DefaultWndStyle, 0));
-		repWindow.SetBodySize(vec2(1280, 800));
-
 		// Start main loop
 		lastMsg = repWindow.RunMessageLoop();
 

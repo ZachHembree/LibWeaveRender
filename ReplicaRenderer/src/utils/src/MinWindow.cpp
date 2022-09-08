@@ -18,7 +18,11 @@ MinWindow::MinWindow(
 	bodySize(initSize),
 	wndMsg(MSG{}),
 	hInst(hInst),
-	hWnd(nullptr)
+	hWnd(nullptr),
+	isFullscreen(false),
+	lastPos(0),
+	lastSize(0),
+	initStyle(initStyle)
 {
 	// Setup window descriptor
 	WNDCLASSEX wc = { 0 };
@@ -72,14 +76,9 @@ MinWindow::MinWindow(
 	ShowWindow(hWnd, SW_SHOW);
 }
 
-MinWindow::MinWindow(MinWindow&& other) noexcept :
-	name(other.name),
-	hInst(other.hInst),
-	hWnd(other.hWnd),
-	wndMsg(other.wndMsg),
-	bodySize(other.bodySize),
-	wndSize(other.wndSize)
+MinWindow::MinWindow(MinWindow&& other) noexcept
 {
+	memcpy(this, &other, sizeof(MinWindow));
 	memset(&other, 0, sizeof(MinWindow));
 }
 
@@ -271,6 +270,18 @@ vec2 MinWindow::GetNormMonitorDPI() const
 	return vec2(dpi.x / 96.0f, dpi.y / 96.0f);
 }
 
+ivec2 MinWindow::GetMonitorPosition() const
+{
+	HMONITOR mon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO info;
+	info.cbSize = sizeof(MONITORINFO);
+
+	WIN_ASSERT_NZ_LAST(GetMonitorInfo(mon, &info));
+
+	RECT rect = info.rcMonitor;
+	return ivec2(rect.left, rect. top);
+}
+
 ivec2 MinWindow::GetMonitorResolution() const
 {
 	HMONITOR mon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
@@ -281,6 +292,38 @@ ivec2 MinWindow::GetMonitorResolution() const
 
 	RECT rect = info.rcMonitor;
 	return ivec2(rect.right - rect.left, rect.bottom - rect.top);
+}
+
+/// <summary>
+/// Returns true if the window is in borderless fullscreen mode
+/// </summary>
+bool MinWindow::GetIsFullScreen() const { return isFullscreen; }
+
+/// <summary>
+/// Enable/disable borderless full screen
+/// </summary>
+void MinWindow::SetFullScreen(bool value)
+{
+	if (value != isFullscreen)
+	{
+		isFullscreen = value;
+
+		if (isFullscreen)
+		{
+			lastPos = GetPos();
+			lastSize = GetSize();
+
+			DisableStyleFlags(initStyle);
+			SetSize(GetMonitorResolution());
+			SetPos(GetMonitorPosition());
+		}
+		else
+		{
+			EnableStyleFlags(initStyle);
+			SetSize(lastSize);
+			SetPos(lastPos);
+		}
+	}
 }
 
 LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

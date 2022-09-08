@@ -25,7 +25,7 @@ namespace Replica::D3D11
             texQuadEffect(renderer.GetDevice(), g_PosTextured2DEffect)
         {
             fileDialog.SetTitle("Load Image");
-            fileDialog.SetTypeFilters({".bmp", ".gif", ".ico", "jpg", ".png", ".tiff", ".tif", ".dds"});
+            fileDialog.SetTypeFilters({".bmp", ".gif", ".ico", ".jpg", ".png", ".tiff", ".tif", ".dds"});
 
             MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
             quad = Mesh(renderer.GetDevice(), quadDef);
@@ -38,20 +38,9 @@ namespace Replica::D3D11
                 if (ImGui::Button("Load Image"))
                     fileDialog.Open();
 
-                if (ImGui::Button("Enter Fullscreen"))
+                if (ImGui::Button("Toggle Fullscreen"))
                 {
-                    MinWindow& win = GetWindow();
-                    ivec2 mres = win.GetMonitorResolution();
-                    win.DisableStyleFlags(WndStyle(g_DefaultWndStyle, 0));
-                    win.SetBodySize(mres);
-                    win.SetPos(ivec2(0));
-                }
-
-                if (ImGui::Button("Exit Fullscreen"))
-                {
-                    MinWindow& win = GetWindow();
-                    win.EnableStyleFlags(WndStyle(g_DefaultWndStyle, 0));
-                    win.SetBodySize(vec2(1280, 800));
+                    GetWindow().SetFullScreen(!GetWindow().GetIsFullScreen());
                 }
             }
             ImGui::End();

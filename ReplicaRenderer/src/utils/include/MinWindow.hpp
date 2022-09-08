@@ -74,6 +74,16 @@ namespace Replica
 			HWND GetWndHandle() const noexcept;
 
 			/// <summary>
+			/// Returns true if the window is in borderless fullscreen mode
+			/// </summary>
+			bool GetIsFullScreen() const;
+
+			/// <summary>
+			/// Enable/disable borderless full screen
+			/// </summary>
+			void SetFullScreen(bool value);
+
+			/// <summary>
 			/// Returns the size of the window in pixels.
 			/// </summary>
 			ivec2 GetSize() const;
@@ -144,6 +154,11 @@ namespace Replica
 			ivec2 GetMonitorDPI() const;
 
 			/// <summary>
+			/// Returns the virtual coordinates for the top left corner of the current monitor
+			/// </summary>
+			ivec2 GetMonitorPosition() const;
+
+			/// <summary>
 			/// Returns the current resolution of the monitor occupied by the window
 			/// </summary>
 			ivec2 GetMonitorResolution() const;
@@ -156,6 +171,10 @@ namespace Replica
 			HWND hWnd;
 			MSG wndMsg;
 			ivec2 bodySize, wndSize;
+
+			bool isFullscreen;
+			ivec2 lastPos, lastSize;
+			WndStyle initStyle;
 
 			/// <summary>
 			/// Component objects associated with the window
