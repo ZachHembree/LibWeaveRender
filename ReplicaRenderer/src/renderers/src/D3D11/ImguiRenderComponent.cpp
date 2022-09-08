@@ -6,6 +6,8 @@
 
 using namespace Replica::D3D11;
 
+bool ImguiRenderComponent::enableDemoWindow = false;
+
 ImguiRenderComponent::ImguiRenderComponent()
 { }
 
@@ -28,7 +30,8 @@ void ImguiRenderComponent::Update(Context& ctx)
 	ImGui::NewFrame();
 
 	// IMGUI Test
-	ImGui::ShowDemoWindow();
+	if (enableDemoWindow)
+		ImGui::ShowDemoWindow();
 }
 
 void ImguiRenderComponent::DrawLate(Context& ctx)

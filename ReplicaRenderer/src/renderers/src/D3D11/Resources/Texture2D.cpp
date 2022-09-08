@@ -20,10 +20,9 @@ Texture2D::Texture2D(
 	void* data,
 	UINT stride
 ) :
-	ResourceBase(dev),
-	size(dim)
+	ResourceBase(dev)
 {
-	D3D11_TEXTURE2D_DESC desc = {};
+	desc = {};
 	desc.Width = dim.x;
 	desc.Height = dim.y;
 	desc.Format = (DXGI_FORMAT)format;
@@ -70,13 +69,14 @@ Texture2D::Texture2D(
 	void* data,
 	UINT stride,
 	Formats format,
+	ResourceUsages usage,
 	UINT mipLevels
 ) : 
 	Texture2D(
 		dev, 
 		dim, 
 		format, 
-		ResourceUsages::Default, 
+		usage, 
 		ResourceTypes::ShaderResource, 
 		ResourceAccessFlags::None,
 		1u, 
@@ -86,36 +86,92 @@ Texture2D::Texture2D(
 	)
 { }
 
-Texture2D::Texture2D() : size(0) {}
+Texture2D::Texture2D() : desc({}) {}
 
-ivec2 Texture2D::GetSize() const
-{
-	return size;
-}
+ivec2 Texture2D::GetSize() const { return ivec2(desc.Width, desc.Height); }
+
+Formats Texture2D::GetFormat() const { return (Formats)desc.Format; }
+
+ResourceUsages Texture2D::GetUsage() const { return (ResourceUsages)desc.Usage; }
+
+ResourceTypes Texture2D::GetBindFlags() const { return (ResourceTypes)desc.BindFlags; }
+
+ResourceAccessFlags Texture2D::GetAccessFlags() const { return (ResourceAccessFlags)desc.CPUAccessFlags; }
 
 /// <summary>
 /// Returns interface to resource
 /// </summary>
 ID3D11Resource* Texture2D::GetResource() { return pRes.Get(); }
 
-Texture2D Texture2D::FromImageWIC(Device& dev, const wchar_t* file)
+void Texture2D::UpdateTextureWIC(Context& ctx, wstring_view file, ScratchImage& buffer)
 {
-	ScratchImage buf;
+	LoadImageWIC(file, buffer);
+	const Image& img = *buffer.GetImage(0, 0, 0);
+	UpdateTextureData(ctx, img.pixels, 4 * sizeof(uint8_t), ivec2(img.width, img.height));
+}
+
+void Texture2D::UpdateTextureData(Context& ctx, void* data, size_t stride, ivec2 dim)
+{
+	pRes->GetDesc(&desc);
+
+	if (dim == GetSize())
+	{ 
+		D3D11_BOX dstBox;
+		dstBox.left = 0;
+		dstBox.right = dim.x;
+		dstBox.top = 0;
+		dstBox.bottom = dim.y;
+		dstBox.front = 0;
+		dstBox.back = 1;
+
+		ctx->UpdateSubresource(
+			pRes.Get(), 
+			0, 
+			&dstBox, 
+			data, 
+			stride * dim.x, 
+			stride * dim.x * dim.y
+		);
+	}
+	else
+	{
+		pRes.Reset();
+		*this = std::move(Texture2D(
+			GetDevice(), 
+			dim, 
+			GetFormat(), 
+			GetUsage(), 
+			GetBindFlags(), 
+			GetAccessFlags(), 
+			desc.MipLevels,
+			desc.ArraySize,
+			data,
+			stride
+		));
+	}
+}
+
+void Texture2D::LoadImageWIC(wstring_view file, ScratchImage& buffer)
+{
 	GFX_THROW_FAILED(LoadFromWICFile(
-		file,
+		file.data(),
 		WIC_FLAGS::WIC_FLAGS_FORCE_RGB,
 		nullptr,
-		buf
+		buffer
 	));
+}
 
-	const Image* img = buf.GetImage(0, 0, 0);
+Texture2D Texture2D::FromImageWIC(Device& dev, wstring_view file)
+{
+	ScratchImage buf;
+	LoadImageWIC(file, buf);
+	const Image& img = *buf.GetImage(0, 0, 0);
 
 	return Texture2D(dev, 
-		ivec2(img->width, img->height),
-		img->pixels,
+		ivec2(img.width, img.height),
+		img.pixels,
 		4 * sizeof(uint8_t),
-		Formats::R8G8B8A8_UNORM,
-		1
+		Formats::R8G8B8A8_UNORM
 	);
 }
 
