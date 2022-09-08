@@ -323,6 +323,7 @@
     <FxCompile Include="ReplicaRenderer\res\DefaultShaders\TexturePS.hlsl" />
     <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultVS.hlsl" />
     <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Texture2DVS.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\PosTexturedVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

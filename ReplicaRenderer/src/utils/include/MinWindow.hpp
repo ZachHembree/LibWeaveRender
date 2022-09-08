@@ -126,7 +126,7 @@ namespace Replica
 			/// <summary>
 			/// Adds the given style flags to the window
 			/// </summary>
-			void SetStyleFlags(WndStyle flags);
+			void EnableStyleFlags(WndStyle flags);
 
 			/// <summary>
 			/// Removes the given style flags from the current style

@@ -79,13 +79,13 @@ void Renderer::Update()
 	backBuf.Clear(ctx);
 	defaultDS.Clear(ctx);
 
-	BeforeDraw(ctx);
-
 	// Set viewport bounds
 	ctx.RSSetViewport(bodySize);
 
 	// Bind back buffer as render target
 	ctx.SetRenderTarget(backBuf, defaultDS);
+
+	BeforeDraw(ctx);
 
 	DrawEarly(ctx);
 	Draw(ctx);

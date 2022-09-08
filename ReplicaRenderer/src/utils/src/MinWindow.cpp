@@ -240,7 +240,7 @@ bool MinWindow::PollWindowMessages()
 	return true;
 }
 
-void MinWindow::SetStyleFlags(WndStyle flags)
+void MinWindow::EnableStyleFlags(WndStyle flags)
 {
 	WndStyle style = GetStyle();
 	style.x |= flags.x;
@@ -303,10 +303,6 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 			if (!component->OnWndMessage(hWnd, msg, wParam, lParam))
 				break;
 		}
-	}
-	catch (const RepWinException& e)
-	{
-		MessageBoxA(nullptr, e.what(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
 	}
 	catch (const RepException& e)
 	{
