@@ -6,15 +6,11 @@
 
 using namespace Replica::D3D11;
 
-BufferBase::BufferBase() :
-	byteSize(0),
-	type(ResourceTypes::Constant),
-	usage(ResourceUsages::Immutable),
-	cpuAccess(ResourceAccessFlags::None)
+BufferBase::BufferBase() : desc({})
 { }
 
 BufferBase::BufferBase(
-	ResourceTypes type, 
+	ResourceBindFlags type, 
 	ResourceUsages usage, 
 	ResourceAccessFlags cpuAccess, 
 	Device& dev, 
@@ -22,18 +18,9 @@ BufferBase::BufferBase(
 	const UINT byteSize
 ) :
 	ResourceBase(dev),
-	type(type),
-	usage(usage),
-	cpuAccess(cpuAccess),
-	byteSize(byteSize)
+	desc({})
 {
 	GFX_ASSERT(byteSize > 0, "Buffer size cannot be 0.");
-	CreateBuffer(data, byteSize, dev.Get());
-}
-
-void BufferBase::CreateBuffer(const void* data, const UINT byteSize, ID3D11Device& dev)
-{
-	D3D11_BUFFER_DESC desc = {};
 	D3D11_SUBRESOURCE_DATA resDesc = {};
 
 	desc.Usage = (D3D11_USAGE)usage;
@@ -48,28 +35,66 @@ void BufferBase::CreateBuffer(const void* data, const UINT byteSize, ID3D11Devic
 
 	if (data != nullptr)
 	{
-		GFX_THROW_FAILED(dev.CreateBuffer(&desc, &resDesc, &pBuf));
+		(dev->CreateBuffer(&desc, &resDesc, &pBuf));
 	}
 	else
 	{
-		GFX_THROW_FAILED(dev.CreateBuffer(&desc, nullptr, &pBuf));
+		(dev->CreateBuffer(&desc, nullptr, &pBuf));
 	}
 }
 
-void BufferBase::UpdateMapUnmap(const void* data, Context& ctx)
-{
-	if (byteSize > 0)
-	{ 
-		D3D11_MAPPED_SUBRESOURCE msr;
-		GFX_THROW_FAILED(ctx->Map(
-			Get(),
-			0u,
-			D3D11_MAP_WRITE_DISCARD,
-			0u,
-			&msr
-		));
+/// <summary>
+/// Returns the size of the buffer in bytes
+/// </summary>
+ID3D11Buffer* BufferBase::Get() { return pBuf.Get(); }
 
-		memcpy(msr.pData, data, byteSize);
-		ctx->Unmap(Get(), 0u);
+ID3D11Buffer** const BufferBase::GetAddressOf() { return pBuf.GetAddressOf(); }
+
+ID3D11Resource* BufferBase::GetResource() { return Get(); }
+
+ID3D11Resource** const BufferBase::GetResAddress() { return reinterpret_cast<ID3D11Resource**>(GetAddressOf()); }
+
+UINT BufferBase::GetSize() const { return desc.ByteWidth; }
+
+ResourceUsages BufferBase::GetUsage() const { return (ResourceUsages)desc.Usage; }
+
+ResourceBindFlags BufferBase::GetBindFlags() const { return (ResourceBindFlags)desc.BindFlags; }
+
+ResourceAccessFlags BufferBase::GetAccessFlags() const { return (ResourceAccessFlags)desc.CPUAccessFlags; }
+
+void BufferBase::SetData(Context& ctx, const void* data)
+{
+	if (GetSize() > 0)
+	{
+		GFX_ASSERT(GetUsage() != ResourceUsages::Immutable, "Cannot update Buffers without write access.");
+
+		if (GetUsage() == ResourceUsages::Dynamic)
+		{
+			UpdateMapUnmap(ctx, data);
+		}
+		else
+		{
+			UpdateSubresource(ctx, data);
+		}
 	}
+}
+
+void BufferBase::UpdateSubresource(Context& ctx, const void* data)
+{
+	ctx->UpdateSubresource( Get(), 0, nullptr, data, GetSize(), GetSize());
+}
+
+void BufferBase::UpdateMapUnmap(Context& ctx, const void* data)
+{
+	D3D11_MAPPED_SUBRESOURCE msr;
+	GFX_THROW_FAILED(ctx->Map(
+		Get(),
+		0u,
+		D3D11_MAP_WRITE_DISCARD,
+		0u,
+		&msr
+	));
+
+	memcpy(msr.pData, data, GetSize());
+	ctx->Unmap(Get(), 0u);
 }

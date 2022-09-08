@@ -10,7 +10,7 @@ IndexBuffer::IndexBuffer(Device& device,
 	ResourceAccessFlags cpuAccess
 ) :
 	count((UINT)data.GetLength()),
-	BufferBase(ResourceTypes::Index, usage, cpuAccess, device, data)
+	BufferBase(ResourceBindFlags::Index, usage, cpuAccess, device, data)
 { }
 
 /// <summary>

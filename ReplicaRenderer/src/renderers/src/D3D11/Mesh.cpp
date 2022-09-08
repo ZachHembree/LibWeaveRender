@@ -4,6 +4,23 @@
 
 namespace Replica::D3D11
 {
+	Mesh::Mesh(
+		Device& device, 
+		const IDynamicCollection<USHORT>& indices, 
+		const void* vertices, 
+		size_t vCount, 
+		size_t vStride
+	) :
+		vBuf(device, vertices, vCount, vStride),
+		iBuf(device, indices),
+		translation(0),
+		rotation(1, 0, 0, 0),
+		scale(1)
+	{ }
+
+	Mesh::Mesh() : translation(0), rotation(0, 0, 0, 0), scale(0)
+	{ }
+
 	/// <summary>
 	/// Updates any resources needed prior to drawing
 	/// </summary>

@@ -11,11 +11,19 @@ namespace Replica::D3D11
 			Device& device,
 			const IDynamicCollection<T>& data,
 			ResourceUsages usage = ResourceUsages::Default, 
-			ResourceAccessFlags cpuAccess = ResourceAccessFlags::None) :
-			count((UINT)data.GetLength()),
-			stride((UINT)sizeof(T)),
-			BufferBase(ResourceTypes::Vertex, usage, cpuAccess, device, data)
+			ResourceAccessFlags cpuAccess = ResourceAccessFlags::None
+		) :
+			VertexBuffer(device, data.GetPtr(), data.GetLength(), sizeof(T), usage, cpuAccess)
 		{ }
+
+		VertexBuffer(
+			Device& device,
+			const void* data,
+			size_t count,
+			size_t stride,
+			ResourceUsages usage = ResourceUsages::Default,
+			ResourceAccessFlags cpuAccess = ResourceAccessFlags::None
+		);
 
 		VertexBuffer() : count(0), stride(0) { }
 

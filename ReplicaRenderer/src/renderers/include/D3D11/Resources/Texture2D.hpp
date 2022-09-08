@@ -43,7 +43,7 @@ namespace Replica::D3D11
 
 		ResourceUsages GetUsage() const;
 
-		ResourceTypes GetBindFlags() const;
+		ResourceBindFlags GetBindFlags() const;
 
 		ResourceAccessFlags GetAccessFlags() const;
 
@@ -99,11 +99,15 @@ namespace Replica::D3D11
 		/// Initializes new Texture2D from WIC-compatible image 
 		/// (BMP, GIF, ICO, JPEG, PNG, TIFF)
 		/// </summary>
-		static Texture2D FromImageWIC(Device& dev, wstring_view file);
+		static Texture2D FromImageWIC(
+			Device& dev, 
+			wstring_view file, 
+			ResourceUsages usage = ResourceUsages::Immutable
+		);
 
 	protected:
 		ComPtr<ID3D11Texture2D> pRes;
-		ComPtr<ID3D11ShaderResourceView> pRTV;
+		ComPtr<ID3D11ShaderResourceView> pSRV;
 		D3D11_TEXTURE2D_DESC desc;
 
 		Texture2D(
@@ -111,7 +115,7 @@ namespace Replica::D3D11
 			ivec2 dim,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			ResourceUsages usage = ResourceUsages::Default,
-			ResourceTypes bindFlags = ResourceTypes::ShaderResource,
+			ResourceBindFlags bindFlags = ResourceBindFlags::ShaderResource,
 			ResourceAccessFlags accessFlags = ResourceAccessFlags::None,
 			UINT mipLevels = 1u,
 			UINT arraySize = 1u,
@@ -119,5 +123,8 @@ namespace Replica::D3D11
 			UINT stride = 0
 		);
 
+		void UpdateMapUnmap(Context& ctx, void* data, size_t stride, ivec2 dim);
+
+		void UpdateSubresource(Context& ctx, void* data, size_t stride, ivec2 dim);
 	};
 }

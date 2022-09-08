@@ -2,12 +2,14 @@
 
 using namespace Replica::D3D11;
 
+ConstantBuffer::ConstantBuffer() { }
+
 ConstantBuffer::ConstantBuffer(Device& device,
 	size_t size,
 	const void* data
 ) :
 	BufferBase(
-		ResourceTypes::Constant,
+		ResourceBindFlags::Constant,
 		ResourceUsages::Dynamic,
 		ResourceAccessFlags::Write,
 		device,
@@ -15,8 +17,3 @@ ConstantBuffer::ConstantBuffer(Device& device,
 		(uint)GetAlignedByteSize(size, 16)
 	) 
 { }
-
-void ConstantBuffer::SetData(const void* data, Context & ctx)
-{
-	UpdateMapUnmap(data, ctx);
-}

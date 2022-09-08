@@ -13,7 +13,7 @@ DepthStencilTexture::DepthStencilTexture(
 	ResourceUsages usage,
 	TexCmpFunc depthCmp
 ) :
-	Texture2D(dev, dim, format, usage, ResourceTypes::DepthStencil )
+	Texture2D(dev, dim, format, usage, ResourceBindFlags::DepthStencil )
 {
 	// State
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};

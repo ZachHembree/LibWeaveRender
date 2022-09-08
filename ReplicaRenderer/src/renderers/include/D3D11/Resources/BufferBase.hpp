@@ -7,28 +7,34 @@ namespace Replica::D3D11
 	class BufferBase : public ResourceBase
 	{
 	public:
-		ID3D11Buffer* Get() { return pBuf.Get(); };
+		ID3D11Buffer* Get();
 
-		ID3D11Buffer** const GetAddressOf() { return pBuf.GetAddressOf(); };
+		ID3D11Buffer** const GetAddressOf();
 
-		ID3D11Resource* GetResource() { return Get(); };
+		ID3D11Resource* GetResource();
 
-		ID3D11Resource** const GetResAddress() { return reinterpret_cast<ID3D11Resource**>(GetAddressOf()); };
+		ID3D11Resource** const GetResAddress();
 
 		/// <summary>
 		/// Returns the size of the buffer in bytes
 		/// </summary>
-		UINT GetSize() { return byteSize; }
+		UINT GetSize() const;
+
+		ResourceUsages GetUsage() const;
+
+		ResourceBindFlags GetBindFlags() const;
+
+		ResourceAccessFlags GetAccessFlags() const;
+
+		void SetData(Context& ctx, const void* data);
 
 	protected:
-		ResourceTypes type;
-		ResourceUsages usage;
-		ResourceAccessFlags cpuAccess;
+		D3D11_BUFFER_DESC desc;
 		ComPtr<ID3D11Buffer> pBuf;
-		UINT byteSize;
 
 		template<typename T>
-		BufferBase(ResourceTypes type,
+		BufferBase(
+			ResourceBindFlags type,
 			ResourceUsages usage,
 			ResourceAccessFlags cpuAccess,
 			Device& device,
@@ -38,7 +44,8 @@ namespace Replica::D3D11
 
 		BufferBase();
 
-		BufferBase(ResourceTypes type, 
+		BufferBase(
+			ResourceBindFlags type, 
 			ResourceUsages usage, 
 			ResourceAccessFlags cpuAccess, 
 			Device& device, 
@@ -48,9 +55,9 @@ namespace Replica::D3D11
 		BufferBase(BufferBase&&) = default;
 
 		BufferBase& operator=(BufferBase&&) = default;
-
-		void CreateBuffer(const void* data, const UINT byteSize, ID3D11Device& pDevice);
 	
-		void UpdateMapUnmap(const void* data, Context& ctx);
+		void UpdateSubresource(Context& ctx, const void* data);
+
+		void UpdateMapUnmap(Context& ctx, const void* data);
 	};
 }

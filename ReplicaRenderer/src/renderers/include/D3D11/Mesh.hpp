@@ -35,11 +35,7 @@ namespace Replica::D3D11
 			Device& device,
 			const MeshDef<Vert_T>& def
 		) :
-			vBuf(device, def.vertices),
-			iBuf(device, def.indices),
-			translation(0),
-			rotation(1, 0, 0, 0),
-			scale(1)
+			Mesh(device, def.indices, def.vertices.GetPtr(), def.vertices.GetLength(), sizeof(Vert_T))
 		{ }
 
 		template <typename Vert_T>
@@ -48,16 +44,21 @@ namespace Replica::D3D11
 			const IDynamicCollection<Vert_T>& vertices,
 			const IDynamicCollection<USHORT>& indices
 		) : 
-			vBuf(device, vertices),
-			iBuf(device, indices),
-			translation(0),
-			rotation(1, 0, 0, 0),
-			scale(1)
+			Mesh(device, indices, vertices.GetPtr(), vertices.GetLength(), sizeof(Vert_T))
 		{ }
 
-		Mesh() : translation(0), rotation(0, 0, 0, 0), scale(0) {}
+		Mesh(
+			Device& device,
+			const IDynamicCollection<USHORT>& indices,
+			const void* vertices,
+			size_t vCount,
+			size_t vStride
+		);
+
+		Mesh();
 
 		Mesh(Mesh&&) = default;
+
 		Mesh& operator=(Mesh&&) = default;
 
 		/// <summary>

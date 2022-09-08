@@ -33,7 +33,7 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Supported buffer types
 	/// </summary>
-	enum class ResourceTypes
+	enum class ResourceBindFlags
 	{
 		Vertex = D3D11_BIND_VERTEX_BUFFER,
 		Index = D3D11_BIND_INDEX_BUFFER,
@@ -47,7 +47,7 @@ namespace Replica::D3D11
 		VideoEncoder = D3D11_BIND_VIDEO_ENCODER,
 	};
 
-	BITWISE_ALL(ResourceTypes, UINT)
+	BITWISE_ALL(ResourceBindFlags, UINT)
 
 	/// <summary>
 	/// Specifies types of CPU access allowed for a resource
@@ -56,7 +56,8 @@ namespace Replica::D3D11
 	{
 		None = 0u,
 		Write = D3D11_CPU_ACCESS_WRITE,
-		Read = D3D11_CPU_ACCESS_READ
+		Read = D3D11_CPU_ACCESS_READ,
+		ReadWrite = Read | Write
 	};
 
 	BITWISE_ALL(ResourceAccessFlags, UINT)

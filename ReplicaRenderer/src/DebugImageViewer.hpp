@@ -55,7 +55,13 @@ namespace Replica::D3D11
                 if (tex.GetIsValid())
                     tex.UpdateTextureWIC(ctx, fileDialog.GetSelected().native(), buffer);
                 else
-                    tex = Texture2D::FromImageWIC(GetDevice(), fileDialog.GetSelected().native());
+                {
+                    tex = Texture2D::FromImageWIC(
+                        GetDevice(), 
+                        fileDialog.GetSelected().native(),
+                        ResourceUsages::Dynamic
+                    );
+                }
 
                 fileDialog.ClearSelected();
             }

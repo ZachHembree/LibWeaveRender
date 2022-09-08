@@ -104,7 +104,7 @@ wstring MinWindow::GetWindowTitle() const
 {
 	size_t len = GetWindowTextLengthW(hWnd);
 	wstring title(len, '\0');
-	WIN_ASSERT_NZ_LAST(GetWindowTextW(hWnd, title.data(), len));
+	WIN_ASSERT_NZ_LAST(GetWindowTextW(hWnd, title.data(), (int)len));
 
 	return title;
 }

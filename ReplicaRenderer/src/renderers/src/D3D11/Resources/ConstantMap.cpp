@@ -46,7 +46,7 @@ ConstantMap& ConstantMap::operator=(const ConstantMap& other)
 void ConstantMap::UpdateConstantBuffer(ConstantBuffer& cb, Context& ctx)
 {
 	GFX_ASSERT(cb.GetSize() >= data.GetSize(), "Destination constant buffer cannot be smaller than the source.");
-	cb.SetData(data.GetPtr(), ctx);
+	cb.SetData(ctx, data.GetPtr());
 }
 
 /// <summary>

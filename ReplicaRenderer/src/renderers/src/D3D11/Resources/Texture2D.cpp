@@ -13,7 +13,7 @@ Texture2D::Texture2D(
 	ivec2 dim,
 	Formats format,
 	ResourceUsages usage,
-	ResourceTypes bindFlags,
+	ResourceBindFlags bindFlags,
 	ResourceAccessFlags accessFlags,
 	UINT mipLevels,
 	UINT arraySize,
@@ -51,7 +51,7 @@ Texture2D::Texture2D(
 		GFX_THROW_FAILED(GetDevice()->CreateTexture2D(&desc, nullptr, &pRes));
 	}
 
-	if ((int)(bindFlags & ResourceTypes::ShaderResource))
+	if ((int)(bindFlags & ResourceBindFlags::ShaderResource))
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC vDesc = {};
 		vDesc.Format = desc.Format;
@@ -59,7 +59,7 @@ Texture2D::Texture2D(
 		vDesc.Texture2D.MostDetailedMip = 0;
 		vDesc.Texture2D.MipLevels = desc.MipLevels;
 
-		GFX_THROW_FAILED(GetDevice()->CreateShaderResourceView(pRes.Get(), &vDesc, &pRTV));
+		GFX_THROW_FAILED(GetDevice()->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
 	}
 }
 
@@ -77,8 +77,8 @@ Texture2D::Texture2D(
 		dim, 
 		format, 
 		usage, 
-		ResourceTypes::ShaderResource, 
-		ResourceAccessFlags::None,
+		ResourceBindFlags::ShaderResource,
+		(usage == ResourceUsages::Dynamic) ? ResourceAccessFlags::Write : ResourceAccessFlags::None,
 		1u, 
 		1u,
 		data, 
@@ -94,7 +94,7 @@ Formats Texture2D::GetFormat() const { return (Formats)desc.Format; }
 
 ResourceUsages Texture2D::GetUsage() const { return (ResourceUsages)desc.Usage; }
 
-ResourceTypes Texture2D::GetBindFlags() const { return (ResourceTypes)desc.BindFlags; }
+ResourceBindFlags Texture2D::GetBindFlags() const { return (ResourceBindFlags)desc.BindFlags; }
 
 ResourceAccessFlags Texture2D::GetAccessFlags() const { return (ResourceAccessFlags)desc.CPUAccessFlags; }
 
@@ -110,28 +110,57 @@ void Texture2D::UpdateTextureWIC(Context& ctx, wstring_view file, ScratchImage& 
 	UpdateTextureData(ctx, img.pixels, 4 * sizeof(uint8_t), ivec2(img.width, img.height));
 }
 
+void Texture2D::UpdateMapUnmap(Context& ctx, void* data, size_t stride, ivec2 dim)
+{
+	D3D11_MAPPED_SUBRESOURCE msr;
+	GFX_THROW_FAILED(ctx->Map(
+		pRes.Get(),
+		0u,
+		D3D11_MAP_WRITE_DISCARD,
+		0u,
+		&msr
+	));
+
+	memcpy(msr.pData, data, stride * dim.x * dim.y);
+	ctx->Unmap(pRes.Get(), 0u);
+}
+
+void Texture2D::UpdateSubresource(Context& ctx, void* data, size_t stride, ivec2 dim)
+{
+	D3D11_BOX dstBox;
+	dstBox.left = 0;
+	dstBox.right = dim.x;
+	dstBox.top = 0;
+	dstBox.bottom = dim.y;
+	dstBox.front = 0;
+	dstBox.back = 1;
+
+	ctx->UpdateSubresource(
+		pRes.Get(),
+		0,
+		&dstBox,
+		data,
+		stride * dim.x,
+		stride * dim.x * dim.y
+	);
+}
+
 void Texture2D::UpdateTextureData(Context& ctx, void* data, size_t stride, ivec2 dim)
 {
 	pRes->GetDesc(&desc);
 
 	if (dim == GetSize())
 	{ 
-		D3D11_BOX dstBox;
-		dstBox.left = 0;
-		dstBox.right = dim.x;
-		dstBox.top = 0;
-		dstBox.bottom = dim.y;
-		dstBox.front = 0;
-		dstBox.back = 1;
+		GFX_ASSERT(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
 
-		ctx->UpdateSubresource(
-			pRes.Get(), 
-			0, 
-			&dstBox, 
-			data, 
-			stride * dim.x, 
-			stride * dim.x * dim.y
-		);
+		if (GetUsage() == ResourceUsages::Dynamic)
+		{
+			UpdateMapUnmap(ctx, data, stride, dim);
+		}
+		else
+		{
+			UpdateSubresource(ctx, data, stride, dim);
+		}
 	}
 	else
 	{
@@ -161,7 +190,7 @@ void Texture2D::LoadImageWIC(wstring_view file, ScratchImage& buffer)
 	));
 }
 
-Texture2D Texture2D::FromImageWIC(Device& dev, wstring_view file)
+Texture2D Texture2D::FromImageWIC(Device& dev, wstring_view file, ResourceUsages usage)
 {
 	ScratchImage buf;
 	LoadImageWIC(file, buf);
@@ -171,12 +200,13 @@ Texture2D Texture2D::FromImageWIC(Device& dev, wstring_view file)
 		ivec2(img.width, img.height),
 		img.pixels,
 		4 * sizeof(uint8_t),
-		Formats::R8G8B8A8_UNORM
+		Formats::R8G8B8A8_UNORM,
+		usage
 	);
 }
 
 ID3D11Resource** const Texture2D::GetResAddress() { return reinterpret_cast<ID3D11Resource**>(pRes.GetAddressOf()); }
 
-ID3D11ShaderResourceView* Texture2D::GetSRV() { return pRTV.Get(); }
+ID3D11ShaderResourceView* Texture2D::GetSRV() { return pSRV.Get(); }
 
-ID3D11ShaderResourceView** const Texture2D::GetSRVAddress() { return pRTV.GetAddressOf(); }
+ID3D11ShaderResourceView** const Texture2D::GetSRVAddress() { return pSRV.GetAddressOf(); }

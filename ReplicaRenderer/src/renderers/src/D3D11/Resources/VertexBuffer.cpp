@@ -3,6 +3,19 @@
 
 using namespace Replica::D3D11;
 
+VertexBuffer::VertexBuffer(
+	Device& device, 
+	const void* data, 
+	size_t count, 
+	size_t stride,
+	ResourceUsages usage, 
+	ResourceAccessFlags cpuAccess
+) :
+	count((UINT)count),
+	stride((UINT)stride),
+	BufferBase(ResourceBindFlags::Vertex, usage, cpuAccess, device, data, (UINT)(stride * count))
+{ }
+
 /// <summary>
 /// Returns the number of elements in the buffer
 /// </summary>
