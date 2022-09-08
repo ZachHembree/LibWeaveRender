@@ -1,13 +1,19 @@
 #pragma once
 #include "D3D11/Effect.hpp"
+#include "D3D11/Shaders/ComputeShader.hpp"
 
 namespace Replica::D3D11
 {
+	// Compute Shaders
+	const ComputeShaderDef g_TestCS
+	{
+		{ L"Shaders/TestCompute.cso" },
+	};
+
 	// Vertex Shaders
 	const VertexShaderDef g_DefaultVS =
 	{
-		{ },
-		L"Shaders/DefaultVS.cso",
+		{ L"Shaders/DefaultVS.cso" },
 		{
 			{ "Position", Formats::R32G32_FLOAT },
 		},
@@ -15,8 +21,7 @@ namespace Replica::D3D11
 
 	const VertexShaderDef g_PosTexturedVS =
 	{
-		{ },
-		L"Shaders/PosTexturedVS.cso",
+		{ L"Shaders/PosTexturedVS.cso" },
 		{
 			{ "Position", Formats::R32G32_FLOAT },
 		},
@@ -24,8 +29,7 @@ namespace Replica::D3D11
 
 	const VertexShaderDef g_Texture2DVS =
 	{
-		{ },
-		L"Shaders/Texture2DVS.cso",
+		{ L"Shaders/Texture2DVS.cso" },
 		{
 			{ "Position", Formats::R32G32_FLOAT },
 			{ "TexCoord", Formats::R32G32_FLOAT },
@@ -35,9 +39,9 @@ namespace Replica::D3D11
 	const VertexShaderDef g_3DVS =
 	{
 		{
+			L"Shaders/3DVS.cso",
 			{ ConstantDef::Get<mat4>(L"mvp"), }
 		},
-		L"Shaders/3DVS.cso",
 		{
 			{ "Position", Formats::R32G32B32_FLOAT },
 		},
@@ -46,9 +50,9 @@ namespace Replica::D3D11
 	const VertexShaderDef g_Texture3DVS =
 	{
 		{
+			L"Shaders/Texture3DVS.cso",
 			{ ConstantDef::Get<mat4>(L"mvp"), }
 		},
-		L"Shaders/Texture3DVS.cso",
 		{
 			{ "Position", Formats::R32G32B32_FLOAT },
 			{ "TexCoord", Formats::R32G32_FLOAT },
@@ -58,24 +62,20 @@ namespace Replica::D3D11
 	// Pixel Shaders
 	const PixelShaderDef g_DefaultPS =
 	{
-		{ },
 		L"Shaders/DefaultPS.cso",
 	};
 
 	const PixelShaderDef g_Flat3DPS =
 	{
-		{ },
 		L"Shaders/Flat3DPS.cso",
 	};
 
 	const PixelShaderDef g_TexturePS =
 	{
-		{ 
-			{ },
-			{ L"samp" },
-			{ L"tex" },
-		},
 		L"Shaders/TexturePS.cso",
+		{ },
+		{ L"samp" },
+		{ L"tex" },
 	};
 
 	// Effects

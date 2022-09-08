@@ -15,6 +15,7 @@ namespace Replica::D3D11
 
 	struct ShaderDefBase
 	{
+		wstring_view file;
 		ConstantMapDef constMap;
 		ResourceMap<ID3D11SamplerState> samplerMap;
 		ResourceMap<ID3D11ShaderResourceView> textureMap;
@@ -26,7 +27,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns true if the shader is bound
 		/// </summary>
-		bool GetIsBound() { return isBound; }
+		bool GetIsBound();
 
 		/// <summary>
 		/// Binds shader to the main context
@@ -76,12 +77,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Sets sampler using last context
 		/// </summary>
-		virtual void SetSampler(wstring_view name, Sampler& samp) = 0;
+		virtual void SetSampler(wstring_view name, Sampler& samp);
 
 		/// <summary>
 		/// Sets Texture2D using last context
 		/// </summary>
-		virtual void SetTexture(wstring_view name, Texture2D& tex) = 0;
+		virtual void SetTexture(wstring_view name, Texture2D& tex);
 
 	protected:
 		ConstantMap constants;

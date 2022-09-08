@@ -2,12 +2,15 @@
 #include "D3D11/Device.hpp"
 #include "D3D11/Resources/ConstantBuffer.hpp"
 #include "D3D11/Resources/ConstantMap.hpp"
+#include "D3D11/Resources/Sampler.hpp"
+#include "D3D11/Resources/Texture2D.hpp"
 
 using namespace Replica::D3D11;
 
 ShaderBase::ShaderBase() : 
 	DeviceChild(),
-	isBound(false)
+	isBound(false),
+	pCtx(nullptr)
 { }
 
 ShaderBase::ShaderBase(Device& dev) :
@@ -57,3 +60,18 @@ ShaderBase& ShaderBase::operator=(ShaderBase&& other) noexcept
 }
 
 void ShaderBase::Bind() { Bind(pDev->GetContext()); }
+
+/// <summary>
+/// Returns true if the shader is bound
+/// </summary>
+bool ShaderBase::GetIsBound() { return isBound; }
+
+void ShaderBase::SetSampler(wstring_view name, Sampler& samp)
+{
+	samplers.SetResource(name, samp.Get());
+}
+
+void ShaderBase::SetTexture(wstring_view name, Texture2D& tex)
+{
+	textures.SetResource(name, tex.GetSRV());
+}

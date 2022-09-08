@@ -8,14 +8,14 @@ namespace Replica::D3D11
 	class Sampler;
 
 	struct PixelShaderDef : public ShaderDefBase
-	{
-		wstring_view file;
-	};
+	{ };
 
 	class PixelShader : public ShaderBase
 	{
 	public:
 		using ShaderBase::Bind;
+		using ShaderBase::SetSampler;
+		using ShaderBase::SetTexture;
 
 		PixelShader();
 
@@ -32,16 +32,6 @@ namespace Replica::D3D11
 		/// Unbinds pixel shader
 		/// </summary>
 		void Unbind() override;
-
-		/// <summary>
-		/// Sets sampler
-		/// </summary>
-		void SetSampler(wstring_view name, Sampler& samp) override;
-
-		/// <summary>
-		/// Sets Texture2D
-		/// </summary>
-		void SetTexture(wstring_view name, Texture2D& tex) override;
 
 	private:
 		ComPtr<ID3D11PixelShader> pPS;

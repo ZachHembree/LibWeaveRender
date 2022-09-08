@@ -76,19 +76,6 @@ MinWindow::MinWindow(
 	ShowWindow(hWnd, SW_SHOW);
 }
 
-MinWindow::MinWindow(MinWindow&& other) noexcept
-{
-	memcpy(this, &other, sizeof(MinWindow));
-	memset(&other, 0, sizeof(MinWindow));
-}
-
-MinWindow& MinWindow::operator=(MinWindow&& rhs) noexcept
-{
-	memcpy(this, &rhs, sizeof(MinWindow));
-	memset(&rhs, 0, sizeof(MinWindow));
-	return *this;
-}
-
 MinWindow::~MinWindow()
 {
 	if (hWnd != nullptr)

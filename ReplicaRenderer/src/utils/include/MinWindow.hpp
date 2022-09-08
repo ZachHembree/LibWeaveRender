@@ -3,10 +3,11 @@
 
 #include "RepLeanWin.h"
 #include "RepWinException.hpp"
-
-#include <glm/glm.hpp>
-#include "DynamicCollections.hpp"
 #include <string_view>
+#include <glm/glm.hpp>
+
+#include "DynamicCollections.hpp"
+#include "MoveOnlyBase.hpp"
 
 #pragma comment(lib, "Shcore.lib")
 
@@ -27,7 +28,7 @@ namespace Replica
 	/// <summary>
 	/// Minimal wrapper class for Win32 Window
 	/// </summary>
-	class MinWindow
+	class MinWindow : public MoveOnlyObjBase
 	{
 		public:
 			MinWindow(
@@ -38,13 +39,9 @@ namespace Replica
 				const wchar_t* iconRes
 			);
 
-			MinWindow(MinWindow&& other) noexcept;
+			MinWindow(MinWindow&& other) noexcept = default;
 
-			MinWindow(const MinWindow&) = delete;
-
-			MinWindow& operator=(MinWindow&& rhs) noexcept;
-
-			MinWindow& operator=(const MinWindow&) = delete;
+			MinWindow& operator=(MinWindow&& rhs) noexcept = default;
 
 			~MinWindow();
 

@@ -7,7 +7,6 @@ namespace Replica::D3D11
 { 
 	struct VertexShaderDef : public ShaderDefBase
 	{
-		wstring_view file;
 		DynamicArray<IAElement> iaLayout;
 	};
 
@@ -15,6 +14,8 @@ namespace Replica::D3D11
 	{
 	public:
 		using ShaderBase::Bind;
+		using ShaderBase::SetSampler;
+		using ShaderBase::SetTexture;
 
 		VertexShader();
 
@@ -36,16 +37,6 @@ namespace Replica::D3D11
 		/// Unbinds vertex shader;
 		/// </summary>
 		void Unbind() override;
-
-		/// <summary>
-		/// Sets sampler
-		/// </summary>
-		void SetSampler(wstring_view name, Sampler& samp) override;
-
-		/// <summary>
-		/// Sets Texture2D
-		/// </summary>
-		void SetTexture(wstring_view name, Texture2D& tex) override;
 
 	private:
 		InputLayout layout;

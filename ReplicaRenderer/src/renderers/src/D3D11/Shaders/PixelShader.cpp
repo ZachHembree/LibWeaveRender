@@ -12,7 +12,7 @@ PixelShader::PixelShader()
 { }
 
 PixelShader::PixelShader(Device& dev, const PixelShaderDef& psDef) :
-	ShaderBase(dev, reinterpret_cast<const ShaderDefBase&>(psDef))
+	ShaderBase(dev, psDef)
 {
 	ComPtr<ID3DBlob> psBlob;
 	GFX_THROW_FAILED(D3DReadFileToBlob(psDef.file.data(), &psBlob));
@@ -22,16 +22,6 @@ PixelShader::PixelShader(Device& dev, const PixelShaderDef& psDef) :
 ID3D11PixelShader* PixelShader::Get() const
 {
 	return pPS.Get();
-}
-
-void PixelShader::SetSampler(wstring_view name, Sampler& samp)
-{
-	samplers.SetResource(name, samp.Get());
-}
-
-void PixelShader::SetTexture(wstring_view name, Texture2D& tex)
-{
-	textures.SetResource(name, tex.GetSRV());
 }
 
 void PixelShader::Bind(Context& ctx)

@@ -10,8 +10,11 @@ namespace Replica::D3D11
 	class ConstantBuffer;
 	class SwapChain;
 	class InputLayout;
+
 	class VertexShader;
 	class PixelShader;
+	class ComputeShader;
+
 	class IRenderTarget;
 	class IDepthStencil;
 
@@ -88,9 +91,25 @@ namespace Replica::D3D11
 		/// </summary>
 		void SetPS(PixelShader* ps);
 
-		bool GetIsVsBound(VertexShader* vs);
+		/// <summary>
+		/// Binds the given compute shader
+		/// </summary>
+		void SetCS(ComputeShader* cs);
 
-		bool GetIsPsBound(PixelShader* ps);
+		/// <summary>
+		/// Returns true if the given shader is bound
+		/// </summary>
+		bool GetIsVsBound(VertexShader* vs) const;
+
+		/// <summary>
+		/// Returns true if the given shader is bound
+		/// </summary>
+		bool GetIsPsBound(PixelShader* ps) const;
+
+		/// <summary>
+		/// Returns true if the given shader is bound
+		/// </summary>
+		bool GetIsCsBound(ComputeShader* cs) const;
 
 		/// <summary>
 		/// Unbinds all resources
@@ -162,6 +181,8 @@ namespace Replica::D3D11
 		ComPtr<ID3D11DeviceContext> pContext;
 		VertexShader* currentVS;
 		PixelShader* currentPS;
+		ComputeShader* currentCS;
+
 		ID3D11DepthStencilState* currentDSS;
 		ID3D11DepthStencilView* currentDSV;
 		UniqueArray<ID3D11RenderTargetView*> currentRTVs;

@@ -15,7 +15,7 @@ VertexShader::VertexShader(
 	Device& dev, 
 	const VertexShaderDef& vsDef
 ) :
-	ShaderBase(dev, reinterpret_cast<const ShaderDefBase&>(vsDef))
+	ShaderBase(dev, vsDef)
 {
 	ComPtr<ID3DBlob> vsBlob;
 	GFX_THROW_FAILED(D3DReadFileToBlob(vsDef.file.data(), &vsBlob));
@@ -27,16 +27,6 @@ VertexShader::VertexShader(
 ID3D11VertexShader* VertexShader::Get() const { return pVS.Get(); }
 
 const InputLayout& VertexShader::GetLayout() const { return layout; }
-
-void VertexShader::SetSampler(wstring_view name, Sampler& samp)
-{
-	samplers.SetResource(name, samp.Get());
-}
-
-void VertexShader::SetTexture(wstring_view name, Texture2D& tex)
-{
-	textures.SetResource(name, tex.GetSRV());
-}
 
 void VertexShader::Bind(Context& ctx)
 {

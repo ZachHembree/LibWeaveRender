@@ -30,11 +30,6 @@ namespace Replica::D3D11
 		/// </summary>
 		Context& GetContext();
 
-		/// <summary>
-		/// Creates an RT view for accessing resource data
-		/// </summary>
-		ComPtr<ID3D11RenderTargetView> GetRtView(const ComPtr<ID3D11Resource>& buffer);
-
 	private:
 		ComPtr<ID3D11Device> pDev;
 		Context context;

@@ -2,15 +2,17 @@
 #include "MinWindow.hpp"
 #include <imgui.h>
 #include <imfilebrowser.h>
+#include <DirectXTex.h>
+
+#include "D3D11/Shaders/BuiltInShaders.hpp"
 #include "D3D11/RenderComponent.hpp"
 #include "D3D11/Renderer.hpp"
-#include "D3D11/Effect.hpp"
-#include "D3D11/Resources/Texture2D.hpp"
-#include "D3D11/Resources/Sampler.hpp"
 #include "D3D11/Mesh.hpp"
 #include "D3D11/Primitives.hpp"
-#include "D3D11/Shaders/BuiltInShaders.hpp"
-#include <DirectXTex.h>
+#include "D3D11/Resources/Texture2D.hpp"
+#include "D3D11/Resources/Sampler.hpp"
+#include "D3D11/Effect.hpp"
+#include "D3D11/Shaders/ComputeShader.hpp"
 
 using DirectX::ScratchImage;
 
@@ -21,6 +23,7 @@ namespace Replica::D3D11
 	public:
 		DebugImageViewer(Renderer& renderer) : 
             RenderComponentBase(renderer),
+            computeShader(renderer.GetDevice(), g_TestCS),
             samp(renderer.GetDevice(), TexFilterMode::LINEAR, TexClampMode::BORDER),
             texQuadEffect(renderer.GetDevice(), g_PosTextured2DEffect)
         {
@@ -91,6 +94,7 @@ namespace Replica::D3D11
 		}
 
 	private:
+        ComputeShader computeShader;
         ScratchImage buffer;
 		ImGui::FileBrowser fileDialog;
         Texture2D tex;

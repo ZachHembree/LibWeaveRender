@@ -4,10 +4,11 @@
 #include "D3D11/Resources/IndexBuffer.hpp"
 #include "D3D11/Resources/ConstantBuffer.hpp"
 #include "D3D11/Resources/InputLayout.hpp"
-#include "D3D11/Shaders/VertexShader.hpp"
-#include "D3D11/Shaders/PixelShader.hpp"
 #include "D3D11/Resources/RenderTarget.hpp"
 #include "D3D11/Resources/DepthStencilTexture.hpp"
+#include "D3D11/Shaders/VertexShader.hpp"
+#include "D3D11/Shaders/PixelShader.hpp"
+#include "D3D11/Shaders/ComputeShader.hpp"
 
 using namespace glm;
 using namespace Replica;
@@ -18,6 +19,7 @@ Context::Context(Device& dev, ComPtr<ID3D11DeviceContext>& pContext) :
 	pContext(pContext),
 	currentVS(nullptr),
 	currentPS(nullptr),
+	currentCS(nullptr),
 	currentRTVs(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT),
 	currentDSV(nullptr),
 	currentDSS(nullptr),
@@ -28,6 +30,7 @@ Context::Context() :
 	DeviceChild(),
 	currentVS(nullptr),
 	currentPS(nullptr),
+	currentCS(nullptr),
 	currentDSV(nullptr),
 	currentDSS(nullptr),
 	rtvCount(0)
@@ -53,20 +56,36 @@ void Context::SetPS(PixelShader* ps)
 	}
 }
 
-bool Context::GetIsVsBound(VertexShader* vs)
+void Context::SetCS(ComputeShader* cs)
+{
+	if (cs != currentCS || currentCS == nullptr || cs == nullptr)
+	{
+		ID3D11ComputeShader* pCS = cs != nullptr ? cs->Get() : nullptr;
+		Get().CSSetShader(pCS, nullptr, 0);
+		currentCS = cs;
+	}
+}
+
+bool Context::GetIsVsBound(VertexShader* vs) const
 {
 	return currentVS != nullptr && vs == currentVS;
 }
 
-bool Context::GetIsPsBound(PixelShader* ps)
+bool Context::GetIsPsBound(PixelShader* ps) const
 {
 	return currentPS != nullptr && ps == currentPS;
+}
+
+bool Context::GetIsCsBound(ComputeShader* cs) const
+{
+	return currentCS != nullptr && cs == currentCS;
 }
 
 void Context::Reset()
 {
 	SetVS(nullptr);
 	SetPS(nullptr);
+	SetCS(nullptr);
 	pContext->OMSetRenderTargets(0, nullptr, nullptr);
 	pContext->OMSetDepthStencilState(nullptr, 0);
 

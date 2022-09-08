@@ -135,6 +135,9 @@
     <ClCompile Include="ReplicaRenderer\src\DebugImageViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Shaders\ComputeShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplicaRenderer\src\utils\include\RepLeanWin.h">
@@ -302,6 +305,9 @@
     <ClInclude Include="ReplicaRenderer\src\DebugImageViewer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\ComputeShader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="ReplicaRenderer\res\icon.ico">
@@ -324,6 +330,7 @@
     <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultVS.hlsl" />
     <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Texture2DVS.hlsl" />
     <FxCompile Include="ReplicaRenderer\res\DefaultShaders\PosTexturedVS.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\TestCompute.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

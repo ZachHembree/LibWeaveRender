@@ -38,14 +38,3 @@ ID3D11Device* Device::operator->() { return pDev.Get(); }
 /// Returns reference to main device context
 /// </summary>
 Context& Device::GetContext() { return this->context; }
-
-/// <summary>
-/// Creates an RT view for accessing resource data
-/// </summary>
-ComPtr<ID3D11RenderTargetView> Device::GetRtView(const ComPtr<ID3D11Resource>& buffer)
-{
-	ComPtr<ID3D11RenderTargetView> pRtView;
-	GFX_THROW_FAILED(pDev->CreateRenderTargetView(buffer.Get(), nullptr, &pRtView));
-
-	return pRtView;
-}
