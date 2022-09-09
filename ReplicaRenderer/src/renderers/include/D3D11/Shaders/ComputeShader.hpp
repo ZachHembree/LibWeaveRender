@@ -3,8 +3,12 @@
 
 namespace Replica::D3D11
 {
+	class RWTexture2D;
+
 	struct ComputeShaderDef : public ShaderDefBase
-	{ };
+	{
+		ResourceMap<ID3D11UnorderedAccessView> uavBuffers;
+	};
 
 	class ComputeShader : public ShaderBase
 	{
@@ -18,6 +22,11 @@ namespace Replica::D3D11
 		ComputeShader(Device& dev, const ComputeShaderDef& csDef);
 
 		ID3D11ComputeShader* Get() const;
+
+		/// <summary>
+		/// Sets RWTexture2D using last context
+		/// </summary>
+		virtual void SetRWTexture(wstring_view name, RWTexture2D& tex);
 
 		/// <summary>
 		/// Dispatch the shader in the given context with the given number of

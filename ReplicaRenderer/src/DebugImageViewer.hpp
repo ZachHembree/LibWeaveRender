@@ -23,7 +23,7 @@ namespace Replica::D3D11
 	public:
 		DebugImageViewer(Renderer& renderer) : 
             RenderComponentBase(renderer),
-            computeShader(renderer.GetDevice(), g_TestCS),
+            cs(renderer.GetDevice(), g_TestCS),
             samp(renderer.GetDevice(), TexFilterMode::LINEAR, TexClampMode::BORDER),
             texQuadEffect(renderer.GetDevice(), g_PosTextured2DEffect),
             tex(GetDevice(), Formats::R8G8B8A8_UNORM)
@@ -78,7 +78,17 @@ namespace Replica::D3D11
                     vpSize.y = bodySize.x / imgAspect;
 
                 ctx.RSSetViewport(vpSize, 0.5f * (bodySize - vpSize));
+
+                ID3D11ShaderResourceView* nullViews[] = { nullptr };
+                ctx->PSSetShaderResources(0, _countof(nullViews), nullViews);
+
+                cs.SetConstant(L"DstTexelSize", vec4(1.0f / imgSize, imgSize));
+                cs.SetRWTexture(L"dstTex", tex);
+                cs.Dispatch(ctx, vec3(imgSize, 1));
             }
+
+            ID3D11UnorderedAccessView* nullViews[] = { nullptr };
+            ctx->CSSetUnorderedAccessViews(0, _countof(nullViews), nullViews, 0);
 
             texQuadEffect.SetSampler(L"samp", samp);
             texQuadEffect.Update(ctx);
@@ -91,7 +101,7 @@ namespace Replica::D3D11
 		}
 
 	private:
-        ComputeShader computeShader;
+        ComputeShader cs;
         ScratchImage buffer;
 		ImGui::FileBrowser fileDialog;
         RWTexture2D tex;

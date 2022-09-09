@@ -1,6 +1,6 @@
 #include <d3dcompiler.h>
 #include "D3D11/Device.hpp"
-#include "D3D11/Resources/Texture2D.hpp"
+#include "D3D11/Resources/RWTexture2D.hpp"
 #include "D3D11/Resources/ConstantBuffer.hpp"
 #include "D3D11/Resources/Sampler.hpp"
 #include "D3D11/Shaders/ComputeShader.hpp"
@@ -12,7 +12,8 @@ ComputeShader::ComputeShader()
 { }
 
 ComputeShader::ComputeShader(Device& dev, const ComputeShaderDef& csDef) :
-	ShaderBase(dev, csDef)
+	ShaderBase(dev, csDef),
+	uavBuffers(csDef.uavBuffers)
 {
 	ComPtr<ID3DBlob> csBlob;
 	GFX_THROW_FAILED(D3DReadFileToBlob(csDef.file.data(), &csBlob));
@@ -22,6 +23,11 @@ ComputeShader::ComputeShader(Device& dev, const ComputeShaderDef& csDef) :
 ID3D11ComputeShader* ComputeShader::Get() const
 {
 	return pCS.Get();
+}
+
+void ComputeShader::SetRWTexture(wstring_view name, RWTexture2D& tex)
+{
+	uavBuffers.SetResource(name, tex.GetUAV());
 }
 
 void ComputeShader::Dispatch(Context& ctx, ivec3 groups)
