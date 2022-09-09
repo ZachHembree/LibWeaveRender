@@ -9,7 +9,7 @@ namespace Replica::D3D11
 	class ImguiRenderComponent : public RenderComponentBase
 	{
 	public:
-		static bool enableDemoWindow;
+		bool enableDemoWindow;
 
 		ImguiRenderComponent();
 

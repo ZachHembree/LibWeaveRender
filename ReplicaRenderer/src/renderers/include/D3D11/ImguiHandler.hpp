@@ -11,6 +11,8 @@ namespace Replica::D3D11
 	class ImguiHandler : public WindowComponentBase
 	{
 	public:
+		static bool enableDemoWindow;
+
 		ImguiHandler();
 
 		ImguiHandler(MinWindow& window, Renderer& renderer);

@@ -6,13 +6,12 @@
 
 using namespace Replica::D3D11;
 
-bool ImguiRenderComponent::enableDemoWindow = false;
-
-ImguiRenderComponent::ImguiRenderComponent()
+ImguiRenderComponent::ImguiRenderComponent() : enableDemoWindow(false)
 { }
 
 ImguiRenderComponent::ImguiRenderComponent(Renderer& renderer) :
-	RenderComponentBase(renderer)
+	RenderComponentBase(renderer),
+	enableDemoWindow(false)
 {
 	Device& dev = renderer.GetDevice();
 	ImGui_ImplDX11_Init(&dev.Get(), &dev.GetContext().Get());
@@ -25,17 +24,22 @@ ImguiRenderComponent::~ImguiRenderComponent()
 
 void ImguiRenderComponent::Update(Context& ctx)
 {
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
+	if (ImGui::GetCurrentContext() != nullptr)
+	{ 
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
 
-	// IMGUI Test
-	if (enableDemoWindow)
-		ImGui::ShowDemoWindow();
+		if (enableDemoWindow)
+			ImGui::ShowDemoWindow();
+	}
 }
 
 void ImguiRenderComponent::DrawLate(Context& ctx)
 {
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	if (ImGui::GetCurrentContext() != nullptr)
+	{ 
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	}
 }

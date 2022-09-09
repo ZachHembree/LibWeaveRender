@@ -20,6 +20,7 @@ MinWindow::MinWindow(
 	hInst(hInst),
 	hWnd(nullptr),
 	isFullscreen(false),
+	isInitialized(false),
 	lastPos(0),
 	lastSize(0),
 	initStyle(initStyle)
@@ -200,6 +201,8 @@ void MinWindow::RegisterComponent(WindowComponentBase& component)
 
 MSG MinWindow::RunMessageLoop()
 {
+	isInitialized = true;
+
 	while (PollWindowMessages())
 	{
 		for (WindowComponentBase* component : components)
@@ -327,11 +330,14 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 			break;
 		}
 
-		for (WindowComponentBase* component : components)
+		if (msg != WM_CLOSE && isInitialized)
 		{
-			// Allow components to intercept messages from later components
-			if (!component->OnWndMessage(hWnd, msg, wParam, lParam))
-				break;
+			for (WindowComponentBase* component : components)
+			{
+				// Allow components to intercept messages from later components
+				if (!component->OnWndMessage(hWnd, msg, wParam, lParam))
+					break;
+			}
 		}
 	}
 	catch (const RepException& e)

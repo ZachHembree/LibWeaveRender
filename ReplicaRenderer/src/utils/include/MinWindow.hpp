@@ -168,6 +168,7 @@ namespace Replica
 			HWND hWnd;
 			MSG wndMsg;
 			ivec2 bodySize, wndSize;
+			bool isInitialized;
 
 			bool isFullscreen;
 			ivec2 lastPos, lastSize;
