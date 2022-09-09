@@ -1,67 +1,10 @@
 #pragma once
 #include <d3d11.h>
 #include "D3D11/Resources/DeviceChild.hpp"
+#include "D3D11/Resources/ResourceEnums.hpp"
 
 namespace Replica::D3D11
 {
-	/// <summary>
-	/// Specifies how a buffer will be used
-	/// </summary>
-	enum class ResourceUsages
-	{
-		/// <summary>
-		/// R/W Access required for GPU
-		/// </summary>
-		Default = D3D11_USAGE_DEFAULT,
-
-		/// <summary>
-		/// Read-only GPU resource. Cannot be accessed by CPU.
-		/// </summary>
-		Immutable = D3D11_USAGE_IMMUTABLE,
-
-		/// <summary>
-		/// Read-only GPU access; write-only CPU access.
-		/// </summary>
-		Dynamic = D3D11_USAGE_DYNAMIC,
-
-		/// <summary>
-		/// Resource supports transfer from GPU to CPU
-		/// </summary>
-		Staging = D3D11_USAGE_STAGING
-	};
-
-	/// <summary>
-	/// Supported buffer types
-	/// </summary>
-	enum class ResourceBindFlags
-	{
-		Vertex = D3D11_BIND_VERTEX_BUFFER,
-		Index = D3D11_BIND_INDEX_BUFFER,
-		Constant = D3D11_BIND_CONSTANT_BUFFER,
-		ShaderResource = D3D11_BIND_SHADER_RESOURCE,
-		StreamOutput = D3D11_BIND_STREAM_OUTPUT,
-		RenderTarget = D3D11_BIND_RENDER_TARGET,
-		DepthStencil = D3D11_BIND_DEPTH_STENCIL,
-		UnorderedAccess = D3D11_BIND_UNORDERED_ACCESS,
-		Decoder = D3D11_BIND_DECODER,
-		VideoEncoder = D3D11_BIND_VIDEO_ENCODER,
-	};
-
-	BITWISE_ALL(ResourceBindFlags, UINT)
-
-	/// <summary>
-	/// Specifies types of CPU access allowed for a resource
-	/// </summary>
-	enum class ResourceAccessFlags : UINT
-	{
-		None = 0u,
-		Write = D3D11_CPU_ACCESS_WRITE,
-		Read = D3D11_CPU_ACCESS_READ,
-		ReadWrite = Read | Write
-	};
-
-	BITWISE_ALL(ResourceAccessFlags, UINT)
-
 	class ResourceBase : public DeviceChild
 	{
 	public:
@@ -75,4 +18,94 @@ namespace Replica::D3D11
 		ResourceBase(Device& dev) : DeviceChild(dev) {}
 
 	};
+
+	/// <summary>
+	/// Interface for types that can be bound as a shader resource
+	/// </summary>
+	class IShaderResource
+	{
+	public:
+		/// <summary>
+		/// Returns interface to resource view
+		/// </summary>
+		virtual ID3D11ShaderResourceView* GetSRV() = 0;
+
+		/// <summary>
+		/// Returns interface to resource view
+		/// </summary>
+		virtual ID3D11ShaderResourceView** const GetSRVAddress() = 0;
+	};
+
+	/// <summary>
+	/// Interface for types that can be bound as Render Targets
+	/// </summary>
+	class IRenderTarget
+	{
+	public:
+		/// <summary>
+		/// Pointer to Render Target view interface
+		/// </summary>
+		virtual ID3D11RenderTargetView* GetRTV() = 0;
+
+		/// <summary>
+		/// Read-only pointer to pointer for Render Target view
+		/// </summary>
+		virtual ID3D11RenderTargetView** const GetAddressRTV() = 0;
+
+		/// <summary>
+		/// Clears the render target to the given color
+		/// </summary>
+		virtual void Clear(
+			Context& ctx,
+			vec4 color = vec4(0)
+		) = 0;
+	};
+
+	/// <summary>
+	/// Interface for types that can be used for unordered access
+	/// </summary>
+	class IUnorderedAccess
+	{
+	public:
+		
+		/// <summary>
+		/// Returns pointer to UAV interface
+		/// </summary>
+		virtual ID3D11UnorderedAccessView* GetUAV() = 0;
+
+		/// <summary>
+		/// Returns pointer to UAV pointer field
+		/// </summary>
+		virtual ID3D11UnorderedAccessView** const GetAddressUAV() = 0;
+	};
+
+	class IDepthStencil
+	{
+	public:
+		/// <summary>
+		/// Returns pointer to depth stencil state interface
+		/// </summary>
+		virtual ID3D11DepthStencilState* GetState() = 0;
+
+		/// <summary>
+		/// Returns interface to depth-stencil view
+		/// </summary>
+		virtual ID3D11DepthStencilView* GetDSV() = 0;
+
+		/// <summary>
+		/// Returns interface to depth-stencil view
+		/// </summary>
+		virtual ID3D11DepthStencilView** const GetDSVAddress() = 0;
+
+		/// <summary>
+		/// Clears the texture
+		/// </summary>
+		virtual void Clear(
+			Context& ctx,
+			DSClearFlags clearFlags = DSClearFlags::Depth,
+			float depthClear = 1.0f,
+			UINT8 stencilClear = 0
+		) const = 0;
+	};
+
 }

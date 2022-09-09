@@ -1,6 +1,5 @@
 #pragma once
-#include "D3D11/Resources/ResourceBase.hpp"
-#include "D3D11/Resources/Formats.hpp"
+#include "D3D11/Resources/Texture2DBase.hpp"
 
 namespace DirectX
 {
@@ -9,7 +8,7 @@ namespace DirectX
 
 namespace Replica::D3D11
 {
-	class Texture2D : public ResourceBase
+	class Texture2D : public Texture2DBase, public IShaderResource
 	{
 	public:
 
@@ -27,104 +26,68 @@ namespace Replica::D3D11
 
 		Texture2D(
 			Device& dev,
-			ivec2 dim, 
-			void* data, 
-			UINT stride, 
-			Formats format = Formats::R8G8B8A8_UNORM, 
+			ivec2 dim,
+			void* data,
+			UINT stride,
+			Formats format = Formats::R8G8B8A8_UNORM,
+			ResourceUsages usage = ResourceUsages::Default,
+			UINT mipLevels = 1u
+		);
+
+		Texture2D(
+			Device& dev,
+			Formats format = Formats::R8G8B8A8_UNORM,
 			ResourceUsages usage = ResourceUsages::Default,
 			UINT mipLevels = 1u
 		);
 
 		Texture2D();
 
-		ivec2 GetSize() const;
-
-		Formats GetFormat() const;
-
-		ResourceUsages GetUsage() const;
-
-		ResourceBindFlags GetBindFlags() const;
-
-		ResourceAccessFlags GetAccessFlags() const;
-
 		/// <summary>
-		/// Returns interface to resource
+		/// Returns interface to resource view
 		/// </summary>
-		ID3D11Resource* GetResource();
-
-		/// <summary>
-		/// Returns pointer to interface pointer field
-		/// </summary>
-		ID3D11Resource** const GetResAddress() override;
+		ID3D11ShaderResourceView* GetSRV() override;
 
 		/// <summary>
 		/// Returns interface to resource view
 		/// </summary>
-		ID3D11ShaderResourceView* GetSRV();
+		ID3D11ShaderResourceView** const GetSRVAddress() override;
 
 		/// <summary>
-		/// Returns interface to resource view
+		/// Updates texture with contents of a scratch image, assuming compatible formats.
+		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
-		ID3D11ShaderResourceView** const GetSRVAddress();
+		void SetTextureWIC(Context& ctx, wstring_view file, DirectX::ScratchImage& buffer);
 
 		/// <summary>
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
 		template<typename T>
-		void UpdateTextureData(Context& ctx, IDynamicCollection<T> data, ivec2 dim)
+		void SetTextureData(Context& ctx, IDynamicCollection<T> data, ivec2 dim)
 		{
-			UpdateTextureData(ctx, data.GetPtr(), sizeof(T), dim);
+			SetTextureData(ctx, data.GetPtr(), sizeof(T), dim);
 		}
 
 		/// <summary>
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
-		void UpdateTextureData(Context& ctx, void* data, size_t stride, ivec2 dim);
-
-		/// <summary>
-		/// Updates texture with contents of a scratch image, assuming compatible formats.
-		/// Allocates new Texture2D if the dimensions aren't the same.
-		/// </summary>
-		void UpdateTextureWIC(Context& ctx, wstring_view file, DirectX::ScratchImage& buffer);
-
-		/// <summary>
-		/// Loads WIC-compatible image into a buffer
-		/// (BMP, GIF, ICO, JPEG, PNG, TIFF)
-		/// </summary>
-		static void LoadImageWIC(wstring_view file, DirectX::ScratchImage& buffer);
+		virtual void SetTextureData(Context& ctx, void* data, size_t stride, ivec2 dim);
 
 		/// <summary>
 		/// Initializes new Texture2D from WIC-compatible image 
 		/// (BMP, GIF, ICO, JPEG, PNG, TIFF)
 		/// </summary>
 		static Texture2D FromImageWIC(
-			Device& dev, 
-			wstring_view file, 
+			Device& dev,
+			wstring_view file,
 			ResourceUsages usage = ResourceUsages::Immutable
 		);
-
+		
 	protected:
-		ComPtr<ID3D11Texture2D> pRes;
+		using Texture2DBase::Texture2DBase;
 		ComPtr<ID3D11ShaderResourceView> pSRV;
-		D3D11_TEXTURE2D_DESC desc;
 
-		Texture2D(
-			Device& dev,
-			ivec2 dim,
-			Formats format = Formats::R8G8B8A8_UNORM,
-			ResourceUsages usage = ResourceUsages::Default,
-			ResourceBindFlags bindFlags = ResourceBindFlags::ShaderResource,
-			ResourceAccessFlags accessFlags = ResourceAccessFlags::None,
-			UINT mipLevels = 1u,
-			UINT arraySize = 1u,
-			void* data = nullptr,
-			UINT stride = 0
-		);
-
-		void UpdateMapUnmap(Context& ctx, void* data, size_t stride, ivec2 dim);
-
-		void UpdateSubresource(Context& ctx, void* data, size_t stride, ivec2 dim);
 	};
 }

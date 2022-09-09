@@ -66,7 +66,7 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\RenderTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\Texture2D.cpp">
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\Texture2DBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\Sampler.cpp">
@@ -136,6 +136,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Shaders\ComputeShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\RWTexture2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -215,7 +221,7 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RenderTarget.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\Texture2D.hpp">
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\Texture2DBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\Sampler.hpp">
@@ -306,6 +312,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\ComputeShader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\Texture2D.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\ResourceEnums.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RWTexture2D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

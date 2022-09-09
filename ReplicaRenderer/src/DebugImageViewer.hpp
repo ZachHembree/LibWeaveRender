@@ -9,7 +9,7 @@
 #include "D3D11/Renderer.hpp"
 #include "D3D11/Mesh.hpp"
 #include "D3D11/Primitives.hpp"
-#include "D3D11/Resources/Texture2D.hpp"
+#include "D3D11/Resources/RWTexture2D.hpp"
 #include "D3D11/Resources/Sampler.hpp"
 #include "D3D11/Effect.hpp"
 #include "D3D11/Shaders/ComputeShader.hpp"
@@ -25,7 +25,8 @@ namespace Replica::D3D11
             RenderComponentBase(renderer),
             computeShader(renderer.GetDevice(), g_TestCS),
             samp(renderer.GetDevice(), TexFilterMode::LINEAR, TexClampMode::BORDER),
-            texQuadEffect(renderer.GetDevice(), g_PosTextured2DEffect)
+            texQuadEffect(renderer.GetDevice(), g_PosTextured2DEffect),
+            tex(GetDevice(), Formats::R8G8B8A8_UNORM)
         {
             fileDialog.SetTitle("Load Image");
             fileDialog.SetTypeFilters({".bmp", ".gif", ".ico", ".jpg", ".png", ".tiff", ".tif", ".dds"});
@@ -52,17 +53,7 @@ namespace Replica::D3D11
 
             if (fileDialog.HasSelected())
             {
-                if (tex.GetIsValid())
-                    tex.UpdateTextureWIC(ctx, fileDialog.GetSelected().native(), buffer);
-                else
-                {
-                    tex = Texture2D::FromImageWIC(
-                        GetDevice(), 
-                        fileDialog.GetSelected().native(),
-                        ResourceUsages::Dynamic
-                    );
-                }
-
+                tex.SetTextureWIC(ctx, fileDialog.GetSelected().native(), buffer);
                 fileDialog.ClearSelected();
             }
         }
@@ -103,7 +94,7 @@ namespace Replica::D3D11
         ComputeShader computeShader;
         ScratchImage buffer;
 		ImGui::FileBrowser fileDialog;
-        Texture2D tex;
+        RWTexture2D tex;
         Sampler samp;
         Effect texQuadEffect;
         Mesh quad;
