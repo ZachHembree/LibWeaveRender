@@ -5,18 +5,6 @@
 namespace Replica::D3D11
 {
 	// Compute Shaders
-	const ComputeShaderDef g_TestCS
-	{
-		{
-			L"Shaders/TestCompute.cso",
-			{
-				ConstantDef::Get<vec4>(L"DstTexelSize"),
-			},
-			{ },
-			{ },
-		},
-		{ L"dstTex" }
-	};
 
 	// Vertex Shaders
 	const VertexShaderDef g_DefaultVS =

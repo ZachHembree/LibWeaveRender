@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ReplicaRenderer\src\DebugMain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\utils\src\MinWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -126,13 +123,7 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\src\DebugScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\DepthStencilTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ReplicaRenderer\src\DebugImageViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Shaders\ComputeShader.cpp">
@@ -150,9 +141,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\utils\include\MinWindow.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ReplicaRenderer\src\DebugMain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\utils\include\RepException.hpp">
@@ -284,9 +272,6 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Primitives.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\BuiltInShaders.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -299,16 +284,10 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiHandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\src\DebugScene.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\DepthStencilTexture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\TextureEnums.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ReplicaRenderer\src\DebugImageViewer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\ComputeShader.hpp">
@@ -325,14 +304,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="ReplicaRenderer\res\icon.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="ReplicaRenderer\res\lena_color_512.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
     <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Texture3DVS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
@@ -345,14 +316,8 @@
     <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultVS.hlsl" />
     <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Texture2DVS.hlsl" />
     <FxCompile Include="ReplicaRenderer\res\DefaultShaders\PosTexturedVS.hlsl" />
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\TestCompute.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="ReplicaRenderer.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
   </ItemGroup>
 </Project>
