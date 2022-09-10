@@ -6,14 +6,16 @@ using namespace Replica::D3D11;
 
 Device::Device()
 {
+	const D3D_FEATURE_LEVEL level = D3D_FEATURE_LEVEL_11_1;
+
 	ComPtr<ID3D11DeviceContext> pContext;
 	GFX_THROW_FAILED(D3D11CreateDevice(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
 		D3D11_CREATE_DEVICE_DEBUG,
-		nullptr,
-		0,
+		&level,
+		1,
 		D3D11_SDK_VERSION,
 		&pDev,
 		nullptr,

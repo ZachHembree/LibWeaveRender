@@ -8,6 +8,7 @@ namespace Replica::D3D11
 {
 	class Device;
 	class Context;
+	class Effect;
 
 	/// <summary>
 	/// Contains vertex and index data needed to instantiate a new mesh
@@ -64,12 +65,17 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Updates any resources needed prior to drawing
 		/// </summary>
-		void Update(Context& ctx) override;
+		void Setup(Context& ctx) override;
 
 		/// <summary>
 		/// Draws the object
 		/// </summary>
-		void Draw(Context& ctx) override;
+		void Draw(Context& ctx, Effect& effect) override;
+
+		/// <summary>
+		/// Returns the number of indices in the index buffer
+		/// </summary>
+		UINT GetIndexCount() const;;
 
 		/// <summary>
 		/// Retrieves the model matrix representing the translation, rotation and

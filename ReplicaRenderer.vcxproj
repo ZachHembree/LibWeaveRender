@@ -291,10 +291,10 @@
     <ClInclude Include="ReplicaRenderer\src\utils\include\WindowComponentBase.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Flat3DPS.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\Flat3DPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultPS.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\DefaultPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjDir)%(Filename).cso</ObjectFileOutput>
@@ -310,19 +310,19 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\3DVS.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\3DVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Texture2DVS.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\Texture2DVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\PosTexturedVS.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\PosTexturedVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\TexturePS.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\TexturePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Texture3DVS.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\Texture3DVS.hlsl">
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
@@ -338,7 +338,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultVS.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\DefaultVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
     </FxCompile>
   </ItemGroup>

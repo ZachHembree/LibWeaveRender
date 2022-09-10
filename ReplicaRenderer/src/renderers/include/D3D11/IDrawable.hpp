@@ -4,6 +4,7 @@
 namespace Replica::D3D11
 {
 	class Context;
+	class Effect;
 
 	/// <summary>
 	/// Interface for types that can be drawn
@@ -11,6 +12,6 @@ namespace Replica::D3D11
 	class IDrawable : public IResource
 	{
 	public:
-		virtual void Draw(Context& ctx) = 0;
+		virtual void Draw(Context& ctx, Effect& effect) = 0;
 	};
 }

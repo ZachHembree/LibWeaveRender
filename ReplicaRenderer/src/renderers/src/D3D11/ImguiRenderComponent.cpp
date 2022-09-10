@@ -22,7 +22,7 @@ ImguiRenderComponent::~ImguiRenderComponent()
 	ImGui_ImplDX11_Shutdown();
 }
 
-void ImguiRenderComponent::Update(Context& ctx)
+void ImguiRenderComponent::Setup(Context& ctx)
 {
 	if (ImGui::GetCurrentContext() != nullptr)
 	{ 

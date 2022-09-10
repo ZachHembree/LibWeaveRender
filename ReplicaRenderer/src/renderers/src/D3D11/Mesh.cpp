@@ -24,18 +24,24 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Updates any resources needed prior to drawing
 	/// </summary>
-	void Mesh::Update(Context& ctx)
+	void Mesh::Setup(Context& ctx)
 	{
 		vBuf.Bind(ctx);
 		iBuf.Bind(ctx);
 	}
+
 	/// <summary>
 	/// Draws the object
 	/// </summary>
-	void Mesh::Draw(Context& ctx)
+	void Mesh::Draw(Context& ctx, Effect& effect)
 	{
-		ctx.DrawIndexed((UINT)iBuf.GetLength());
+		ctx.Draw(*this, effect);
 	}
+
+	/// <summary>
+	/// Returns the number of indices in the index buffer
+	/// </summary>
+	UINT Mesh::GetIndexCount() const { return iBuf.GetLength(); }
 
 	/// <summary>
 	/// Retrieves the model matrix representing the translation, rotation and

@@ -27,7 +27,7 @@ namespace Replica::D3D11
 		/// Updates before draw, but after the state and resources for the previous
 		/// frame have been cleaned up.
 		/// </summary>
-		virtual void Update(Context& ctx) { }
+		virtual void Setup(Context& ctx) { }
 
 		virtual void DrawEarly(Context& ctx) { }
 

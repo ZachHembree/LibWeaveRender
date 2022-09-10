@@ -50,8 +50,19 @@ void PixelShader::Unbind()
 {
 	if (isBound && pCtx->GetIsPsBound(this))
 	{ 
-		pCtx->SetPS(nullptr);
 		isBound = false;
+		pCtx->SetPS(nullptr);
+		ID3D11DeviceContext& ctx = pCtx->Get();
+
+		ID3D11SamplerState* nullSamp[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT](nullptr);
+		ctx.PSSetSamplers(0, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, nullSamp);
+
+		ID3D11ShaderResourceView* nullSRV[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT](nullptr);
+		ctx.PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, nullSRV);
+
+		ID3D11Buffer* nullCB[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT](nullptr);
+		ctx.PSSetConstantBuffers(0, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, nullCB);
+
 		pCtx = nullptr;
 	}	
 }

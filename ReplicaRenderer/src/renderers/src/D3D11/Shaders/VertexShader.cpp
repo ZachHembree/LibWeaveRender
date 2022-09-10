@@ -56,8 +56,19 @@ void VertexShader::Unbind()
 {
 	if (isBound && pCtx->GetIsVsBound(this))
 	{
-		pCtx->SetPS(nullptr);	
 		isBound = false;
+		pCtx->SetVS(nullptr);	
+		ID3D11DeviceContext& ctx = pCtx->Get();
+
+		ID3D11SamplerState* nullSamp[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT](nullptr);
+		ctx.VSSetSamplers(0, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, nullSamp);
+
+		ID3D11ShaderResourceView* nullSRV[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT](nullptr);
+		ctx.VSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, nullSRV);
+
+		ID3D11Buffer* nullCB[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT](nullptr);
+		ctx.VSSetConstantBuffers(0, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, nullCB);
+	
 		pCtx = nullptr;
 	}	
 }

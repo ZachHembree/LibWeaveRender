@@ -126,7 +126,7 @@ void Renderer::BeforeDraw(Context& ctx)
 { 
 	for (RenderComponentBase* pComp : pComponents)
 	{
-		pComp->Update(ctx);
+		pComp->Setup(ctx);
 	}
 }
 

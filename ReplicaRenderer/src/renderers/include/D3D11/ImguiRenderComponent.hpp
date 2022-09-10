@@ -17,7 +17,7 @@ namespace Replica::D3D11
 
 		~ImguiRenderComponent();
 
-		void Update(Context& ctx) override;
+		void Setup(Context& ctx) override;
 
 		void DrawLate(Context& ctx) override;
 

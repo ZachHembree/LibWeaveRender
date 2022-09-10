@@ -18,14 +18,20 @@ namespace Replica
 	class DynIterator
 	{
 	public:
-		DynIterator(ValueType* pData) : pData(pData)
+		DynIterator(const ValueType* pData) : pData((ValueType*)pData)
 		{ }
+
+		bool operator==(const DynIterator& other) { return pData == other.pData; }
+
+		bool operator!=(const DynIterator& other) { return pData != other.pData; }
 
 		DynIterator& operator++()
 		{
 			pData++;
 			return *this;
 		}
+
+		DynIterator operator+(int value) { return DynIterator(pData + value); }
 
 		DynIterator operator++(int) { return DynIterator(pData + 1); }
 
@@ -50,6 +56,8 @@ namespace Replica
 	class IDynamicCollection
 	{
 	public:
+		using Iterator = DynIterator<T>;
+
 		/// <summary>
 		/// Returns the length of the array.
 		/// </summary>
@@ -79,6 +87,26 @@ namespace Replica
 		/// Returns a const copy of the pointer to the backing the array.
 		/// </summary>
 		virtual const T* GetPtr() const = 0;
+
+		/// <summary>
+		/// Returns iterator pointing to the start of the collection
+		/// </summary>
+		virtual Iterator begin() = 0;
+
+		/// <summary>
+		/// Returns iterator pointing to the end of the collection
+		/// </summary>
+		virtual Iterator end() = 0;
+
+		/// <summary>
+		/// Returns iterator pointing to the start of the collection
+		/// </summary>
+		virtual const Iterator begin() const = 0;
+
+		/// <summary>
+		/// Returns iterator pointing to the end of the collection
+		/// </summary>
+		virtual const Iterator end() const = 0;
 	};
 
 	/// <summary>
@@ -171,22 +199,22 @@ namespace Replica
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
-		Iterator begin() { return Iterator(data); }
+		Iterator begin() override { return Iterator(data); }
 
 		/// <summary>
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
-		Iterator end() { return Iterator(data + length); }
+		Iterator end() override { return Iterator(data + length); }
 
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
-		const Iterator begin() const { return Iterator(data); }
+		const Iterator begin() const override { return Iterator(data); }
 
 		/// <summary>
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
-		const Iterator end() const { return Iterator(data + length); }
+		const Iterator end() const override { return Iterator(data + length); }
 
 		/// <summary>
 		/// Copy assignment operator.
@@ -479,13 +507,12 @@ namespace Replica
 	class Vector : public IDynamicCollection<T>, private std::vector<T>
 	{
 	public:
+		using Iterator = DynIterator<T>;
+
 		using std::vector<T>::vector;
 		using std::vector<T>::push_back;
 		using std::vector<T>::emplace_back;
 		using std::vector<T>::pop_back;
-		using std::vector<T>::begin;
-		using std::vector<T>::end;
-		using std::vector<T>::erase;
 		using std::vector<T>::clear;
 		using std::vector<T>::max_size;
 		using std::vector<T>::resize;
@@ -503,7 +530,7 @@ namespace Replica
 		/// </summary>
 		void RemoveAt(int index)
 		{
-			erase(begin() + index);
+			this->erase(std::vector<T>::begin() + index);
 		}
 
 		/// <summary>
@@ -525,6 +552,26 @@ namespace Replica
 		/// Returns a const copy of the pointer to the backing the vector.
 		/// </summary>
 		const T* GetPtr() const override { return this->data(); }
+
+		/// <summary>
+		/// Returns iterator pointing to the start of the collection
+		/// </summary>
+		Iterator begin() override { return Iterator(this->data()); }
+
+		/// <summary>
+		/// Returns iterator pointing to the end of the collection
+		/// </summary>
+		Iterator end() override { return Iterator(this->data() + this->size()); }
+
+		/// <summary>
+		/// Returns iterator pointing to the start of the collection
+		/// </summary>
+		const Iterator begin() const override { return Iterator(this->data()); }
+
+		/// <summary>
+		/// Returns iterator pointing to the end of the collection
+		/// </summary>
+		const Iterator end() const override { return Iterator(this->data() + this->size()); }
 
 		/// <summary>
 		/// Provides indexed access to vector member references.

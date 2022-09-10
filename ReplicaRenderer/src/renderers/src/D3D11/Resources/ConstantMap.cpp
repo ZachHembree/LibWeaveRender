@@ -144,7 +144,7 @@ void ConstantMapDef::Add(wstring_view name, const type_info& type, const size_t 
 /// </summary>
 void ConstantMapDef::Clear()
 {
-	members.erase(members.begin(), members.end());
+	members.clear();
 	stride = 0;
 }
 

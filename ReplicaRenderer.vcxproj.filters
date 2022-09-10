@@ -304,18 +304,18 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Texture3DVS.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\Texture3DVS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultPS.hlsl">
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\DefaultPS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Flat3DPS.hlsl" />
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\3DVS.hlsl" />
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\TexturePS.hlsl" />
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\DefaultVS.hlsl" />
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\Texture2DVS.hlsl" />
-    <FxCompile Include="ReplicaRenderer\res\DefaultShaders\PosTexturedVS.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\Flat3DPS.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\3DVS.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\TexturePS.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\DefaultVS.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\Texture2DVS.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\PosTexturedVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

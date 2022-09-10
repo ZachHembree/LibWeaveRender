@@ -14,6 +14,9 @@ namespace Replica::D3D11
 	class VertexShader;
 	class PixelShader;
 	class ComputeShader;
+	class Effect;
+
+	class Mesh;
 
 	class IRenderTarget;
 	class IDepthStencil;
@@ -173,9 +176,14 @@ namespace Replica::D3D11
 		void IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, int startSlot = 0);
 
 		/// <summary>
-		/// Draw indexed, non-instanced primitives
+		/// Draws an indexed, non-instanced triangle meshes using the given effect
 		/// </summary>
-		void DrawIndexed(UINT length, UINT start = 0, UINT baseVertexLocation = 0);
+		void Draw(Mesh& mesh, Effect& effect);
+
+		/// <summary>
+		/// Draws a group of indexed, non-instanced triangle meshes using the given effect
+		/// </summary>
+		void Draw(IDynamicCollection<Mesh>& meshes, Effect& effect);
 
 	private:
 		ComPtr<ID3D11DeviceContext> pContext;

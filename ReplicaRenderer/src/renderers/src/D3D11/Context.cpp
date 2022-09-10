@@ -9,6 +9,8 @@
 #include "D3D11/Shaders/VertexShader.hpp"
 #include "D3D11/Shaders/PixelShader.hpp"
 #include "D3D11/Shaders/ComputeShader.hpp"
+#include "D3D11/Effect.hpp"
+#include "D3D11/Mesh.hpp"
 
 using namespace glm;
 using namespace Replica;
@@ -40,6 +42,9 @@ void Context::SetVS(VertexShader* vs)
 {
 	if (vs != currentVS || currentVS == nullptr || vs == nullptr)
 	{
+		if ((vs != currentVS) && currentVS != nullptr)
+			currentVS->Unbind();
+
 		ID3D11VertexShader* pVs = vs != nullptr ? vs->Get() : nullptr;
 		Get().VSSetShader(pVs, nullptr, 0);
 		currentVS = vs;
@@ -50,6 +55,9 @@ void Context::SetPS(PixelShader* ps)
 {
 	if (ps != currentPS || currentPS == nullptr || ps == nullptr)
 	{ 
+		if ((ps != currentPS) && currentPS != nullptr)
+			currentPS->Unbind();
+
 		ID3D11PixelShader* pPs = ps != nullptr ? ps->Get() : nullptr;
 		Get().PSSetShader(pPs, nullptr, 0);
 		currentPS = ps;
@@ -60,6 +68,9 @@ void Context::SetCS(ComputeShader* cs)
 {
 	if (cs != currentCS || currentCS == nullptr || cs == nullptr)
 	{
+		if ((cs != currentCS) && currentCS != nullptr)
+			currentCS->Unbind();
+
 		ID3D11ComputeShader* pCS = cs != nullptr ? cs->Get() : nullptr;
 		Get().CSSetShader(pCS, nullptr, 0);
 		currentCS = cs;
@@ -233,10 +244,31 @@ void Context::IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, 
 }
 
 /// <summary>
-/// Draw indexed, non-instanced primitives
+/// Draw indexed, non-instanced triangle meshes using the given effect
 /// </summary>
-void Context::DrawIndexed(UINT length, UINT start, UINT baseVertexLocation)
+void Context::Draw(Mesh& mesh, Effect& effect)
 {
-	pContext->DrawIndexed(length, start, baseVertexLocation);
+	effect.Setup(*this);
+	mesh.Setup(*this);
+
+	pContext->DrawIndexed(mesh.GetIndexCount(), 0, 0);
+
+	effect.Reset();
+}
+
+/// <summary>
+/// Draws a group of indexed, non-instanced triangle meshes using the given effect
+/// </summary>
+void Context::Draw(IDynamicCollection<Mesh>& meshes, Effect& effect)
+{
+	effect.Setup(*this);
+
+	for (Mesh& mesh : meshes)
+	{
+		mesh.Setup(*this);
+		pContext->DrawIndexed(mesh.GetIndexCount(), 0, 0);
+	}
+
+	effect.Reset();
 }
 

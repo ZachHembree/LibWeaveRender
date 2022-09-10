@@ -34,6 +34,7 @@ void ComputeShader::Dispatch(Context& ctx, ivec3 groups)
 {
 	Bind(ctx);
 	ctx->Dispatch(groups.x, groups.y, groups.z);
+	Unbind();
 }
 
 void ComputeShader::Bind(Context& ctx)
@@ -65,8 +66,22 @@ void ComputeShader::Unbind()
 {
 	if (isBound && pCtx->GetIsCsBound(this))
 	{
-		pCtx->SetPS(nullptr);
 		isBound = false;
+		pCtx->SetPS(nullptr);
+		ID3D11DeviceContext& ctx = pCtx->Get();
+
+		ID3D11SamplerState* nullSamp[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT](nullptr);
+		ctx.CSSetSamplers(0, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, nullSamp);
+
+		ID3D11ShaderResourceView* nullSRV[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT](nullptr);
+		ctx.CSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, nullSRV);
+
+		ID3D11Buffer* nullCB[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT](nullptr);
+		ctx.CSSetConstantBuffers(0, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, nullCB);
+
+		ID3D11UnorderedAccessView* nullUAV[D3D11_1_UAV_SLOT_COUNT](nullptr);
+		ctx.CSSetUnorderedAccessViews(0, D3D11_1_UAV_SLOT_COUNT, nullUAV, 0);
+
 		pCtx = nullptr;
 	}
 }
