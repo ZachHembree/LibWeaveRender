@@ -82,7 +82,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Sets Texture2D using last context
 		/// </summary>
-		virtual void SetTexture(wstring_view name, Texture2D& tex);
+		virtual void SetTexture(wstring_view name, IShaderResource& tex);
 
 	protected:
 		ConstantMap constants;

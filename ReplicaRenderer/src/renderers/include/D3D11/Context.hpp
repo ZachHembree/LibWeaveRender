@@ -1,9 +1,12 @@
 #pragma once
 #include "D3DUtils.hpp"
 #include "D3D11/Resources/DeviceChild.hpp"
+#include "D3D11/Resources/ResourceBase.hpp"
 
 namespace Replica::D3D11
 {
+	class Renderer;
+
 	class BufferBase;
 	class VertexBuffer;
 	class IndexBuffer;
@@ -16,6 +19,8 @@ namespace Replica::D3D11
 	class ComputeShader;
 	class Effect;
 
+	class Texture2D;
+	class RWTexture2D;
 	class Mesh;
 
 	class IRenderTarget;
@@ -83,6 +88,11 @@ namespace Replica::D3D11
 		Context(Context&&) = default;
 
 		Context& operator=(Context&&) = default;
+
+		/// <summary>
+		/// Returns reference to renderer using this context
+		/// </summary>
+		Renderer& GetRenderer();
 
 		/// <summary>
 		/// Binds the given vertex shader
@@ -176,6 +186,11 @@ namespace Replica::D3D11
 		void IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, int startSlot = 0);
 
 		/// <summary>
+		/// Copies the contents of one texture to another
+		/// </summary>
+		void Blit(IShaderResource& src, IRenderTarget& dst);
+
+		/// <summary>
 		/// Draws an indexed, non-instanced triangle meshes using the given effect
 		/// </summary>
 		void Draw(Mesh& mesh, Effect& effect);
@@ -187,6 +202,7 @@ namespace Replica::D3D11
 
 	private:
 		ComPtr<ID3D11DeviceContext> pContext;
+
 		VertexShader* currentVS;
 		PixelShader* currentPS;
 		ComputeShader* currentCS;

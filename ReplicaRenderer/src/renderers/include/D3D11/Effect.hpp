@@ -47,7 +47,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Sets Texture2D
 		/// </summary>
-		void SetTexture(wstring_view name, Texture2D& tex)
+		void SetTexture(wstring_view name, IShaderResource& tex)
 		{
 			vs.SetTexture(name, tex);
 			ps.SetTexture(name, tex);

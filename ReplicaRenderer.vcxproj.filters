@@ -60,7 +60,7 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Context.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\RenderTarget.cpp">
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\RTHandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\Texture2DBase.cpp">
@@ -206,7 +206,7 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3DUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RenderTarget.hpp">
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RTHandle.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\Texture2DBase.hpp">

@@ -2,7 +2,7 @@
 #include <wrl.h>
 #include "MinWindow.hpp"
 #include "D3D11/SwapChain.hpp"
-#include "D3D11/Resources/RenderTarget.hpp"
+#include "D3D11/Resources/RTHandle.hpp"
 #include "D3D11/Resources/Texture2D.hpp"
 
 using namespace Replica::D3D11;
@@ -82,7 +82,7 @@ Formats SwapChain::GetBufferFormat() const
 }
 
 /// <summary>
-/// Returns interface to swap chain buffer at the given index
+/// Returns handle to swap chain back buffer
 /// </summary>
 RTHandle& SwapChain::GetBackBuf()
 {

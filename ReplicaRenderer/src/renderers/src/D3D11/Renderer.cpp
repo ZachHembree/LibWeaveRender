@@ -1,15 +1,39 @@
 #include "MinWindow.hpp"
 #include "D3D11/Renderer.hpp"
+#include "D3D11/Effect.hpp"
+#include "D3D11/Shaders/ComputeShader.hpp"
+#include "D3D11/Mesh.hpp"
+#include "D3D11/Resources/Sampler.hpp"
+#include "D3D11/Primitives.hpp"
+#include "D3D11/Shaders/BuiltInShaders.hpp"
 
 using namespace Replica::D3D11;
 
 Renderer::Renderer(MinWindow& window) :
 	WindowComponentBase(window),
-	device(), // Create device and context
+	device(*this), // Create device and context
 	swap(window, device), // Create swap chain for window
 	defaultDS(device, swap.GetSize()),
 	useDefaultDS(true)
-{ }
+{ 
+	MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
+	defaultMeshes[L"FSQuad"] = Mesh(device, quadDef);
+
+	defaultEffects[L"Default"] = Effect(device, g_DefaultEffect);
+	defaultEffects[L"PosTextured2D"] = Effect(device, g_PosTextured2DEffect);
+	defaultEffects[L"Textured2D"] = Effect(device, g_Textured2DEffect);
+	defaultEffects[L"TexturedQuad"] = Effect(device, g_TexturedQuadEffect);
+	defaultEffects[L"DebugFlat3D"] = Effect(device, g_DebugFlat3DEffect);
+	defaultEffects[L"Textured3D"] = Effect(device, g_Textured3DEffect);
+
+	defaultSamplers[L"PointClamp"] = Sampler(device, TexFilterMode::POINT, TexClampMode::CLAMP);
+	defaultSamplers[L"PointMirror"] = Sampler(device, TexFilterMode::POINT, TexClampMode::MIRROR);
+	defaultSamplers[L"PointBorder"] = Sampler(device, TexFilterMode::POINT, TexClampMode::BORDER);
+
+	defaultSamplers[L"LinearClamp"] = Sampler(device, TexFilterMode::LINEAR, TexClampMode::CLAMP);
+	defaultSamplers[L"LinearMirror"] = Sampler(device, TexFilterMode::LINEAR, TexClampMode::MIRROR);
+	defaultSamplers[L"LinearBorder"] = Sampler(device, TexFilterMode::LINEAR, TexClampMode::BORDER);
+}
 
 /// <summary>
 /// Returns the interface to the device the renderer is running on
@@ -30,6 +54,38 @@ bool Renderer::GetIsDepthStencilEnabled() { return useDefaultDS; }
 /// Enable/disable default depth-stencil buffer
 /// </summary>
 void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
+
+/// <summary>
+/// Returns reference to a default effect
+/// </summary>
+Effect& Renderer::GetDefaultEffect(wstring_view name) const
+{
+	return (Effect&)defaultEffects.at(name);
+}
+
+/// <summary>
+/// Returns reference to a default compute shader
+/// </summary>
+ComputeShader& Renderer::GetDefaultCompute(wstring_view name) const
+{
+	return (ComputeShader&)defaultCompute.at(name);
+}
+
+/// <summary>
+/// Retursn a reference to a default mesh
+/// </summary>
+Mesh& Renderer::GetDefaultMesh(wstring_view name) const
+{
+	return (Mesh&)defaultMeshes.at(name);
+}
+
+/// <summary>
+/// Retursn a reference to a default texture sampler
+/// </summary>
+Sampler& Renderer::GetDefaultSampler(wstring_view name) const
+{
+	return (Sampler&)defaultSamplers.at(name);
+}
 
 bool Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 { 

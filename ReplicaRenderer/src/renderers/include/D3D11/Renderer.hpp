@@ -1,4 +1,7 @@
 #pragma once
+#include <unordered_map>
+
+#include <string_view>
 #include "WindowComponentBase.hpp"
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/Device.hpp"
@@ -12,12 +15,15 @@
 
 namespace Replica::D3D11
 { 
+	using std::unordered_map;
+
 	class Device;
 	class BufferBase;
 	class VertexBuffer;
 	class IndexBuffer;
 	class ConstantBuffer;
 	class SwapChain;
+	class Sampler;
 
 	class Renderer : public WindowComponentBase
 	{
@@ -45,6 +51,26 @@ namespace Replica::D3D11
 		void SetIsDepthStencilEnabled(bool value);
 
 		/// <summary>
+		/// Returns reference to a default effect
+		/// </summary>
+		Effect& GetDefaultEffect(wstring_view name) const;
+
+		/// <summary>
+		/// Returns reference to a default compute shader
+		/// </summary>
+		ComputeShader& GetDefaultCompute(wstring_view name) const;
+
+		/// <summary>
+		/// Retursn a reference to a default mesh
+		/// </summary>
+		Mesh& GetDefaultMesh(wstring_view name) const;
+
+		/// <summary>
+		/// Returns reference to a default texture sampler
+		/// </summary>
+		Sampler& GetDefaultSampler(wstring_view name) const;
+
+		/// <summary>
 		/// Updates the state of the renderer
 		/// </summary>
 		void Update() override;
@@ -65,6 +91,11 @@ namespace Replica::D3D11
 		bool UnregisterComponent(RenderComponentBase& component);
 
 	private:
+		unordered_map<wstring_view, Effect> defaultEffects;
+		unordered_map<wstring_view, ComputeShader> defaultCompute;
+		unordered_map<wstring_view, Mesh> defaultMeshes;
+		unordered_map<wstring_view, Sampler> defaultSamplers;
+
 		UniqueVector<RenderComponentBase*> pComponents;
 		Device device;
 		SwapChain swap;

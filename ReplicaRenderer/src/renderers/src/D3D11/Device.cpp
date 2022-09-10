@@ -1,10 +1,12 @@
 #include "D3D11/Device.hpp"
+#include "D3D11/Renderer.hpp"
+#include "GfxException.hpp"
 
 using namespace glm;
 using namespace Replica;
 using namespace Replica::D3D11;
 
-Device::Device()
+Device::Device(Renderer& renderer) : pRenderer(&renderer)
 {
 	const D3D_FEATURE_LEVEL level = D3D_FEATURE_LEVEL_11_1;
 
@@ -25,6 +27,8 @@ Device::Device()
 	context = Context(*this, pContext);
 	context.IASetPrimitiveTopology(PrimTopology::TRIANGLELIST);
 }
+
+Renderer& Device::GetRenderer() { GFX_ASSERT(pRenderer != nullptr, "Renderer cannot be null."); return *pRenderer; }
 
 /// <summary>
 /// Returns reference to COM device interface

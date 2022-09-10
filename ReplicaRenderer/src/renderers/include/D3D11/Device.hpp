@@ -6,14 +6,21 @@
 
 namespace Replica::D3D11
 {	
+	class Renderer;
+
 	class Device : protected MoveOnlyObjBase
 	{
 	public:
-		Device();
+		Device(Renderer& renderer);
 
 		Device(Device&&) = default;
 
 		Device& operator=(Device&&) = default;
+
+		/// <summary>
+		/// Returns reference to renderer using this device
+		/// </summary>
+		Renderer& GetRenderer();
 
 		/// <summary>
 		/// Returns pointer to COM device interface
@@ -31,6 +38,7 @@ namespace Replica::D3D11
 		Context& GetContext();
 
 	private:
+		Renderer* pRenderer;
 		ComPtr<ID3D11Device> pDev;
 		Context context;
 	};

@@ -4,13 +4,15 @@
 #include "D3D11/Resources/IndexBuffer.hpp"
 #include "D3D11/Resources/ConstantBuffer.hpp"
 #include "D3D11/Resources/InputLayout.hpp"
-#include "D3D11/Resources/RenderTarget.hpp"
+#include "D3D11/Resources/RTHandle.hpp"
 #include "D3D11/Resources/DepthStencilTexture.hpp"
 #include "D3D11/Shaders/VertexShader.hpp"
 #include "D3D11/Shaders/PixelShader.hpp"
 #include "D3D11/Shaders/ComputeShader.hpp"
 #include "D3D11/Effect.hpp"
 #include "D3D11/Mesh.hpp"
+#include "D3D11/Resources/RWTexture2D.hpp"
+#include "D3D11/Renderer.hpp"
 
 using namespace glm;
 using namespace Replica;
@@ -37,6 +39,14 @@ Context::Context() :
 	currentDSS(nullptr),
 	rtvCount(0)
 { }
+
+/// <summary>
+/// Returns reference to renderer using this context
+/// </summary>
+Renderer& Context::GetRenderer()
+{
+	return GetDevice().GetRenderer();
+}
 
 void Context::SetVS(VertexShader* vs)
 {
@@ -241,6 +251,23 @@ void Context::IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, 
 	{
 		IASetVertexBuffer(vertBuffers[i], startSlot + i);
 	}
+}
+
+/// <summary>
+/// Copies the contents of one texture to another
+/// </summary>
+void Context::Blit(IShaderResource& src, IRenderTarget& dst)
+{
+	Renderer& renderer = GetRenderer();
+	Mesh& quad = renderer.GetDefaultMesh(L"FSQuad");
+	Effect& quadFX = renderer.GetDefaultEffect(L"PosTextured2D");
+
+	pContext->OMSetRenderTargets(1, dst.GetAddressRTV(), nullptr);
+	quadFX.SetTexture(L"tex", src);
+	quadFX.SetSampler(L"samp", renderer.GetDefaultSampler(L"LinearClamp"));
+	Draw(quad, quadFX);
+
+	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
 }
 
 /// <summary>

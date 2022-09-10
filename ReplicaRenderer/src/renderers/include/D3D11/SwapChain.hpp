@@ -2,7 +2,7 @@
 #include <dxgi1_2.h>
 #include "D3D11/Device.hpp"
 #include "D3D11/Resources/Texture2D.hpp"
-#include "D3D11/Resources/RenderTarget.hpp"
+#include "D3D11/Resources/RTHandle.hpp"
 
 namespace Replica
 {
@@ -56,7 +56,7 @@ namespace Replica::D3D11
 		Formats GetBufferFormat() const;
 
 		/// <summary>
-		/// Returns handle to swap chain buffer at the given index
+		/// Returns handle to swap chain back buffer
 		/// </summary>
 		RTHandle& GetBackBuf();
 
