@@ -16,21 +16,28 @@ namespace Replica::D3D11
 		virtual ID3D11Resource** const GetResAddress() = 0;
 	};
 
-	class ResourceBase : public DeviceChild
+	class ResourceBase : public virtual IResource, public DeviceChild
 	{
 	public:
-		virtual ID3D11Resource* GetResource() = 0;
-
-		virtual ID3D11Resource** const GetResAddress() = 0;
 
 	protected:
-		ResourceBase() { }
+		ResourceBase() : DeviceChild() { }
 
-		ResourceBase(Device& dev) : DeviceChild(dev) {}
+		ResourceBase(Device& dev) : DeviceChild(dev) { }
 
-		ResourceBase(ResourceBase&&) = default;
+		ResourceBase(ResourceBase&& other) noexcept : 
+			DeviceChild(std::move(other)) 
+		{ }
 
-		ResourceBase& operator=(ResourceBase&&) = default;
+		ResourceBase& operator=(ResourceBase&& other) noexcept
+		{
+			DeviceChild::operator=(std::move(other));
+			return *this;
+		}
+
+		ResourceBase(const ResourceBase& other) = delete;
+
+		ResourceBase& operator=(const ResourceBase& other) = delete;
 	};
 
 	/// <summary>

@@ -24,6 +24,9 @@ namespace Replica::D3D11
 		virtual bool GetIsValid() const { return pDev != nullptr; }
 
 	protected:
+		using MoveOnlyObjBase::MoveOnlyObjBase;
+		using MoveOnlyObjBase::operator=;
+
 		Device* pDev;
 
 		DeviceChild() : pDev(nullptr) { }
