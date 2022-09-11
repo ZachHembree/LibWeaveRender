@@ -26,6 +26,7 @@ Renderer::Renderer(MinWindow& window) :
 	defaultEffects[L"Textured3D"] = Effect(device, g_Textured3DEffect);
 
 	defaultCompute[L"TexCopySamp2D"] = ComputeShader(device, g_CS_TexCopySamp2D);
+	defaultCompute[L"TexCopy2D"] = ComputeShader(device, g_CS_TexCopy2D);
 
 	defaultSamplers[L"PointClamp"] = Sampler(device, TexFilterMode::POINT, TexClampMode::CLAMP);
 	defaultSamplers[L"PointMirror"] = Sampler(device, TexFilterMode::POINT, TexClampMode::MIRROR);

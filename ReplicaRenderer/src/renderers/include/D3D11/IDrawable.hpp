@@ -1,5 +1,5 @@
 #pragma once
-#include "D3D11/IResource.hpp"
+#include "D3D11/IAsset.hpp"
 
 namespace Replica::D3D11
 {
@@ -9,7 +9,7 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Interface for types that can be drawn
 	/// </summary>
-	class IDrawable : public IResource
+	class IDrawable : public IAsset
 	{
 	public:
 		virtual void Draw(Context& ctx, Effect& effect) = 0;

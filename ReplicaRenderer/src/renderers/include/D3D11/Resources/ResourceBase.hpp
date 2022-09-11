@@ -8,6 +8,14 @@
 
 namespace Replica::D3D11
 {
+	class IResource
+	{
+	public:
+		virtual ID3D11Resource* GetResource() = 0;
+
+		virtual ID3D11Resource** const GetResAddress() = 0;
+	};
+
 	class ResourceBase : public DeviceChild
 	{
 	public:
@@ -20,6 +28,9 @@ namespace Replica::D3D11
 
 		ResourceBase(Device& dev) : DeviceChild(dev) {}
 
+		ResourceBase(ResourceBase&&) = default;
+
+		ResourceBase& operator=(ResourceBase&&) = default;
 	};
 
 	/// <summary>
@@ -114,7 +125,7 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Interface for 2D Textures, without resource views
 	/// </summary>
-	class ITexture2DBase
+	class ITexture2DBase : public virtual IResource
 	{
 	public:
 		/// <summary>

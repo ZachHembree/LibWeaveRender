@@ -193,6 +193,11 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Copies the contents of one texture to another
 		/// </summary>
+		void Blit(ITexture2D& src, ITexture2D& dst);
+
+		/// <summary>
+		/// Copies the contents of one texture to another
+		/// </summary>
 		void Blit(ITexture2D& src, IRenderTarget& dst);
 
 		/// <summary>

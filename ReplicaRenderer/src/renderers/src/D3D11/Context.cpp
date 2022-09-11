@@ -255,19 +255,58 @@ void Context::IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, 
 	}
 }
 
+bool CanDirectCopy(ITexture2D& src, ITexture2D& dst)
+{
+	return 
+		dst.GetUsage() != ResourceUsages::Immutable &&
+		src.GetSize() == dst.GetSize() &&
+		src.GetFormat() == dst.GetFormat();
+}
+
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
 void Context::Blit(ITexture2D& src, IRWTexture2D& dst)
 {
-	Renderer& renderer = GetRenderer();
-	ComputeShader& cs = renderer.GetDefaultCompute(L"TexCopySamp2D");
+	if (CanDirectCopy(src, dst))
+	{
+		pContext->CopyResource(dst.GetResource(), src.GetResource());
+	}
+	else if (src.GetSize() == dst.GetSize())
+	{
+		Renderer& renderer = GetRenderer();
+		ComputeShader& cs = renderer.GetDefaultCompute(L"TexCopy2D");
 
-	cs.SetTexture(L"SrcTex", src);
-	cs.SetRWTexture(L"DstTex", dst);
-	cs.SetSampler(L"Samp", renderer.GetDefaultSampler(L"LinearClamp"));
-	cs.SetConstant(L"DstTexelSize", dst.GetTexelSize());
-	cs.Dispatch(*this, ivec3(dst.GetSize(), 1));
+		cs.SetTexture(L"SrcTex", src);
+		cs.SetRWTexture(L"DstTex", dst);
+		cs.Dispatch(*this, ivec3(dst.GetSize(), 1));
+	}
+	else
+	{ 
+		Renderer& renderer = GetRenderer();
+		ComputeShader& cs = renderer.GetDefaultCompute(L"TexCopySamp2D");
+
+		cs.SetTexture(L"SrcTex", src);
+		cs.SetRWTexture(L"DstTex", dst);
+		cs.SetSampler(L"Samp", renderer.GetDefaultSampler(L"LinearClamp"));
+		cs.SetConstant(L"DstTexelSize", dst.GetTexelSize());
+		cs.Dispatch(*this, ivec3(dst.GetSize(), 1));
+	}
+}
+
+/// <summary>
+/// Copies the contents of one texture to another
+/// </summary>
+void Context::Blit(ITexture2D& src, ITexture2D& dst)
+{
+	if (CanDirectCopy(src, dst))
+	{
+		pContext->CopyResource(dst.GetResource(), src.GetResource());
+	}
+	else
+	{
+		GFX_THROW("Failed to copy texture. Destination incompatible with source.");
+	}
 }
 
 /// <summary>

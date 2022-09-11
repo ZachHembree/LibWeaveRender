@@ -1,5 +1,5 @@
 #pragma once
-#include "D3D11/IResource.hpp"
+#include "D3D11/IAsset.hpp"
 #include "D3D11/Shaders/VertexShader.hpp"
 #include "D3D11/Shaders/PixelShader.hpp"
 
@@ -11,7 +11,7 @@ namespace Replica::D3D11
 		PixelShaderDef psDef;
 	};
 
-	class Effect : public IResource
+	class Effect : public IAsset
 	{
 	public:
 		Effect() {}

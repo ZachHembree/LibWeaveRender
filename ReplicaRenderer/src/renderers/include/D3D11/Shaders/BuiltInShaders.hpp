@@ -24,6 +24,21 @@ namespace Replica::D3D11
 		}
 	};
 
+	const ComputeShaderDef g_CS_TexCopy2D
+	{
+		{
+			L"Shaders/CS_TexCopy2D.cso",
+			{ },
+			{ },
+			{
+				L"SrcTex",
+			},
+		},
+		{
+			L"DstTex"
+		}
+	};
+
 	// Vertex Shaders
 	const VertexShaderDef g_VS_Default =
 	{

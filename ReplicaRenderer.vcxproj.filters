@@ -263,7 +263,7 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Mesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\IResource.hpp">
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\IAsset.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ResourceMap.hpp">
@@ -317,6 +317,7 @@
     <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\VS_Textured2D.hlsl" />
     <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\VS_PosTextured.hlsl" />
     <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\CS_TexCopySamp2D.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\CS_TexCopy2D.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

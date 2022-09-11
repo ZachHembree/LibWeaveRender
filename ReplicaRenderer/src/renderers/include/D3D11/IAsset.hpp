@@ -8,7 +8,7 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Interface for types used as resources by types of IDrawable
 	/// </summary>
-	class IResource
+	class IAsset
 	{
 	public:
 		virtual void Setup(Context& ctx) = 0;

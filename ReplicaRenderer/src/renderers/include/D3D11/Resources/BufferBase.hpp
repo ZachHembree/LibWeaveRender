@@ -52,10 +52,6 @@ namespace Replica::D3D11
 			const void* data, 
 			const UINT byteSize);
 
-		BufferBase(BufferBase&&) = default;
-
-		BufferBase& operator=(BufferBase&&) = default;
-	
 		void UpdateSubresource(Context& ctx, const void* data);
 
 		void UpdateMapUnmap(Context& ctx, const void* data);
