@@ -532,7 +532,6 @@ namespace Replica
 	public:
 		using Iterator = DynIterator<T>;
 
-		using std::vector<T>::vector;
 		using std::vector<T>::push_back;
 		using std::vector<T>::emplace_back;
 		using std::vector<T>::pop_back;
@@ -540,13 +539,43 @@ namespace Replica
 		using std::vector<T>::max_size;
 		using std::vector<T>::resize;
 		using std::vector<T>::capacity;
-		using std::vector<T>::empty;
 		using std::vector<T>::reserve;
+		using std::vector<T>::empty;
 		using std::vector<T>::shrink_to_fit;
 
 		Vector(const IDynamicCollection<T>& other) :
-			Vector(other.GetPtr(), other.GetPtr() + other.GetLength())
+			std::vector<T>(other.GetPtr(), other.GetPtr() + other.GetLength())
 		{ }
+
+		/// <summary>
+		/// Initializes a new unique vector.
+		/// </summary>
+		Vector() : std::vector<T>() { }
+
+		/// <summary>
+		/// Initializes a new unique vector from an initializer list.
+		/// </summary>
+		Vector(const std::initializer_list<T>& initializerList) noexcept :
+			std::vector<T>(initializerList)
+		{ }
+
+		/// <summary>
+		/// Initializes a new unique vector with the given capacity.
+		/// </summary>
+		Vector(size_t capacity)
+		{
+			this->reserve(capacity);
+		}
+
+		/// <summary>
+		/// Initializes a new vector by copying the contents the given vector into itself.
+		/// </summary>
+		Vector(const Vector& rhs) noexcept : std::vector<T>(rhs) { }
+
+		/// <summary>
+		/// Initializes a new vector by moving the contents the given vector into itself.
+		/// </summary>
+		Vector(Vector&& rhs) noexcept : std::vector<T>(std::move(rhs)) { }
 
 		/// <summary>
 		/// Removes the member at the given index
@@ -597,6 +626,24 @@ namespace Replica
 		const Iterator end() const override { return Iterator(this->data() + this->size()); }
 
 		/// <summary>
+		/// Copy assignment operator.
+		/// </summary>
+		Vector& operator=(const Vector& rhs) noexcept
+		{
+			std::vector<T>::operator=(rhs);
+			return *this;
+		}
+
+		/// <summary>
+		/// Move assignment operator.
+		/// </summary>
+		Vector& operator=(Vector&& rhs) noexcept
+		{
+			std::vector<T>::operator=(std::move(rhs));
+			return *this;
+		}
+
+		/// <summary>
 		/// Provides indexed access to vector member references.
 		/// </summary>
 		T& operator[](size_t index) override { return this->at(index); }
@@ -630,12 +677,9 @@ namespace Replica
 		/// <summary>
 		/// Initializes a new unique vector.
 		/// </summary>
-		UniqueVector() :
-			Vector<T>()
-		{ }
+		UniqueVector() : Vector<T>() { }
 
-		UniqueVector(const IDynamicCollection<T>& other) :
-			Vector<T>(other.GetPtr(), other.GetPtr() + other.GetLength())
+		UniqueVector(const IDynamicCollection<T>& other) : Vector<T>(other)
 		{ }
 
 		/// <summary>
@@ -648,9 +692,10 @@ namespace Replica
 		/// <summary>
 		/// Initializes a new unique vector with the given capacity.
 		/// </summary>
-		explicit UniqueVector(size_t capacity) :
-			Vector<T>(capacity)
-		{ }
+		UniqueVector(size_t capacity)
+		{
+			this->reserve(capacity);
+		}
 
 		/// <summary>
 		/// Initializes a new vector by moving the contents the given vector into itself.
