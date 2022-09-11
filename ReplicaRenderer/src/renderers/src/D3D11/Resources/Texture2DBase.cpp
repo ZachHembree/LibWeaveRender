@@ -56,6 +56,12 @@ Texture2DBase::Texture2DBase() : desc({}) {}
 
 ivec2 Texture2DBase::GetSize() const { return ivec2(desc.Width, desc.Height); }
 
+vec4 Texture2DBase::GetTexelSize() const
+{
+	ivec2 size = GetSize();
+	return vec4(1.0f / vec2(size), size);
+}
+
 Formats Texture2DBase::GetFormat() const { return (Formats)desc.Format; }
 
 ResourceUsages Texture2DBase::GetUsage() const { return (ResourceUsages)desc.Usage; }
@@ -63,6 +69,11 @@ ResourceUsages Texture2DBase::GetUsage() const { return (ResourceUsages)desc.Usa
 ResourceBindFlags Texture2DBase::GetBindFlags() const { return (ResourceBindFlags)desc.BindFlags; }
 
 ResourceAccessFlags Texture2DBase::GetAccessFlags() const { return (ResourceAccessFlags)desc.CPUAccessFlags; }
+
+const D3D11_TEXTURE2D_DESC& Texture2DBase::GetDescription() const
+{
+	return desc;
+}
 
 /// <summary>
 /// Returns interface to resource
@@ -99,8 +110,8 @@ void Texture2DBase::UpdateSubresource(Context& ctx, void* data, size_t stride, i
 		0,
 		&dstBox,
 		data,
-		stride * dim.x,
-		stride * dim.x * dim.y
+		(UINT)(stride * dim.x),
+		(UINT)(stride * dim.x * dim.y)
 	);
 }
 

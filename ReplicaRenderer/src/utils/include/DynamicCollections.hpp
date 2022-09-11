@@ -152,7 +152,15 @@ namespace Replica
 		/// </summary>
 		DynamicArrayBase(size_t length) :
 			length(length),
-			data((length > 0) ? new T[length]() : nullptr)
+			data((length > 0) ? new T[length] : nullptr)
+		{ }
+
+		/// <summary>
+		/// Initializes a dynamic array with the given length.
+		/// </summary>
+		DynamicArrayBase(size_t length, T initValue) :
+			length(length),
+			data((length > 0) ? new T[length](initValue) : nullptr)
 		{ }
 
 		/// <summary>
@@ -344,6 +352,13 @@ namespace Replica
 		{ }
 
 		/// <summary>
+		/// Initializes a dynamic array with the given length.
+		/// </summary>
+		DynamicArray(size_t length, T initValue) :
+			DynamicArrayBase<T>(length, initValue)
+		{ }
+
+		/// <summary>
 		/// Initializes a new dynamic array object using the given pointer and length.
 		/// Creates a copy.
 		/// </summary>
@@ -421,6 +436,7 @@ namespace Replica
 		{ }
 
 	public:
+
 		/// <summary>
 		/// Initializes an empty array with a null pointer.
 		/// </summary>
@@ -440,6 +456,13 @@ namespace Replica
 		/// </summary>
 		UniqueArray(size_t length) :
 			DynamicArrayBase<T>(length) 
+		{ }
+
+		/// <summary>
+		/// Initializes a dynamic array with the given length.
+		/// </summary>
+		UniqueArray(size_t length, T initValue) :
+			DynamicArrayBase<T>(length, initValue)
 		{ }
 
 		/// <summary>

@@ -13,6 +13,7 @@
 #include "D3D11/Mesh.hpp"
 #include "D3D11/Resources/RWTexture2D.hpp"
 #include "D3D11/Renderer.hpp"
+#include "D3D11/Shaders/ComputeShader.hpp"
 
 using namespace glm;
 using namespace Replica;
@@ -24,7 +25,7 @@ Context::Context(Device& dev, ComPtr<ID3D11DeviceContext>& pContext) :
 	currentVS(nullptr),
 	currentPS(nullptr),
 	currentCS(nullptr),
-	currentRTVs(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT),
+	currentRTVs(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, nullptr),
 	currentDSV(nullptr),
 	currentDSS(nullptr),
 	rtvCount(0)
@@ -222,6 +223,7 @@ void Context::SetRenderTargets(const IDynamicCollection<IRenderTarget>& rtvs, ID
 	}
 
 	rtvCount = (uint)rtvs.GetLength();
+	memcpy(currentRTVs.GetPtr(), rtvs.GetPtr(), rtvCount);
 	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
 }
 
@@ -256,7 +258,22 @@ void Context::IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, 
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void Context::Blit(IShaderResource& src, IRenderTarget& dst)
+void Context::Blit(ITexture2D& src, IRWTexture2D& dst)
+{
+	Renderer& renderer = GetRenderer();
+	ComputeShader& cs = renderer.GetDefaultCompute(L"TexCopySamp2D");
+
+	cs.SetTexture(L"SrcTex", src);
+	cs.SetRWTexture(L"DstTex", dst);
+	cs.SetSampler(L"Samp", renderer.GetDefaultSampler(L"LinearClamp"));
+	cs.SetConstant(L"DstTexelSize", dst.GetTexelSize());
+	cs.Dispatch(*this, ivec3(dst.GetSize(), 1));
+}
+
+/// <summary>
+/// Copies the contents of one texture to another
+/// </summary>
+void Context::Blit(ITexture2D& src, IRenderTarget& dst)
 {
 	Renderer& renderer = GetRenderer();
 	Mesh& quad = renderer.GetDefaultMesh(L"FSQuad");

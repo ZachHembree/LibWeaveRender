@@ -9,6 +9,5 @@ SamplerState samp;
 
 float4 main(VertOut i) : SV_Target
 {
-	//return float4(i.uv, 0, 0);
 	return tex.Sample(samp, i.uv);
 }

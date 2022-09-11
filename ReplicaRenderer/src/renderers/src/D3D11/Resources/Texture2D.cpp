@@ -43,12 +43,13 @@ Texture2D::Texture2D(
 Texture2D::Texture2D(
 	Device& dev,
 	Formats format,
+	ivec2 dim,
 	ResourceUsages usage,
 	UINT mipLevels
 ) :
 	Texture2DBase(
 		dev,
-		vec2(0),
+		dim,
 		format,
 		usage,
 		ResourceBindFlags::ShaderResource,
@@ -87,7 +88,7 @@ void Texture2D::SetTextureData(Context& ctx, void* data, size_t stride, ivec2 di
 			GetDevice(),
 			dim,
 			data,
-			stride,
+			(UINT)stride,
 			GetFormat(),
 			GetUsage(),
 			desc.MipLevels

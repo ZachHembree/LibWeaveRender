@@ -71,7 +71,7 @@ void ShaderBase::SetSampler(wstring_view name, Sampler& samp)
 	samplers.SetResource(name, samp.Get());
 }
 
-void ShaderBase::SetTexture(wstring_view name, IShaderResource& tex)
+void ShaderBase::SetTexture(wstring_view name, ITexture2D& tex)
 {
 	textures.SetResource(name, tex.GetSRV());
 }

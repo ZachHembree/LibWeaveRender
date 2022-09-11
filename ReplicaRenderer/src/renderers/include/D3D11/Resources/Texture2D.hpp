@@ -8,7 +8,7 @@ namespace DirectX
 
 namespace Replica::D3D11
 {
-	class Texture2D : public Texture2DBase, public IShaderResource
+	class Texture2D : public virtual ITexture2D, public Texture2DBase
 	{
 	public:
 
@@ -37,6 +37,7 @@ namespace Replica::D3D11
 		Texture2D(
 			Device& dev,
 			Formats format = Formats::R8G8B8A8_UNORM,
+			ivec2 dim = ivec2(0),
 			ResourceUsages usage = ResourceUsages::Default,
 			UINT mipLevels = 1u
 		);

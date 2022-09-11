@@ -22,9 +22,10 @@ Renderer::Renderer(MinWindow& window) :
 	defaultEffects[L"Default"] = Effect(device, g_DefaultEffect);
 	defaultEffects[L"PosTextured2D"] = Effect(device, g_PosTextured2DEffect);
 	defaultEffects[L"Textured2D"] = Effect(device, g_Textured2DEffect);
-	defaultEffects[L"TexturedQuad"] = Effect(device, g_TexturedQuadEffect);
 	defaultEffects[L"DebugFlat3D"] = Effect(device, g_DebugFlat3DEffect);
 	defaultEffects[L"Textured3D"] = Effect(device, g_Textured3DEffect);
+
+	defaultCompute[L"TexCopySamp2D"] = ComputeShader(device, g_CS_TexCopySamp2D);
 
 	defaultSamplers[L"PointClamp"] = Sampler(device, TexFilterMode::POINT, TexClampMode::CLAMP);
 	defaultSamplers[L"PointMirror"] = Sampler(device, TexFilterMode::POINT, TexClampMode::MIRROR);

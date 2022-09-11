@@ -188,7 +188,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Copies the contents of one texture to another
 		/// </summary>
-		void Blit(IShaderResource& src, IRenderTarget& dst);
+		void Blit(ITexture2D& src, IRWTexture2D& dst);
+
+		/// <summary>
+		/// Copies the contents of one texture to another
+		/// </summary>
+		void Blit(ITexture2D& src, IRenderTarget& dst);
 
 		/// <summary>
 		/// Draws an indexed, non-instanced triangle meshes using the given effect

@@ -3,7 +3,7 @@
 
 namespace Replica::D3D11
 {
-	class RWTexture2D : public Texture2D, public IUnorderedAccess
+	class RWTexture2D : public virtual IRWTexture2D, public Texture2D
 	{
 	public:
 		RWTexture2D();
@@ -20,6 +20,7 @@ namespace Replica::D3D11
 		RWTexture2D(
 			Device& dev,
 			Formats format,
+			ivec2 dim = ivec2(0),
 			UINT mipLevels = 1u
 		);
 
@@ -62,5 +63,17 @@ namespace Replica::D3D11
 	private:
 		ComPtr<ID3D11UnorderedAccessView> pUAV;
 
+		RWTexture2D(
+			Device& dev,
+			ivec2 dim,
+			Formats format = Formats::R8G8B8A8_UNORM,
+			ResourceUsages usage = ResourceUsages::Default,
+			ResourceBindFlags bindFlags = ResourceBindFlags::ShaderResource,
+			ResourceAccessFlags accessFlags = ResourceAccessFlags::None,
+			UINT mipLevels = 1u,
+			UINT arraySize = 1u,
+			void* data = nullptr,
+			UINT stride = 0
+		);
 	};
 }

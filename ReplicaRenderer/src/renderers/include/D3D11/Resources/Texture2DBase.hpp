@@ -9,19 +9,45 @@ namespace DirectX
 
 namespace Replica::D3D11
 {
-	class Texture2DBase : public ResourceBase
+	class Texture2DBase : public virtual ITexture2DBase, public ResourceBase
 	{
 	public:
 
-		ivec2 GetSize() const;
+		/// <summary>
+		/// Returns the dimensions of the texture
+		/// </summary>
+		ivec2 GetSize() const override;
 
-		Formats GetFormat() const;
+		/// <summary>
+		/// Returns combined texel size and dim fp vector.
+		/// XY == Texel Size; ZW == Dim
+		/// </summary>
+		vec4 GetTexelSize() const override;
 
-		ResourceUsages GetUsage() const;
+		/// <summary>
+		/// Returns color format of the texture
+		/// </summary>
+		Formats GetFormat() const override;
 
+		/// <summary>
+		/// Returns resource usage type
+		/// </summary>
+		ResourceUsages GetUsage() const override;
+
+		/// <summary>
+		/// Returns the view bind flags for the texture
+		/// </summary>
 		ResourceBindFlags GetBindFlags() const;
 
+		/// <summary>
+		/// Returns cpu access flags for the texture
+		/// </summary>
 		ResourceAccessFlags GetAccessFlags() const;
+
+		/// <summary>
+		/// Returns descriptor object for the texture
+		/// </summary>
+		const D3D11_TEXTURE2D_DESC& GetDescription() const;
 
 		/// <summary>
 		/// Returns interface to resource

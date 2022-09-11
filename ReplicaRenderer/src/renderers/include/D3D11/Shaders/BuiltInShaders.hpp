@@ -5,37 +5,55 @@
 namespace Replica::D3D11
 {
 	// Compute Shaders
+	const ComputeShaderDef g_CS_TexCopySamp2D
+	{
+		{
+			L"Shaders/CS_TexCopySamp2D.cso",
+			{
+				ConstantDef::Get<vec4>(L"DstTexelSize"),
+			},
+			{
+				L"Samp",
+			},
+			{
+				L"SrcTex",
+			},
+		},
+		{
+			L"DstTex"
+		}
+	};
 
 	// Vertex Shaders
-	const VertexShaderDef g_DefaultVS =
+	const VertexShaderDef g_VS_Default =
 	{
-		{ L"Shaders/DefaultVS.cso" },
+		{ L"Shaders/VS_Default.cso" },
 		{
 			{ "Position", Formats::R32G32_FLOAT },
 		},
 	};
 
-	const VertexShaderDef g_PosTexturedVS =
+	const VertexShaderDef g_VS_PosTextured =
 	{
-		{ L"Shaders/PosTexturedVS.cso" },
+		{ L"Shaders/VS_PosTextured.cso" },
 		{
 			{ "Position", Formats::R32G32_FLOAT },
 		},
 	};
 
-	const VertexShaderDef g_Texture2DVS =
+	const VertexShaderDef g_VS_Textured2D =
 	{
-		{ L"Shaders/Texture2DVS.cso" },
+		{ L"Shaders/VS_Textured2D.cso" },
 		{
 			{ "Position", Formats::R32G32_FLOAT },
 			{ "TexCoord", Formats::R32G32_FLOAT },
 		},
 	};
 
-	const VertexShaderDef g_3DVS =
+	const VertexShaderDef g_VS_3D =
 	{
 		{
-			L"Shaders/3DVS.cso",
+			L"Shaders/VS_3D.cso",
 			{ ConstantDef::Get<mat4>(L"mvp"), }
 		},
 		{
@@ -43,10 +61,10 @@ namespace Replica::D3D11
 		},
 	};
 
-	const VertexShaderDef g_Texture3DVS =
+	const VertexShaderDef g_VS_Textured3D =
 	{
 		{
-			L"Shaders/Texture3DVS.cso",
+			L"Shaders/VS_Textured3D.cso",
 			{ ConstantDef::Get<mat4>(L"mvp"), }
 		},
 		{
@@ -56,19 +74,19 @@ namespace Replica::D3D11
 	};
 
 	// Pixel Shaders
-	const PixelShaderDef g_DefaultPS =
+	const PixelShaderDef g_PS_Default =
 	{
-		L"Shaders/DefaultPS.cso",
+		L"Shaders/PS_Default.cso",
 	};
 
-	const PixelShaderDef g_Flat3DPS =
+	const PixelShaderDef g_PS_Flat3D =
 	{
-		L"Shaders/Flat3DPS.cso",
+		L"Shaders/PS_Flat3D.cso",
 	};
 
-	const PixelShaderDef g_TexturePS =
+	const PixelShaderDef g_PS_Textured =
 	{
-		L"Shaders/TexturePS.cso",
+		L"Shaders/PS_Textured.cso",
 		{ },
 		{ L"samp" },
 		{ L"tex" },
@@ -77,38 +95,32 @@ namespace Replica::D3D11
 	// Effects
 	const EffectDef g_DefaultEffect =
 	{
-		g_DefaultVS,
-		g_DefaultPS
+		g_VS_Default,
+		g_PS_Default
 	};
 
 	const EffectDef g_PosTextured2DEffect
 	{
-		g_PosTexturedVS,
-		g_TexturePS
+		g_VS_PosTextured,
+		g_PS_Textured
 	};
 
 	const EffectDef g_Textured2DEffect
 	{
-		g_Texture2DVS,
-		g_TexturePS
-	};
-
-	const EffectDef g_TexturedQuadEffect
-	{
-		g_Texture2DVS,
-		g_TexturePS
+		g_VS_Textured2D,
+		g_PS_Textured
 	};
 
 	const EffectDef g_DebugFlat3DEffect
 	{
-		g_3DVS,
-		g_Flat3DPS
+		g_VS_3D,
+		g_PS_Flat3D
 	};
 
 	const EffectDef g_Textured3DEffect
 	{
-		g_Texture3DVS,
-		g_TexturePS
+		g_VS_Textured3D,
+		g_PS_Textured
 	};
 
 	// Common Vertex Formats
