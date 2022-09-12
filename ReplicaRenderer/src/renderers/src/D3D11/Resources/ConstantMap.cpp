@@ -155,7 +155,7 @@ const IDynamicCollection<ConstantDef>& ConstantMapDef::GetMembers() const { retu
 /// <summary>
 /// Returns the size of the buffer defined by the definition, in bytes.
 /// </summary>
-size_t ConstantMapDef::GetStride() const { return stride; }
+size_t ConstantMapDef::GetStride() const { return GetAlignedByteSize(stride, 16); }
 
 ConstantDef::ConstantDef() : name(L""), type(typeid(void*)), stride(0)
 { }
@@ -163,7 +163,7 @@ ConstantDef::ConstantDef() : name(L""), type(typeid(void*)), stride(0)
 ConstantDef::ConstantDef(wstring_view name, const type_info& type, const size_t stride) :
 	name(name),
 	type(type),
-	stride(GetAlignedByteSize(stride, 16))
+	stride(stride)
 { }
 
 ConstantDef::ConstantDef(const ConstantDef& other) :
