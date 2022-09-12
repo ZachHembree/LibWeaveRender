@@ -1,6 +1,4 @@
-#include "DynamicCollections.hpp"
-#include "D3D11/Resources/InputLayout.hpp"
-#include "D3D11/Device.hpp"
+#include "ReplicaInternalD3D11.hpp"
 
 using namespace Replica::D3D11;
 using namespace Microsoft::WRL;

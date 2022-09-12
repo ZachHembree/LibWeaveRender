@@ -1,5 +1,5 @@
 #pragma once
-#include "D3D11/Shaders/ShaderBase.hpp"
+#include "ShaderBase.hpp"
 
 namespace Replica::D3D11
 {

@@ -1,6 +1,5 @@
-#include "D3D11/Device.hpp"
-#include "D3D11/Renderer.hpp"
-#include "GfxException.hpp"
+#include "ReplicaMain.hpp"
+#include "ReplicaD3D11.hpp"
 
 using namespace glm;
 using namespace Replica;

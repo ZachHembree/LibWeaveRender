@@ -1,11 +1,5 @@
-#include "MinWindow.hpp"
-#include "D3D11/Renderer.hpp"
-#include "D3D11/Effect.hpp"
-#include "D3D11/Shaders/ComputeShader.hpp"
-#include "D3D11/Mesh.hpp"
-#include "D3D11/Resources/Sampler.hpp"
-#include "D3D11/Primitives.hpp"
-#include "D3D11/Shaders/BuiltInShaders.hpp"
+#include "ReplicaMain.hpp"
+#include "ReplicaInternalD3D11.hpp"
 
 using namespace Replica::D3D11;
 

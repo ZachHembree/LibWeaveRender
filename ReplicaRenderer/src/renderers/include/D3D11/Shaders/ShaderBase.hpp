@@ -1,9 +1,9 @@
 #pragma once
-#include "D3D11/Resources/DeviceChild.hpp"
-#include "D3D11/Resources/InputLayout.hpp"
-#include "D3D11/Resources/ConstantBuffer.hpp"
-#include "D3D11/Resources/ConstantMap.hpp"
-#include "D3D11/ResourceMap.hpp"
+#include "../Resources/DeviceChild.hpp"
+#include "../Resources/InputLayout.hpp"
+#include "../Resources/ConstantBuffer.hpp"
+#include "../Resources/ConstantMap.hpp"
+#include "../ResourceMap.hpp"
 
 namespace Replica::D3D11
 {

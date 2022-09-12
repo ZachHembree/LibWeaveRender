@@ -1,6 +1,6 @@
 #pragma once
-#include "D3D11/Effect.hpp"
-#include "D3D11/Shaders/ComputeShader.hpp"
+#include "../Effect.hpp"
+#include "../Shaders/ComputeShader.hpp"
 
 namespace Replica::D3D11
 {

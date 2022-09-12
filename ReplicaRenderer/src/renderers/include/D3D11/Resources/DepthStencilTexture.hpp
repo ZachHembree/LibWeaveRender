@@ -1,6 +1,6 @@
 #pragma once
-#include "D3D11/Resources/Texture2D.hpp"
-#include "D3D11/Resources/TextureEnums.hpp"
+#include "Texture2D.hpp"
+#include "TextureEnums.hpp"
 
 namespace Replica::D3D11
 {

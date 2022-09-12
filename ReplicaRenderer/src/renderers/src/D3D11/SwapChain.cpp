@@ -1,10 +1,9 @@
 #include <d3d11.h>
 #include <wrl.h>
-#include "MinWindow.hpp"
-#include "D3D11/SwapChain.hpp"
-#include "D3D11/Resources/RTHandle.hpp"
-#include "D3D11/Resources/Texture2D.hpp"
+#include "ReplicaMain.hpp"
+#include "ReplicaInternalD3D11.hpp"
 
+using namespace Replica;
 using namespace Replica::D3D11;
 
 SwapChain::SwapChain() : desc({})

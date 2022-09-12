@@ -1,19 +1,4 @@
-#include "D3D11/SwapChain.hpp"
-#include "D3D11/Context.hpp"
-#include "D3D11/Resources/VertexBuffer.hpp"
-#include "D3D11/Resources/IndexBuffer.hpp"
-#include "D3D11/Resources/ConstantBuffer.hpp"
-#include "D3D11/Resources/InputLayout.hpp"
-#include "D3D11/Resources/RTHandle.hpp"
-#include "D3D11/Resources/DepthStencilTexture.hpp"
-#include "D3D11/Shaders/VertexShader.hpp"
-#include "D3D11/Shaders/PixelShader.hpp"
-#include "D3D11/Shaders/ComputeShader.hpp"
-#include "D3D11/Effect.hpp"
-#include "D3D11/Mesh.hpp"
-#include "D3D11/Resources/RWTexture2D.hpp"
-#include "D3D11/Renderer.hpp"
-#include "D3D11/Shaders/ComputeShader.hpp"
+#include "ReplicaD3D11.hpp"
 
 using namespace glm;
 using namespace Replica;

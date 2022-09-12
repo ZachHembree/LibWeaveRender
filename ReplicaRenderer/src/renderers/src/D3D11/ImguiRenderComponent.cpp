@@ -1,5 +1,5 @@
-#include "D3D11/ImguiRenderComponent.hpp"
-#include "D3D11/Renderer.hpp"
+#include "ReplicaD3D11.hpp"
+#include "../src/renderers/include/D3D11/ImguiRenderComponent.hpp"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>

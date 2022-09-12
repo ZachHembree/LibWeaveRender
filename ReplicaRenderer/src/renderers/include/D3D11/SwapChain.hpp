@@ -1,8 +1,8 @@
 #pragma once
 #include <dxgi1_2.h>
-#include "D3D11/Device.hpp"
-#include "D3D11/Resources/Texture2D.hpp"
-#include "D3D11/Resources/RTHandle.hpp"
+#include "Device.hpp"
+#include "Resources/Texture2D.hpp"
+#include "Resources/RTHandle.hpp"
 
 namespace Replica
 {

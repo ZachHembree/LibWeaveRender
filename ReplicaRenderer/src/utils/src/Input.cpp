@@ -1,5 +1,4 @@
-#include "Input.hpp"
-#include "MinWindow.hpp"
+#include "ReplicaMain.hpp"
 
 using namespace glm;
 using namespace Replica;

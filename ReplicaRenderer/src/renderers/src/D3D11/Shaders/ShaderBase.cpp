@@ -1,9 +1,4 @@
-#include "D3D11/Shaders/ShaderBase.hpp"
-#include "D3D11/Device.hpp"
-#include "D3D11/Resources/ConstantBuffer.hpp"
-#include "D3D11/Resources/ConstantMap.hpp"
-#include "D3D11/Resources/Sampler.hpp"
-#include "D3D11/Resources/Texture2D.hpp"
+#include "ReplicaInternalD3D11.hpp"
 
 using namespace Replica::D3D11;
 

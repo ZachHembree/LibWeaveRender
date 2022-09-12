@@ -1,6 +1,6 @@
 #pragma once
-#include "D3D11/Resources/DeviceChild.hpp"
-#include "D3D11/Resources/TextureEnums.hpp"
+#include "DeviceChild.hpp"
+#include "TextureEnums.hpp"
 
 namespace Replica::D3D11
 {

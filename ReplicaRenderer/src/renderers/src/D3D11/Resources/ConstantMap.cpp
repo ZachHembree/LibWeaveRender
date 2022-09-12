@@ -1,5 +1,4 @@
-#include "D3D11/Resources/ConstantBuffer.hpp"
-#include "D3D11/Resources/ConstantMap.hpp"
+#include "ReplicaInternalD3D11.hpp"
 
 using namespace Replica;
 using namespace Replica::D3D11;

@@ -1,7 +1,5 @@
-#include "D3D11/RenderComponent.hpp"
-#include "D3D11/Renderer.hpp"
-#include "D3D11/Device.hpp"
-#include "MinWindow.hpp"
+#include "ReplicaMain.hpp"
+#include "ReplicaD3D11.hpp"
 
 using namespace Replica;
 using namespace Replica::D3D11;

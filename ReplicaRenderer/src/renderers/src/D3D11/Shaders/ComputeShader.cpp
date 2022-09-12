@@ -1,9 +1,5 @@
 #include <d3dcompiler.h>
-#include "D3D11/Device.hpp"
-#include "D3D11/Resources/RWTexture2D.hpp"
-#include "D3D11/Resources/ConstantBuffer.hpp"
-#include "D3D11/Resources/Sampler.hpp"
-#include "D3D11/Shaders/ComputeShader.hpp"
+#include "ReplicaInternalD3D11.hpp"
 
 using namespace Replica::D3D11;
 using namespace Microsoft::WRL;

@@ -1,5 +1,5 @@
 #pragma once
-#include "D3D11/RenderComponent.hpp"
+#include "RenderComponent.hpp"
 
 namespace Replica::D3D11
 {

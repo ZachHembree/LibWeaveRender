@@ -1,6 +1,6 @@
 #pragma once
-#include "D3D11/Resources/ResourceBase.hpp"
-#include "D3D11/Resources/Formats.hpp"
+#include "ResourceBase.hpp"
+#include "Formats.hpp"
 
 namespace DirectX
 {

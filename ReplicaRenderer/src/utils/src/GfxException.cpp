@@ -1,7 +1,8 @@
-#include "GfxException.hpp"
 #include <sstream>
+#include "ReplicaMain.hpp"
 
 using namespace std;
+using namespace Replica;
 using namespace Replica::D3D11;
 
 GfxException::GfxException(int line, const char* file, HRESULT hr) noexcept :

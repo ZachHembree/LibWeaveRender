@@ -1,6 +1,5 @@
-#include "D3D11/Resources/RWTexture2D.hpp"
-#include "D3D11/Device.hpp"
 #include <DirectXTex.h>
+#include "ReplicaInternalD3D11.hpp"
 
 using namespace DirectX;
 using namespace Replica::D3D11;

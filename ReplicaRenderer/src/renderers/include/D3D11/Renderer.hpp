@@ -2,11 +2,11 @@
 #include <unordered_map>
 
 #include <string_view>
-#include "WindowComponentBase.hpp"
-#include "D3D11/SwapChain.hpp"
-#include "D3D11/Device.hpp"
-#include "D3D11/RenderComponent.hpp"
-#include "D3D11/Resources/DepthStencilTexture.hpp"
+#include "../src/utils/include/WindowComponentBase.hpp"
+#include "SwapChain.hpp"
+#include "Device.hpp"
+#include "RenderComponent.hpp"
+#include "Resources/DepthStencilTexture.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")

@@ -2,9 +2,10 @@
 #pragma warning(disable: 4250)
 
 #include <d3d11.h>
-#include "D3D11/Resources/DeviceChild.hpp"
-#include "D3D11/Resources/ResourceEnums.hpp"
-#include "D3D11/Resources/Formats.hpp"
+#include "../../D3DUtils.hpp"
+#include "DeviceChild.hpp"
+#include "ResourceEnums.hpp"
+#include "Formats.hpp"
 
 namespace Replica::D3D11
 {

@@ -1,5 +1,5 @@
 #pragma once
-#include "D3D11/IAsset.hpp"
+#include "IAsset.hpp"
 
 namespace Replica::D3D11
 {

@@ -1,5 +1,4 @@
-#include "MinWindow.hpp"
-#include "WindowComponentBase.hpp"
+#include "ReplicaMain.hpp"
 #include <ShellScalingApi.h>
 
 using namespace glm;

@@ -1,7 +1,7 @@
 #pragma once
-#include "D3DUtils.hpp"
-#include "D3D11/Resources/DeviceChild.hpp"
-#include "D3D11/Resources/ResourceBase.hpp"
+#include "../D3DUtils.hpp"
+#include "Resources/DeviceChild.hpp"
+#include "Resources/ResourceBase.hpp"
 
 namespace Replica::D3D11
 {

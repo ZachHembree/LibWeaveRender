@@ -1,5 +1,5 @@
 #pragma once
-#include "D3D11/Resources/Texture2D.hpp"
+#include "Texture2D.hpp"
 
 namespace Replica::D3D11
 {

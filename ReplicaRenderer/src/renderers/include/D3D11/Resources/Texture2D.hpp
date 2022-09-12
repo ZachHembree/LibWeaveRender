@@ -1,5 +1,5 @@
 #pragma once
-#include "D3D11/Resources/Texture2DBase.hpp"
+#include "Texture2DBase.hpp"
 
 namespace DirectX
 {

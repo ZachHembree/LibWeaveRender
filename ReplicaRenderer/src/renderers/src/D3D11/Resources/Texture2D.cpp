@@ -1,9 +1,6 @@
-#include "D3D11/Device.hpp"
-#include "D3D11/Resources/Formats.hpp"
-#include "D3D11/Resources/BufferBase.hpp"
-#include "D3D11/Resources/Texture2D.hpp"
 #include <WICTextureLoader.h>
 #include <DirectXTex.h>
+#include "ReplicaInternalD3D11.hpp"
 
 using namespace DirectX;
 using namespace Replica::D3D11;

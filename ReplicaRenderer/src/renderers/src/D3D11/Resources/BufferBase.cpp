@@ -1,8 +1,5 @@
-#include "D3DUtils.hpp"
 #include <d3d11.h>
-#include "D3D11/Resources/BufferBase.hpp"
-#include "D3D11/Device.hpp"
-#include "D3D11/Context.hpp"
+#include "ReplicaInternalD3D11.hpp"
 
 using namespace Replica::D3D11;
 

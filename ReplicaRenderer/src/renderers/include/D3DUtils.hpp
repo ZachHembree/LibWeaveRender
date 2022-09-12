@@ -1,13 +1,18 @@
 #pragma once
+#include "../src/utils/include/RepLeanWin.h"
 
 #include <string_view>
-#include "GfxException.hpp"
+#include <wrl.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <wrl.h>
-#include "MoveOnlyBase.hpp"
-#include "DynamicCollections.hpp"
+
+#include "../src/utils/include/MoveOnlyBase.hpp"
+#include "../src/utils/include/DynamicCollections.hpp"
+#include "../src/utils/include/RepWinException.hpp"
+#include "../src/utils/include/GfxException.hpp"
 
 #define BITWISE_AND(T, T_INT) \
         inline T operator& (const T& a, const T& b)\
@@ -39,7 +44,7 @@
 
 #define BITWISE_ALL(T, T_INT) BITWISE_AND(T, T_INT) BITWISE_OR(T, T_INT) BITWISE_NEGATE(T, T_INT) 
 
-namespace Replica::D3D11
+namespace Replica
 {
 	using std::string_view;
 	using std::wstring_view;

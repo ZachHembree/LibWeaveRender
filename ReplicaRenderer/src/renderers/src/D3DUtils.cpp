@@ -1,6 +1,6 @@
-#include "D3DUtils.hpp"
+#include "../src/renderers/include/D3DUtils.hpp"
 
-namespace Replica::D3D11
+namespace Replica
 { 
 	fquat QuatFromAxis(vec3 axis, float rad)
 	{

@@ -302,6 +302,15 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RWTexture2D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ReplicaRenderer\include\ReplicaMain.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\include\ReplicaD3D11.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\include\ReplicaInternalD3D11.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\VS_Textured3D.hlsl">

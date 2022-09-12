@@ -1,7 +1,7 @@
 #pragma once
-#include "D3D11/IDrawable.hpp"
-#include "D3D11/Resources/VertexBuffer.hpp"
-#include "D3D11/Resources/IndexBuffer.hpp"
+#include "IDrawable.hpp"
+#include "Resources/VertexBuffer.hpp"
+#include "Resources/IndexBuffer.hpp"
 #include <math.h>
 
 namespace Replica::D3D11
