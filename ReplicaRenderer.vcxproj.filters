@@ -327,6 +327,7 @@
     <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\VS_PosTextured.hlsl" />
     <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\CS_TexCopySamp2D.hlsl" />
     <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\CS_TexCopy2D.hlsl" />
+    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\CS_TexCopyScaledSamp2D.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -24,6 +24,8 @@ ImguiHandler::ImguiHandler(MinWindow& window, Renderer& renderer) :
 	ImGui_ImplWin32_Init(window.GetWndHandle());
 	pRenderComponent = new ImguiRenderComponent(renderer);
 	UpdateUI();
+
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
 
 ImguiHandler::~ImguiHandler()

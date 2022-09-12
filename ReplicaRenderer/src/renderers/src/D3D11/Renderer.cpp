@@ -19,6 +19,7 @@ Renderer::Renderer(MinWindow& window) :
 	defaultEffects[L"DebugFlat3D"] = Effect(device, g_DebugFlat3DEffect);
 	defaultEffects[L"Textured3D"] = Effect(device, g_Textured3DEffect);
 
+	defaultCompute[L"TexCopyScaledSamp2D"] = ComputeShader(device, g_CS_TexCopyScaledSamp2D);
 	defaultCompute[L"TexCopySamp2D"] = ComputeShader(device, g_CS_TexCopySamp2D);
 	defaultCompute[L"TexCopy2D"] = ComputeShader(device, g_CS_TexCopy2D);
 
