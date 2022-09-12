@@ -48,6 +48,8 @@ namespace Replica::D3D11
 
 		const IDynamicCollection<T*>& GetResources() { return resources; }
 
+		size_t GetCount() { return resources.GetLength(); }
+
 	private:
 		DynamicArray<T*> resources;
 		std::unordered_map<wstring_view, uint> resourceMap;

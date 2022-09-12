@@ -67,16 +67,16 @@ void ComputeShader::Unbind()
 		ID3D11DeviceContext& ctx = pCtx->Get();
 
 		ID3D11SamplerState* nullSamp[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT](nullptr);
-		ctx.CSSetSamplers(0, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, nullSamp);
+		ctx.CSSetSamplers(0, samplers.GetCount(), nullSamp);
 
 		ID3D11ShaderResourceView* nullSRV[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT](nullptr);
-		ctx.CSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, nullSRV);
+		ctx.CSSetShaderResources(0, textures.GetCount(), nullSRV);
 
 		ID3D11Buffer* nullCB[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT](nullptr);
-		ctx.CSSetConstantBuffers(0, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, nullCB);
+		ctx.CSSetConstantBuffers(0, 1, nullCB);
 
 		ID3D11UnorderedAccessView* nullUAV[D3D11_1_UAV_SLOT_COUNT](nullptr);
-		ctx.CSSetUnorderedAccessViews(0, D3D11_1_UAV_SLOT_COUNT, nullUAV, 0);
+		ctx.CSSetUnorderedAccessViews(0, uavBuffers.GetCount(), nullUAV, 0);
 
 		pCtx = nullptr;
 	}
