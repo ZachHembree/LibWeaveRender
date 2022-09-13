@@ -53,6 +53,7 @@ bool ImguiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 	if (ImGui::GetCurrentContext() != nullptr)
 	{ 
 		ImGuiIO& io = ImGui::GetIO();
+		ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 
 		switch (msg)
 		{
@@ -74,7 +75,6 @@ bool ImguiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		case WM_SYSKEYUP:
 		case WM_SYSKEYDOWN:
 			UpdateUI();
-			ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 			return !(io.WantCaptureKeyboard || io.WantCaptureMouse);
 		}
 	}
