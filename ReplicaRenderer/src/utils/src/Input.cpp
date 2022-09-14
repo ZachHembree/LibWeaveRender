@@ -4,7 +4,32 @@ using namespace glm;
 using namespace Replica;
 using namespace DirectX;
 
-bool InputComponent::GetIsKeyPressed(KbKey key)
+MouseKey InputComponent::GetLastPressedMouseKeys() const
+{
+	return lastMousePresses;
+}
+
+MouseKey InputComponent::GetPresssedMouseKeys() const
+{		
+	return currentMousePresses;
+}
+
+bool InputComponent::GetIsNewKeyPressed(MouseKey key) const
+{
+	return GetIsKeyPressed(key) && !GetWasKeyPressed(key);
+}
+
+bool InputComponent::GetWasKeyPressed(MouseKey key) const
+{
+	return (uint)(key & GetLastPressedMouseKeys());
+}
+
+bool InputComponent::GetIsKeyPressed(MouseKey key) const
+{
+	return (uint)(key & GetPresssedMouseKeys());
+}
+
+bool InputComponent::GetIsKeyPressed(KbKey key) const
 {
 	return keyboard.GetState().IsKeyDown(key);
 }
@@ -22,6 +47,10 @@ vec2 InputComponent::GetNormMousePos() const
 
 	return (1.0f / vpSize.y) * vec2(pos.x * aspectRatio, pos.y);
 }
+
+InputComponent::InputComponent(MinWindow& window) :
+	WindowComponentBase(window)
+{ }
 
 bool InputComponent::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -60,6 +89,21 @@ bool InputComponent::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		keyboard.Reset();
 		break;
 	}	
+
+	auto state = mouse.GetState();
+	lastMousePresses = currentMousePresses;
+	currentMousePresses = MouseKey::None;
+
+	if (state.leftButton)
+		currentMousePresses |= MouseKey::LeftButton;
+	else if (state.middleButton)
+		currentMousePresses |= MouseKey::MiddleButton;
+	else if (state.rightButton)
+		currentMousePresses |= MouseKey::RightButton;
+	else if (state.xButton2)
+		currentMousePresses |= MouseKey::xButton1;
+	else if (state.xButton2)
+		currentMousePresses |= MouseKey::xButton2;
 
 	return true;
 }

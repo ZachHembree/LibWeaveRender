@@ -160,6 +160,11 @@ namespace Replica
 			/// </summary>
 			ivec2 GetMonitorResolution() const;
 
+			/// <summary>
+			/// Returns true if the mouse is inside the bounds of the window's client area
+			/// </summary>
+			bool GetIsMousedOver() const;
+
 		protected:	
 			static MinWindow* pLastInit;
 
@@ -169,6 +174,8 @@ namespace Replica
 			MSG wndMsg;
 			ivec2 bodySize, wndSize;
 			bool isInitialized;
+			bool isMousedOver;
+			TRACKMOUSEEVENT tme;
 
 			bool isFullscreen;
 			ivec2 lastPos, lastSize;

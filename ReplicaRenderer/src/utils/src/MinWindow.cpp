@@ -20,6 +20,7 @@ MinWindow::MinWindow(
 	hWnd(nullptr),
 	isFullscreen(false),
 	isInitialized(false),
+	isMousedOver(false),
 	lastPos(0),
 	lastSize(0),
 	initStyle(initStyle)
@@ -74,6 +75,12 @@ MinWindow::MinWindow(
 
 	// Make the window visible
 	ShowWindow(hWnd, SW_SHOW);
+
+	// Setup mouse tracker
+	tme.cbSize = sizeof(tme);
+	tme.hwndTrack = hWnd;
+	tme.dwFlags = TME_LEAVE | TME_HOVER;
+	tme.dwHoverTime = 1;
 }
 
 MinWindow::~MinWindow()
@@ -315,6 +322,11 @@ void MinWindow::SetFullScreen(bool value)
 	}
 }
 
+bool MinWindow::GetIsMousedOver() const
+{
+	return isMousedOver;
+}
+
 LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	try
@@ -326,6 +338,24 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 			break;
 		case WM_SIZE:
 			OnResize();
+			break;
+		case WM_ACTIVATE:
+		case WM_SETFOCUS:
+		case WM_MOUSEACTIVATE:
+		case WM_NCMOUSEHOVER:
+		case WM_NCMOUSEMOVE:
+		case WM_MOUSEHOVER:
+		case WM_MOUSEMOVE:
+
+			if (!isMousedOver)
+				TrackMouseEvent(&tme);
+
+			isMousedOver = true;
+			break;
+		case WM_KILLFOCUS:
+		case WM_MOUSELEAVE:
+		case WM_NCMOUSELEAVE:
+			isMousedOver = false;
 			break;
 		}
 
