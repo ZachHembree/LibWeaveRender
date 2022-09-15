@@ -1,9 +1,13 @@
 #pragma once
-#include "../src/renderers/include/D3DUtils.hpp"
+#include "ReplicaWinUtils.hpp"
+#include "ReplicaMath.hpp"
+#include <d3d11.h>
+
+#include "../src/utils/include/GfxException.hpp"
 
 #include "../src/renderers/include/D3D11/Renderer.hpp"
 #include "../src/renderers/include/D3D11/RenderComponent.hpp"
-#include "../src/renderers/include/D3D11/ImguiHandler.hpp"
+#include "../src/utils/include/Input.hpp"
 
 #include "../src/renderers/include/D3D11/Mesh.hpp"
 #include "../src/renderers/include/D3D11/Primitives.hpp"

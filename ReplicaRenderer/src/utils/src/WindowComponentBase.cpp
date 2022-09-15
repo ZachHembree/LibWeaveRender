@@ -1,4 +1,4 @@
-#include "ReplicaMain.hpp"
+#include "ReplicaWin32.hpp"
 
 using namespace Replica;
 

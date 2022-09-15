@@ -1,8 +1,7 @@
 #pragma once
 #pragma warning(disable: 4250)
 
-#include <d3d11.h>
-#include "../../D3DUtils.hpp"
+#include "ReplicaD3D11.hpp"
 #include "DeviceChild.hpp"
 #include "ResourceEnums.hpp"
 #include "Formats.hpp"

@@ -1,4 +1,5 @@
-#include "ReplicaMain.hpp"
+#include "ReplicaWin32.hpp"
+#include "ReplicaImgui.hpp"
 #include "ReplicaInternalD3D11.hpp"
 
 #include <imgui.h>

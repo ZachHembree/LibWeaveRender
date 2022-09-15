@@ -1,5 +1,5 @@
 #include <sstream>
-#include "ReplicaMain.hpp"
+#include "../src/utils/include/GfxException.hpp"
 
 using namespace std;
 using namespace Replica;
@@ -9,7 +9,7 @@ GfxException::GfxException(int line, const char* file, HRESULT hr) noexcept :
 	RepWinException(line, file, hr)
 { }
 
-const char* GfxException::GetType() const noexcept
+string_view GfxException::GetType() const noexcept
 {
 	return "D3D11 Exception";
 }
@@ -32,7 +32,7 @@ const char* GfxAssertException::what() const noexcept
 	return whatBuf.c_str();
 }
 
-const char* GfxAssertException::GetType() const noexcept
+string_view GfxAssertException::GetType() const noexcept
 {
 	return "General GFX";
 }

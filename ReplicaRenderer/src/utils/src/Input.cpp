@@ -1,46 +1,47 @@
-#include "ReplicaMain.hpp"
+#include "ReplicaWin32.hpp"
+#include "../src/utils/include/Input.hpp"
 
 using namespace glm;
 using namespace Replica;
 using namespace DirectX;
 
-MouseKey InputComponent::GetLastPressedMouseKeys() const
+MouseKey InputHandler::GetLastPressedMouseKeys() const
 {
 	return lastMousePresses;
 }
 
-MouseKey InputComponent::GetPresssedMouseKeys() const
+MouseKey InputHandler::GetPresssedMouseKeys() const
 {		
 	return currentMousePresses;
 }
 
-bool InputComponent::GetIsNewKeyPressed(MouseKey key) const
+bool InputHandler::GetIsNewKeyPressed(MouseKey key) const
 {
 	return GetIsKeyPressed(key) && !GetWasKeyPressed(key);
 }
 
-bool InputComponent::GetWasKeyPressed(MouseKey key) const
+bool InputHandler::GetWasKeyPressed(MouseKey key) const
 {
 	return (uint)(key & GetLastPressedMouseKeys());
 }
 
-bool InputComponent::GetIsKeyPressed(MouseKey key) const
+bool InputHandler::GetIsKeyPressed(MouseKey key) const
 {
 	return (uint)(key & GetPresssedMouseKeys());
 }
 
-bool InputComponent::GetIsKeyPressed(KbKey key) const
+bool InputHandler::GetIsKeyPressed(KbKey key) const
 {
 	return keyboard.GetState().IsKeyDown(key);
 }
 
-ivec2 InputComponent::GetMousePos() const
+ivec2 InputHandler::GetMousePos() const
 {
 	auto state = mouse.GetState();
 	return ivec2(state.x, state.y);
 }
 
-vec2 InputComponent::GetNormMousePos() const
+vec2 InputHandler::GetNormMousePos() const
 {
 	ivec2 vpSize = GetWindow().GetSize(), pos = GetMousePos();
 	float aspectRatio = (float)vpSize.y / vpSize.x;
@@ -48,11 +49,11 @@ vec2 InputComponent::GetNormMousePos() const
 	return (1.0f / vpSize.y) * vec2(pos.x * aspectRatio, pos.y);
 }
 
-InputComponent::InputComponent(MinWindow& window) :
+InputHandler::InputHandler(MinWindow& window) :
 	WindowComponentBase(window)
 { }
 
-bool InputComponent::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+bool InputHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{

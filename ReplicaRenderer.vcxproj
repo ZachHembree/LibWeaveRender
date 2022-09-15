@@ -207,7 +207,7 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\RenderComponent.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\Texture2D.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Shaders\ComputeShader.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3DUtils.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\ReplicaMath.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantMap.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantBuffer.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Shaders\ShaderBase.cpp" />
@@ -235,7 +235,11 @@
   <ItemGroup>
     <ClInclude Include="ReplicaRenderer\include\ReplicaD3D11.hpp" />
     <ClInclude Include="ReplicaRenderer\include\ReplicaInternalD3D11.hpp" />
-    <ClInclude Include="ReplicaRenderer\include\ReplicaMain.hpp" />
+    <ClInclude Include="ReplicaRenderer\include\ReplicaImgui.hpp" />
+    <ClInclude Include="ReplicaRenderer\include\ReplicaMath.hpp" />
+    <ClInclude Include="ReplicaRenderer\include\ReplicaUtils.hpp" />
+    <ClInclude Include="ReplicaRenderer\include\ReplicaWin32.hpp" />
+    <ClInclude Include="ReplicaRenderer\include\ReplicaWinUtils.hpp" />
     <ClInclude Include="ReplicaRenderer\libs\imgui\backends\imgui_impl_dx11.h" />
     <ClInclude Include="ReplicaRenderer\libs\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="ReplicaRenderer\libs\imgui\imconfig.h" />
@@ -251,7 +255,6 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\ComputeShader.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\DepthStencilTexture.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\TextureEnums.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3DUtils.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiHandler.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiRenderComponent.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\RenderComponent.hpp" />

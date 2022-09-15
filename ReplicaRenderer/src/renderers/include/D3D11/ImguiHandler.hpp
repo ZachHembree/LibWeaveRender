@@ -4,6 +4,7 @@
 namespace Replica::D3D11
 {
 	class ImguiRenderComponent;
+	class Renderer;
 
 	/// <summary>
 	/// Manages initialization and cleanup of Imgui

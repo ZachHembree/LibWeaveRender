@@ -1,6 +1,6 @@
 #include <d3d11.h>
 #include <wrl.h>
-#include "ReplicaMain.hpp"
+#include "ReplicaWin32.hpp"
 #include "ReplicaInternalD3D11.hpp"
 
 using namespace Replica;

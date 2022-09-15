@@ -1,7 +1,6 @@
 #pragma once
 #include "DeviceChild.hpp"
 #include "Formats.hpp"
-#include "../../D3DUtils.hpp"
 
 namespace Replica::D3D11
 {

@@ -1,4 +1,4 @@
-#include "ReplicaMain.hpp"
+#include "ReplicaWin32.hpp"
 #include <ShellScalingApi.h>
 
 using namespace glm;
@@ -371,7 +371,7 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 	}
 	catch (const RepException& e)
 	{
-		MessageBoxA(nullptr, e.what(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
+		MessageBoxA(nullptr, e.what(), e.GetType().data(), MB_OK | MB_ICONEXCLAMATION);
 	}
 	catch (const std::exception& e)
 	{

@@ -12,7 +12,7 @@ namespace Replica::D3D11
 	public:
 		GfxException(int line, const char* file, HRESULT hr) noexcept;
 
-		const char* GetType() const noexcept override;
+		string_view GetType() const noexcept override;
 	};
 
 	class GfxAssertException : public RepException
@@ -22,7 +22,7 @@ namespace Replica::D3D11
 
 		const char* what() const noexcept override;
 
-		const char* GetType() const noexcept override;
+		string_view GetType() const noexcept override;
 
 	private:
 		const char* msg;

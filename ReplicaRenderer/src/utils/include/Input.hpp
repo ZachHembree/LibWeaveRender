@@ -21,13 +21,13 @@ BITWISE_ALL(MouseKey, unsigned int)
 
 namespace Replica
 {
-	class InputComponent : public WindowComponentBase
+	class InputHandler : public WindowComponentBase
 	{
 	using ivec2 = glm::ivec2;
 	using vec2 = glm::vec2;
 
 	public:
-		InputComponent(MinWindow& window);
+		InputHandler(MinWindow& window);
 
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 

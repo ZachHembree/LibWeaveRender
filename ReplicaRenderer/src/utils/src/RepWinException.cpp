@@ -1,11 +1,11 @@
-#include "ReplicaMain.hpp"
+#include "../src/utils/include/RepWinException.hpp"
 #include <sstream>
 #include <winnls.h>
 
 using namespace std;
 using namespace Replica;
 
-RepWinException::RepWinException(int line, const char* file, HRESULT hr) noexcept :
+RepWinException::RepWinException(int line, string_view file, HRESULT hr) noexcept :
 	RepException(line, file),
 	hr(hr)
 { }
@@ -24,7 +24,7 @@ const char* RepWinException::what() const noexcept
 	return whatBuf.c_str();
 }
 
-std::string RepWinException::GetErrorString() const noexcept
+string RepWinException::GetErrorString() const noexcept
 {
 	return GetTranslatedErrorCode(hr);
 }
@@ -34,12 +34,12 @@ HRESULT RepWinException::GetErrorCode() const noexcept
 	return hr;
 }
 
-const char* RepWinException::GetType() const noexcept
+string_view RepWinException::GetType() const noexcept
 {
 	return "Windows Exception";
 }
 
-std::string RepWinException::GetTranslatedErrorCode(HRESULT hr) noexcept
+string RepWinException::GetTranslatedErrorCode(HRESULT hr) noexcept
 {
 	char* lpBuf = nullptr;
 	DWORD msgLen = FormatMessageA(

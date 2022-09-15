@@ -1,5 +1,5 @@
 #pragma once
-#include "../D3DUtils.hpp"
+#include "ReplicaD3D11.hpp"
 #include "Resources/DeviceChild.hpp"
 #include "Resources/ResourceBase.hpp"
 

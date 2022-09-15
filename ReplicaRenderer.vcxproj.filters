@@ -108,7 +108,7 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3DUtils.cpp">
+    <ClCompile Include="ReplicaRenderer\src\ReplicaMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Mesh.cpp">
@@ -201,9 +201,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Context.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3DUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RTHandle.hpp">
@@ -302,13 +299,25 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RWTexture2D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicaRenderer\include\ReplicaMain.hpp">
+    <ClInclude Include="ReplicaRenderer\include\ReplicaImgui.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\include\ReplicaD3D11.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\include\ReplicaInternalD3D11.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\include\ReplicaWin32.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\include\ReplicaUtils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\include\ReplicaMath.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\include\ReplicaWinUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,4 +1,3 @@
-#include "ReplicaMain.hpp"
 #include "ReplicaD3D11.hpp"
 
 using namespace Replica;

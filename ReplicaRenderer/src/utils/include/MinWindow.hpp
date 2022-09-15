@@ -1,28 +1,12 @@
 #ifndef REP_WIND_H
 #define REP_WIND_H
 
-#include "RepLeanWin.h"
-#include "RepWinException.hpp"
-#include <string_view>
-#include <glm/glm.hpp>
-
-#include "DynamicCollections.hpp"
-#include "MoveOnlyBase.hpp"
+#include "ReplicaWin32.hpp"
 
 #pragma comment(lib, "Shcore.lib")
 
 namespace Replica
 {
-	typedef glm::tvec2<DWORD> WndStyle;
-	typedef glm::tvec2<UINT> uivec2;
-	
-	using glm::ivec2;
-	using glm::vec2;
-	using std::string_view;
-	using std::wstring_view;
-	using std::string;
-	using std::wstring;
-
 	class WindowComponentBase;
 
 	/// <summary>

@@ -1,6 +1,6 @@
 #pragma once
 #include <d3d11.h>
-#include "../../D3DUtils.hpp"
+#include "ReplicaUtils.hpp"
 
 namespace Replica::D3D11
 {
