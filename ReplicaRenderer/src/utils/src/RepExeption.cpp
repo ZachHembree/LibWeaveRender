@@ -36,7 +36,7 @@ string_view RepException::GetType() const noexcept
 	return "Replica Exception";
 }
 
-RepMsgException::RepMsgException(int line, const char* file, string_view msg) noexcept :
+RepMsgException::RepMsgException(int line, string_view file, string_view msg) noexcept :
 	RepException(line, file),
 	msg(msg)
 { }

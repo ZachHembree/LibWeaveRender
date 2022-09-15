@@ -65,7 +65,7 @@ namespace Replica::D3D11
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
 		template<typename T>
-		void SetTextureData(Context& ctx, IDynamicCollection<T> data, ivec2 dim)
+		void SetTextureData(Context& ctx, IDynamicCollection<T>& data, ivec2 dim)
 		{
 			SetTextureData(ctx, data.GetPtr(), sizeof(T), dim);
 		}

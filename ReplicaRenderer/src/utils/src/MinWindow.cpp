@@ -369,18 +369,8 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 			}
 		}
 	}
-	catch (const RepException& e)
-	{
-		MessageBoxA(nullptr, e.what(), e.GetType().data(), MB_OK | MB_ICONEXCLAMATION);
-	}
-	catch (const std::exception& e)
-	{
-		MessageBoxA(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
-	}
 	catch (...)
-	{
-		MessageBoxA(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
-	}
+	{ }
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }

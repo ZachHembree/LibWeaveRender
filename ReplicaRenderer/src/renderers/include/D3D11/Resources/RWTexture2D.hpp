@@ -39,6 +39,16 @@ namespace Replica::D3D11
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
+		template<typename T>
+		void SetTextureData(Context& ctx, IDynamicCollection<T>& data, ivec2 dim)
+		{
+			SetTextureData(ctx, data.GetPtr(), sizeof(T), dim);
+		}
+
+		/// <summary>
+		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
+		/// Allocates new Texture2D if the dimensions aren't the same.
+		/// </summary>
 		void SetTextureData(Context& ctx, void* data, size_t stride, ivec2 dim) override;
 
 		/// <summary>

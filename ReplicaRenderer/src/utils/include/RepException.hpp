@@ -32,7 +32,7 @@ namespace Replica
 	{
 	public:
 
-		RepMsgException(int line, const char* file, string_view msg) noexcept;
+		RepMsgException(int line, string_view file, string_view msg) noexcept;
 
 		const char* what() const noexcept override;
 
