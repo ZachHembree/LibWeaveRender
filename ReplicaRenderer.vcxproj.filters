@@ -135,6 +135,9 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\RWTexture2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\ReplicaWinUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplicaRenderer\src\utils\include\RepLeanWin.h">

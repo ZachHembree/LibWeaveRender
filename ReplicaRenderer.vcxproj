@@ -225,6 +225,7 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\BufferBase.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Device.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Renderer.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\ReplicaWinUtils.cpp" />
     <ClCompile Include="ReplicaRenderer\src\utils\src\GfxException.cpp" />
     <ClCompile Include="ReplicaRenderer\src\utils\src\Input.cpp" />
     <ClCompile Include="ReplicaRenderer\src\utils\src\RepExeption.cpp" />

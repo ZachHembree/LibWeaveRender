@@ -1,7 +1,10 @@
 #pragma once
 #include "../src/utils/include/RepLeanWin.h"
+#include "../src/utils/include/RepWinException.hpp"
+
 #include <wrl.h>
 #include <glm/glm.hpp>
+#include "ReplicaUtils.hpp"
 
 namespace Replica
 {
@@ -13,6 +16,14 @@ namespace Replica
 
 	template <typename T>
 	using ComPtr = Microsoft::WRL::ComPtr<T>;
-}
 
-#include "ReplicaUtils.hpp"
+	/// <summary>
+	/// Returns a copy of a given wide UTF-16LE string as a narrow UTF-8 string.
+	/// </summary>
+	string GetMultiByteString_UTF16LE_TO_UTF8(wstring_view src);
+
+	/// <summary>
+	/// Returns a copy of a given narrow UTF-8 string as a UTF-16LE string.
+	/// </summary>
+	wstring GetWideString_UTF8_TO_UTF16LE(string_view src);
+}
