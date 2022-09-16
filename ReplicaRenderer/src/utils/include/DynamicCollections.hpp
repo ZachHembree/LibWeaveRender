@@ -233,7 +233,9 @@ namespace Replica
 			{
 				if (length != rhs.length)
 				{ 
-					delete[] data;
+					if (data != nullptr)
+						delete[] data;
+
 					data = new T[rhs.length];
 				}
 
@@ -249,7 +251,8 @@ namespace Replica
 		/// </summary>
 		DynamicArrayBase& operator=(DynamicArrayBase&& rhs) noexcept
 		{
-			delete[] data;
+			if (data != nullptr)
+				delete[] data;
 
 			data = rhs.data;
 			length = rhs.length;
@@ -265,7 +268,8 @@ namespace Replica
 		/// </summary>
 		virtual ~DynamicArrayBase()
 		{
-			delete[] data;
+			if (data != nullptr)
+				delete[] data;
 		}
 
 		/// <summary>
