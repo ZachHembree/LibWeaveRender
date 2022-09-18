@@ -31,8 +31,12 @@
 
 #include <string>
 #include <string_view>
+#include "../src/utils/include/Utils.hpp"
 #include "../src/utils/include/MoveOnlyBase.hpp"
 #include "../src/utils/include/DynamicCollections.hpp"
+#include "../src/utils/include/Stopwatch.hpp"
+#include "../src/utils/include/Span.hpp"
+#include "../src/utils/include/TextBlock.hpp"
 
 namespace Replica
 {

@@ -108,7 +108,7 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\src\ReplicaMath.cpp">
+    <ClCompile Include="ReplicaRenderer\src\utils\src\ReplicaMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Mesh.cpp">
@@ -135,7 +135,16 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\RWTexture2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\src\ReplicaWinUtils.cpp">
+    <ClCompile Include="ReplicaRenderer\src\utils\src\ReplicaWinUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\utils\src\Stopwatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\utils\src\TextBlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\utils\src\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -321,6 +330,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\include\ReplicaWinUtils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\utils\include\Stopwatch.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\utils\include\TextBlock.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\utils\include\Span.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\utils\include\Utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

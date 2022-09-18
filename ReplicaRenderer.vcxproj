@@ -207,7 +207,7 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\RenderComponent.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\Texture2D.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Shaders\ComputeShader.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\ReplicaMath.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\utils\src\ReplicaMath.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantMap.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantBuffer.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Shaders\ShaderBase.cpp" />
@@ -225,12 +225,15 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\BufferBase.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Device.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Renderer.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\ReplicaWinUtils.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\utils\src\ReplicaWinUtils.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\utils\src\Utils.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\utils\src\TextBlock.cpp" />
     <ClCompile Include="ReplicaRenderer\src\utils\src\GfxException.cpp" />
     <ClCompile Include="ReplicaRenderer\src\utils\src\Input.cpp" />
     <ClCompile Include="ReplicaRenderer\src\utils\src\RepExeption.cpp" />
     <ClCompile Include="ReplicaRenderer\src\utils\src\MinWindow.cpp" />
     <ClCompile Include="ReplicaRenderer\src\utils\src\RepWinException.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\utils\src\Stopwatch.cpp" />
     <ClCompile Include="ReplicaRenderer\src\utils\src\WindowComponentBase.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -295,6 +298,10 @@
     <ClInclude Include="ReplicaRenderer\src\utils\include\RepWinException.hpp" />
     <ClInclude Include="ReplicaRenderer\src\utils\include\DynamicCollections.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\VertexBuffer.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\Span.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\Stopwatch.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\TextBlock.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\utils\include\Utils.hpp" />
     <ClInclude Include="ReplicaRenderer\src\utils\include\WindowComponentBase.hpp" />
   </ItemGroup>
   <ItemGroup>
