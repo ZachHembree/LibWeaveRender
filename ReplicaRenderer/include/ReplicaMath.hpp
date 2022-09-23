@@ -3,12 +3,13 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <cstdint>
 
 namespace Replica
 {
-	typedef unsigned char byte;
-	typedef unsigned long ulong;
-	typedef unsigned int uint;
+	typedef uint8_t byte;
+	typedef uint64_t ulong;
+	typedef uint32_t uint;
 
 	template<typename T>
 	using tvec2 = glm::tvec1<T>;

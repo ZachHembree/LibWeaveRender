@@ -16,7 +16,7 @@ namespace Replica
 			pStart(nullptr), length(0)
 		{ }
 
-		Span(T* pStart) :
+		explicit Span(T* pStart) :
 			pStart(pStart), length(1)
 		{ }
 
@@ -34,10 +34,15 @@ namespace Replica
 			length(length)
 		{ }
 
-		Span(const Span& other) :
-			pStart(other.pStart),
-			length(other.length)
-		{ }
+		Span(const Span& other) = default;
+
+		Span(Span&& other) = default;
+
+		~Span() = default;
+
+		Span& operator=(const Span& other) = default;
+
+		Span& operator=(Span&& other) = default;
 
 		size_t GetLength() const { return length; }
 
@@ -48,12 +53,6 @@ namespace Replica
 		const T* GetFirst() const { return pStart; }
 
 		const T* GetLast() const { return pStart + length - 1; }
-
-		Span& operator=(const Span& other)
-		{
-			memcpy(this, &other, sizeof(Span));
-			return *this;
-		}
 
 		/// <summary>
 		/// Provides indexed access to array member references.

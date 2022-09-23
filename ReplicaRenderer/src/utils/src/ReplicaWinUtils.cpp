@@ -32,7 +32,7 @@ namespace Replica
 	string GetMultiByteString_UTF16LE_TO_UTF8(wstring_view src)
 	{
 		size_t dstSize = GetMultiByteSize_UTF16LE_TO_UTF8(src);
-		string dst(dstSize, '\0');
+		string dst(dstSize + 1, '\0');
 
 		WIN_ASSERT_NZ_LAST(WideCharToMultiByte(
 			CP_UTF8,  // Code page
@@ -48,7 +48,7 @@ namespace Replica
 	wstring GetWideString_UTF8_TO_UTF16LE(string_view src)
 	{
 		size_t dstSize = GetWideSize_UTF8_TO_UTF16LE(src);
-		wstring dst(dstSize, '\0');
+		wstring dst(dstSize + 1, '\0');
 
 		WIN_ASSERT_NZ_LAST(MultiByteToWideChar(
 			CP_UTF8, // Code page

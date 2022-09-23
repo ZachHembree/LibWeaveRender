@@ -3,6 +3,7 @@
 #include "../src/utils/include/RepWinException.hpp"
 
 #include <wrl.h>
+#include <cstdint>
 #include <glm/glm.hpp>
 #include "ReplicaUtils.hpp"
 

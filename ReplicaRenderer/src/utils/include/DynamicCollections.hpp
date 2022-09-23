@@ -270,6 +270,8 @@ namespace Replica
 		{
 			if (data != nullptr)
 				delete[] data;
+
+			data = nullptr;
 		}
 
 		/// <summary>
