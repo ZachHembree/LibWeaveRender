@@ -53,7 +53,7 @@ namespace Replica
 	/// Interface template for dynamic arrays/vectors
 	/// </summary>
 	template<typename T>
-	class IDynamicCollection
+	class IDynamicArray
 	{
 	public:
 		using Iterator = DynIterator<T>;
@@ -113,7 +113,7 @@ namespace Replica
 	/// Dynamically allocated array with members of type T and a fixed length.
 	/// </summary>
 	template<typename T>
-	class DynamicArrayBase : public IDynamicCollection<T>
+	class DynamicArrayBase : public IDynamicArray<T>
 	{
 	public:
 		using Iterator = DynIterator<T>;
@@ -533,7 +533,7 @@ namespace Replica
 	/// Vector{T} implementing IDynamicCollection{T}
 	/// </summary>
 	template<typename T>
-	class Vector : public IDynamicCollection<T>, private std::vector<T>
+	class Vector : public IDynamicArray<T>, private std::vector<T>
 	{
 	public:
 		using Iterator = DynIterator<T>;
@@ -549,7 +549,7 @@ namespace Replica
 		using std::vector<T>::empty;
 		using std::vector<T>::shrink_to_fit;
 
-		Vector(const IDynamicCollection<T>& other) :
+		Vector(const IDynamicArray<T>& other) :
 			std::vector<T>(other.GetPtr(), other.GetPtr() + other.GetLength())
 		{ }
 
@@ -685,7 +685,7 @@ namespace Replica
 		/// </summary>
 		UniqueVector() : Vector<T>() { }
 
-		UniqueVector(const IDynamicCollection<T>& other) : Vector<T>(other)
+		UniqueVector(const IDynamicArray<T>& other) : Vector<T>(other)
 		{ }
 
 		/// <summary>

@@ -3,7 +3,7 @@
 using namespace Replica::D3D11;
 
 IndexBuffer::IndexBuffer(Device& device, 
-	const IDynamicCollection<USHORT>& data, 
+	const IDynamicArray<USHORT>& data, 
 	ResourceUsages usage, 
 	ResourceAccessFlags cpuAccess
 ) :

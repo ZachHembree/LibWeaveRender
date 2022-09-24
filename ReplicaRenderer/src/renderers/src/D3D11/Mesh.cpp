@@ -4,7 +4,7 @@ namespace Replica::D3D11
 {
 	Mesh::Mesh(
 		Device& device, 
-		const IDynamicCollection<USHORT>& indices, 
+		const IDynamicArray<USHORT>& indices, 
 		const void* vertices, 
 		size_t vCount, 
 		size_t vStride

@@ -155,7 +155,7 @@ void Context::SetRenderTarget(IRenderTarget& rt, IDepthStencil& ds)
 /// <summary>
 /// Binds the given buffer as a render target. Doesn't unbind previously set depth-stencil buffers.
 /// </summary>
-void Context::SetRenderTargets(const IDynamicCollection<IRenderTarget>& rtvs, IDepthStencil& ds)
+void Context::SetRenderTargets(const IDynamicArray<IRenderTarget>& rtvs, IDepthStencil& ds)
 {
 	SetRenderTargets(rtvs, &ds);
 }
@@ -189,7 +189,7 @@ void Context::SetRenderTarget(IRenderTarget& rtv, IDepthStencil* depthStencil)
 /// <summary>
 /// Binds the given buffers as render targets. Doesn't unbind previously set depth-stencil buffers.
 /// </summary>
-void Context::SetRenderTargets(const IDynamicCollection<IRenderTarget>& rtvs, IDepthStencil* depthStencil)
+void Context::SetRenderTargets(const IDynamicArray<IRenderTarget>& rtvs, IDepthStencil* depthStencil)
 {
 	if (depthStencil != nullptr)
 	{
@@ -232,7 +232,7 @@ void Context::IASetPrimitiveTopology(PrimTopology topology)
 /// <summary>
 /// Binds an array of buffers starting at the given slot
 /// </summary>
-void Context::IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, int startSlot)
+void Context::IASetVertexBuffers(IDynamicArray<VertexBuffer>& vertBuffers, int startSlot)
 {
 	for (int i = 0; i < vertBuffers.GetLength(); i++)
 	{
@@ -327,7 +327,7 @@ void Context::Draw(Mesh& mesh, Effect& effect)
 /// <summary>
 /// Draws a group of indexed, non-instanced triangle meshes using the given effect
 /// </summary>
-void Context::Draw(IDynamicCollection<Mesh>& meshes, Effect& effect)
+void Context::Draw(IDynamicArray<Mesh>& meshes, Effect& effect)
 {
 	effect.Setup(*this);
 

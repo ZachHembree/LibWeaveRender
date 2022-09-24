@@ -42,15 +42,15 @@ namespace Replica::D3D11
 		template <typename Vert_T>
 		Mesh(
 			Device& device,
-			const IDynamicCollection<Vert_T>& vertices,
-			const IDynamicCollection<USHORT>& indices
+			const IDynamicArray<Vert_T>& vertices,
+			const IDynamicArray<USHORT>& indices
 		) : 
 			Mesh(device, indices, vertices.GetPtr(), vertices.GetLength(), sizeof(Vert_T))
 		{ }
 
 		Mesh(
 			Device& device,
-			const IDynamicCollection<USHORT>& indices,
+			const IDynamicArray<USHORT>& indices,
 			const void* vertices,
 			size_t vCount,
 			size_t vStride

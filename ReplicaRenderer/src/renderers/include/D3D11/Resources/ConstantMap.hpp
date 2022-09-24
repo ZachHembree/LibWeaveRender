@@ -87,7 +87,7 @@ namespace Replica::D3D11
 	public:
 		ConstantMapDef();
 
-		ConstantMapDef(const IDynamicCollection<ConstantDef>& definition);;
+		ConstantMapDef(const IDynamicArray<ConstantDef>& definition);;
 
 		ConstantMapDef(const std::initializer_list<ConstantDef>& definition);
 
@@ -119,7 +119,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns a list of the constants defined by the map definition
 		/// </summary>
-		const IDynamicCollection<ConstantDef>& GetMembers() const;
+		const IDynamicArray<ConstantDef>& GetMembers() const;
 
 	private:
 		UniqueVector<ConstantDef> members;

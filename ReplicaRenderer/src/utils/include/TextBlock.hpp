@@ -16,6 +16,12 @@ namespace Replica
     using string_view = std::string_view;
 
     public:
+        using Span<char>::GetLength;
+        using Span<char>::GetSize;
+        using Span<char>::operator[];
+        using Span<char>::GetPtr;
+        using Span<char>::begin;
+        using Span<char>::end;
 
         TextBlock();
 

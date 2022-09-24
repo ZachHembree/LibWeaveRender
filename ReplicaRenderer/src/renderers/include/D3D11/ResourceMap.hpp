@@ -14,7 +14,7 @@ namespace Replica::D3D11
 		ResourceMap& operator=(const ResourceMap& other) = default;
 		ResourceMap& operator=(ResourceMap&& other) = default;
 
-		ResourceMap(const IDynamicCollection<wstring_view>& def) :
+		ResourceMap(const IDynamicArray<wstring_view>& def) :
 			resources(def.GetLength())
 		{
 			for (uint i = 0; i < def.GetLength(); i++)
@@ -46,7 +46,7 @@ namespace Replica::D3D11
 
 		void SetResource(wstring_view name, ComPtr<T>& pRes) { SetResource(name, pRes.Get()); }
 
-		const IDynamicCollection<T*>& GetResources() { return resources; }
+		const IDynamicArray<T*>& GetResources() { return resources; }
 
 		size_t GetCount() { return resources.GetLength(); }
 

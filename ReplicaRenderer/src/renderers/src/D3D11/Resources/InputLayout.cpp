@@ -7,7 +7,7 @@ InputLayout::InputLayout() noexcept : DeviceChild() { }
 
 InputLayout::InputLayout(Device& dev, 
 	const ComPtr<ID3DBlob>& vsBlob, 
-	const IDynamicCollection<IAElement>& description
+	const IDynamicArray<IAElement>& description
 ) : DeviceChild(dev)
 { 
 	GFX_THROW_FAILED(dev->CreateInputLayout(

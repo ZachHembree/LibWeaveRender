@@ -10,7 +10,7 @@ ConstantMap::ConstantMap(const ConstantMapDef& layout) :
 	stride(layout.GetStride()),
 	data(layout.GetStride())
 {
-	const IDynamicCollection<ConstantDef>& members = layout.GetMembers();
+	const IDynamicArray<ConstantDef>& members = layout.GetMembers();
 	size_t offset = 0;
 	defMap.reserve(members.GetLength());
 
@@ -90,7 +90,7 @@ ConstantMapDef::ConstantMapDef() :
 	members.reserve(10);
 }
 
-ConstantMapDef::ConstantMapDef(const IDynamicCollection<ConstantDef>& definition) :
+ConstantMapDef::ConstantMapDef(const IDynamicArray<ConstantDef>& definition) :
 	members(definition),
 	stride(0)
 {
@@ -150,7 +150,7 @@ void ConstantMapDef::Clear()
 /// <summary>
 /// Returns a list of the constants defined by the map definition
 /// </summary>
-const IDynamicCollection<ConstantDef>& ConstantMapDef::GetMembers() const { return members; }
+const IDynamicArray<ConstantDef>& ConstantMapDef::GetMembers() const { return members; }
 
 /// <summary>
 /// Returns the size of the buffer defined by the definition, in bytes.

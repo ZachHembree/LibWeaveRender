@@ -20,7 +20,7 @@ namespace Replica::D3D11
 		/// </summary>
 		InputLayout(Device& dev, 
 			const ComPtr<ID3DBlob>& vsBlob,
-			const IDynamicCollection<IAElement>& layout
+			const IDynamicArray<IAElement>& layout
 		);
 
 		/// <summary>

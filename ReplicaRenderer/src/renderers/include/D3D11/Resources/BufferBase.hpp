@@ -38,7 +38,7 @@ namespace Replica::D3D11
 			ResourceUsages usage,
 			ResourceAccessFlags cpuAccess,
 			Device& device,
-			const IDynamicCollection<T>& data) :
+			const IDynamicArray<T>& data) :
 			BufferBase(type, usage, cpuAccess, device, data.GetPtr(), (UINT)data.GetSize())
 		{ }
 

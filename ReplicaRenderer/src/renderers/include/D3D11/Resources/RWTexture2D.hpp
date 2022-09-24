@@ -28,7 +28,7 @@ namespace Replica::D3D11
 		RWTexture2D(
 			Device& dev,
 			ivec2 dim,
-			IDynamicCollection<T> data,
+			IDynamicArray<T> data,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			UINT mipLevels = 1u
 		)
@@ -40,7 +40,7 @@ namespace Replica::D3D11
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
 		template<typename T>
-		void SetTextureData(Context& ctx, IDynamicCollection<T>& data, ivec2 dim)
+		void SetTextureData(Context& ctx, IDynamicArray<T>& data, ivec2 dim)
 		{
 			SetTextureData(ctx, data.GetPtr(), sizeof(T), dim);
 		}

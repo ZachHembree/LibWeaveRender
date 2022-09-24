@@ -163,12 +163,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Binds the given buffers as render targets. Doesn't unbind previously set depth-stencil buffers.
 		/// </summary>
-		void SetRenderTargets(const IDynamicCollection<IRenderTarget>& rts, IDepthStencil& ds);
+		void SetRenderTargets(const IDynamicArray<IRenderTarget>& rts, IDepthStencil& ds);
 
 		/// <summary>
 		/// Binds the given buffers as render targets. Doesn't unbind previously set depth-stencil buffers.
 		/// </summary>
-		void SetRenderTargets(const IDynamicCollection<IRenderTarget>& rts, IDepthStencil* pDS = nullptr);
+		void SetRenderTargets(const IDynamicArray<IRenderTarget>& rts, IDepthStencil* pDS = nullptr);
 
 		/// <summary>
 		/// Binds a vertex buffer to the given slot
@@ -183,7 +183,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Binds an array of buffers starting at the given slot
 		/// </summary>
-		void IASetVertexBuffers(IDynamicCollection<VertexBuffer>& vertBuffers, int startSlot = 0);
+		void IASetVertexBuffers(IDynamicArray<VertexBuffer>& vertBuffers, int startSlot = 0);
 
 		/// <summary>
 		/// Copies the contents of one texture to another
@@ -208,7 +208,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Draws a group of indexed, non-instanced triangle meshes using the given effect
 		/// </summary>
-		void Draw(IDynamicCollection<Mesh>& meshes, Effect& effect);
+		void Draw(IDynamicArray<Mesh>& meshes, Effect& effect);
 
 	private:
 		ComPtr<ID3D11DeviceContext> pContext;
