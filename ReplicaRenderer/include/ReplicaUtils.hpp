@@ -63,6 +63,7 @@
 #include "../src/utils/include/Stopwatch.hpp"
 #include "../src/utils/include/Span.hpp"
 #include "../src/utils/include/TextBlock.hpp"
+#include "../src/utils/include/DataBufferHandleBase.hpp"
 
 namespace Replica
 {
