@@ -10,9 +10,11 @@ Context::Context(Device& dev, ComPtr<ID3D11DeviceContext>& pContext) :
 	currentVS(nullptr),
 	currentPS(nullptr),
 	currentCS(nullptr),
+	currentVPs(D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE),
 	currentRTVs(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, nullptr),
 	currentDSV(nullptr),
 	currentDSS(nullptr),
+	vpCount(0),
 	rtvCount(0)
 { 
 	IASetPrimitiveTopology(PrimTopology::TRIANGLELIST);
@@ -96,11 +98,17 @@ void Context::Reset()
 	SetPS(nullptr);
 	SetCS(nullptr);
 	pContext->OMSetRenderTargets(0, nullptr, nullptr);
+	pContext->RSSetViewports(0, nullptr);
 	pContext->OMSetDepthStencilState(nullptr, 0);
 
+	currentDepthRange = vec2(0);
 	currentDSV = nullptr;
 	currentDSS = nullptr;
-	memset(currentRTVs.GetPtr(), 0, sizeof(void*) * currentRTVs.GetLength());
+
+	memset(currentVPs.GetPtr(), 0, currentVPs.GetSize());
+	vpCount = 0;
+
+	memset(currentRTVs.GetPtr(), 0, currentRTVs.GetSize());
 	rtvCount = 0;
 }
 
@@ -114,20 +122,29 @@ ID3D11DeviceContext& Context::Get() const { return *pContext.Get(); }
 /// </summary>
 ID3D11DeviceContext* Context::operator->() const { return pContext.Get(); }
 
+void Context::RSSetViewports(const IDynamicArray<Viewport>& viewports, int offset)
+{
+	GFX_ASSERT((offset + viewports.GetLength()) <= D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
+		"Number of viewports supplied exceeds limit.")
+
+	size_t vpStart = sizeof(Viewport) * offset;
+	memcpy(currentVPs.GetPtr() + vpStart, viewports.GetPtr(), viewports.GetSize());
+
+	vpCount = std::max(vpCount, (uint)(offset + viewports.GetLength()));
+	pContext->RSSetViewports(vpCount, (D3D11_VIEWPORT*)currentVPs.GetPtr());
+}
+
 /// <summary>
 /// Binds the given viewport to the rasterizer stage
 /// </summary>
-void Context::RSSetViewport(const vec2 size, const vec2 offset, const vec2 depth)
+void Context::RSSetViewport(int index, const vec2 size, const vec2 offset, const vec2 depth)
 {
-	D3D11_VIEWPORT vp = {};
-	vp.Width = size.x;
-	vp.Height = size.y;
-	vp.TopLeftX = offset.x;
-	vp.TopLeftY = offset.y;
-	vp.MinDepth = depth.x;
-	vp.MaxDepth = depth.y;
+	GFX_ASSERT(index >= 0 && (index) < D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
+		"Viewport index out of range.")
 
-	pContext->RSSetViewports(1, &vp);
+	vpCount = std::max(vpCount, (uint)(index + 1));
+	currentVPs[index] = { offset, size, depth };
+	pContext->RSSetViewports(vpCount, (D3D11_VIEWPORT*)currentVPs.GetPtr());
 }
 
 /// <summary>
@@ -140,6 +157,7 @@ void Context::SetDepthStencilBuffer(IDepthStencil& depthStencil)
 	{
 		currentDSS = depthStencil.GetState();
 		pContext->OMSetDepthStencilState(currentDSS, 1);
+		currentDepthRange = depthStencil.GetRange();
 	}
 
 	currentDSV = depthStencil.GetDSV();
@@ -157,7 +175,7 @@ void Context::SetRenderTarget(IRenderTarget& rt, IDepthStencil& ds)
 /// <summary>
 /// Binds the given buffer as a render target. Doesn't unbind previously set depth-stencil buffers.
 /// </summary>
-void Context::SetRenderTargets(const IDynamicArray<IRenderTarget>& rtvs, IDepthStencil& ds)
+void Context::SetRenderTargets(IDynamicArray<IRenderTarget>& rtvs, IDepthStencil& ds)
 {
 	SetRenderTargets(rtvs, &ds);
 }
@@ -167,38 +185,25 @@ void Context::SetRenderTargets(const IDynamicArray<IRenderTarget>& rtvs, IDepthS
 /// </summary>
 void Context::SetRenderTarget(IRenderTarget& rtv, IDepthStencil* depthStencil)
 {
-	if (depthStencil != nullptr)
-	{
-		if (currentDSS != depthStencil->GetState())
-		{
-			currentDSS = depthStencil->GetState();
-			pContext->OMSetDepthStencilState(currentDSS, 1);
-		}
-
-		currentDSV = depthStencil->GetDSV();
-	}
-	else
-	{
-		currentDSV = nullptr;
-		currentDSS = nullptr;
-	}
-
-	currentRTVs[0] = rtv.GetRTV();
-	rtvCount = 1;
-	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
+	Span rtvSpan(&rtv);
+	SetRenderTargets(rtvSpan, depthStencil);
 }
 
 /// <summary>
 /// Binds the given buffers as render targets. Doesn't unbind previously set depth-stencil buffers.
 /// </summary>
-void Context::SetRenderTargets(const IDynamicArray<IRenderTarget>& rtvs, IDepthStencil* depthStencil)
+void Context::SetRenderTargets(IDynamicArray<IRenderTarget>& rtvs, IDepthStencil* depthStencil)
 {
+	GFX_ASSERT(rtvs.GetLength() <= D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+		"Number of render targets supplied exceeds limit.")
+
 	if (depthStencil != nullptr)
 	{
 		if (currentDSS != depthStencil->GetState())
 		{
 			currentDSS = depthStencil->GetState();
 			pContext->OMSetDepthStencilState(currentDSS, 1);
+			currentDepthRange = depthStencil->GetRange();
 		}
 
 		currentDSV = depthStencil->GetDSV();
@@ -210,8 +215,26 @@ void Context::SetRenderTargets(const IDynamicArray<IRenderTarget>& rtvs, IDepthS
 	}
 
 	rtvCount = (uint)rtvs.GetLength();
-	memcpy(currentRTVs.GetPtr(), rtvs.GetPtr(), rtvCount);
+
+	for (int i = 0; i < (int)rtvCount; i++)
+		currentRTVs[i] = rtvs[i].GetRTV();
+
 	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
+
+	// Update viewports for render textures
+	Viewport viewports[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]({});
+
+	for (int i = 0; i < (int)rtvCount; i++)
+	{
+		viewports[i] = 
+		{ 
+			rtvs[i].GetOffset(), 
+			rtvs[i].GetRenderSize(), 
+			currentDepthRange 
+		};
+	}
+
+	RSSetViewports(Span((Viewport*)&viewports, rtvCount));
 }
 
 /// <summary>

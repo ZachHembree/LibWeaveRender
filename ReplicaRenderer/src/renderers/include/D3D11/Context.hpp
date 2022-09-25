@@ -26,6 +26,8 @@ namespace Replica::D3D11
 	class IRenderTarget;
 	class IDepthStencil;
 
+	struct Viewport;
+
 	enum class PrimTopology;
 
 	/// <summary>
@@ -93,9 +95,15 @@ namespace Replica::D3D11
 		ID3D11DeviceContext* operator->() const;
 
 		/// <summary>
+		/// Binds the given collection of viewports to the rasterizer stage
+		/// </summary>
+		/// <param name="viewports"></param>
+		void RSSetViewports(const IDynamicArray<Viewport>& viewports, int offset = 0);
+
+		/// <summary>
 		/// Binds the given viewport to the rasterizer stage
 		/// </summary>
-		void RSSetViewport(const vec2 size, const vec2 offset = vec2(0, 0), const vec2 depth = vec2(0, 1));
+		void RSSetViewport(int index, const vec2 size, const vec2 offset = vec2(0, 0), const vec2 depth = vec2(0, 1));
 
 		/// <summary>
 		/// Binds the given buffer as the depth stencil buffer doesn't overwrite render targets. Set to nullptr
@@ -116,12 +124,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Binds the given buffers as render targets. Doesn't unbind previously set depth-stencil buffers.
 		/// </summary>
-		void SetRenderTargets(const IDynamicArray<IRenderTarget>& rts, IDepthStencil& ds);
+		void SetRenderTargets(IDynamicArray<IRenderTarget>& rts, IDepthStencil& ds);
 
 		/// <summary>
 		/// Binds the given buffers as render targets. Doesn't unbind previously set depth-stencil buffers.
 		/// </summary>
-		void SetRenderTargets(const IDynamicArray<IRenderTarget>& rts, IDepthStencil* pDS = nullptr);
+		void SetRenderTargets(IDynamicArray<IRenderTarget>& rts, IDepthStencil* pDS = nullptr);
 
 		/// <summary>
 		/// Binds a vertex buffer to the given slot
@@ -129,7 +137,8 @@ namespace Replica::D3D11
 		void IASetVertexBuffer(VertexBuffer& vertBuffer, int slot = 0);
 
 		/// <summary>
-		/// Determines how vertices are interpreted by the input assembler
+		/// Determines how vertices are interpreted by the input assembler.
+		/// Defaults to PrimTopology::TRIANGLELIST.
 		/// </summary>
 		void IASetPrimitiveTopology(PrimTopology topology);
 
@@ -172,6 +181,11 @@ namespace Replica::D3D11
 
 		ID3D11DepthStencilState* currentDSS;
 		ID3D11DepthStencilView* currentDSV;
+		vec2 currentDepthRange;
+
+		UniqueArray<Viewport> currentVPs;
+		uint vpCount;
+
 		UniqueArray<ID3D11RenderTargetView*> currentRTVs;
 		uint rtvCount;
 	};

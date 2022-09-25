@@ -287,6 +287,7 @@
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Primitives.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ResourceMap.hpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiRenderComponent.cpp" />
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Viewport.hpp" />
     <ClInclude Include="ReplicaRenderer\src\utils\include\DataBufferHandleBase.hpp" />
     <ClInclude Include="ReplicaRenderer\src\utils\include\MoveOnlyBase.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\SwapChain.hpp" />

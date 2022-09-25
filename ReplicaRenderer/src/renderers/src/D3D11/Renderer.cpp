@@ -1,6 +1,7 @@
 #include "ReplicaWin32.hpp"
 #include "ReplicaInternalD3D11.hpp"
 
+using namespace Replica;
 using namespace Replica::D3D11;
 
 Renderer::Renderer(MinWindow& window) :
@@ -8,7 +9,8 @@ Renderer::Renderer(MinWindow& window) :
 	device(*this), // Create device and context
 	swap(window, device), // Create swap chain for window
 	defaultDS(device, swap.GetSize()),
-	useDefaultDS(true)
+	useDefaultDS(true),
+	fitToWindow(true)
 { 
 	MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
 	defaultMeshes[L"FSQuad"] = Mesh(device, quadDef);
@@ -41,6 +43,66 @@ Device& Renderer::GetDevice() { return device; }
 /// Returns reference to the swap chain interface
 /// </summary>
 SwapChain& Renderer::GetSwapChain() { return swap; }
+
+/// <summary>
+/// Returns the viewport used with the back buffer
+/// </summary>
+Viewport Renderer::GetMainViewport() const
+{
+	return
+	{
+		swap.GetBackBuf().GetOffset(), 
+		swap.GetBackBuf().GetSize(),
+		defaultDS.GetRange() 
+	};
+}
+
+/// <summary>
+/// Sets the viewport used with the back buffer
+/// </summary>
+void Renderer::SetMainViewport(Viewport& vp)
+{
+	SetOutputResolution(vp.size);
+	swap.GetBackBuf().SetOffset(vp.offset);
+	defaultDS.SetRange(vp.zDepth);
+}
+
+/// <summary>
+/// Returns the rendering resolution used by the renderer
+/// </summary>
+vec2 Renderer::GetOutputResolution() const 
+{
+	return swap.GetBackBuf().GetSize();
+}
+
+/// <summary>
+/// Sets the render resolution to the given value
+/// </summary>
+void Renderer::SetOutputResolution(vec2 res)
+{
+	const ivec2 lastBackSize = swap.GetSize(),
+		stencilSize = defaultDS.GetSize();
+
+	if (res.x > lastBackSize.x || res.y > lastBackSize.y)
+		swap.ResizeBuffers(res);
+
+	if (res.x > stencilSize.x || res.y > stencilSize.y)
+		defaultDS = DepthStencilTexture(device, res);
+
+	swap.GetBackBuf().SetRenderSize(res);
+}
+
+/// <summary>
+/// Returns true if the render resolution is set to match
+/// that of the window body being rendered to.
+/// </summary>
+bool Renderer::GetIsFitToWindow() const { return fitToWindow; }
+
+/// <summary>
+/// Set to true if the renderer should automatically match the
+/// window resolution.
+/// </summary>
+void Renderer::SetIsFitToWindow(bool value) { fitToWindow = value; }
 
 /// <summary>
 /// Returns true if the default depth stencil buffer is enabled
@@ -136,17 +198,9 @@ void Renderer::Update()
 {
 	// Reset binds
 	Context& ctx = device.GetContext();
-	const ivec2 bodySize = GetWindow().GetBodySize(),
-		lastBackSize = swap.GetSize(),
-		stencilSize = defaultDS.GetSize();
+	const ivec2 bodySize = GetWindow().GetBodySize();
 
 	ctx.Reset();
-
-	if (bodySize.x > lastBackSize.x || bodySize.y > lastBackSize.y)
-		swap.ResizeBuffers(bodySize);
-
-	if (bodySize.x > stencilSize.x || bodySize.y > stencilSize.y)
-		defaultDS = DepthStencilTexture(device, bodySize);
 
 	// Clear back buffer
 	swap.GetBackBuf().Clear(ctx);
@@ -155,7 +209,8 @@ void Renderer::Update()
 		defaultDS.Clear(ctx);
 
 	// Set viewport bounds
-	ctx.RSSetViewport(bodySize);
+	if (fitToWindow)
+		SetOutputResolution(bodySize);
 
 	// Bind back buffer as render target
 	if (useDefaultDS)

@@ -9,6 +9,7 @@
 #include "../src/renderers/include/D3D11/RenderComponent.hpp"
 #include "../src/utils/include/Input.hpp"
 
+#include "../src/renderers/include/D3D11/Viewport.hpp"
 #include "../src/renderers/include/D3D11/Mesh.hpp"
 #include "../src/renderers/include/D3D11/Primitives.hpp"
 #include "../src/renderers/include/D3D11/Effect.hpp"

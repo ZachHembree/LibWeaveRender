@@ -204,6 +204,8 @@ namespace Replica
 			rhs.length = -1;
 		}
 
+	public:
+
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>

@@ -29,6 +29,15 @@ ivec2 RTHandle::GetSize() const
 }
 
 /// <summary>
+/// Sets the offset for this target in pixels
+/// </summary>
+void RTHandle::SetOffset(ivec2 offset)
+{
+	offset = glm::clamp(offset, ivec2(0), GetSize());
+	this->offset = offset;
+}
+
+/// <summary>
 /// Returns the offset set for this target in pixels
 /// </summary>
 ivec2 RTHandle::GetOffset() const

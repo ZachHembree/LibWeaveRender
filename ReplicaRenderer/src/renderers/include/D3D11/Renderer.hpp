@@ -41,6 +41,38 @@ namespace Replica::D3D11
 		SwapChain& GetSwapChain();
 
 		/// <summary>
+		/// Returns the viewport used with the back buffer
+		/// </summary>
+		Viewport GetMainViewport() const;
+
+		/// <summary>
+		/// Sets the viewport used with the back buffer
+		/// </summary>
+		void SetMainViewport(Viewport& vp);
+
+		/// <summary>
+		/// Returns the resolution of the back buffer
+		/// </summary>
+		vec2 GetOutputResolution() const;
+
+		/// <summary>
+		/// Sets the output resolution to the given value
+		/// </summary>
+		void SetOutputResolution(vec2 res);
+
+		/// <summary>
+		/// Returns true if the render resolution is set to match
+		/// that of the window body being rendered to.
+		/// </summary>
+		bool GetIsFitToWindow() const;
+
+		/// <summary>
+		/// Set to true if the renderer should automatically match the
+		/// window resolution.
+		/// </summary>
+		void SetIsFitToWindow(bool value);
+
+		/// <summary>
 		/// Returns true if the default depth stencil buffer is enabled
 		/// </summary>
 		bool GetIsDepthStencilEnabled();
@@ -98,8 +130,9 @@ namespace Replica::D3D11
 
 		UniqueVector<RenderComponentBase*> pComponents;
 		Device device;
-		SwapChain swap;
+		mutable SwapChain swap;
 		DepthStencilTexture defaultDS;
+		bool fitToWindow;
 		bool useDefaultDS;
 
 		void BeforeDraw(Context& ctx);
