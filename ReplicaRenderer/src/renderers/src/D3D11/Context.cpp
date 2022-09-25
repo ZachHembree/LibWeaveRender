@@ -394,11 +394,11 @@ void CopySubresource(Context& ctx, ITexture2D& src, ITexture2D& dst, ivec4& srcB
 
 		D3D11_BOX srcBB = 
 		{
-			.left = (uint)srcBox.z,
-			.top = (uint)srcBox.w,
+			.left = (uint)std::max(srcBox.z, 0),
+			.top = (uint)std::max(srcBox.w, 0),
 			.front = 0u,
-			.right = (uint)(srcBox.z + srcBox.x),
-			.bottom = (uint)(srcBox.w + srcBox.y),
+			.right = (uint)std::max(srcBox.z + srcBox.x, 0),
+			.bottom = (uint)std::max(srcBox.w + srcBox.y, 0),
 			.back = 1u
 		};
 

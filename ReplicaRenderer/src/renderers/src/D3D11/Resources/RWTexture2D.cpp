@@ -118,8 +118,7 @@ ID3D11RenderTargetView** const RWTexture2D::GetAddressRTV() { return pRTV.GetAdd
 /// </summary>
 void RWTexture2D::SetRenderOffset(ivec2 offset)
 {
-	offset = glm::clamp(offset, ivec2(0), GetSize());
-	this->renderOffset = offset;
+	this->renderOffset = glm::clamp(vec2(offset) / vec2(GetSize()), vec2(-1), vec2(1));
 }
 
 /// <summary>
@@ -127,8 +126,7 @@ void RWTexture2D::SetRenderOffset(ivec2 offset)
 /// </summary>
 ivec2 RWTexture2D::GetRenderOffset() const
 {
-	renderOffset = glm::clamp(renderOffset, ivec2(0), GetSize());
-	return renderOffset;
+	return ivec2(glm::round(renderOffset * vec2(GetSize())));
 }
 
 void RWTexture2D::SetRenderSize(ivec2 renderSize)

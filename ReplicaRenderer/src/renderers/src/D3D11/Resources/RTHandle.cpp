@@ -16,7 +16,7 @@ RTHandle::RTHandle(
 	DeviceChild(dev),
 	pSwapChain(pSwapChain),
 	ppRTV(ppRTV),
-	offset(offset),
+	renderOffset(offset),
 	renderScale(glm::clamp(scale, vec2(1E-6f), vec2(1)))
 { }
 
@@ -41,8 +41,7 @@ Formats RTHandle::GetFormat() const { return pSwapChain->GetBufferFormat(); }
 /// </summary>
 void RTHandle::SetRenderOffset(ivec2 offset)
 {
-	offset = glm::clamp(offset, ivec2(0), GetSize());
-	this->offset = offset;
+	this->renderOffset = glm::clamp(vec2(offset) / vec2(GetSize()), vec2(-1), vec2(1));
 }
 
 /// <summary>
@@ -50,8 +49,7 @@ void RTHandle::SetRenderOffset(ivec2 offset)
 /// </summary>
 ivec2 RTHandle::GetRenderOffset() const
 {
-	offset = glm::clamp(offset, ivec2(0), GetSize());
-	return offset;
+	return ivec2(glm::round(renderOffset * vec2(GetSize())));
 }
 
 void RTHandle::SetRenderSize(ivec2 renderSize)

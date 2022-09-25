@@ -128,8 +128,8 @@ namespace Replica::D3D11
 	private:
 		ComPtr<ID3D11UnorderedAccessView> pUAV;
 		ComPtr< ID3D11RenderTargetView> pRTV;
-		mutable ivec2 renderOffset;
-		vec2 renderScale;
+		mutable vec2 renderOffset;
+		mutable vec2 renderScale;
 
 		RWTexture2D(
 			Device& dev,

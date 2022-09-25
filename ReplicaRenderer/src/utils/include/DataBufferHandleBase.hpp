@@ -14,6 +14,11 @@ namespace Replica
 	{
 	public:
 		/// <summary>
+		/// Returns the buffer as a Span
+		/// </summary>
+		virtual SpanT Get() = 0;
+
+		/// <summary>
 		/// Returns the next unused span from the buffer
 		/// </summary>
 		virtual SpanT GetNext(size_t length) = 0;

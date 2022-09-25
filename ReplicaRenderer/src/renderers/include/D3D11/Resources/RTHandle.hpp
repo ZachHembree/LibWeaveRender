@@ -93,7 +93,7 @@ namespace Replica::D3D11
 	private:
 		ID3D11RenderTargetView** ppRTV;
 		SwapChain* pSwapChain;
-		mutable ivec2 offset;
-		vec2 renderScale;
+		mutable vec2 renderOffset;
+		mutable vec2 renderScale;
 	};
 }
