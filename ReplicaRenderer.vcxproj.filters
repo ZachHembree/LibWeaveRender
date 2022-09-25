@@ -147,7 +147,7 @@
     <ClCompile Include="ReplicaRenderer\src\utils\src\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\DeviceChild.cpp">
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\DeviceChild.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -53,12 +53,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns the resolution of the back buffer
 		/// </summary>
-		vec2 GetOutputResolution() const;
+		ivec2 GetOutputResolution() const;
 
 		/// <summary>
 		/// Sets the output resolution to the given value
 		/// </summary>
-		void SetOutputResolution(vec2 res);
+		void SetOutputResolution(ivec2 res);
 
 		/// <summary>
 		/// Returns true if the render resolution is set to match

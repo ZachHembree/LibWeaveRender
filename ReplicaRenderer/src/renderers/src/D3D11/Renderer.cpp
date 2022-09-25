@@ -51,7 +51,7 @@ Viewport Renderer::GetMainViewport() const
 {
 	return
 	{
-		swap.GetBackBuf().GetOffset(), 
+		swap.GetBackBuf().GetRenderOffset(), 
 		swap.GetBackBuf().GetSize(),
 		defaultDS.GetRange() 
 	};
@@ -63,22 +63,22 @@ Viewport Renderer::GetMainViewport() const
 void Renderer::SetMainViewport(Viewport& vp)
 {
 	SetOutputResolution(vp.size);
-	swap.GetBackBuf().SetOffset(vp.offset);
+	swap.GetBackBuf().SetRenderOffset(vp.offset);
 	defaultDS.SetRange(vp.zDepth);
 }
 
 /// <summary>
 /// Returns the rendering resolution used by the renderer
 /// </summary>
-vec2 Renderer::GetOutputResolution() const 
+ivec2 Renderer::GetOutputResolution() const 
 {
-	return swap.GetBackBuf().GetSize();
+	return swap.GetBackBuf().GetRenderSize();
 }
 
 /// <summary>
 /// Sets the render resolution to the given value
 /// </summary>
-void Renderer::SetOutputResolution(vec2 res)
+void Renderer::SetOutputResolution(ivec2 res)
 {
 	const ivec2 lastBackSize = swap.GetSize(),
 		stencilSize = defaultDS.GetSize();

@@ -36,20 +36,59 @@ namespace Replica::D3D11
 		{ }
 
 		/// <summary>
-		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
-		/// Allocates new Texture2D if the dimensions aren't the same.
+		/// Read-only pointer to pointer for Render Target view
 		/// </summary>
-		template<typename T>
-		void SetTextureData(Context& ctx, IDynamicArray<T>& data, ivec2 dim)
-		{
-			SetTextureData(ctx, data.GetPtr(), sizeof(T), dim);
-		}
+		ID3D11RenderTargetView* GetRTV() override;
 
 		/// <summary>
-		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
-		/// Allocates new Texture2D if the dimensions aren't the same.
+		/// Binds the render target to the output merger
 		/// </summary>
-		void SetTextureData(Context& ctx, void* data, size_t stride, ivec2 dim) override;
+		ID3D11RenderTargetView** const GetAddressRTV() override;
+
+		/// <summary>
+		/// Sets the offset for this target in pixels
+		/// </summary>
+		void SetRenderOffset(ivec2 offset);
+
+		/// <summary>
+		/// Returns the offset set for this target in pixels
+		/// </summary>
+		ivec2 GetRenderOffset() const override;
+
+		/// <summary>
+		/// Sets the size of the render area for the render texture.
+		/// Cannot exceed the size of the underlying buffer.
+		/// </summary>
+		void SetRenderSize(ivec2 renderSize);
+
+		/// <summary>
+		/// Returns the size of the render area in pixels
+		/// </summary>
+		ivec2 GetRenderSize() const override;
+
+		/// <summary>
+		/// Returns combined scaled (DRS) texel size and dim fp vector.
+		/// XY == Texel Size; ZW == Dim
+		/// </summary>
+		vec4 GetRenderTexelSize() const;
+
+		/// <summary>
+		/// Sets the renderSize to size ratio on (0, 1].
+		/// </summary>
+		void SetRenderScale(vec2 scale);
+
+		/// <summary>
+		/// Returns the renderSize to size ratio on (0, 1].
+		/// </summary>
+		vec2 GetRenderScale() const override;
+
+		/// <summary>
+		/// Clears the texture to the given color
+		/// </summary>
+		void Clear(
+			Context& ctx,
+			vec4 color = vec4(0)
+		) override;
 
 		/// <summary>
 		/// Returns pointer to UAV interface
@@ -70,8 +109,27 @@ namespace Replica::D3D11
 			wstring_view file
 		);
 
+		/// <summary>
+		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
+		/// Allocates new Texture2D if the dimensions aren't the same.
+		/// </summary>
+		template<typename T>
+		void SetTextureData(Context& ctx, IDynamicArray<T>& data, ivec2 dim)
+		{
+			SetTextureData(ctx, data.GetPtr(), sizeof(T), dim);
+		}
+
+		/// <summary>
+		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
+		/// Allocates new Texture2D if the dimensions aren't the same.
+		/// </summary>
+		void SetTextureData(Context& ctx, void* data, size_t stride, ivec2 dim) override;
+
 	private:
 		ComPtr<ID3D11UnorderedAccessView> pUAV;
+		ComPtr< ID3D11RenderTargetView> pRTV;
+		mutable ivec2 renderOffset;
+		vec2 renderScale;
 
 		RWTexture2D(
 			Device& dev,

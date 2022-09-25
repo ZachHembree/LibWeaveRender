@@ -11,8 +11,14 @@ namespace Replica::D3D11
 	class IResource
 	{
 	public:
+		/// <summary>
+		/// Returns a pointer to the resource interface
+		/// </summary>
 		virtual ID3D11Resource* GetResource() = 0;
 
+		/// <summary>
+		/// Returns a pointer to the resource field address
+		/// </summary>
 		virtual ID3D11Resource** const GetResAddress() = 0;
 	};
 
@@ -58,15 +64,39 @@ namespace Replica::D3D11
 	};
 
 	/// <summary>
+	/// Interface for resource types capable of storing color data in a 2D array, but
+	/// without any specific resource views.
+	/// </summary>
+	class IColorBuffer2D
+	{
+	public:
+		/// <summary>
+		/// Returns the dimensions of the underlying buffer
+		/// </summary>
+		virtual ivec2 GetSize() const = 0;
+
+		/// <summary>
+		/// Returns combined texel size and dim fp vector.
+		/// XY == Texel Size; ZW == Dim
+		/// </summary>
+		virtual vec4 GetTexelSize() const = 0;
+
+		/// <summary>
+		/// Returns color format of the underlying buffer
+		/// </summary>
+		virtual Formats GetFormat() const = 0;
+	};
+
+	/// <summary>
 	/// Interface for types that can be bound as Render Targets
 	/// </summary>
-	class IRenderTarget
+	class IRenderTarget : public virtual IColorBuffer2D
 	{
 	public:
 		/// <summary>
 		/// Returns the offset set for this target in pixels
 		/// </summary>
-		virtual ivec2 GetOffset() const = 0;
+		virtual ivec2 GetRenderOffset() const = 0;
 
 		/// <summary>
 		/// Returns the size of the render area in pixels
@@ -74,14 +104,15 @@ namespace Replica::D3D11
 		virtual ivec2 GetRenderSize() const = 0;
 
 		/// <summary>
-		/// Returns the size of the underlying buffer
+		/// Returns combined scaled (DRS) texel size and dim fp vector.
+		/// XY == Texel Size; ZW == Dim
 		/// </summary>
-		virtual ivec2 GetSize() const = 0;
+		virtual vec4 GetRenderTexelSize() const = 0;
 
 		/// <summary>
 		/// Returns the renderSize to size ratio on (0, 1].
 		/// </summary>
-		virtual vec2 GetRenderScale() = 0;
+		virtual vec2 GetRenderScale() const = 0;
 
 		/// <summary>
 		/// Pointer to Render Target view interface
@@ -157,25 +188,9 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Interface for 2D Textures, without resource views
 	/// </summary>
-	class ITexture2DBase : public virtual IResource
+	class ITexture2DBase : public virtual IResource, public virtual IColorBuffer2D
 	{
 	public:
-		/// <summary>
-		/// Returns the dimensions of the texture
-		/// </summary>
-		virtual ivec2 GetSize() const = 0;
-
-		/// <summary>
-		/// Returns combined texel size and dim fp vector.
-		/// XY == Texel Size; ZW == Dim
-		/// </summary>
-		virtual vec4 GetTexelSize() const = 0;
-
-		/// <summary>
-		/// Returns color format of the texture
-		/// </summary>
-		virtual Formats GetFormat() const = 0;
-
 		/// <summary>
 		/// Returns resource usage type
 		/// </summary>
@@ -191,7 +206,7 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Interface for 2D Textures, with SRVs and UAVs
 	/// </summary>
-	class IRWTexture2D : public virtual ITexture2D, public IUnorderedAccess
+	class IRWTexture2D : public virtual ITexture2D, public virtual IRenderTarget, public IUnorderedAccess
 	{ };
 
 }

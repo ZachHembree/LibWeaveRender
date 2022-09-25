@@ -25,14 +25,25 @@ namespace Replica::D3D11
 		ivec2 GetSize() const override;
 
 		/// <summary>
+		/// Returns combined texel size and dim fp vector.
+		/// XY == Texel Size; ZW == Dim
+		/// </summary>
+		vec4 GetTexelSize() const override;
+
+		/// <summary>
+		/// Returns color format of the underlying buffer
+		/// </summary>
+		Formats GetFormat() const override;
+
+		/// <summary>
 		/// Sets the offset for this target in pixels
 		/// </summary>
-		void SetOffset(ivec2 offset);
+		void SetRenderOffset(ivec2 offset);
 
 		/// <summary>
 		/// Returns the offset set for this target in pixels
 		/// </summary>
-		ivec2 GetOffset() const override;
+		ivec2 GetRenderOffset() const override;
 
 		/// <summary>
 		/// Sets the size of the render area for the render texture.
@@ -46,6 +57,12 @@ namespace Replica::D3D11
 		ivec2 GetRenderSize() const override;
 
 		/// <summary>
+		/// Returns combined scaled (DRS) texel size and dim fp vector.
+		/// XY == Texel Size; ZW == Dim
+		/// </summary>
+		vec4 GetRenderTexelSize() const;
+
+		/// <summary>
 		/// Sets the renderSize to size ratio on (0, 1].
 		/// </summary>
 		void SetRenderScale(vec2 scale);
@@ -53,7 +70,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns the renderSize to size ratio on (0, 1].
 		/// </summary>
-		vec2 GetRenderScale() override;
+		vec2 GetRenderScale() const override;
 
 		/// <summary>
 		/// Read-only pointer to pointer for Render Target view

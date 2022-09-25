@@ -95,21 +95,45 @@ namespace Replica::D3D11
 		ID3D11DeviceContext* operator->() const;
 
 		/// <summary>
+		/// Returns the number of viewports currently bound
+		/// </summary>
+		const int GetViewportCount() const;
+
+		/// <summary>
+		/// Returns the viewport bound to the given index.
+		/// </summary>
+		const Viewport& GetViewport(int index) const;
+
+		/// <summary>
+		/// Returns an array of the viewports currently bound
+		/// </summary>
+		const IDynamicArray<Viewport>& GetViewports() const;
+
+		/// <summary>
 		/// Binds the given collection of viewports to the rasterizer stage
 		/// </summary>
-		/// <param name="viewports"></param>
-		void RSSetViewports(const IDynamicArray<Viewport>& viewports, int offset = 0);
+		void SetViewports(const IDynamicArray<Viewport>& viewports, int offset = 0);
 
 		/// <summary>
 		/// Binds the given viewport to the rasterizer stage
 		/// </summary>
-		void RSSetViewport(int index, const vec2 size, const vec2 offset = vec2(0, 0), const vec2 depth = vec2(0, 1));
+		void SetViewport(int index, const vec2& size, const vec2& offset = vec2(0, 0), const vec2& depth = vec2(0, 1));
+
+		/// <summary>
+		/// Binds the given viewport to the rasterizer stage
+		/// </summary>
+		void SetViewport(int index, const Viewport& vp);
 
 		/// <summary>
 		/// Binds the given buffer as the depth stencil buffer doesn't overwrite render targets. Set to nullptr
 		/// to unbind.
 		/// </summary>
 		void SetDepthStencilBuffer(IDepthStencil& depthStencil);
+
+		/// <summary>
+		/// Returns the number of render targets currently bound
+		/// </summary>
+		int GetRenderTargetCount() const;
 
 		/// <summary>
 		/// Binds the given buffer as a render target. Doesn't unbind previously set depth-stencil buffers.
@@ -150,17 +174,27 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Copies the contents of one texture to another
 		/// </summary>
-		void Blit(ITexture2D& src, IRWTexture2D& dst);
+		void Blit(IRWTexture2D& src, IRWTexture2D& dst);
 
 		/// <summary>
 		/// Copies the contents of one texture to another
 		/// </summary>
-		void Blit(ITexture2D& src, ITexture2D& dst);
+		void Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox = ivec4(0));
 
 		/// <summary>
 		/// Copies the contents of one texture to another
 		/// </summary>
-		void Blit(ITexture2D& src, IRenderTarget& dst);
+		void Blit(ITexture2D& src, ITexture2D& dst, ivec4 srcBox = ivec4(0), ivec4 dstBox = ivec4(0));
+
+		/// <summary>
+		/// Copies the contents of a texture to a render target
+		/// </summary>
+		void Blit(IRWTexture2D& src, IRenderTarget& dst);
+
+		/// <summary>
+		/// Copies the contents of a texture to a render target
+		/// </summary>
+		void Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox = ivec4(0));
 
 		/// <summary>
 		/// Draws an indexed, non-instanced triangle meshes using the given effect
@@ -184,9 +218,23 @@ namespace Replica::D3D11
 		vec2 currentDepthRange;
 
 		UniqueArray<Viewport> currentVPs;
+		Span<Viewport> vpSpan;
 		uint vpCount;
 
 		UniqueArray<ID3D11RenderTargetView*> currentRTVs;
+		Span<ID3D11RenderTargetView*> rtvSpan;
 		uint rtvCount;
+
+		/* These expose raw interfaces. Fix that, then make them public. */
+
+		/// <summary>
+		/// Returns the render target view bound to the given index.
+		/// </summary>
+		ID3D11RenderTargetView* GetRenderTarget(int index) const;
+
+		/// <summary>
+		/// Returns an array of the render target views currently bound
+		/// </summary>
+		const IDynamicArray<ID3D11RenderTargetView*>& GetRenderTargets() const;
 	};
 }

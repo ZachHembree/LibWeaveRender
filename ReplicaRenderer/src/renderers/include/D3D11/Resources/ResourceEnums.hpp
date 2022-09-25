@@ -45,6 +45,8 @@ namespace Replica::D3D11
 		UnorderedAccess = D3D11_BIND_UNORDERED_ACCESS,
 		Decoder = D3D11_BIND_DECODER,
 		VideoEncoder = D3D11_BIND_VIDEO_ENCODER,
+
+		RWTexture = ShaderResource | RenderTarget | UnorderedAccess
 	};
 
 	BITWISE_ALL(ResourceBindFlags, UINT)

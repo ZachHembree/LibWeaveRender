@@ -17,7 +17,7 @@ RTHandle::RTHandle(
 	pSwapChain(pSwapChain),
 	ppRTV(ppRTV),
 	offset(offset),
-	renderScale(glm::clamp(scale, vec2(1E-6), vec2(1)))
+	renderScale(glm::clamp(scale, vec2(1E-6f), vec2(1)))
 { }
 
 /// <summary>
@@ -28,10 +28,18 @@ ivec2 RTHandle::GetSize() const
 	return pSwapChain->GetSize();
 }
 
+vec4 RTHandle::GetTexelSize() const
+{
+	ivec2 size = GetSize();
+	return vec4(1.0f / vec2(size), size);
+}
+
+Formats RTHandle::GetFormat() const { return pSwapChain->GetBufferFormat(); }
+
 /// <summary>
 /// Sets the offset for this target in pixels
 /// </summary>
-void RTHandle::SetOffset(ivec2 offset)
+void RTHandle::SetRenderOffset(ivec2 offset)
 {
 	offset = glm::clamp(offset, ivec2(0), GetSize());
 	this->offset = offset;
@@ -40,7 +48,7 @@ void RTHandle::SetOffset(ivec2 offset)
 /// <summary>
 /// Returns the offset set for this target in pixels
 /// </summary>
-ivec2 RTHandle::GetOffset() const
+ivec2 RTHandle::GetRenderOffset() const
 {
 	offset = glm::clamp(offset, ivec2(0), GetSize());
 	return offset;
@@ -59,8 +67,18 @@ void RTHandle::SetRenderSize(ivec2 renderSize)
 ivec2 RTHandle::GetRenderSize() const
 {
 	const vec2 size = GetSize();
-	vec2 renderSize = glm::ceil(renderScale * size);
+	vec2 renderSize = glm::round(renderScale * size);
 	return glm::clamp(ivec2(renderSize), ivec2(1), ivec2(size));
+}
+
+/// <summary>
+/// Returns combined scaled (DRS) texel size and dim fp vector.
+/// XY == Texel Size; ZW == Dim
+/// </summary>
+vec4 RTHandle::GetRenderTexelSize() const
+{
+	const vec2 renderSize = GetRenderSize();
+	return vec4(1.0f / renderSize.x, 1.0f / renderSize.y, renderSize);
 }
 
 /// <summary>
@@ -68,13 +86,14 @@ ivec2 RTHandle::GetRenderSize() const
 /// </summary>
 void RTHandle::SetRenderScale(vec2 scale)
 {
+	scale = glm::round(scale * 1E6f) * 1E-6f;
 	renderScale = glm::clamp(scale, vec2(1E-6f), vec2(1));
 }
 
 /// <summary>
 /// Returns the renderSize to size ratio on (0, 1].
 /// </summary>
-vec2 RTHandle::GetRenderScale()
+vec2 RTHandle::GetRenderScale() const
 {
 	return renderScale;
 }

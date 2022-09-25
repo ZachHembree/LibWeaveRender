@@ -110,6 +110,9 @@ void Context::Reset()
 
 	memset(currentRTVs.GetPtr(), 0, currentRTVs.GetSize());
 	rtvCount = 0;
+
+	vpSpan = Span<Viewport>();
+	rtvSpan = Span<ID3D11RenderTargetView*>();
 }
 
 /// <summary>
@@ -122,29 +125,61 @@ ID3D11DeviceContext& Context::Get() const { return *pContext.Get(); }
 /// </summary>
 ID3D11DeviceContext* Context::operator->() const { return pContext.Get(); }
 
-void Context::RSSetViewports(const IDynamicArray<Viewport>& viewports, int offset)
+/// <summary>
+/// Returns the number of viewports currently bound
+/// </summary>
+const int  Context::GetViewportCount() const
 {
-	GFX_ASSERT((offset + viewports.GetLength()) <= D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
-		"Number of viewports supplied exceeds limit.")
+	return vpCount;
+}
 
-	size_t vpStart = sizeof(Viewport) * offset;
-	memcpy(currentVPs.GetPtr() + vpStart, viewports.GetPtr(), viewports.GetSize());
+/// <summary>
+/// Returns the viewport bound to the given index.
+/// </summary>
+const Viewport& Context::GetViewport(int index) const
+{
+	return vpSpan[index];
+}
 
-	vpCount = std::max(vpCount, (uint)(offset + viewports.GetLength()));
-	pContext->RSSetViewports(vpCount, (D3D11_VIEWPORT*)currentVPs.GetPtr());
+/// <summary>
+/// Returns an array of the viewports currently bound
+/// </summary>
+const IDynamicArray<Viewport>& Context::GetViewports() const
+{
+	return vpSpan;
 }
 
 /// <summary>
 /// Binds the given viewport to the rasterizer stage
 /// </summary>
-void Context::RSSetViewport(int index, const vec2 size, const vec2 offset, const vec2 depth)
+void Context::SetViewport(int index, const vec2& size, const vec2& offset, const vec2& depth)
 {
-	GFX_ASSERT(index >= 0 && (index) < D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
-		"Viewport index out of range.")
+	Viewport vp = { offset, size, depth };
+	SetViewports(Span(&vp), index);
+}
 
-	vpCount = std::max(vpCount, (uint)(index + 1));
-	currentVPs[index] = { offset, size, depth };
+/// <summary>
+/// Binds the given viewport to the rasterizer stage
+/// </summary>
+void Context::SetViewport(int index, const Viewport& vp)
+{
+	SetViewports(Span((Viewport*)&vp), index);
+}
+
+/// <summary>
+/// Binds the given collection of viewports to the rasterizer stage
+/// </summary>
+void Context::SetViewports(const IDynamicArray<Viewport>& viewports, int offset)
+{
+	GFX_ASSERT((offset + viewports.GetLength()) <= D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
+		"Number of viewports supplied exceeds limit.")
+
+	memcpy(currentVPs.GetPtr() + glm::max(offset, 0), viewports.GetPtr(), viewports.GetSize());
+
+	vpCount = std::max(vpCount, (uint)(offset + viewports.GetLength()));
 	pContext->RSSetViewports(vpCount, (D3D11_VIEWPORT*)currentVPs.GetPtr());
+
+	vpSpan = Span(currentVPs.GetPtr(), vpCount);
 }
 
 /// <summary>
@@ -162,6 +197,30 @@ void Context::SetDepthStencilBuffer(IDepthStencil& depthStencil)
 
 	currentDSV = depthStencil.GetDSV();
 	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
+}
+
+/// <summary>
+/// Returns the number of render targets currently bound
+/// </summary>
+int Context::GetRenderTargetCount() const
+{
+	return rtvCount;
+}
+
+/// <summary>
+/// Returns the render target view bound to the given index.
+/// </summary>
+ID3D11RenderTargetView* Context::GetRenderTarget(int index) const
+{
+	return rtvSpan[index];
+}
+
+/// <summary>
+/// Returns an array of the render target views currently bound
+/// </summary>
+const IDynamicArray<ID3D11RenderTargetView*>& Context::GetRenderTargets() const
+{
+	return rtvSpan;
 }
 
 /// <summary>
@@ -220,6 +279,7 @@ void Context::SetRenderTargets(IDynamicArray<IRenderTarget>& rtvs, IDepthStencil
 		currentRTVs[i] = rtvs[i].GetRTV();
 
 	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
+	rtvSpan = Span(currentRTVs.GetPtr(), rtvCount);
 
 	// Update viewports for render textures
 	Viewport viewports[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]({});
@@ -228,13 +288,13 @@ void Context::SetRenderTargets(IDynamicArray<IRenderTarget>& rtvs, IDepthStencil
 	{
 		viewports[i] = 
 		{ 
-			rtvs[i].GetOffset(), 
+			rtvs[i].GetRenderOffset(), 
 			rtvs[i].GetRenderSize(), 
 			currentDepthRange 
 		};
 	}
 
-	RSSetViewports(Span((Viewport*)&viewports, rtvCount));
+	SetViewports(Span((Viewport*)&viewports, rtvCount));
 }
 
 /// <summary>
@@ -265,53 +325,163 @@ void Context::IASetVertexBuffers(IDynamicArray<VertexBuffer>& vertBuffers, int s
 	}
 }
 
-bool CanDirectCopy(ITexture2D& src, ITexture2D& dst)
+void ValidateResourceBounds(
+	IColorBuffer2D& src, 
+	IColorBuffer2D& dst, 
+	ivec4& srcBox, 
+	ivec4& dstBox, 
+	bool canRescale = false)
 {
-	return 
-		dst.GetUsage() != ResourceUsages::Immutable &&
-		src.GetSize() == dst.GetSize() &&
-		src.GetFormat() == dst.GetFormat();
+	srcBox = glm::max(srcBox, ivec4(0));
+	dstBox = glm::max(dstBox, ivec4(0));
+
+	if (srcBox != ivec4(0) || dstBox != ivec4(0))
+	{
+		if (srcBox == ivec4(0))
+			srcBox = ivec4(src.GetSize(), ivec2(0));
+
+		if (dstBox == ivec4(0))
+			dstBox = ivec4(dst.GetSize(), ivec2(0));
+
+		 ivec2
+			srcSize(srcBox.x, srcBox.y),
+			dstSize(dstBox.x, dstBox.y),
+			srcOffset(srcBox.z, srcBox.w),
+			dstOffset(dstBox.z, dstBox.w),
+			srcMax = glm::min(src.GetSize(), srcOffset + srcSize) - srcSize,
+			dstMax = glm::min(dst.GetSize(), dstOffset + dstSize) - dstSize;
+
+		GFX_ASSERT(srcMax == srcOffset,
+			"[Blit] Source subregion exceeds the bounds of the source buffer.");
+
+		GFX_ASSERT(dstMax == dstOffset,
+			"[Blit] Destination subregion exceeds the bounds of the destination buffer.");
+
+		if (!canRescale)
+		{
+			srcMax = srcOffset + srcSize;
+			dstMax = dstOffset + dstSize;
+
+			GFX_ASSERT(srcMax.x <= dstMax.x && srcMax.y <= dstMax.y,
+				"[Blit] Source subregion exceeds the bounds of the destination buffer.");
+		}
+	}
+}
+
+bool CanDirectCopy(ITexture2D& src, ITexture2D& dst, const ivec4& srcBox, const ivec4& dstBox)
+{
+	if (srcBox != ivec4(0) || dstBox != ivec4(0))
+	{
+		return
+			dst.GetUsage() != ResourceUsages::Immutable &&
+			srcBox.x == dstBox.x && srcBox.y == dstBox.y &&
+			src.GetFormat() == dst.GetFormat();
+	}
+	else
+	{
+		return 
+			dst.GetUsage() != ResourceUsages::Immutable &&
+			src.GetSize() == dst.GetSize() &&
+			src.GetFormat() == dst.GetFormat();
+	}
+}
+
+void CopySubresource(Context& ctx, ITexture2D& src, ITexture2D& dst, ivec4& srcBox, ivec4& dstBox)
+{
+	if (srcBox != ivec4(0) || dstBox != ivec4(0))
+	{ 
+		ValidateResourceBounds(src, dst, srcBox, dstBox);
+
+		D3D11_BOX srcBB = 
+		{
+			.left = (uint)srcBox.z,
+			.top = (uint)srcBox.w,
+			.front = 0u,
+			.right = (uint)(srcBox.z + srcBox.x),
+			.bottom = (uint)(srcBox.w + srcBox.y),
+			.back = 1u
+		};
+
+		ctx->CopySubresourceRegion(
+			dst.GetResource(), 0u,
+			(uint)dstBox.z, (uint)dstBox.w, 0u, // Dst start bounds
+			src.GetResource(), 0u, 
+			&srcBB
+		);
+	}
+	else
+		ctx->CopyResource(dst.GetResource(), src.GetResource());
 }
 
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void Context::Blit(ITexture2D& src, IRWTexture2D& dst)
+void Context::Blit(IRWTexture2D& src, IRWTexture2D& dst)
 {
-	if (CanDirectCopy(src, dst))
+	Blit(src, dst, ivec4(src.GetRenderSize(), src.GetRenderOffset()));
+}
+
+/// <summary>
+/// Copies the contents of one texture to another
+/// </summary>
+void Context::Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
+{
+	if (srcBox == ivec4(0))
+		srcBox = ivec4(src.GetSize(), 0, 0);
+
+	ivec4 dstBox(dst.GetRenderSize(), dst.GetRenderOffset());
+
+	if (CanDirectCopy(src, dst, srcBox, dstBox))
 	{
-		pContext->CopyResource(dst.GetResource(), src.GetResource());
+		CopySubresource(*this, src, dst, srcBox, dstBox);
+		return;
 	}
-	else if (src.GetSize() == dst.GetSize())
+
+	if (srcBox.x == dstBox.x && srcBox.y == dstBox.y)
 	{
+		ValidateResourceBounds(src, dst, srcBox, dstBox);
+
 		Renderer& renderer = GetRenderer();
 		ComputeShader& cs = renderer.GetDefaultCompute(L"TexCopy2D");
 
 		cs.SetTexture(L"SrcTex", src);
 		cs.SetRWTexture(L"DstTex", dst);
-		cs.Dispatch(*this, ivec3(dst.GetSize(), 1));
+		cs.SetConstant(L"SrcOffset", ivec2(srcBox.z, srcBox.w));
+		cs.SetConstant(L"DstOffset", ivec2(dstBox.z, dstBox.w));
+		cs.Dispatch(*this, ivec3(dstBox.x, dstBox.y, 1));
 	}
 	else
 	{ 
+		ValidateResourceBounds(src, dst, srcBox, dstBox, true);
+
 		Renderer& renderer = GetRenderer();
-		ComputeShader& cs = renderer.GetDefaultCompute(L"TexCopySamp2D");
+		ComputeShader& cs = renderer.GetDefaultCompute(L"TexCopyScaledSamp2D");
+
+		const ivec2 srcRenderSize = vec2(srcBox.x, srcBox.y);
+		const vec2 scale = vec2(srcRenderSize) / vec2(src.GetSize()),
+			offset = vec2(srcBox.z, srcBox.w) * vec2(src.GetTexelSize());
 
 		cs.SetTexture(L"SrcTex", src);
 		cs.SetRWTexture(L"DstTex", dst);
-		cs.SetSampler(L"Samp", renderer.GetDefaultSampler(L"LinearClamp"));
-		cs.SetConstant(L"DstTexelSize", dst.GetTexelSize());
-		cs.Dispatch(*this, ivec3(dst.GetSize(), 1));
+		cs.SetSampler(L"Samp", renderer.GetDefaultSampler(L"LinearBorder"));
+		cs.SetConstant(L"Scale", scale);
+		cs.SetConstant(L"Offset", offset);
+		cs.SetConstant(L"SrcOffset", ivec2(srcBox.z, srcBox.w));
+		cs.SetConstant(L"DstOffset", ivec2(dstBox.z, dstBox.w));
+		cs.SetConstant(L"DstTexelSize", dst.GetRenderTexelSize());
+		cs.Dispatch(*this, ivec3(dstBox.x, dstBox.y, 1));
 	}
 }
 
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void Context::Blit(ITexture2D& src, ITexture2D& dst)
+void Context::Blit(ITexture2D& src, ITexture2D& dst, ivec4 srcBox, ivec4 dstBox)
 {
-	if (CanDirectCopy(src, dst))
+	if (CanDirectCopy(src, dst, srcBox, dstBox))
 	{
-		pContext->CopyResource(dst.GetResource(), src.GetResource());
+		ValidateResourceBounds(src, dst, srcBox, dstBox);
+		CopySubresource(*this, src, dst, srcBox, dstBox);
 	}
 	else
 	{
@@ -320,20 +490,52 @@ void Context::Blit(ITexture2D& src, ITexture2D& dst)
 }
 
 /// <summary>
+/// Copies the contents of a texture to a render target
+/// </summary>
+void Context::Blit(IRWTexture2D& src, IRenderTarget& dst)
+{
+	Blit(src, dst, ivec4(src.GetRenderSize(), src.GetRenderOffset()));
+}
+
+/// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void Context::Blit(ITexture2D& src, IRenderTarget& dst)
+void Context::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 {
+	ivec4 dstBox(dst.GetRenderSize(), dst.GetRenderOffset());
+
+	if (srcBox == ivec4(0))
+		srcBox = ivec4(src.GetSize(), 0, 0);
+	else
+		ValidateResourceBounds(src, dst, srcBox, dstBox, true);
+
 	Renderer& renderer = GetRenderer();
 	Mesh& quad = renderer.GetDefaultMesh(L"FSQuad");
 	Effect& quadFX = renderer.GetDefaultEffect(L"PosTextured2D");
 
+	ID3D11RenderTargetView* const lastRTV = GetRenderTarget(0);
+	const Viewport& lastVP = GetViewport(0);
+
 	pContext->OMSetRenderTargets(1, dst.GetAddressRTV(), nullptr);
+	SetViewport(0, dst.GetRenderSize(), dst.GetRenderOffset());
+
+	const ivec2 srcRenderSize = vec2(srcBox.x, srcBox.y);
+	const vec2 scale = vec2(srcRenderSize) / vec2(src.GetSize()),
+		offset = vec2(srcBox.z, srcBox.w) * vec2(src.GetTexelSize());
+
+	if (srcRenderSize == dst.GetRenderSize())
+		quadFX.SetSampler(L"samp", renderer.GetDefaultSampler(L"PointBorder"));
+	else
+		quadFX.SetSampler(L"samp", renderer.GetDefaultSampler(L"LinearClamp"));
+
+	quadFX.SetConstant(L"Scale", scale);
+	quadFX.SetConstant(L"Offset", offset);
 	quadFX.SetTexture(L"tex", src);
-	quadFX.SetSampler(L"samp", renderer.GetDefaultSampler(L"LinearClamp"));
+
 	Draw(quad, quadFX);
 
 	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
+	SetViewport(0, lastVP);
 }
 
 /// <summary>

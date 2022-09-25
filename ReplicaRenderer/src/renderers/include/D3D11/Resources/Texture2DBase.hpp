@@ -52,7 +52,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns interface to resource
 		/// </summary>
-		ID3D11Resource* GetResource();
+		ID3D11Resource* GetResource() override;
 
 		/// <summary>
 		/// Returns pointer to interface pointer field

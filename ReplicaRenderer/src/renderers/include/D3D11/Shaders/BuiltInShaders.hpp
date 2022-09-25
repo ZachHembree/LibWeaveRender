@@ -12,7 +12,10 @@ namespace Replica::D3D11
 			// Source binary
 			L"Shaders/CS_TexCopy2D.cso",
 			// Constants
-			{ },
+			{ 
+				ConstantDef::Get<ivec2>(L"SrcOffset"),
+				ConstantDef::Get<ivec2>(L"DstOffset"),
+			},
 			// Samplers
 			{ },
 			// Textures
@@ -33,6 +36,8 @@ namespace Replica::D3D11
 			L"Shaders/CS_TexCopySamp2D.cso",
 			// Constants
 			{
+				ConstantDef::Get<ivec2>(L"SrcOffset"),
+				ConstantDef::Get<ivec2>(L"DstOffset"),
 				ConstantDef::Get<vec4>(L"DstTexelSize"),
 			},
 			// Samplers
@@ -155,7 +160,10 @@ namespace Replica::D3D11
 		// Source binary
 		L"Shaders/PS_Textured.cso",
 		// Constants
-		{ },
+		{ 
+			ConstantDef::Get<vec2>(L"Scale"),
+			ConstantDef::Get<vec2>(L"Offset"),
+		},
 		// Samplers
 		{ L"samp" },
 		// Textures
