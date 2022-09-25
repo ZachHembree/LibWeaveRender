@@ -42,7 +42,6 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns the dimensions of the chain's buffers
 		/// </summary>
-		/// <returns></returns>
 		ivec2 GetSize() const;
 
 		/// <summary>

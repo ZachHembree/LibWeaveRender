@@ -1,5 +1,6 @@
 #include "ReplicaInternalD3D11.hpp"
 
+using namespace Replica;
 using namespace Replica::D3D11;
 
 DepthStencilTexture::DepthStencilTexture()
@@ -29,6 +30,16 @@ DepthStencilTexture::DepthStencilTexture(
 	descDSV.Texture2D.MipSlice = 0u;
 
 	GFX_THROW_FAILED(dev->CreateDepthStencilView(pRes.Get(), &descDSV, &pDSV));
+}
+
+void DepthStencilTexture::SetRange(vec2 range)
+{
+	this->range = range;
+}
+
+vec2 DepthStencilTexture::GetRange() const
+{
+	return range;
 }
 
 ID3D11DepthStencilState* DepthStencilTexture::GetState() { return pState.Get(); }

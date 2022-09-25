@@ -11,7 +11,7 @@ SwapChain::SwapChain() : desc({})
 
 SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	DeviceChild(dev),
-	backBufRt(dev, &pBackBuf)
+	backBufRt(dev, this, &pBackBuf)
 {
 	ComPtr<IDXGIFactory2> dxgiFactory;
 	GFX_THROW_FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory2), &dxgiFactory));

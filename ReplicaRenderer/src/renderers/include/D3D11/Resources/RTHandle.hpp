@@ -13,8 +13,47 @@ namespace Replica::D3D11
 		
 		RTHandle(
 			Device& dev, 
-			ID3D11RenderTargetView** ppRTV
+			SwapChain* pSwapChain,
+			ID3D11RenderTargetView** ppRTV,
+			ivec2 offset = ivec2(0),
+			vec2 scale = vec2(1)
 		);
+
+		/// <summary>
+		/// Returns the size of the underlying buffer
+		/// </summary>
+		ivec2 GetSize() const override;
+
+		/// <summary>
+		/// Sets the offset for this target in pixels
+		/// </summary>
+		void SetOffset(ivec2 offset);
+
+		/// <summary>
+		/// Returns the offset set for this target in pixels
+		/// </summary>
+		ivec2 GetOffset() const override;
+
+		/// <summary>
+		/// Sets the size of the render area for the render texture.
+		/// Cannot exceed the size of the underlying buffer.
+		/// </summary>
+		void SetRenderSize(ivec2 renderSize);
+
+		/// <summary>
+		/// Returns the size of the render area in pixels
+		/// </summary>
+		ivec2 GetRenderSize() const override;
+
+		/// <summary>
+		/// Sets the renderSize to size ratio on (0, 1].
+		/// </summary>
+		void SetRenderScale(vec2 scale);
+
+		/// <summary>
+		/// Returns the renderSize to size ratio on (0, 1].
+		/// </summary>
+		vec2 GetRenderScale() override;
 
 		/// <summary>
 		/// Read-only pointer to pointer for Render Target view
@@ -36,5 +75,8 @@ namespace Replica::D3D11
 
 	private:
 		ID3D11RenderTargetView** ppRTV;
+		SwapChain* pSwapChain;
+		mutable ivec2 offset;
+		vec2 renderScale;
 	};
 }

@@ -8,8 +8,9 @@
 namespace Replica
 {
 	typedef uint8_t byte;
-	typedef uint64_t ulong;
 	typedef uint32_t uint;
+	typedef uint64_t ulong;
+	typedef int64_t llong;
 
 	template<typename T>
 	using tvec2 = glm::tvec1<T>;

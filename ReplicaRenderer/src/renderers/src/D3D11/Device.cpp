@@ -23,10 +23,9 @@ Device::Device(Renderer& renderer) : pRenderer(&renderer)
 	));
 
 	context = Context(*this, pContext);
-	context.IASetPrimitiveTopology(PrimTopology::TRIANGLELIST);
 }
 
-Renderer& Device::GetRenderer() { GFX_ASSERT(pRenderer != nullptr, "Renderer cannot be null."); return *pRenderer; }
+Renderer& Device::GetRenderer() const { GFX_ASSERT(pRenderer != nullptr, "Renderer cannot be null."); return *pRenderer; }
 
 /// <summary>
 /// Returns reference to COM device interface

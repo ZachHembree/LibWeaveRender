@@ -64,6 +64,26 @@ namespace Replica::D3D11
 	{
 	public:
 		/// <summary>
+		/// Returns the offset set for this target in pixels
+		/// </summary>
+		virtual ivec2 GetOffset() const = 0;
+
+		/// <summary>
+		/// Returns the size of the render area in pixels
+		/// </summary>
+		virtual ivec2 GetRenderSize() const = 0;
+
+		/// <summary>
+		/// Returns the size of the underlying buffer
+		/// </summary>
+		virtual ivec2 GetSize() const = 0;
+
+		/// <summary>
+		/// Returns the renderSize to size ratio on (0, 1].
+		/// </summary>
+		virtual vec2 GetRenderScale() = 0;
+
+		/// <summary>
 		/// Pointer to Render Target view interface
 		/// </summary>
 		virtual ID3D11RenderTargetView* GetRTV() = 0;
@@ -103,6 +123,11 @@ namespace Replica::D3D11
 	class IDepthStencil
 	{
 	public:
+		/// <summary>
+		/// Returns the range of normalized depth values accepted by the buffer
+		/// </summary>
+		virtual vec2 GetRange() const = 0;
+
 		/// <summary>
 		/// Returns pointer to depth stencil state interface
 		/// </summary>

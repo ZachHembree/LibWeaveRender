@@ -12,10 +12,22 @@ namespace Replica::D3D11
 		DepthStencilTexture(
 			Device& dev,
 			ivec2 dim,
+			vec2 range = vec2(0, 1),
 			Formats format = Formats::D32_FLOAT,
 			ResourceUsages usage = ResourceUsages::Default,
 			TexCmpFunc depthCmp = TexCmpFunc::LESS
 		);
+
+		/// <summary>
+		/// Sets the acceptable range of normalized values for objects rendered
+		/// with this depth buffer
+		/// </summary>
+		void SetRange(vec2 range);
+
+		/// <summary>
+		/// Returns the range of normalized depth values accepted by the buffer
+		/// </summary>
+		vec2 GetRange() const override;
 
 		/// <summary>
 		/// Returns pointer to depth stencil state interface
@@ -45,5 +57,6 @@ namespace Replica::D3D11
 	private:
 		ComPtr<ID3D11DepthStencilState> pState;
 		ComPtr<ID3D11DepthStencilView> pDSV;
+		vec2 range;
 	};
 }

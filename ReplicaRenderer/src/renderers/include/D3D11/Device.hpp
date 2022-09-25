@@ -18,7 +18,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns reference to renderer using this device
 		/// </summary>
-		Renderer& GetRenderer();
+		Renderer& GetRenderer() const;
 
 		/// <summary>
 		/// Returns pointer to COM device interface

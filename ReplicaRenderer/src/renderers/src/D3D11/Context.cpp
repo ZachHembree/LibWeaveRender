@@ -14,7 +14,9 @@ Context::Context(Device& dev, ComPtr<ID3D11DeviceContext>& pContext) :
 	currentDSV(nullptr),
 	currentDSS(nullptr),
 	rtvCount(0)
-{ }
+{ 
+	IASetPrimitiveTopology(PrimTopology::TRIANGLELIST);
+}
 
 Context::Context() : 
 	DeviceChild(),

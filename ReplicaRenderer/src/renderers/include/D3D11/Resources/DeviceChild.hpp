@@ -5,6 +5,7 @@
 namespace Replica::D3D11
 {
 	class Device;
+	class Renderer;
 	class Context;
 
 	/// <summary>
@@ -16,12 +17,17 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns the device associated with the child object
 		/// </summary>
-		Device& GetDevice() const { GFX_ASSERT(pDev != nullptr, "Cannot get null reference."); return *pDev; }
+		Device& GetDevice() const;
+
+		/// <summary>
+		/// Returns reference to renderer using this object
+		/// </summary>
+		Renderer& GetRenderer() const;
 
 		/// <summary>
 		/// Returns true if the object is valid and has been initialized
 		/// </summary>
-		virtual bool GetIsValid() const { return pDev != nullptr; }
+		virtual bool GetIsValid() const;
 
 	protected:
 		using MoveOnlyObjBase::MoveOnlyObjBase;
@@ -29,8 +35,8 @@ namespace Replica::D3D11
 
 		Device* pDev;
 
-		DeviceChild() : pDev(nullptr) { }
+		DeviceChild();
 
-		DeviceChild(Device& dev) : pDev(&dev) { }
+		DeviceChild(Device& dev);
 	};
 }
