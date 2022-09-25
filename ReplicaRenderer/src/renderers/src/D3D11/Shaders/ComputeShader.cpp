@@ -26,6 +26,16 @@ void ComputeShader::SetRWTexture(wstring_view name, IRWTexture2D& tex)
 	uavBuffers.SetResource(name, tex.GetUAV());
 }
 
+void ComputeShader::Dispatch(Context& ctx, int groups)
+{
+	Dispatch(ctx, ivec3(groups, 1, 1));
+}
+
+void ComputeShader::Dispatch(Context& ctx, ivec2 groups)
+{
+	Dispatch(ctx, ivec3(groups, 1));
+}
+
 void ComputeShader::Dispatch(Context& ctx, ivec3 groups)
 {
 	Bind(ctx);

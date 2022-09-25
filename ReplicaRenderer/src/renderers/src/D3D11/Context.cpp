@@ -448,7 +448,7 @@ void Context::Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
 		cs.SetRWTexture(L"DstTex", dst);
 		cs.SetConstant(L"SrcOffset", ivec2(srcBox.z, srcBox.w));
 		cs.SetConstant(L"DstOffset", ivec2(dstBox.z, dstBox.w));
-		cs.Dispatch(*this, ivec3(dstBox.x, dstBox.y, 1));
+		cs.Dispatch(*this, { dstBox.x, dstBox.y });
 	}
 	else
 	{ 
@@ -469,7 +469,7 @@ void Context::Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
 		cs.SetConstant(L"SrcOffset", ivec2(srcBox.z, srcBox.w));
 		cs.SetConstant(L"DstOffset", ivec2(dstBox.z, dstBox.w));
 		cs.SetConstant(L"DstTexelSize", dst.GetRenderTexelSize());
-		cs.Dispatch(*this, ivec3(dstBox.x, dstBox.y, 1));
+		cs.Dispatch(*this, { dstBox.x, dstBox.y });
 	}
 }
 

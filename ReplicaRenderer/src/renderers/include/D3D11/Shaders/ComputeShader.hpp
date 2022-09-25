@@ -32,6 +32,18 @@ namespace Replica::D3D11
 		/// Dispatch the shader in the given context with the given number of
 		/// groups. Automatically binds the shader as needed.
 		/// </summary>
+		void Dispatch(Context& ctx, int groups);
+
+		/// <summary>
+		/// Dispatch the shader in the given context with the given number of
+		/// groups. Automatically binds the shader as needed.
+		/// </summary>
+		void Dispatch(Context& ctx, ivec2 groups);
+
+		/// <summary>
+		/// Dispatch the shader in the given context with the given number of
+		/// groups. Automatically binds the shader as needed.
+		/// </summary>
 		void Dispatch(Context& ctx, ivec3 groups);
 
 		/// <summary>
