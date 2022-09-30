@@ -1,5 +1,6 @@
 #pragma once
 #include <chrono>
+#include "ReplicaMath.hpp"
 
 namespace Replica
 {
@@ -9,7 +10,7 @@ namespace Replica
 	class Stopwatch
 	{
 		using Clock = std::chrono::high_resolution_clock;
-		using Duration = std::chrono::duration<int64_t, std::nano>;
+		using Duration = std::chrono::duration<llong, std::nano>;
 		using TimePoint = std::chrono::high_resolution_clock::time_point;
 
 	public:
@@ -18,12 +19,12 @@ namespace Replica
 		/// <summary>
 		/// Start or resume timer
 		/// </summary>
-		void Start();
+		void Start(llong offsetNS = 0ull);
 
 		/// <summary>
 		/// Reset and restart timer
 		/// </summary>
-		void Restart();
+		void Restart(llong offsetNS = 0ull);
 
 		/// <summary>
 		/// Stop timer
@@ -33,7 +34,7 @@ namespace Replica
 		/// <summary>
 		/// Reset time
 		/// </summary>
-		void Reset();
+		void Reset(llong offsetNS = 0ull);
 
 		/// <summary>
 		/// Returns true if the stopwatch is rnning
@@ -53,7 +54,7 @@ namespace Replica
 		/// <summary>
 		/// Returns elapsed time in nanoseconds
 		/// </summary>
-		int64_t GetElapsedNS() const;
+		llong GetElapsedNS() const;
 
 	private:
 		mutable Duration elapsedTime;

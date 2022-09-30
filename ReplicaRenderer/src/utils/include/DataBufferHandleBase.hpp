@@ -44,6 +44,8 @@ namespace Replica
 			pParent(pParent)
 		{ }
 
+		HandleT& GetParent() { return *pParent; }
+
 	protected:
 		HandleT* pParent;
 	};
