@@ -12,37 +12,55 @@ namespace Replica::D3D11
 	{
 	public:
 
+		/// <summary>
+		/// Constructs and alocates a texture initialized with the given data with either
+		/// Default or Immutable usage, depending whether the read-only flag is set.
+		/// </summary>
 		template<typename T>
 		Texture2D(
 			Device& dev,
 			ivec2 dim,
 			IDynamicArray<T> data,
 			Formats format = Formats::R8G8B8A8_UNORM,
-			ResourceUsages usage = ResourceUsages::Default,
-			UINT mipLevels = 1u
+			uint mipLevels = 1u,
+			bool isReadonly = true
 		)
-			: Texture2D(dev, dim, data.GetPtr(), sizeof(T), format, usage, mipLevels)
+			: Texture2D(dev, dim, data.GetPtr(), sizeof(T), format, isReadonly, mipLevels)
 		{ }
 
+		/// <summary>
+		/// Constructs and alocates a texture initialized with the given data with either
+		/// Default or Immutable usage, depending whether the read-only flag is set.
+		/// </summary>
 		Texture2D(
 			Device& dev,
 			ivec2 dim,
 			void* data,
-			UINT stride,
+			uint stride,
 			Formats format = Formats::R8G8B8A8_UNORM,
-			ResourceUsages usage = ResourceUsages::Default,
-			UINT mipLevels = 1u
+			uint mipLevels = 1u,
+			bool isReadonly = true
 		);
 
+		/// <summary>
+		/// Constructs and alocates an empty texture with default usage
+		/// </summary>
 		Texture2D(
 			Device& dev,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			ivec2 dim = ivec2(0),
-			ResourceUsages usage = ResourceUsages::Default,
-			UINT mipLevels = 1u
+			uint mipLevels = 1u
 		);
 
+		/// <summary>
+		/// Constructs an uninitialized texture object
+		/// </summary>
 		Texture2D();
+
+		/// <summary>
+		/// Returns true if the texture is immutable
+		/// </summary>
+		bool GetIsReadOnly() const;
 
 		/// <summary>
 		/// Returns interface to resource view
@@ -83,7 +101,7 @@ namespace Replica::D3D11
 		static Texture2D FromImageWIC(
 			Device& dev,
 			wstring_view file,
-			ResourceUsages usage = ResourceUsages::Immutable
+			bool isReadOnly = true
 		);
 		
 	protected:

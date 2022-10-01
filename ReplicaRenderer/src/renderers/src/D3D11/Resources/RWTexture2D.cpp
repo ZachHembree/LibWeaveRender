@@ -74,7 +74,7 @@ RWTexture2D::RWTexture2D(Device& dev,
 		format,
 		ResourceUsages::Default,
 		ResourceBindFlags::RWTexture,
-		ResourceAccessFlags::ReadWrite,
+		ResourceAccessFlags::None,
 		mipLevels, 
 		1u,
 		data, stride
@@ -93,7 +93,7 @@ RWTexture2D::RWTexture2D(
 		format,
 		ResourceUsages::Default,
 		ResourceBindFlags::RWTexture,
-		ResourceAccessFlags::ReadWrite,
+		ResourceAccessFlags::None,
 		1u, 1u,
 		nullptr, 0u
 	)

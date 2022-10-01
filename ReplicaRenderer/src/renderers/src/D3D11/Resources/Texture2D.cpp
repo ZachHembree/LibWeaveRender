@@ -14,16 +14,16 @@ Texture2D::Texture2D(
 	void* data,
 	UINT stride,
 	Formats format,
-	ResourceUsages usage,
-	UINT mipLevels
+	UINT mipLevels,
+	bool isReadonly
 ) :
 	Texture2DBase(
 		dev,
 		dim,
 		format,
-		usage,
+		isReadonly ? ResourceUsages::Immutable : ResourceUsages::Default,
 		ResourceBindFlags::ShaderResource,
-		(usage == ResourceUsages::Dynamic) ? ResourceAccessFlags::Write : ResourceAccessFlags::None,
+		ResourceAccessFlags::None,
 		1u, 1u,
 		data, stride
 	)
@@ -41,20 +41,27 @@ Texture2D::Texture2D(
 	Device& dev,
 	Formats format,
 	ivec2 dim,
-	ResourceUsages usage,
 	UINT mipLevels
 ) :
 	Texture2DBase(
 		dev,
 		dim,
 		format,
-		usage,
+		ResourceUsages::Default,
 		ResourceBindFlags::ShaderResource,
-		(usage == ResourceUsages::Dynamic) ? ResourceAccessFlags::Write : ResourceAccessFlags::None,
+		ResourceAccessFlags::None,
 		1u, 1u,
 		nullptr, 0u
 	)
 { }
+
+/// <summary>
+/// Returns true if the texture is immutable
+/// </summary>
+bool Texture2D::GetIsReadOnly() const
+{
+	return GetUsage() == ResourceUsages::Immutable;
+}
 
 ID3D11ShaderResourceView* Texture2D::GetSRV() { return pSRV.Get(); }
 
@@ -87,7 +94,7 @@ void Texture2D::SetTextureData(Context& ctx, void* data, size_t stride, ivec2 di
 			data,
 			(UINT)stride,
 			GetFormat(),
-			GetUsage(),
+			GetIsReadOnly(),
 			desc.MipLevels
 		));
 	}
@@ -95,7 +102,7 @@ void Texture2D::SetTextureData(Context& ctx, void* data, size_t stride, ivec2 di
 	pRes->GetDesc(&desc);
 }
 
-Texture2D Texture2D::FromImageWIC(Device& dev, wstring_view file, ResourceUsages usage)
+Texture2D Texture2D::FromImageWIC(Device& dev, wstring_view file, bool isReadOnly)
 {
 	ScratchImage buf;
 	LoadImageWIC(file, buf);
@@ -106,6 +113,6 @@ Texture2D Texture2D::FromImageWIC(Device& dev, wstring_view file, ResourceUsages
 		img.pixels,
 		4 * sizeof(uint8_t),
 		Formats::R8G8B8A8_UNORM,
-		usage
+		isReadOnly
 	);
 }
