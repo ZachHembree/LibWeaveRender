@@ -30,9 +30,19 @@ bool InputHandler::GetIsKeyPressed(MouseKey key) const
 	return (uint)(key & GetPresssedMouseKeys());
 }
 
+bool InputHandler::GetIsNewKeyPressed(KbKey key) const
+{
+	return kbTracker.IsKeyPressed(key);
+}
+
+bool InputHandler::GetWasKeyPressed(KbKey key) const
+{
+	return kbTracker.IsKeyReleased(key);
+}
+
 bool InputHandler::GetIsKeyPressed(KbKey key) const
 {
-	return keyboard.GetState().IsKeyDown(key);
+	return kbTracker.lastState.IsKeyDown(key);
 }
 
 ivec2 InputHandler::GetMousePos() const
@@ -55,6 +65,8 @@ InputHandler::InputHandler(MinWindow& window) :
 
 bool InputHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	kbTracker.Update(keyboard.GetState());
+
 	switch (msg)
 	{
 	case WM_ACTIVATEAPP:
@@ -91,7 +103,7 @@ bool InputHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		break;
 	}	
 
-	auto state = mouse.GetState();
+	MouseState state = mouse.GetState();
 	lastMousePresses = currentMousePresses;
 	currentMousePresses = MouseKey::None;
 

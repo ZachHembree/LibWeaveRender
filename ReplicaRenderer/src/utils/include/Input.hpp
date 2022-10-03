@@ -23,6 +23,12 @@ namespace Replica
 {
 	class InputHandler : public WindowComponentBase
 	{
+	using Mouse = DirectX::Mouse;
+	using Keyboard = DirectX::Keyboard;
+	using KbTracker = Keyboard::KeyboardStateTracker;
+	using MouseState = Mouse::State;
+	using KbState = Keyboard::State;
+
 	using ivec2 = glm::ivec2;
 	using vec2 = glm::vec2;
 
@@ -57,6 +63,16 @@ namespace Replica
 		bool GetIsKeyPressed(MouseKey key) const;
 
 		/// <summary>
+		/// Returns true if the given key was only just pressed
+		/// </summary>
+		bool GetIsNewKeyPressed(KbKey key) const;
+
+		/// <summary>
+		/// Returns true if the given key was previously pressed
+		/// </summary>
+		bool GetWasKeyPressed(KbKey key) const;
+
+		/// <summary>
 		/// Returns true if a given keyboard key is pressed
 		/// </summary>
 		bool GetIsKeyPressed(KbKey key) const;
@@ -74,9 +90,10 @@ namespace Replica
 		vec2 GetNormMousePos() const;
 
 	private:
-		DirectX::Keyboard keyboard;
-		DirectX::Mouse mouse;
+		Keyboard keyboard;
+		Mouse mouse;
 
+		KbTracker kbTracker;
 		MouseKey currentMousePresses,
 			lastMousePresses;
 	};
