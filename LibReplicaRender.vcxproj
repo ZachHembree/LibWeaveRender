@@ -24,7 +24,7 @@
     <ProjectGuid>{8d991dca-1e4a-416f-b200-01877db93e29}</ProjectGuid>
     <RootNamespace>D3D11Renderer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>ReplicaRenderer</ProjectName>
+    <ProjectName>LibReplicaRender</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -99,7 +99,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)ReplicaRenderer\res;$(ProjectDir)ReplicaRenderer\include;$(ProjectDir)ReplicaRenderer\libs;$(ProjectDir)ReplicaRenderer\libs\imgui;$(ProjectDir)ReplicaRenderer\libs\imgui\backends;$(ProjectDir)ReplicaRenderer\libs\imgui-filebrowser</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)$(ProjectName)\res;$(ProjectDir)$(ProjectName)\include;$(ProjectDir)$(ProjectName)\libs;$(ProjectDir)$(ProjectName)\libs\imgui;$(ProjectDir)$(ProjectName)\libs\imgui\backends;$(ProjectDir)$(ProjectName)\libs\imgui-filebrowser</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -123,7 +123,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)ReplicaRenderer\res;$(ProjectDir)ReplicaRenderer\include;$(ProjectDir)ReplicaRenderer\libs;$(ProjectDir)ReplicaRenderer\libs\imgui;$(ProjectDir)ReplicaRenderer\libs\imgui\backends;$(ProjectDir)ReplicaRenderer\libs\imgui-filebrowser</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)$(ProjectName)\res;$(ProjectDir)$(ProjectName)\include;$(ProjectDir)$(ProjectName)\libs;$(ProjectDir)$(ProjectName)\libs\imgui;$(ProjectDir)$(ProjectName)\libs\imgui\backends;$(ProjectDir)$(ProjectName)\libs\imgui-filebrowser</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -148,7 +148,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)ReplicaRenderer\res;$(ProjectDir)ReplicaRenderer\include;$(ProjectDir)ReplicaRenderer\libs;$(ProjectDir)ReplicaRenderer\libs\imgui;$(ProjectDir)ReplicaRenderer\libs\imgui\backends;$(ProjectDir)ReplicaRenderer\libs\imgui-filebrowser</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)$(ProjectName)\res;$(ProjectDir)$(ProjectName)\include;$(ProjectDir)$(ProjectName)\libs;$(ProjectDir)$(ProjectName)\libs\imgui;$(ProjectDir)$(ProjectName)\libs\imgui\backends;$(ProjectDir)$(ProjectName)\libs\imgui-filebrowser</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
     </ClCompile>
@@ -175,7 +175,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)ReplicaRenderer\res;$(ProjectDir)ReplicaRenderer\include;$(ProjectDir)ReplicaRenderer\libs;$(ProjectDir)ReplicaRenderer\libs\imgui;$(ProjectDir)ReplicaRenderer\libs\imgui\backends;$(ProjectDir)ReplicaRenderer\libs\imgui-filebrowser</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)$(ProjectName)\res;$(ProjectDir)$(ProjectName)\include;$(ProjectDir)$(ProjectName)\libs;$(ProjectDir)$(ProjectName)\libs\imgui;$(ProjectDir)$(ProjectName)\libs\imgui\backends;$(ProjectDir)$(ProjectName)\libs\imgui-filebrowser</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -192,139 +192,139 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ReplicaRenderer\libs\imgui\backends\imgui_impl_dx11.cpp" />
-    <ClCompile Include="ReplicaRenderer\libs\imgui\backends\imgui_impl_win32.cpp" />
-    <ClCompile Include="ReplicaRenderer\libs\imgui\imgui.cpp" />
-    <ClCompile Include="ReplicaRenderer\libs\imgui\imgui_demo.cpp" />
-    <ClCompile Include="ReplicaRenderer\libs\imgui\imgui_draw.cpp" />
-    <ClCompile Include="ReplicaRenderer\libs\imgui\imgui_tables.cpp" />
-    <ClCompile Include="ReplicaRenderer\libs\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="ReplicaRenderer\libs\imgui\misc\cpp\imgui_stdlib.cpp" />
-    <ClCompile Include="ReplicaRenderer\libs\imgui\misc\fonts\binary_to_compressed_c.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ResizeableTexture2D.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\StagingTexture2D.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\DeviceChild.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\RWTexture2D.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\DepthStencilTexture.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiHandler.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\RenderComponent.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\Texture2D.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Shaders\ComputeShader.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\utils\src\ReplicaMath.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantMap.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ConstantBuffer.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Shaders\ShaderBase.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\RTHandle.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Context.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\Sampler.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\Texture2DBase.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\VertexBuffer.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\IndexBuffer.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Shaders\PixelShader.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Shaders\VertexShader.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\InputLayout.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Mesh.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\SwapChain.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\BufferBase.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Device.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Renderer.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\utils\src\ReplicaWinUtils.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\utils\src\Utils.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\utils\src\TextBlock.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\utils\src\GfxException.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\utils\src\Input.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\utils\src\RepExeption.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\utils\src\MinWindow.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\utils\src\RepWinException.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\utils\src\Stopwatch.cpp" />
-    <ClCompile Include="ReplicaRenderer\src\utils\src\WindowComponentBase.cpp" />
+    <ClCompile Include="LibReplicaRender\libs\imgui\backends\imgui_impl_dx11.cpp" />
+    <ClCompile Include="LibReplicaRender\libs\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="LibReplicaRender\libs\imgui\imgui.cpp" />
+    <ClCompile Include="LibReplicaRender\libs\imgui\imgui_demo.cpp" />
+    <ClCompile Include="LibReplicaRender\libs\imgui\imgui_draw.cpp" />
+    <ClCompile Include="LibReplicaRender\libs\imgui\imgui_tables.cpp" />
+    <ClCompile Include="LibReplicaRender\libs\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="LibReplicaRender\libs\imgui\misc\cpp\imgui_stdlib.cpp" />
+    <ClCompile Include="LibReplicaRender\libs\imgui\misc\fonts\binary_to_compressed_c.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\ResizeableTexture2D.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\StagingTexture2D.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\DeviceChild.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\RWTexture2D.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\DepthStencilTexture.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\ImguiHandler.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\RenderComponent.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\Texture2D.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Shaders\ComputeShader.cpp" />
+    <ClCompile Include="LibReplicaRender\src\utils\src\ReplicaMath.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\ConstantMap.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\ConstantBuffer.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Shaders\ShaderBase.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\RTHandle.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Context.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\Sampler.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\Texture2DBase.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\VertexBuffer.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\IndexBuffer.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Shaders\PixelShader.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Shaders\VertexShader.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\InputLayout.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Mesh.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\SwapChain.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\BufferBase.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Device.cpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Renderer.cpp" />
+    <ClCompile Include="LibReplicaRender\src\utils\src\ReplicaWinUtils.cpp" />
+    <ClCompile Include="LibReplicaRender\src\utils\src\Utils.cpp" />
+    <ClCompile Include="LibReplicaRender\src\utils\src\TextBlock.cpp" />
+    <ClCompile Include="LibReplicaRender\src\utils\src\GfxException.cpp" />
+    <ClCompile Include="LibReplicaRender\src\utils\src\Input.cpp" />
+    <ClCompile Include="LibReplicaRender\src\utils\src\RepExeption.cpp" />
+    <ClCompile Include="LibReplicaRender\src\utils\src\MinWindow.cpp" />
+    <ClCompile Include="LibReplicaRender\src\utils\src\RepWinException.cpp" />
+    <ClCompile Include="LibReplicaRender\src\utils\src\Stopwatch.cpp" />
+    <ClCompile Include="LibReplicaRender\src\utils\src\WindowComponentBase.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ReplicaRenderer\include\ReplicaD3D11.hpp" />
-    <ClInclude Include="ReplicaRenderer\include\ReplicaInt.hpp" />
-    <ClInclude Include="ReplicaRenderer\include\ReplicaInternalD3D11.hpp" />
-    <ClInclude Include="ReplicaRenderer\include\ReplicaImgui.hpp" />
-    <ClInclude Include="ReplicaRenderer\include\ReplicaMath.hpp" />
-    <ClInclude Include="ReplicaRenderer\include\ReplicaUtils.hpp" />
-    <ClInclude Include="ReplicaRenderer\include\ReplicaWin32.hpp" />
-    <ClInclude Include="ReplicaRenderer\include\ReplicaWinUtils.hpp" />
-    <ClInclude Include="ReplicaRenderer\libs\imgui\backends\imgui_impl_dx11.h" />
-    <ClInclude Include="ReplicaRenderer\libs\imgui\backends\imgui_impl_win32.h" />
-    <ClInclude Include="ReplicaRenderer\libs\imgui\imconfig.h" />
-    <ClInclude Include="ReplicaRenderer\libs\imgui\imgui.h" />
-    <ClInclude Include="ReplicaRenderer\libs\imgui\imgui_internal.h" />
-    <ClInclude Include="ReplicaRenderer\libs\imgui\imstb_rectpack.h" />
-    <ClInclude Include="ReplicaRenderer\libs\imgui\imstb_textedit.h" />
-    <ClInclude Include="ReplicaRenderer\libs\imgui\imstb_truetype.h" />
-    <ClInclude Include="ReplicaRenderer\libs\imgui\misc\cpp\imgui_stdlib.h" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\ResizeableTexture2D.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\ResourceEnums.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RWTexture2D.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\StagingTexture2D.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\Texture2D.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ShaderSrc\CS_TexCopy2D.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ShaderSrc\CS_TexCopySamp2D.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ShaderSrc\CS_TexCopyScaledSamp2D.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ShaderSrc\PS_Default.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ShaderSrc\PS_Flat3D.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ShaderSrc\PS_Textured.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ShaderSrc\VS_3D.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ShaderSrc\VS_Default.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ShaderSrc\VS_PosTextured.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ShaderSrc\VS_Textured2D.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ShaderSrc\VS_Textured3D.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\ComputeShader.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\DepthStencilTexture.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\TextureEnums.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiHandler.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ImguiRenderComponent.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\RenderComponent.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\BufferBase.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\ConstantBuffer.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\ConstantMap.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Context.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Device.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\DeviceChild.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\Formats.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\InputLayout.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\IAsset.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\ResourceBase.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\BuiltInShaders.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\PixelShader.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RTHandle.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\Sampler.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\ShaderBase.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\Texture2DBase.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\VertexShader.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\IDrawable.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Effect.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Material.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Mesh.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Primitives.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\ResourceMap.hpp" />
-    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\ImguiRenderComponent.cpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Viewport.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\DataBufferHandleBase.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\MoveOnlyBase.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\SwapChain.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\GfxException.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\IndexBuffer.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\Input.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Renderer.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\RepLeanWin.h" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\RepException.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\MinWindow.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\RepWinException.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\DynamicCollections.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\VertexBuffer.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\Span.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\Stopwatch.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\TextBlock.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\Utils.hpp" />
-    <ClInclude Include="ReplicaRenderer\src\utils\include\WindowComponentBase.hpp" />
+    <ClInclude Include="LibReplicaRender\include\ReplicaD3D11.hpp" />
+    <ClInclude Include="LibReplicaRender\include\ReplicaInt.hpp" />
+    <ClInclude Include="LibReplicaRender\include\ReplicaInternalD3D11.hpp" />
+    <ClInclude Include="LibReplicaRender\include\ReplicaImgui.hpp" />
+    <ClInclude Include="LibReplicaRender\include\ReplicaMath.hpp" />
+    <ClInclude Include="LibReplicaRender\include\ReplicaUtils.hpp" />
+    <ClInclude Include="LibReplicaRender\include\ReplicaWin32.hpp" />
+    <ClInclude Include="LibReplicaRender\include\ReplicaWinUtils.hpp" />
+    <ClInclude Include="LibReplicaRender\libs\imgui\backends\imgui_impl_dx11.h" />
+    <ClInclude Include="LibReplicaRender\libs\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="LibReplicaRender\libs\imgui\imconfig.h" />
+    <ClInclude Include="LibReplicaRender\libs\imgui\imgui.h" />
+    <ClInclude Include="LibReplicaRender\libs\imgui\imgui_internal.h" />
+    <ClInclude Include="LibReplicaRender\libs\imgui\imstb_rectpack.h" />
+    <ClInclude Include="LibReplicaRender\libs\imgui\imstb_textedit.h" />
+    <ClInclude Include="LibReplicaRender\libs\imgui\imstb_truetype.h" />
+    <ClInclude Include="LibReplicaRender\libs\imgui\misc\cpp\imgui_stdlib.h" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\ResizeableTexture2D.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\ResourceEnums.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\RWTexture2D.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\StagingTexture2D.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\Texture2D.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ShaderSrc\CS_TexCopy2D.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ShaderSrc\CS_TexCopySamp2D.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ShaderSrc\CS_TexCopyScaledSamp2D.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ShaderSrc\PS_Default.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ShaderSrc\PS_Flat3D.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ShaderSrc\PS_Textured.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ShaderSrc\VS_3D.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ShaderSrc\VS_Default.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ShaderSrc\VS_PosTextured.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ShaderSrc\VS_Textured2D.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ShaderSrc\VS_Textured3D.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Shaders\ComputeShader.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\DepthStencilTexture.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\TextureEnums.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ImguiHandler.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ImguiRenderComponent.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\RenderComponent.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\BufferBase.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\ConstantBuffer.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\ConstantMap.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Context.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Device.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\DeviceChild.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\Formats.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\InputLayout.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\IAsset.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\ResourceBase.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Shaders\BuiltInShaders.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Shaders\PixelShader.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\RTHandle.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\Sampler.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Shaders\ShaderBase.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\Texture2DBase.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Shaders\VertexShader.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\IDrawable.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Effect.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Material.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Mesh.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Primitives.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ResourceMap.hpp" />
+    <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\ImguiRenderComponent.cpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Viewport.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\DataBufferHandleBase.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\MoveOnlyBase.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\SwapChain.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\GfxException.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\IndexBuffer.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\Input.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Renderer.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\RepLeanWin.h" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\RepException.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\MinWindow.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\RepWinException.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\DynamicCollections.hpp" />
+    <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\VertexBuffer.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\Span.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\Stopwatch.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\TextBlock.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\Utils.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\WindowComponentBase.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\CS_TexCopy2D.hlsl">
+    <FxCompile Include="LibReplicaRender\res\BuiltInShaders\CS_TexCopy2D.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
@@ -350,7 +350,7 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\CS_TexCopyScaledSamp2D.hlsl">
+    <FxCompile Include="LibReplicaRender\res\BuiltInShaders\CS_TexCopyScaledSamp2D.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
@@ -372,7 +372,7 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)Src</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)Src</VariableName>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\PS_Flat3D.hlsl">
+    <FxCompile Include="LibReplicaRender\res\BuiltInShaders\PS_Flat3D.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
@@ -394,7 +394,7 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)Src</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)Src</VariableName>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\PS_Default.hlsl">
+    <FxCompile Include="LibReplicaRender\res\BuiltInShaders\PS_Default.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -425,7 +425,7 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)Src</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)Src</VariableName>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\VS_3D.hlsl">
+    <FxCompile Include="LibReplicaRender\res\BuiltInShaders\VS_3D.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
@@ -447,7 +447,7 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)Src</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)Src</VariableName>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\CS_TexCopySamp2D.hlsl">
+    <FxCompile Include="LibReplicaRender\res\BuiltInShaders\CS_TexCopySamp2D.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
@@ -473,7 +473,7 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)Src</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)Src</VariableName>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\VS_Textured2D.hlsl">
+    <FxCompile Include="LibReplicaRender\res\BuiltInShaders\VS_Textured2D.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
@@ -495,7 +495,7 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)Src</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)Src</VariableName>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\VS_PosTextured.hlsl">
+    <FxCompile Include="LibReplicaRender\res\BuiltInShaders\VS_PosTextured.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
@@ -517,7 +517,7 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)Src</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)Src</VariableName>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\PS_Textured.hlsl">
+    <FxCompile Include="LibReplicaRender\res\BuiltInShaders\PS_Textured.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
@@ -539,7 +539,7 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)Src</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)Src</VariableName>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\VS_Textured3D.hlsl">
+    <FxCompile Include="LibReplicaRender\res\BuiltInShaders\VS_Textured3D.hlsl">
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -570,7 +570,7 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)Src</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)Src</VariableName>
     </FxCompile>
-    <FxCompile Include="ReplicaRenderer\res\BuiltInShaders\VS_Default.hlsl">
+    <FxCompile Include="LibReplicaRender\res\BuiltInShaders\VS_Default.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
