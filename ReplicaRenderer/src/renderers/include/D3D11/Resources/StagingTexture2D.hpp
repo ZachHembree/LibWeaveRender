@@ -19,7 +19,7 @@ namespace Replica::D3D11
 
 		/// <summary>
 		/// Constructs and allocates a staging texture with the given format and size.
-		/// CPU access flags cannot be none.
+		/// CPU access flags cannot be set to none.
 		/// </summary>
 		StagingTexture2D(
 			Device& dev,

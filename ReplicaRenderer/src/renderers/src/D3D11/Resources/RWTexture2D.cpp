@@ -21,7 +21,7 @@ RWTexture2D::RWTexture2D(
 	void* data,
 	UINT stride
 ) :
-	Texture2D(
+	ResizeableTexture2D(
 		dev,
 		dim,
 		format,
@@ -109,66 +109,6 @@ ID3D11UnorderedAccessView** const RWTexture2D::GetAddressUAV() { return pUAV.Get
 ID3D11RenderTargetView* RWTexture2D::GetRTV() { return pRTV.Get(); }
 
 ID3D11RenderTargetView** const RWTexture2D::GetAddressRTV() { return pRTV.GetAddressOf(); }
-
-/// <summary>
-/// Sets the offset for this target in pixels
-/// </summary>
-void RWTexture2D::SetRenderOffset(ivec2 offset)
-{
-	this->renderOffset = glm::clamp(vec2(offset) / vec2(GetSize()), vec2(-1), vec2(1));
-}
-
-/// <summary>
-/// Returns the offset set for this target in pixels
-/// </summary>
-ivec2 RWTexture2D::GetRenderOffset() const
-{
-	return ivec2(glm::round(renderOffset * vec2(GetSize())));
-}
-
-void RWTexture2D::SetRenderSize(ivec2 renderSize)
-{
-	const vec2 size = glm::max(GetSize(), ivec2(1));
-	vec2 newSize = glm::clamp(vec2(renderSize), vec2(1), size);
-	SetRenderScale(newSize / size);
-}
-
-/// <summary>
-/// Returns the size of the render area in pixels
-/// </summary>
-ivec2 RWTexture2D::GetRenderSize() const
-{
-	const vec2 size = GetSize();
-	vec2 renderSize = glm::round(renderScale * size);
-	return glm::clamp(ivec2(renderSize), ivec2(1), ivec2(size));
-}
-
-/// <summary>
-/// Returns combined scaled (DRS) texel size and dim fp vector.
-/// XY == Texel Size; ZW == Dim
-/// </summary>
-vec4 RWTexture2D::GetRenderTexelSize() const
-{
-	const vec2 renderSize = GetRenderSize();
-	return vec4(1.0f / renderSize.x, 1.0f / renderSize.y, renderSize);
-}
-
-/// <summary>
-/// Sets the renderSize to size ratio on (0, 1].
-/// </summary>
-void RWTexture2D::SetRenderScale(vec2 scale)
-{
-	scale = glm::round(scale * 1E6f) * 1E-6f;
-	renderScale = glm::clamp(scale, vec2(1E-6f), vec2(1));
-}
-
-/// <summary>
-/// Returns the renderSize to size ratio on (0, 1].
-/// </summary>
-vec2 RWTexture2D::GetRenderScale() const
-{
-	return renderScale;
-}
 
 /// <summary>
 /// Clears the texture to the given color

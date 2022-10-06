@@ -69,9 +69,9 @@ void StagingTexture2D::SetTextureData(Context& ctx, void* data, size_t stride, i
 		GFX_ASSERT(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
 
 		if (GetUsage() == ResourceUsages::Dynamic)
-			UpdateMapUnmap(ctx, data, stride, dim);
+			UpdateMapUnmap(ctx, data);
 		else
-			UpdateSubresource(ctx, data, stride, dim);
+			UpdateSubresource(ctx, data, stride);
 	}
 	else
 	{

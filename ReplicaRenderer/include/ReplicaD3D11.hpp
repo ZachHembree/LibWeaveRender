@@ -18,3 +18,5 @@
 #include "../src/renderers/include/D3D11/Resources/StagingTexture2D.hpp"
 #include "../src/renderers/include/D3D11/Resources/Sampler.hpp"
 #include "../src/renderers/include/D3D11/Resources/DepthStencilTexture.hpp"
+#include "../src/renderers/include/D3D11/Resources/ResizeableTexture2D.hpp"
+

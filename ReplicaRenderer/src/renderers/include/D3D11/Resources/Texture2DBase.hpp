@@ -89,8 +89,8 @@ namespace Replica::D3D11
 			UINT stride = 0
 		);
 
-		void UpdateMapUnmap(Context& ctx, void* data, size_t stride, ivec2 dim);
+		void UpdateMapUnmap(Context& ctx, void* data);
 
-		void UpdateSubresource(Context& ctx, void* data, size_t stride, ivec2 dim);
+		void UpdateSubresource(Context& ctx, void* data, size_t stride);
 	};
 }

@@ -153,6 +153,9 @@
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\StagingTexture2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\ResizeableTexture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplicaRenderer\src\utils\include\RepLeanWin.h">
@@ -360,6 +363,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\StagingTexture2D.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\ResizeableTexture2D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

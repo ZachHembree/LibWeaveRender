@@ -1,9 +1,9 @@
 #pragma once
-#include "Texture2D.hpp"
+#include "ResizeableTexture2D.hpp"
 
 namespace Replica::D3D11
 {
-	class RWTexture2D : public virtual IRWTexture2D, public Texture2D
+	class RWTexture2D : public virtual IRWTexture2D, public ResizeableTexture2D
 	{
 	public:
 		RWTexture2D();
@@ -44,43 +44,6 @@ namespace Replica::D3D11
 		/// Binds the render target to the output merger
 		/// </summary>
 		ID3D11RenderTargetView** const GetAddressRTV() override;
-
-		/// <summary>
-		/// Sets the offset for this target in pixels
-		/// </summary>
-		void SetRenderOffset(ivec2 offset);
-
-		/// <summary>
-		/// Returns the offset set for this target in pixels
-		/// </summary>
-		ivec2 GetRenderOffset() const override;
-
-		/// <summary>
-		/// Sets the size of the render area for the render texture.
-		/// Cannot exceed the size of the underlying buffer.
-		/// </summary>
-		void SetRenderSize(ivec2 renderSize);
-
-		/// <summary>
-		/// Returns the size of the render area in pixels
-		/// </summary>
-		ivec2 GetRenderSize() const override;
-
-		/// <summary>
-		/// Returns combined scaled (DRS) texel size and dim fp vector.
-		/// XY == Texel Size; ZW == Dim
-		/// </summary>
-		vec4 GetRenderTexelSize() const;
-
-		/// <summary>
-		/// Sets the renderSize to size ratio on (0, 1].
-		/// </summary>
-		void SetRenderScale(vec2 scale);
-
-		/// <summary>
-		/// Returns the renderSize to size ratio on (0, 1].
-		/// </summary>
-		vec2 GetRenderScale() const override;
 
 		/// <summary>
 		/// Clears the texture to the given color
