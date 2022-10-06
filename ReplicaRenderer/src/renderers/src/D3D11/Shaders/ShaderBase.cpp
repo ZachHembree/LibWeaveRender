@@ -61,12 +61,12 @@ void ShaderBase::Bind() { Bind(pDev->GetContext()); }
 /// </summary>
 bool ShaderBase::GetIsBound() { return isBound; }
 
-void ShaderBase::SetSampler(wstring_view name, Sampler& samp)
+void ShaderBase::SetSampler(string_view name, Sampler& samp)
 {
 	samplers.SetResource(name, samp.Get());
 }
 
-void ShaderBase::SetTexture(wstring_view name, ITexture2D& tex)
+void ShaderBase::SetTexture(string_view name, ITexture2D& tex)
 {
 	textures.SetResource(name, tex.GetSRV());
 }

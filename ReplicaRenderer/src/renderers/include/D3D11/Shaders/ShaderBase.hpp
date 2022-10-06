@@ -52,7 +52,7 @@ namespace Replica::D3D11
 		/// given value.
 		/// </summary>
 		template<typename T>
-		void SetConstant(wstring_view name, const T& value)
+		void SetConstant(string_view name, const T& value)
 		{
 			constants.SetMember(name, value);
 		}
@@ -62,7 +62,7 @@ namespace Replica::D3D11
 		/// given value.
 		/// </summary>
 		template<>
-		void SetConstant<mat4>(wstring_view name, const mat4& value)
+		void SetConstant<mat4>(string_view name, const mat4& value)
 		{
 			constants.SetMember(name, transpose(value));
 		}
@@ -72,7 +72,7 @@ namespace Replica::D3D11
 		/// given value.
 		/// </summary>
 		template<>
-		void SetConstant<mat3>(wstring_view name, const mat3& value)
+		void SetConstant<mat3>(string_view name, const mat3& value)
 		{
 			constants.SetMember(name, transpose(value));
 		}
@@ -80,12 +80,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Sets sampler using last context
 		/// </summary>
-		virtual void SetSampler(wstring_view name, Sampler& samp);
+		virtual void SetSampler(string_view name, Sampler& samp);
 
 		/// <summary>
 		/// Sets Texture2D using last context
 		/// </summary>
-		virtual void SetTexture(wstring_view name, ITexture2D& tex);
+		virtual void SetTexture(string_view name, ITexture2D& tex);
 
 	protected:
 		ConstantMap constants;

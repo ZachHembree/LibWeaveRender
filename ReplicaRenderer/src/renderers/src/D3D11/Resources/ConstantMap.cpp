@@ -33,7 +33,7 @@ ConstantMap::ConstantMap(const ConstantMap& other) :
 ConstantMap& ConstantMap::operator=(const ConstantMap& other)
 {
 	this->data = other.data.GetCopy();
-	this->defMap = std::unordered_map<wstring_view, MapEntry>(other.defMap);
+	this->defMap = std::unordered_map<string_view, MapEntry>(other.defMap);
 	this->stride = other.stride;
 
 	return *this;
@@ -51,7 +51,7 @@ void ConstantMap::UpdateConstantBuffer(ConstantBuffer& cb, Context& ctx)
 /// <summary>
 /// Returns true if a member with the given name is registered to the map
 /// </summary>
-bool ConstantMap::GetMemberExists(wstring_view name)
+bool ConstantMap::GetMemberExists(string_view name)
 {
 	auto pair = defMap.find(name);
 	return pair != defMap.end();
@@ -60,7 +60,7 @@ bool ConstantMap::GetMemberExists(wstring_view name)
 /// <summary>
 /// Sets member with the given name to the value given
 /// </summary>
-void ConstantMap::SetMember(wstring_view name, const byte* src, const type_info& type)
+void ConstantMap::SetMember(string_view name, const byte* src, const type_info& type)
 {
 	const auto itr = defMap.find(name);
 	GFX_ASSERT(itr != defMap.end(), "Named constant not in buffer definition.");
@@ -132,7 +132,7 @@ ConstantMapDef& ConstantMapDef::operator=(ConstantMapDef&& other) noexcept
 /// Adds a new constant entry with the given name and type to the end
 /// of the map definition.
 /// </summary>
-void ConstantMapDef::Add(wstring_view name, const type_info& type, const size_t stride)
+void ConstantMapDef::Add(string_view name, const type_info& type, const size_t stride)
 {
 	members.emplace_back(ConstantDef(name, type, stride));
 	this->stride += stride;
@@ -157,10 +157,10 @@ const IDynamicArray<ConstantDef>& ConstantMapDef::GetMembers() const { return me
 /// </summary>
 size_t ConstantMapDef::GetStride() const { return GetAlignedByteSize(stride, 16); }
 
-ConstantDef::ConstantDef() : name(L""), type(typeid(void*)), stride(0)
+ConstantDef::ConstantDef() : name(""), type(typeid(void*)), stride(0)
 { }
 
-ConstantDef::ConstantDef(wstring_view name, const type_info& type, const size_t stride) :
+ConstantDef::ConstantDef(string_view name, const type_info& type, const size_t stride) :
 	name(name),
 	type(type),
 	stride(stride)

@@ -32,13 +32,13 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns true if a member with the given name is registered to the map
 		/// </summary>
-		bool GetMemberExists(wstring_view name);
+		bool GetMemberExists(string_view name);
 
 		/// <summary>
 		/// Sets member with the given name to the value given
 		/// </summary>
 		template<typename T>
-		void SetMember(wstring_view name, const T& value)
+		void SetMember(string_view name, const T& value)
 		{
 			if (GetMemberExists(name))
 				SetMember(name, reinterpret_cast<const byte*>(&value), typeid(T));
@@ -69,14 +69,14 @@ namespace Replica::D3D11
 
 	private:
 		UniqueArray<byte> data;
-		std::unordered_map<wstring_view, MapEntry> defMap;
+		std::unordered_map<string_view, MapEntry> defMap;
 		size_t stride;
 
 		ConstantMap(const ConstantMap& other);
 
 		ConstantMap& operator=(const ConstantMap& other);
 
-		void SetMember(wstring_view name, const byte* src, const type_info& type);
+		void SetMember(string_view name, const byte* src, const type_info& type);
 	};
 
 	/// <summary>
@@ -104,7 +104,7 @@ namespace Replica::D3D11
 		/// of the map definition.
 		/// </summary>
 		template<typename T>
-		void Add(wstring_view name) { Add(name, typeid(T), sizeof(T)); }
+		void Add(string_view name) { Add(name, typeid(T), sizeof(T)); }
 
 		/// <summary>
 		/// Clears the contents of the initializer
@@ -129,7 +129,7 @@ namespace Replica::D3D11
 		/// Adds a new constant entry with the given name and type to the end
 		/// of the map definition.
 		/// </summary>
-		void Add(wstring_view name, const type_info& type, const size_t stride);
+		void Add(string_view name, const type_info& type, const size_t stride);
 	};
 
 	/// <summary>
@@ -137,20 +137,20 @@ namespace Replica::D3D11
 	/// </summary>
 	struct ConstantDef
 	{
-		wstring_view name;
+		string_view name;
 		const type_info& type;
 		const size_t stride;
 
 		ConstantDef();
 
-		ConstantDef(wstring_view name, const type_info& type, const size_t stride);
+		ConstantDef(string_view name, const type_info& type, const size_t stride);
 
 		ConstantDef(const ConstantDef& other);
 
 		ConstantDef& operator=(const ConstantDef& other);
 
 		template<typename T>
-		static ConstantDef Get(wstring_view name)
+		static ConstantDef Get(string_view name)
 		{
 			return ConstantDef(name, typeid(T), sizeof(T));
 		}

@@ -14,7 +14,7 @@ namespace Replica::D3D11
 		ResourceMap& operator=(const ResourceMap& other) = default;
 		ResourceMap& operator=(ResourceMap&& other) = default;
 
-		ResourceMap(const IDynamicArray<wstring_view>& def) :
+		ResourceMap(const IDynamicArray<string_view>& def) :
 			resources(def.GetLength())
 		{
 			for (uint i = 0; i < def.GetLength(); i++)
@@ -23,11 +23,11 @@ namespace Replica::D3D11
 			}
 		}
 
-		ResourceMap(const std::initializer_list<wstring_view>& list) :
+		ResourceMap(const std::initializer_list<string_view>& list) :
 			ResourceMap(UniqueArray(list))
 		{ }
 
-		void SetResource(wstring_view name, T* pRes)
+		void SetResource(string_view name, T* pRes)
 		{
 			auto pair = resourceMap.find(name);
 
@@ -44,7 +44,7 @@ namespace Replica::D3D11
 				GFX_ASSERT(resources[i] != nullptr, "Cannot get null resources.");
 		}
 
-		void SetResource(wstring_view name, ComPtr<T>& pRes) { SetResource(name, pRes.Get()); }
+		void SetResource(string_view name, ComPtr<T>& pRes) { SetResource(name, pRes.Get()); }
 
 		const IDynamicArray<T*>& GetResources() { return resources; }
 
@@ -52,7 +52,7 @@ namespace Replica::D3D11
 
 	private:
 		DynamicArray<T*> resources;
-		std::unordered_map<wstring_view, uint> resourceMap;
+		std::unordered_map<string_view, uint> resourceMap;
 
 	};
 }

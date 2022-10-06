@@ -442,12 +442,12 @@ void Context::Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
 		ValidateResourceBounds(src, dst, srcBox, dstBox);
 
 		Renderer& renderer = GetRenderer();
-		ComputeShader& cs = renderer.GetDefaultCompute(L"TexCopy2D");
+		ComputeShader& cs = renderer.GetDefaultCompute("TexCopy2D");
 
-		cs.SetTexture(L"SrcTex", src);
-		cs.SetRWTexture(L"DstTex", dst);
-		cs.SetConstant(L"SrcOffset", ivec2(srcBox.z, srcBox.w));
-		cs.SetConstant(L"DstOffset", ivec2(dstBox.z, dstBox.w));
+		cs.SetTexture("SrcTex", src);
+		cs.SetRWTexture("DstTex", dst);
+		cs.SetConstant("SrcOffset", ivec2(srcBox.z, srcBox.w));
+		cs.SetConstant("DstOffset", ivec2(dstBox.z, dstBox.w));
 		cs.Dispatch(*this, { dstBox.x, dstBox.y });
 	}
 	else
@@ -455,20 +455,20 @@ void Context::Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
 		ValidateResourceBounds(src, dst, srcBox, dstBox, true);
 
 		Renderer& renderer = GetRenderer();
-		ComputeShader& cs = renderer.GetDefaultCompute(L"TexCopyScaledSamp2D");
+		ComputeShader& cs = renderer.GetDefaultCompute("TexCopyScaledSamp2D");
 
 		const ivec2 srcRenderSize = vec2(srcBox.x, srcBox.y);
 		const vec2 scale = vec2(srcRenderSize) / vec2(src.GetSize()),
 			offset = vec2(srcBox.z, srcBox.w) * vec2(src.GetTexelSize());
 
-		cs.SetTexture(L"SrcTex", src);
-		cs.SetRWTexture(L"DstTex", dst);
-		cs.SetSampler(L"Samp", renderer.GetDefaultSampler(L"LinearBorder"));
-		cs.SetConstant(L"Scale", scale);
-		cs.SetConstant(L"Offset", offset);
-		cs.SetConstant(L"SrcOffset", ivec2(srcBox.z, srcBox.w));
-		cs.SetConstant(L"DstOffset", ivec2(dstBox.z, dstBox.w));
-		cs.SetConstant(L"DstTexelSize", dst.GetRenderTexelSize());
+		cs.SetTexture("SrcTex", src);
+		cs.SetRWTexture("DstTex", dst);
+		cs.SetSampler("Samp", renderer.GetDefaultSampler("LinearBorder"));
+		cs.SetConstant("Scale", scale);
+		cs.SetConstant("Offset", offset);
+		cs.SetConstant("SrcOffset", ivec2(srcBox.z, srcBox.w));
+		cs.SetConstant("DstOffset", ivec2(dstBox.z, dstBox.w));
+		cs.SetConstant("DstTexelSize", dst.GetRenderTexelSize());
 		cs.Dispatch(*this, { dstBox.x, dstBox.y });
 	}
 }
@@ -549,8 +549,8 @@ void Context::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 		ValidateResourceBounds(src, dst, srcBox, dstBox, true);
 
 	Renderer& renderer = GetRenderer();
-	Mesh& quad = renderer.GetDefaultMesh(L"FSQuad");
-	Effect& quadFX = renderer.GetDefaultEffect(L"PosTextured2D");
+	Mesh& quad = renderer.GetDefaultMesh("FSQuad");
+	Effect& quadFX = renderer.GetDefaultEffect("PosTextured2D");
 
 	ID3D11RenderTargetView* const lastRTV = GetRenderTarget(0);
 	const Viewport& lastVP = GetViewport(0);
@@ -563,13 +563,13 @@ void Context::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 		offset = vec2(srcBox.z, srcBox.w) * vec2(src.GetTexelSize());
 
 	if (srcRenderSize == dst.GetRenderSize())
-		quadFX.SetSampler(L"samp", renderer.GetDefaultSampler(L"PointBorder"));
+		quadFX.SetSampler("samp", renderer.GetDefaultSampler("PointBorder"));
 	else
-		quadFX.SetSampler(L"samp", renderer.GetDefaultSampler(L"LinearClamp"));
+		quadFX.SetSampler("samp", renderer.GetDefaultSampler("LinearClamp"));
 
-	quadFX.SetConstant(L"Scale", scale);
-	quadFX.SetConstant(L"Offset", offset);
-	quadFX.SetTexture(L"tex", src);
+	quadFX.SetConstant("Scale", scale);
+	quadFX.SetConstant("Offset", offset);
+	quadFX.SetTexture("tex", src);
 
 	Draw(quad, quadFX);
 

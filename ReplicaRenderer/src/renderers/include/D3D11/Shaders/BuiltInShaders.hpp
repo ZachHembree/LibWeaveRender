@@ -26,19 +26,19 @@ namespace Replica::D3D11
 			sizeof(CS_TexCopy2DSrc),
 			// Constants
 			{ 
-				ConstantDef::Get<ivec2>(L"SrcOffset"),
-				ConstantDef::Get<ivec2>(L"DstOffset"),
+				ConstantDef::Get<ivec2>("SrcOffset"),
+				ConstantDef::Get<ivec2>("DstOffset"),
 			},
 			// Samplers
 			{ },
 			// Textures
 			{
-				L"SrcTex",
+				"SrcTex",
 			},
 		},
 		// RWTextures
 		{
-			L"DstTex"
+			"DstTex"
 		}
 	};
 
@@ -51,22 +51,22 @@ namespace Replica::D3D11
 			sizeof(CS_TexCopySamp2DSrc),
 			// Constants
 			{
-				ConstantDef::Get<ivec2>(L"SrcOffset"),
-				ConstantDef::Get<ivec2>(L"DstOffset"),
-				ConstantDef::Get<vec4>(L"DstTexelSize"),
+				ConstantDef::Get<ivec2>("SrcOffset"),
+				ConstantDef::Get<ivec2>("DstOffset"),
+				ConstantDef::Get<vec4>("DstTexelSize"),
 			},
 			// Samplers
 			{
-				L"Samp",
+				"Samp",
 			},
 			// Textures
 			{
-				L"SrcTex",
+				"SrcTex",
 			},
 		},
 		// RWTextures
 		{
-			L"DstTex"
+			"DstTex"
 		}
 	};
 
@@ -80,22 +80,22 @@ namespace Replica::D3D11
 			sizeof(CS_TexCopyScaledSamp2DSrc),
 			// Constants
 			{
-				ConstantDef::Get<vec4>(L"DstTexelSize"),
-				ConstantDef::Get<vec2>(L"Scale"),
-				ConstantDef::Get<vec2>(L"Offset"),
+				ConstantDef::Get<vec4>("DstTexelSize"),
+				ConstantDef::Get<vec2>("Scale"),
+				ConstantDef::Get<vec2>("Offset"),
 			},
 			// Samplers
 			{
-				L"Samp",
+				"Samp",
 			},
 			// Textures
 			{
-				L"SrcTex",
+				"SrcTex",
 			},
 		},
 		// RWTextures
 		{
-			L"DstTex"
+			"DstTex"
 		}
 	};
 
@@ -153,7 +153,7 @@ namespace Replica::D3D11
 			// Source binary
 			(byte*)&VS_3DSrc,
 			sizeof(VS_3DSrc),
-			{ ConstantDef::Get<mat4>(L"mvp"), }
+			{ ConstantDef::Get<mat4>("mvp"), }
 		},
 		// Vertex Layout
 		{
@@ -169,7 +169,7 @@ namespace Replica::D3D11
 			(byte*)&VS_Textured3DSrc,
 			sizeof(VS_Textured3DSrc),
 			// Constants
-			{ ConstantDef::Get<mat4>(L"mvp"), }
+			{ ConstantDef::Get<mat4>("mvp"), }
 		},
 		// Vertex Layout
 		{
@@ -203,13 +203,13 @@ namespace Replica::D3D11
 		sizeof(PS_TexturedSrc),
 		// Constants
 		{ 
-			ConstantDef::Get<vec2>(L"Scale"),
-			ConstantDef::Get<vec2>(L"Offset"),
+			ConstantDef::Get<vec2>("Scale"),
+			ConstantDef::Get<vec2>("Offset"),
 		},
 		// Samplers
-		{ L"samp" },
+		{ "samp" },
 		// Textures
-		{ L"tex" },
+		{ "tex" },
 	};
 
 	// Effects

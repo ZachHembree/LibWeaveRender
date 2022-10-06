@@ -29,7 +29,7 @@ namespace Replica::D3D11
 		/// given value.
 		/// </summary>
 		template<typename T>
-		void SetConstant(wstring_view name, const T& value)
+		void SetConstant(string_view name, const T& value)
 		{
 			vs.SetConstant(name, value);
 			ps.SetConstant(name, value);
@@ -38,7 +38,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Sets sampler 
 		/// </summary>
-		void SetSampler(wstring_view name, Sampler& samp)
+		void SetSampler(string_view name, Sampler& samp)
 		{
 			vs.SetSampler(name, samp);
 			ps.SetSampler(name, samp);
@@ -47,7 +47,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Sets Texture2D
 		/// </summary>
-		void SetTexture(wstring_view name, ITexture2D& tex)
+		void SetTexture(string_view name, ITexture2D& tex)
 		{
 			vs.SetTexture(name, tex);
 			ps.SetTexture(name, tex);

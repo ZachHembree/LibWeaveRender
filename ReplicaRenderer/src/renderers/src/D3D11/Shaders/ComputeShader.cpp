@@ -30,7 +30,7 @@ ID3D11ComputeShader* ComputeShader::Get() const
 	return pCS.Get();
 }
 
-void ComputeShader::SetRWTexture(wstring_view name, IRWTexture2D& tex)
+void ComputeShader::SetRWTexture(string_view name, IRWTexture2D& tex)
 {
 	uavBuffers.SetResource(name, tex.GetUAV());
 }

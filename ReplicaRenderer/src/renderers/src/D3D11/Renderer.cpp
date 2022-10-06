@@ -13,25 +13,25 @@ Renderer::Renderer(MinWindow& window) :
 	fitToWindow(true)
 { 
 	MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
-	defaultMeshes[L"FSQuad"] = Mesh(device, quadDef);
+	defaultMeshes["FSQuad"] = Mesh(device, quadDef);
 
-	defaultEffects[L"Default"] = Effect(device, g_DefaultEffect);
-	defaultEffects[L"PosTextured2D"] = Effect(device, g_PosTextured2DEffect);
-	defaultEffects[L"Textured2D"] = Effect(device, g_Textured2DEffect);
-	defaultEffects[L"DebugFlat3D"] = Effect(device, g_DebugFlat3DEffect);
-	defaultEffects[L"Textured3D"] = Effect(device, g_Textured3DEffect);
+	defaultEffects["Default"] = Effect(device, g_DefaultEffect);
+	defaultEffects["PosTextured2D"] = Effect(device, g_PosTextured2DEffect);
+	defaultEffects["Textured2D"] = Effect(device, g_Textured2DEffect);
+	defaultEffects["DebugFlat3D"] = Effect(device, g_DebugFlat3DEffect);
+	defaultEffects["Textured3D"] = Effect(device, g_Textured3DEffect);
 
-	defaultCompute[L"TexCopyScaledSamp2D"] = ComputeShader(device, g_CS_TexCopyScaledSamp2D);
-	defaultCompute[L"TexCopySamp2D"] = ComputeShader(device, g_CS_TexCopySamp2D);
-	defaultCompute[L"TexCopy2D"] = ComputeShader(device, g_CS_TexCopy2D);
+	defaultCompute["TexCopyScaledSamp2D"] = ComputeShader(device, g_CS_TexCopyScaledSamp2D);
+	defaultCompute["TexCopySamp2D"] = ComputeShader(device, g_CS_TexCopySamp2D);
+	defaultCompute["TexCopy2D"] = ComputeShader(device, g_CS_TexCopy2D);
 
-	defaultSamplers[L"PointClamp"] = Sampler(device, TexFilterMode::POINT, TexClampMode::CLAMP);
-	defaultSamplers[L"PointMirror"] = Sampler(device, TexFilterMode::POINT, TexClampMode::MIRROR);
-	defaultSamplers[L"PointBorder"] = Sampler(device, TexFilterMode::POINT, TexClampMode::BORDER);
+	defaultSamplers["PointClamp"] = Sampler(device, TexFilterMode::POINT, TexClampMode::CLAMP);
+	defaultSamplers["PointMirror"] = Sampler(device, TexFilterMode::POINT, TexClampMode::MIRROR);
+	defaultSamplers["PointBorder"] = Sampler(device, TexFilterMode::POINT, TexClampMode::BORDER);
 
-	defaultSamplers[L"LinearClamp"] = Sampler(device, TexFilterMode::LINEAR, TexClampMode::CLAMP);
-	defaultSamplers[L"LinearMirror"] = Sampler(device, TexFilterMode::LINEAR, TexClampMode::MIRROR);
-	defaultSamplers[L"LinearBorder"] = Sampler(device, TexFilterMode::LINEAR, TexClampMode::BORDER);
+	defaultSamplers["LinearClamp"] = Sampler(device, TexFilterMode::LINEAR, TexClampMode::CLAMP);
+	defaultSamplers["LinearMirror"] = Sampler(device, TexFilterMode::LINEAR, TexClampMode::MIRROR);
+	defaultSamplers["LinearBorder"] = Sampler(device, TexFilterMode::LINEAR, TexClampMode::BORDER);
 }
 
 /// <summary>
@@ -117,7 +117,7 @@ void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
 /// <summary>
 /// Returns reference to a default effect
 /// </summary>
-Effect& Renderer::GetDefaultEffect(wstring_view name) const
+Effect& Renderer::GetDefaultEffect(string_view name) const
 {
 	return (Effect&)defaultEffects.at(name);
 }
@@ -125,7 +125,7 @@ Effect& Renderer::GetDefaultEffect(wstring_view name) const
 /// <summary>
 /// Returns reference to a default compute shader
 /// </summary>
-ComputeShader& Renderer::GetDefaultCompute(wstring_view name) const
+ComputeShader& Renderer::GetDefaultCompute(string_view name) const
 {
 	return (ComputeShader&)defaultCompute.at(name);
 }
@@ -133,7 +133,7 @@ ComputeShader& Renderer::GetDefaultCompute(wstring_view name) const
 /// <summary>
 /// Retursn a reference to a default mesh
 /// </summary>
-Mesh& Renderer::GetDefaultMesh(wstring_view name) const
+Mesh& Renderer::GetDefaultMesh(string_view name) const
 {
 	return (Mesh&)defaultMeshes.at(name);
 }
@@ -141,7 +141,7 @@ Mesh& Renderer::GetDefaultMesh(wstring_view name) const
 /// <summary>
 /// Retursn a reference to a default texture sampler
 /// </summary>
-Sampler& Renderer::GetDefaultSampler(wstring_view name) const
+Sampler& Renderer::GetDefaultSampler(string_view name) const
 {
 	return (Sampler&)defaultSamplers.at(name);
 }

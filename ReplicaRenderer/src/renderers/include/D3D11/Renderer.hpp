@@ -85,22 +85,22 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns reference to a default effect
 		/// </summary>
-		Effect& GetDefaultEffect(wstring_view name) const;
+		Effect& GetDefaultEffect(string_view name) const;
 
 		/// <summary>
 		/// Returns reference to a default compute shader
 		/// </summary>
-		ComputeShader& GetDefaultCompute(wstring_view name) const;
+		ComputeShader& GetDefaultCompute(string_view name) const;
 
 		/// <summary>
 		/// Retursn a reference to a default mesh
 		/// </summary>
-		Mesh& GetDefaultMesh(wstring_view name) const;
+		Mesh& GetDefaultMesh(string_view name) const;
 
 		/// <summary>
 		/// Returns reference to a default texture sampler
 		/// </summary>
-		Sampler& GetDefaultSampler(wstring_view name) const;
+		Sampler& GetDefaultSampler(string_view name) const;
 
 		/// <summary>
 		/// Updates the state of the renderer
@@ -123,10 +123,10 @@ namespace Replica::D3D11
 		bool UnregisterComponent(RenderComponentBase& component);
 
 	private:
-		unordered_map<wstring_view, Effect> defaultEffects;
-		unordered_map<wstring_view, ComputeShader> defaultCompute;
-		unordered_map<wstring_view, Mesh> defaultMeshes;
-		unordered_map<wstring_view, Sampler> defaultSamplers;
+		unordered_map<string_view, Effect> defaultEffects;
+		unordered_map<string_view, ComputeShader> defaultCompute;
+		unordered_map<string_view, Mesh> defaultMeshes;
+		unordered_map<string_view, Sampler> defaultSamplers;
 
 		UniqueVector<RenderComponentBase*> pComponents;
 		Device device;
