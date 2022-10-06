@@ -10,9 +10,18 @@ PixelShader::PixelShader()
 PixelShader::PixelShader(Device& dev, const PixelShaderDef& psDef) :
 	ShaderBase(dev, psDef)
 {
-	ComPtr<ID3DBlob> psBlob;
-	GFX_THROW_FAILED(D3DReadFileToBlob(psDef.file.data(), &psBlob));
-	GFX_THROW_FAILED(dev->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pPS));
+	if (psDef.file.size() > 0)
+	{
+		ComPtr<ID3DBlob> psBlob;
+		GFX_THROW_FAILED(D3DReadFileToBlob(psDef.file.data(), &psBlob));
+		GFX_THROW_FAILED(dev->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pPS));
+	}
+	else if (psDef.srcSize > 0)
+	{
+		GFX_THROW_FAILED(dev->CreatePixelShader(psDef.srcBin, psDef.srcSize, nullptr, &pPS));
+	}
+	else
+		GFX_THROW("A shader cannot be instantiated without valid source.")
 }
 
 ID3D11PixelShader* PixelShader::Get() const

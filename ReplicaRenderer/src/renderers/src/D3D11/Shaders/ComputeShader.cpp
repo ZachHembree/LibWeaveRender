@@ -11,9 +11,18 @@ ComputeShader::ComputeShader(Device& dev, const ComputeShaderDef& csDef) :
 	ShaderBase(dev, csDef),
 	uavBuffers(csDef.uavBuffers)
 {
-	ComPtr<ID3DBlob> csBlob;
-	GFX_THROW_FAILED(D3DReadFileToBlob(csDef.file.data(), &csBlob));
-	GFX_THROW_FAILED(dev->CreateComputeShader(csBlob->GetBufferPointer(), csBlob->GetBufferSize(), nullptr, &pCS));
+	if (csDef.file.size() > 0)
+	{
+		ComPtr<ID3DBlob> csBlob;
+		GFX_THROW_FAILED(D3DReadFileToBlob(csDef.file.data(), &csBlob));
+		GFX_THROW_FAILED(dev->CreateComputeShader(csBlob->GetBufferPointer(), csBlob->GetBufferSize(), nullptr, &pCS));
+	}
+	else if (csDef.srcSize > 0)
+	{
+		GFX_THROW_FAILED(dev->CreateComputeShader(csDef.srcBin, csDef.srcSize, nullptr, &pCS));
+	}
+	else
+		GFX_THROW("A shader cannot be instantiated without valid source.")
 }
 
 ID3D11ComputeShader* ComputeShader::Get() const

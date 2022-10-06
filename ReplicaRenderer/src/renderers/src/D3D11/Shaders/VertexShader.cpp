@@ -13,11 +13,21 @@ VertexShader::VertexShader(
 ) :
 	ShaderBase(dev, vsDef)
 {
-	ComPtr<ID3DBlob> vsBlob;
-	GFX_THROW_FAILED(D3DReadFileToBlob(vsDef.file.data(), &vsBlob));
-	GFX_THROW_FAILED(dev->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &pVS));
+	if (vsDef.file.size() > 0)
+	{
+		ComPtr<ID3DBlob> vsBlob;
+		GFX_THROW_FAILED(D3DReadFileToBlob(vsDef.file.data(), &vsBlob));
+		GFX_THROW_FAILED(dev->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &pVS));
 
-	this->layout = InputLayout(dev, vsBlob, vsDef.iaLayout);
+		this->layout = InputLayout(dev, (byte*)vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), vsDef.iaLayout);
+	}
+	else if (vsDef.srcSize > 0)
+	{
+		GFX_THROW_FAILED(dev->CreateVertexShader(vsDef.srcBin, vsDef.srcSize, nullptr, &pVS));
+		this->layout = InputLayout(dev, vsDef.srcBin, vsDef.srcSize, vsDef.iaLayout);
+	}
+	else
+		GFX_THROW("A shader cannot be instantiated without valid source.")
 }
 
 ID3D11VertexShader* VertexShader::Get() const { return pVS.Get(); }

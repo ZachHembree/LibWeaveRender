@@ -6,15 +6,16 @@ using namespace Microsoft::WRL;
 InputLayout::InputLayout() noexcept : DeviceChild() { }
 
 InputLayout::InputLayout(Device& dev, 
-	const ComPtr<ID3DBlob>& vsBlob, 
+	const byte* pVS,
+	const size_t srcSize,
 	const IDynamicArray<IAElement>& description
 ) : DeviceChild(dev)
 { 
 	GFX_THROW_FAILED(dev->CreateInputLayout(
 		reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(description.GetPtr()),
-		(UINT)description.GetLength(),
-		vsBlob->GetBufferPointer(),
-		(UINT)vsBlob->GetBufferSize(),
+		(uint)description.GetLength(),
+		pVS,
+		(uint)srcSize,
 		&pLayout
 	));
 }

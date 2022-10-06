@@ -19,7 +19,8 @@ namespace Replica::D3D11
 		/// Constructs layout definition associated with given shader bytecode
 		/// </summary>
 		InputLayout(Device& dev, 
-			const ComPtr<ID3DBlob>& vsBlob,
+			const byte* pVS,
+			const size_t srcSize,
 			const IDynamicArray<IAElement>& layout
 		);
 

@@ -1,6 +1,17 @@
 #pragma once
 #include "../Effect.hpp"
 #include "../Shaders/ComputeShader.hpp"
+#include "../ShaderSrc/CS_TexCopy2D.hpp"
+#include "../ShaderSrc/CS_TexCopySamp2D.hpp"
+#include "../ShaderSrc/CS_TexCopyScaledSamp2D.hpp"
+#include "../ShaderSrc/PS_Default.hpp"
+#include "../ShaderSrc/PS_Flat3D.hpp"
+#include "../ShaderSrc/PS_Textured.hpp"
+#include "../ShaderSrc/VS_3D.hpp"
+#include "../ShaderSrc/VS_Default.hpp"
+#include "../ShaderSrc/VS_PosTextured.hpp"
+#include "../ShaderSrc/VS_Textured2D.hpp"
+#include "../ShaderSrc/VS_Textured3D.hpp"
 
 namespace Replica::D3D11
 {
@@ -9,8 +20,10 @@ namespace Replica::D3D11
 	const ComputeShaderDef g_CS_TexCopy2D
 	{
 		{
+			L"",
 			// Source binary
-			L"Shaders/CS_TexCopy2D.cso",
+			(byte*)&CS_TexCopy2DSrc,
+			sizeof(CS_TexCopy2DSrc),
 			// Constants
 			{ 
 				ConstantDef::Get<ivec2>(L"SrcOffset"),
@@ -32,8 +45,10 @@ namespace Replica::D3D11
 	const ComputeShaderDef g_CS_TexCopySamp2D
 	{
 		{
+			L"",
 			// Source binary
-			L"Shaders/CS_TexCopySamp2D.cso",
+			(byte*)&CS_TexCopySamp2DSrc,
+			sizeof(CS_TexCopySamp2DSrc),
 			// Constants
 			{
 				ConstantDef::Get<ivec2>(L"SrcOffset"),
@@ -59,8 +74,10 @@ namespace Replica::D3D11
 	const ComputeShaderDef g_CS_TexCopyScaledSamp2D
 	{
 		{
+			L"",
 			// Source binary
-			L"Shaders/CS_TexCopyScaledSamp2D.cso",
+			(byte*)&CS_TexCopyScaledSamp2DSrc,
+			sizeof(CS_TexCopyScaledSamp2DSrc),
 			// Constants
 			{
 				ConstantDef::Get<vec4>(L"DstTexelSize"),
@@ -86,7 +103,12 @@ namespace Replica::D3D11
 	const VertexShaderDef g_VS_Default =
 	{
 		// Source binary
-		{ L"Shaders/VS_Default.cso" },
+		{ 
+			L"",
+			// Source binary
+			(byte*)&VS_DefaultSrc,
+			sizeof(VS_DefaultSrc)
+		},
 		// Vertex Layout
 		{
 			{ "Position", Formats::R32G32_FLOAT },
@@ -96,7 +118,12 @@ namespace Replica::D3D11
 	const VertexShaderDef g_VS_PosTextured =
 	{
 		// Source binary
-		{ L"Shaders/VS_PosTextured.cso" },
+		{
+			L"",
+			// Source binary
+			(byte*)&VS_PosTexturedSrc,
+			sizeof(VS_PosTexturedSrc)
+		},
 		// Vertex Layout
 		{
 			{ "Position", Formats::R32G32_FLOAT },
@@ -106,7 +133,12 @@ namespace Replica::D3D11
 	const VertexShaderDef g_VS_Textured2D =
 	{
 		// Source binary
-		{ L"Shaders/VS_Textured2D.cso" },
+		{
+			L"",
+			// Source binary
+			(byte*)&VS_Textured2DSrc,
+			sizeof(VS_Textured2DSrc)
+		},		
 		// Vertex Layout
 		{
 			{ "Position", Formats::R32G32_FLOAT },
@@ -117,8 +149,10 @@ namespace Replica::D3D11
 	const VertexShaderDef g_VS_3D =
 	{
 		{
+			L"",
 			// Source binary
-			{ L"Shaders/VS_3D.cso" },
+			(byte*)&VS_3DSrc,
+			sizeof(VS_3DSrc),
 			{ ConstantDef::Get<mat4>(L"mvp"), }
 		},
 		// Vertex Layout
@@ -130,8 +164,10 @@ namespace Replica::D3D11
 	const VertexShaderDef g_VS_Textured3D =
 	{
 		{
+			L"",
 			// Source binary
-			{ L"Shaders/VS_Textured3D.cso" },
+			(byte*)&VS_Textured3DSrc,
+			sizeof(VS_Textured3DSrc),
 			// Constants
 			{ ConstantDef::Get<mat4>(L"mvp"), }
 		},
@@ -145,20 +181,26 @@ namespace Replica::D3D11
 	// Pixel Shaders
 	const PixelShaderDef g_PS_Default =
 	{
+		L"",
 		// Source binary
-		L"Shaders/PS_Default.cso",
+		(byte*)&PS_DefaultSrc,
+		sizeof(PS_DefaultSrc)
 	};
 
 	const PixelShaderDef g_PS_Flat3D =
 	{
+		L"",
 		// Source binary
-		L"Shaders/PS_Flat3D.cso",
+		(byte*)&PS_Flat3DSrc,
+		sizeof(PS_Flat3DSrc)
 	};
 
 	const PixelShaderDef g_PS_Textured =
 	{
+		L"",
 		// Source binary
-		L"Shaders/PS_Textured.cso",
+		(byte*)&PS_TexturedSrc,
+		sizeof(PS_TexturedSrc),
 		// Constants
 		{ 
 			ConstantDef::Get<vec2>(L"Scale"),

@@ -16,6 +16,9 @@ namespace Replica::D3D11
 	struct ShaderDefBase
 	{
 		wstring_view file;
+		byte* srcBin;
+		size_t srcSize;
+
 		ConstantMapDef constMap;
 		ResourceMap<ID3D11SamplerState> samplerMap;
 		ResourceMap<ID3D11ShaderResourceView> textureMap;

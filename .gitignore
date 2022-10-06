@@ -349,3 +349,5 @@ healthchecksdb
 MigrationBackup/
 
 *.cso
+
+ReplicaRenderer/src/renderers/include/D3D11/ShaderSrc/
