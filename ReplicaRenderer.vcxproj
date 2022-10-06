@@ -201,6 +201,7 @@
     <ClCompile Include="ReplicaRenderer\libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ReplicaRenderer\libs\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="ReplicaRenderer\libs\imgui\misc\fonts\binary_to_compressed_c.cpp" />
+    <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\StagingTexture2D.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\DeviceChild.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\RWTexture2D.cpp" />
     <ClCompile Include="ReplicaRenderer\src\renderers\src\D3D11\Resources\DepthStencilTexture.cpp" />
@@ -257,6 +258,7 @@
     <ClInclude Include="ReplicaRenderer\libs\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\ResourceEnums.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\RWTexture2D.hpp" />
+    <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\StagingTexture2D.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\Texture2D.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Shaders\ComputeShader.hpp" />
     <ClInclude Include="ReplicaRenderer\src\renderers\include\D3D11\Resources\DepthStencilTexture.hpp" />

@@ -35,6 +35,7 @@ namespace Replica::D3D11
 	/// </summary>
 	enum class ResourceBindFlags
 	{
+		None = 0,
 		Vertex = D3D11_BIND_VERTEX_BUFFER,
 		Index = D3D11_BIND_INDEX_BUFFER,
 		Constant = D3D11_BIND_CONSTANT_BUFFER,
@@ -52,7 +53,7 @@ namespace Replica::D3D11
 	BITWISE_ALL(ResourceBindFlags, UINT)
 
 	/// <summary>
-	/// Specifies types of CPU access allowed for a resource
+	/// Specifies types of CPU access allowed for mapable resources
 	/// </summary>
 	enum class ResourceAccessFlags : UINT
 	{

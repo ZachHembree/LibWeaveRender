@@ -11,46 +11,73 @@ Texture2D::Texture2D()
 Texture2D::Texture2D(
 	Device& dev,
 	ivec2 dim,
-	void* data,
-	UINT stride,
 	Formats format,
-	UINT mipLevels,
-	bool isReadonly
+	ResourceUsages usage,
+	ResourceBindFlags bindFlags,
+	ResourceAccessFlags accessFlags,
+	uint mipLevels,
+	void* data,
+	uint stride
 ) :
 	Texture2DBase(
+		dev,
+		dim,
+		format,
+		usage,
+		bindFlags,
+		accessFlags,
+		mipLevels, 1u,
+		data, stride
+	)
+{
+	if (pRes.Get() != nullptr)
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC vDesc = {};
+		vDesc.Format = desc.Format;
+		vDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		vDesc.Texture2D.MostDetailedMip = 0;
+		vDesc.Texture2D.MipLevels = desc.MipLevels;
+
+		GFX_THROW_FAILED(dev->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
+	}
+}
+
+Texture2D::Texture2D(
+	Device& dev,
+	ivec2 dim,
+	void* data,
+	uint stride,
+	Formats format,
+	uint mipLevels,
+	bool isReadonly
+) :
+	Texture2D(
 		dev,
 		dim,
 		format,
 		isReadonly ? ResourceUsages::Immutable : ResourceUsages::Default,
 		ResourceBindFlags::ShaderResource,
 		ResourceAccessFlags::None,
-		1u, 1u,
+		1u,
 		data, stride
 	)
-{
-	D3D11_SHADER_RESOURCE_VIEW_DESC vDesc = {};
-	vDesc.Format = desc.Format;
-	vDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	vDesc.Texture2D.MostDetailedMip = 0;
-	vDesc.Texture2D.MipLevels = desc.MipLevels;
-
-	GFX_THROW_FAILED(dev->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
-}
+{ }
 
 Texture2D::Texture2D(
 	Device& dev,
 	Formats format,
 	ivec2 dim,
-	UINT mipLevels
+	UINT mipLevels,
+	bool isDynamic
 ) :
-	Texture2DBase(
+	Texture2D(
 		dev,
 		dim,
 		format,
-		ResourceUsages::Default,
+		isDynamic ? ResourceUsages::Dynamic : ResourceUsages::Default,
 		ResourceBindFlags::ShaderResource,
-		ResourceAccessFlags::None,
-		1u, 1u,
+		isDynamic ? ResourceAccessFlags::Write : ResourceAccessFlags::None,
+		1u,
 		nullptr, 0u
 	)
 { }
@@ -91,11 +118,12 @@ void Texture2D::SetTextureData(Context& ctx, void* data, size_t stride, ivec2 di
 		*this = std::move(Texture2D(
 			GetDevice(),
 			dim,
-			data,
-			(UINT)stride,
 			GetFormat(),
-			GetIsReadOnly(),
-			desc.MipLevels
+			GetUsage(),
+			GetBindFlags(),
+			GetAccessFlags(),
+			desc.MipLevels,
+			data, (uint)stride
 		));
 	}
 

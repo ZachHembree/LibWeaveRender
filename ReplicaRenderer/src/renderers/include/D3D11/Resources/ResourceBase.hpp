@@ -88,9 +88,10 @@ namespace Replica::D3D11
 	};
 
 	/// <summary>
-	/// Interface for types that can be bound as Render Targets
+	/// Interface for color buffers that whose bounds can be less than that
+	/// of their underlying buffers.
 	/// </summary>
-	class IRenderTarget : public virtual IColorBuffer2D
+	class IResizableColorBuffer2D : public virtual IColorBuffer2D
 	{
 	public:
 		/// <summary>
@@ -113,7 +114,14 @@ namespace Replica::D3D11
 		/// Returns the renderSize to size ratio on (0, 1].
 		/// </summary>
 		virtual vec2 GetRenderScale() const = 0;
+	};
 
+	/// <summary>
+	/// Interface for types that can be bound as Render Targets
+	/// </summary>
+	class IRenderTarget : public virtual IResizableColorBuffer2D
+	{
+	public:
 		/// <summary>
 		/// Pointer to Render Target view interface
 		/// </summary>
@@ -204,9 +212,15 @@ namespace Replica::D3D11
 	{ };
 
 	/// <summary>
+	/// Interface for resizeable 2D Textures
+	/// </summary>
+	class IResizeableTexture2D : public virtual ITexture2D, public virtual IResizableColorBuffer2D
+	{ };
+
+	/// <summary>
 	/// Interface for 2D Textures, with SRVs and UAVs
 	/// </summary>
-	class IRWTexture2D : public virtual ITexture2D, public virtual IRenderTarget, public IUnorderedAccess
+	class IRWTexture2D : public virtual IResizeableTexture2D, public virtual IRenderTarget, public IUnorderedAccess
 	{ };
 
 }

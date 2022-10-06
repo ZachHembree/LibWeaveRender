@@ -8,6 +8,9 @@ namespace DirectX
 
 namespace Replica::D3D11
 {
+	/// <summary>
+	/// Class representing a read-only GPU resource. Can be updated by CPU.
+	/// </summary>
 	class Texture2D : public virtual ITexture2D, public Texture2DBase
 	{
 	public:
@@ -43,13 +46,14 @@ namespace Replica::D3D11
 		);
 
 		/// <summary>
-		/// Constructs and alocates an empty texture with default usage
+		/// Constructs and alocates an empty texture with default or dynamic usage.
 		/// </summary>
 		Texture2D(
 			Device& dev,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			ivec2 dim = ivec2(0),
-			uint mipLevels = 1u
+			uint mipLevels = 1u,
+			bool isDynamic = false
 		);
 
 		/// <summary>
@@ -105,8 +109,18 @@ namespace Replica::D3D11
 		);
 		
 	protected:
-		using Texture2DBase::Texture2DBase;
 		ComPtr<ID3D11ShaderResourceView> pSRV;
 
+		Texture2D(
+			Device& dev,
+			ivec2 dim,
+			Formats format = Formats::R8G8B8A8_UNORM,
+			ResourceUsages usage = ResourceUsages::Default,
+			ResourceBindFlags bindFlags = ResourceBindFlags::ShaderResource,
+			ResourceAccessFlags accessFlags = ResourceAccessFlags::None,
+			uint mipLevels = 1u,
+			void* data = nullptr,
+			uint stride = 0
+		);
 	};
 }

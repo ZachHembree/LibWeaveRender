@@ -416,9 +416,9 @@ void CopySubresource(Context& ctx, ITexture2D& src, ITexture2D& dst, ivec4& srcB
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void Context::Blit(IRWTexture2D& src, IRWTexture2D& dst)
+void Context::Blit(IResizeableTexture2D& src, IRWTexture2D& dst)
 {
-	Blit(src, dst, ivec4(src.GetRenderSize(), src.GetRenderOffset()));
+	Blit((ITexture2D&)src, dst, ivec4(src.GetRenderSize(), src.GetRenderOffset()));
 }
 
 /// <summary>
@@ -476,6 +476,45 @@ void Context::Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
+void Context::Blit(ITexture2D& src, IResizeableTexture2D& dst, ivec4 srcBox)
+{
+	Blit(
+		src,
+		dst,
+		srcBox,
+		ivec4(dst.GetRenderSize(), dst.GetRenderOffset())
+	);
+}
+
+/// <summary>
+/// Copies the contents of one texture to another
+/// </summary>
+void Context::Blit(IResizeableTexture2D& src, ITexture2D& dst, ivec4 dstBox)
+{
+	Blit(
+		src,
+		dst,
+		ivec4(src.GetRenderSize(), src.GetRenderOffset()),
+		dstBox
+	);
+}
+
+/// <summary>
+/// Copies the contents of one texture to another
+/// </summary>
+void Context::Blit(IResizeableTexture2D& src, IResizeableTexture2D& dst)
+{
+	Blit(
+		src, 
+		dst, 
+		ivec4(src.GetRenderSize(), src.GetRenderOffset()), 
+		ivec4(dst.GetRenderSize(), dst.GetRenderOffset())
+	);
+}
+
+/// <summary>
+/// Copies the contents of one texture to another
+/// </summary>
 void Context::Blit(ITexture2D& src, ITexture2D& dst, ivec4 srcBox, ivec4 dstBox)
 {
 	if (CanDirectCopy(src, dst, srcBox, dstBox))
@@ -492,7 +531,7 @@ void Context::Blit(ITexture2D& src, ITexture2D& dst, ivec4 srcBox, ivec4 dstBox)
 /// <summary>
 /// Copies the contents of a texture to a render target
 /// </summary>
-void Context::Blit(IRWTexture2D& src, IRenderTarget& dst)
+void Context::Blit(IResizeableTexture2D& src, IRenderTarget& dst)
 {
 	Blit(src, dst, ivec4(src.GetRenderSize(), src.GetRenderOffset()));
 }

@@ -80,6 +80,7 @@ ID3D11Resource* Texture2DBase::GetResource() { return pRes.Get(); }
 
 void Texture2DBase::UpdateMapUnmap(Context& ctx, void* data, size_t stride, ivec2 dim)
 {
+	const ivec2 dstSize = GetSize();
 	D3D11_MAPPED_SUBRESOURCE msr;
 	GFX_THROW_FAILED(ctx->Map(
 		pRes.Get(),
@@ -89,20 +90,26 @@ void Texture2DBase::UpdateMapUnmap(Context& ctx, void* data, size_t stride, ivec
 		&msr
 	));
 
-	memcpy(msr.pData, data, stride * dim.x * dim.y);
+	for (int i = 0; i < dstSize.y; i++)
+	{
+		const size_t lnOffset = stride * dstSize.x;
+		memcpy(msr.pData, data, lnOffset + stride * dim.x);
+	}
+
 	ctx->Unmap(pRes.Get(), 0u);
 }
 
 void Texture2DBase::UpdateSubresource(Context& ctx, void* data, size_t stride, ivec2 dim)
 {
+	const ivec2 dstSize = GetSize();
 	D3D11_BOX dstBox;
 	dstBox.left = 0;
-	dstBox.right = dim.x;
+	dstBox.right = dstSize.x;
 	dstBox.top = 0;
-	dstBox.bottom = dim.y;
+	dstBox.bottom = dstSize.y;
 	dstBox.front = 0;
 	dstBox.back = 1;
-
+	
 	ctx->UpdateSubresource(
 		pRes.Get(),
 		0,

@@ -18,7 +18,6 @@ RWTexture2D::RWTexture2D(
 	ResourceBindFlags bindFlags,
 	ResourceAccessFlags accessFlags,
 	UINT mipLevels,
-	UINT arraySize,
 	void* data,
 	UINT stride
 ) :
@@ -30,7 +29,6 @@ RWTexture2D::RWTexture2D(
 		bindFlags,
 		accessFlags,
 		mipLevels,
-		arraySize,
 		data,
 		stride
 	),
@@ -76,7 +74,6 @@ RWTexture2D::RWTexture2D(Device& dev,
 		ResourceBindFlags::RWTexture,
 		ResourceAccessFlags::None,
 		mipLevels, 
-		1u,
 		data, stride
 	)
 { }
@@ -94,7 +91,7 @@ RWTexture2D::RWTexture2D(
 		ResourceUsages::Default,
 		ResourceBindFlags::RWTexture,
 		ResourceAccessFlags::None,
-		1u, 1u,
+		1u,
 		nullptr, 0u
 	)
 { }

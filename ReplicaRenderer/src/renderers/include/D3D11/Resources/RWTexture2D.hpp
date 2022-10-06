@@ -139,7 +139,6 @@ namespace Replica::D3D11
 			ResourceBindFlags bindFlags = ResourceBindFlags::ShaderResource,
 			ResourceAccessFlags accessFlags = ResourceAccessFlags::None,
 			UINT mipLevels = 1u,
-			UINT arraySize = 1u,
 			void* data = nullptr,
 			UINT stride = 0
 		);

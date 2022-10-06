@@ -174,7 +174,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Copies the contents of one texture to another
 		/// </summary>
-		void Blit(IRWTexture2D& src, IRWTexture2D& dst);
+		void Blit(IResizeableTexture2D& src, IRWTexture2D& dst);
 
 		/// <summary>
 		/// Copies the contents of one texture to another
@@ -184,12 +184,27 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Copies the contents of one texture to another
 		/// </summary>
+		void Blit(ITexture2D& src, IResizeableTexture2D& dst, ivec4 srcBox = ivec4(0));
+
+		/// <summary>
+		/// Copies the contents of one texture to another
+		/// </summary>
+		void Blit(IResizeableTexture2D& src, ITexture2D& dst, ivec4 dstBox = ivec4(0));
+
+		/// <summary>
+		/// Copies the contents of one texture to another
+		/// </summary>
+		void Blit(IResizeableTexture2D& src, IResizeableTexture2D& dst);
+
+		/// <summary>
+		/// Copies the contents of one texture to another
+		/// </summary>
 		void Blit(ITexture2D& src, ITexture2D& dst, ivec4 srcBox = ivec4(0), ivec4 dstBox = ivec4(0));
 
 		/// <summary>
 		/// Copies the contents of a texture to a render target
 		/// </summary>
-		void Blit(IRWTexture2D& src, IRenderTarget& dst);
+		void Blit(IResizeableTexture2D& src, IRenderTarget& dst);
 
 		/// <summary>
 		/// Copies the contents of a texture to a render target
