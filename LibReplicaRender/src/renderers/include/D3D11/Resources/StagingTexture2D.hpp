@@ -96,6 +96,12 @@ namespace Replica::D3D11
 		/// Writes the contents of the texture to a PNG in the give file path. Requires
 		/// CPU read access.
 		/// </summary>
+		void WriteToFileWIC(Context& ctx, string_view file);
+
+		/// <summary>
+		/// Writes the contents of the texture to a PNG in the give file path. Requires
+		/// CPU read access.
+		/// </summary>
 		void WriteToFileWIC(Context& ctx, wstring_view file);
 
 	private:

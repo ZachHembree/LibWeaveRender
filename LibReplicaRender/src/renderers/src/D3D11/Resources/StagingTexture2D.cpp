@@ -131,6 +131,12 @@ void StagingTexture2D::ReturnBufferHandle(Context& ctx, Tex2DBufferHandle&& hand
 	ctx->Unmap(pRes.Get(), 0u);
 }
 
+void StagingTexture2D::WriteToFileWIC(Context& ctx, string_view path)
+{
+	wstring widePath = GetWideString_UTF8_TO_UTF16LE(path);
+	WriteToFileWIC(ctx, widePath);
+}
+
 void StagingTexture2D::WriteToFileWIC(Context& ctx, wstring_view path)
 {
 	const ivec2 size = GetSize();
