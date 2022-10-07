@@ -368,7 +368,7 @@ void ValidateResourceBounds(
 	}
 }
 
-bool CanDirectCopy(ITexture2D& src, ITexture2D& dst, const ivec4& srcBox, const ivec4& dstBox)
+bool CanDirectCopy(ITexture2DBase& src, ITexture2DBase& dst, const ivec4& srcBox, const ivec4& dstBox)
 {
 	if (srcBox != ivec4(0) || dstBox != ivec4(0))
 	{
@@ -386,7 +386,7 @@ bool CanDirectCopy(ITexture2D& src, ITexture2D& dst, const ivec4& srcBox, const 
 	}
 }
 
-void CopySubresource(Context& ctx, ITexture2D& src, ITexture2D& dst, ivec4& srcBox, ivec4& dstBox)
+void CopySubresource(Context& ctx, ITexture2DBase& src, ITexture2DBase& dst, ivec4& srcBox, ivec4& dstBox)
 {
 	if (srcBox != ivec4(0) || dstBox != ivec4(0))
 	{ 
@@ -515,7 +515,7 @@ void Context::Blit(IResizeableTexture2D& src, IResizeableTexture2D& dst)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void Context::Blit(ITexture2D& src, ITexture2D& dst, ivec4 srcBox, ivec4 dstBox)
+void Context::Blit(ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox, ivec4 dstBox)
 {
 	if (CanDirectCopy(src, dst, srcBox, dstBox))
 	{

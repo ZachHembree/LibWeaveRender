@@ -25,6 +25,11 @@ namespace Replica::D3D11
 		vec4 GetTexelSize() const override;
 
 		/// <summary>
+		/// Returns the number of bytes per pixel for input/output
+		/// </summary>
+		size_t GetPixelPitch() const { return pixelStride; }
+
+		/// <summary>
 		/// Returns color format of the texture
 		/// </summary>
 		Formats GetFormat() const override;
@@ -73,6 +78,7 @@ namespace Replica::D3D11
 	protected:
 		ComPtr<ID3D11Texture2D> pRes;
 		D3D11_TEXTURE2D_DESC desc;
+		uint pixelStride;
 
 		Texture2DBase();
 
@@ -83,10 +89,10 @@ namespace Replica::D3D11
 			ResourceUsages usage = ResourceUsages::Default,
 			ResourceBindFlags bindFlags = ResourceBindFlags::ShaderResource,
 			ResourceAccessFlags accessFlags = ResourceAccessFlags::None,
-			UINT mipLevels = 1u,
-			UINT arraySize = 1u,
+			uint mipLevels = 1u,
+			uint arraySize = 1u,
 			void* data = nullptr,
-			UINT stride = 0
+			uint pixelStride = 0u
 		);
 
 		void UpdateMapUnmap(Context& ctx, void* data);

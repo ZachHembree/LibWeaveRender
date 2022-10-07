@@ -199,7 +199,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Copies the contents of one texture to another
 		/// </summary>
-		void Blit(ITexture2D& src, ITexture2D& dst, ivec4 srcBox = ivec4(0), ivec4 dstBox = ivec4(0));
+		void Blit(ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox = ivec4(0), ivec4 dstBox = ivec4(0));
 
 		/// <summary>
 		/// Copies the contents of a texture to a render target

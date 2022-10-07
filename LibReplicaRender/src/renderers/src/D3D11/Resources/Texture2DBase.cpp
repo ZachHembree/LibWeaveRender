@@ -13,12 +13,13 @@ Texture2DBase::Texture2DBase(
 	ResourceUsages usage,
 	ResourceBindFlags bindFlags,
 	ResourceAccessFlags accessFlags,
-	UINT mipLevels,
-	UINT arraySize,
+	uint mipLevels,
+	uint arraySize,
 	void* data,
-	UINT stride
+	uint stride
 ) :
-	ResourceBase(dev)
+	ResourceBase(dev),
+	pixelStride(stride)
 {
 	desc = {};
 	desc.Width = dim.x;
@@ -90,6 +91,7 @@ void Texture2DBase::UpdateMapUnmap(Context& ctx, void* data)
 		&msr
 	));
 
+	pixelStride = msr.RowPitch / size.x;
 	memcpy(msr.pData, data, msr.RowPitch * size.y);
 	ctx->Unmap(pRes.Get(), 0u);
 }
@@ -97,6 +99,8 @@ void Texture2DBase::UpdateMapUnmap(Context& ctx, void* data)
 void Texture2DBase::UpdateSubresource(Context& ctx, void* data, size_t stride)
 {
 	const ivec2 size = GetSize();
+	pixelStride = stride;
+
 	D3D11_BOX dstBox;
 	dstBox.left = 0;
 	dstBox.right = size.x;

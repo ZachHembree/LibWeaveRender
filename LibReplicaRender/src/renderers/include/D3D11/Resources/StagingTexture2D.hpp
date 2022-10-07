@@ -3,6 +3,9 @@
 
 namespace Replica::D3D11
 {
+	class StagingTexture2D;
+	class Tex2DBufferHandle;
+
 	/// <summary>
 	/// Class representing a 2D Texture that can only be directly accessed by
 	/// the CPU. GPU access is facilitated by copying to a non-staging texture.
@@ -26,7 +29,7 @@ namespace Replica::D3D11
 			Formats format = Formats::R8G8B8A8_UNORM,
 			ivec2 dim = ivec2(0),
 			uint mipLevels = 1u,
-			ResourceAccessFlags accessFlags = ResourceAccessFlags::Write
+			ResourceAccessFlags accessFlags = ResourceAccessFlags::ReadWrite
 		);
 
 		/// <summary>
@@ -39,7 +42,7 @@ namespace Replica::D3D11
 			IDynamicArray<T> data,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			uint mipLevels = 1u,
-			ResourceAccessFlags accessFlags = ResourceAccessFlags::Write
+			ResourceAccessFlags accessFlags = ResourceAccessFlags::ReadWrite
 		)
 			: StagingTexture2D(dev, dim, data.GetPtr(), sizeof(T), format, accessFlags, mipLevels)
 		{ }
@@ -54,7 +57,7 @@ namespace Replica::D3D11
 			uint stride,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			uint mipLevels = 1u,
-			ResourceAccessFlags accessFlags = ResourceAccessFlags::Write
+			ResourceAccessFlags accessFlags = ResourceAccessFlags::ReadWrite
 		);
 
 		/// <summary>
@@ -79,7 +82,61 @@ namespace Replica::D3D11
 		/// </summary>
 		void SetTextureData(Context& ctx, void* data, size_t stride, ivec2 dim);
 
+		/// <summary>
+		/// Returns a temporary handle to a mapped buffer backing the texture
+		/// </summary>
+		Tex2DBufferHandle GetBufferHandle(Context& ctx);
+
+		/// <summary>
+		/// Returns and unmaps a previously acquired buffer handle accessed using GetBufferHandle()
+		/// </summary>
+		void ReturnBufferHandle(Context& ctx, Tex2DBufferHandle&& handle);
+
+		/// <summary>
+		/// Writes the contents of the texture to a PNG in the give file path. Requires
+		/// CPU read access.
+		/// </summary>
+		void WriteToFileWIC(Context& ctx, wstring_view file);
+
 	private:
+
+	};
+
+	/// <summary>
+	/// Provides temporary access to a mapped resource buffer. Must be returned to parent
+	/// after use.
+	/// </summary>
+	class Tex2DBufferHandle : public DataBufferSpan<StagingTexture2D, byte>
+	{
+	friend StagingTexture2D;
+
+	public:
+		/// <summary>
+		/// True if the underlying texture buffer supports CPU read access
+		/// </summary>
+		const bool canRead;
+
+		/// <summary>
+		/// True if the underlying texture buffer supports CPU write access
+		/// </summary>
+		const bool canWrite;
+
+		Tex2DBufferHandle();
+
+		/// <summary>
+		/// Returns the number of bytes in a row
+		/// </summary>
+		size_t GetRowPitch() const;
+
+		/// <summary>
+		/// Returns the size of the buffer in bytes
+		/// </summary>
+		size_t GetByteSize() const;
+
+	private:
+		const D3D11_MAPPED_SUBRESOURCE msr;
+
+		Tex2DBufferHandle(StagingTexture2D* pParent, D3D11_MAPPED_SUBRESOURCE msr);
 
 	};
 }
