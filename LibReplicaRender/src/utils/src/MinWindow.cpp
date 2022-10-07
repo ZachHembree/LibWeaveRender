@@ -21,6 +21,8 @@ MinWindow::MinWindow(
 	isFullscreen(false),
 	isInitialized(false),
 	isMousedOver(false),
+	canSysSleep(true),
+	canDispSleep(true),
 	lastPos(0),
 	lastSize(0),
 	initStyle(initStyle)
@@ -217,6 +219,16 @@ MSG MinWindow::RunMessageLoop()
 		}
 	}
 
+	DWORD execFlags = ES_CONTINUOUS;
+
+	if (!canSysSleep)
+		execFlags |= ES_SYSTEM_REQUIRED;
+
+	if (!canDispSleep)
+		execFlags |= ES_DISPLAY_REQUIRED;
+
+	SetThreadExecutionState(execFlags);
+
 	return wndMsg;
 }
 
@@ -325,6 +337,50 @@ void MinWindow::SetFullScreen(bool value)
 bool MinWindow::GetIsMousedOver() const
 {
 	return isMousedOver;
+}
+
+void MinWindow::SetIsCursorVisible(bool value)
+{
+	if (value == GetIsCursorVisible())
+		return;
+
+	if (!value)
+	{
+		while(ShowCursor(false) >= 0);
+	}
+	else
+	{
+		while(ShowCursor(true) < 0);
+	}
+}
+
+bool MinWindow::GetIsCursorVisible() const
+{
+	CURSORINFO info;
+	info.cbSize = sizeof(CURSORINFO);
+	WIN_ASSERT_NZ_LAST(GetCursorInfo(&info));
+
+	return info.flags == CURSOR_SHOWING;
+}
+
+void MinWindow::SetCanDisplaySleep(bool value)
+{
+	canDispSleep = value;
+}
+
+bool MinWindow::GetCanDisplaySleep() const
+{
+	return canDispSleep;
+}
+
+void MinWindow::SetCanSystemSleep(bool value)
+{
+	canSysSleep = value;
+}
+
+bool MinWindow::GetCanSystemSleep() const
+{
+	return canSysSleep;
 }
 
 LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

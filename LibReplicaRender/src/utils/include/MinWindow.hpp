@@ -125,6 +125,30 @@ namespace Replica
 			void DisableStyleFlags(WndStyle flags);
 
 			/// <summary>
+			/// Returns true if the application should allow the display to turn off
+			/// while its running.
+			/// </summary>
+			bool GetCanDisplaySleep() const;
+
+			/// <summary>
+			/// Determines whether the application should allow the display to turn
+			/// off while its running.
+			/// </summary>
+			void SetCanDisplaySleep(bool value);
+
+			/// <summary>
+			/// Returns true if the application should allow the system to sleep
+			/// while its running.
+			/// </summary>
+			bool GetCanSystemSleep() const;
+
+			/// <summary>
+			/// Determines whether the application should allow the system to sleep
+			/// while its running.
+			/// </summary>
+			void SetCanSystemSleep(bool value);
+
+			/// <summary>
 			/// Returns fractional, floating-point, DPI normalized to 96 DPI
 			/// </summary>
 			vec2 GetNormMonitorDPI() const;
@@ -149,6 +173,16 @@ namespace Replica
 			/// </summary>
 			bool GetIsMousedOver() const;
 
+			/// <summary>
+			/// Returns true if the cursor can be drawn inside the client region
+			/// </summary>
+			bool GetIsCursorVisible() const;
+
+			/// <summary>
+			/// Enables/disables the cursor inside the window's client region
+			/// </summary>
+			void SetIsCursorVisible(bool value);
+
 		protected:	
 			static MinWindow* pLastInit;
 
@@ -157,9 +191,11 @@ namespace Replica
 			HWND hWnd;
 			MSG wndMsg;
 			ivec2 bodySize, wndSize;
+			TRACKMOUSEEVENT tme;
 			bool isInitialized;
 			bool isMousedOver;
-			TRACKMOUSEEVENT tme;
+			bool canSysSleep;
+			bool canDispSleep;
 
 			bool isFullscreen;
 			ivec2 lastPos, lastSize;
