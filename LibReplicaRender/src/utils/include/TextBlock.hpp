@@ -65,7 +65,7 @@ namespace Replica
         /// </summary>
         const char* Find(const string_view& substr, const char* pStart = nullptr) const
         {
-            return Find(substr, pStart);
+            return Find(&substr[0], (int)substr.length(), pStart);
         }
 
         //// <summary>
@@ -74,7 +74,7 @@ namespace Replica
         /// </summary>
         const char* Find(const TextBlock& substr, const char* pStart = nullptr) const
         {
-            return Find(substr, pStart);
+            return Find(substr.pStart, (int)substr.length, pStart);
         }
 
         /// <summary>
@@ -90,10 +90,7 @@ namespace Replica
         /// Finds position of the first character of the first matching occurence of 
         /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
         /// </summary>
-        const char* Find(const char* substr, int subLen, const char* pStart = nullptr) const
-        {
-            return Find(substr, subLen, pStart);
-        }
+        const char* Find(const char* substr, int subLen, const char* pStart = nullptr) const;
 
         TextBlock GetWord(char* pStart, const string_view& breakFilter = "", char min = '!', char max = '~')
         {

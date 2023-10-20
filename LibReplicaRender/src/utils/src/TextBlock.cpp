@@ -56,6 +56,41 @@ char* TextBlock::Find(const TextBlock& substr, const char* pStart)
 /// Finds position of the first character of the first matching occurence of 
 /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
 /// </summary>
+const char* TextBlock::Find(const char* substr, int subLen, const char* pStart) const
+{
+    if (pStart == nullptr)
+        pStart = this->pStart;
+
+    size_t remLen = UnsignedDelta(GetLast(), pStart);
+
+    if (substr[subLen - 1] == '\0')
+        subLen--;
+
+    if (pStart >= GetFirst() && remLen >= subLen)
+    {
+        for (size_t i = 0; i < remLen; i++)
+        {
+            if (pStart[i] == substr[0])
+            {
+                size_t matchLen = 1;
+
+                for (size_t j = 1; j < subLen; j++)
+                {
+                    if (pStart[i + j] != substr[j])
+                        break;
+
+                    matchLen++;
+                }
+
+                if (matchLen == subLen)
+                    return (char*)&pStart[i];
+            }
+        }
+    }
+
+    return nullptr;
+}
+
 char* TextBlock::Find(const char* substr, int subLen, const char* pStart)
 {
     if (pStart == nullptr)
