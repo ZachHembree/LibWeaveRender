@@ -60,6 +60,12 @@ namespace Replica
         }
 
         /// <summary>
+        /// Returns the total number of the given character in the text block, starting
+        /// from the given point.
+        /// </summary>
+        int FindCount(const char ch, const char* pStart = nullptr) const;
+
+        /// <summary>
         /// Finds position of the first character of the first matching occurence of 
         /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
         /// </summary>

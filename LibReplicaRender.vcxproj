@@ -229,6 +229,7 @@
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Device.cpp" />
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Renderer.cpp" />
     <ClCompile Include="LibReplicaRender\src\utils\src\ReplicaWinUtils.cpp" />
+    <ClCompile Include="LibReplicaRender\src\utils\src\TextUtils.cpp" />
     <ClCompile Include="LibReplicaRender\src\utils\src\Utils.cpp" />
     <ClCompile Include="LibReplicaRender\src\utils\src\TextBlock.cpp" />
     <ClCompile Include="LibReplicaRender\src\utils\src\GfxException.cpp" />
@@ -320,6 +321,7 @@
     <ClInclude Include="LibReplicaRender\src\utils\include\Span.hpp" />
     <ClInclude Include="LibReplicaRender\src\utils\include\Stopwatch.hpp" />
     <ClInclude Include="LibReplicaRender\src\utils\include\TextBlock.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\TextUtils.hpp" />
     <ClInclude Include="LibReplicaRender\src\utils\include\Utils.hpp" />
     <ClInclude Include="LibReplicaRender\src\utils\include\WindowComponentBase.hpp" />
   </ItemGroup>

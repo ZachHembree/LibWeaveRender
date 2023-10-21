@@ -35,6 +35,33 @@ TextBlock::TextBlock(Span<char>& span) : Span(span.GetFirst(), span.GetLength())
 { }
 
 /// <summary>
+/// Returns the total number of the given character in the text block, starting
+/// from the given point.
+/// </summary>
+int TextBlock::FindCount(const char ch, const char* pStart) const
+{
+    int count = 0;
+
+    if (pStart == nullptr)
+        pStart = this->pStart;
+
+    size_t remLen = UnsignedDelta(GetLast(), pStart);
+
+    if (pStart >= GetFirst() && remLen >= 1)
+    {
+        for (size_t i = 0; i <= remLen; i++)
+        {
+            if (pStart[i] == ch)
+            {
+                count++;
+            }
+        }
+    }
+
+    return count;
+}
+
+/// <summary>
 /// Finds position of the first character of the first matching occurence of 
 /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
 /// </summary>

@@ -65,12 +65,6 @@
 #include "../src/utils/include/TextBlock.hpp"
 #include "../src/utils/include/DataBufferHandle.hpp"
 
-namespace Replica
-{
-	using std::string_view;
-	using std::wstring_view;
-    using std::string;
-    using std::wstring;
-}
+#include "../src/utils/include/TextUtils.hpp"
 
 #include "../src/utils/include/RepException.hpp"
