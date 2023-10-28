@@ -19,16 +19,19 @@ const char* ClampPtr(const char* ptr, const char* min, const char* max)
 TextBlock::TextBlock() : Span()
 { }
 
-TextBlock::TextBlock(char* pStart) : Span(pStart, 1)
+TextBlock::TextBlock(const char* pStart) : Span(pStart, 1)
 { }
 
-TextBlock::TextBlock(char* pStart, size_t length) : Span(pStart, length)
+TextBlock::TextBlock(const char* pStart, size_t length) : Span(pStart, length)
 { }
 
-TextBlock::TextBlock(char* pStart, const char* pEnd) : Span(pStart, pEnd)
+TextBlock::TextBlock(const char* pStart, const char* pEnd) : Span(pStart, pEnd)
 { }
 
-TextBlock::TextBlock(string & str) : Span(&str[0], str.length())
+TextBlock::TextBlock(string& str) : Span(&str[0], str.length())
+{ }
+
+TextBlock::TextBlock(string_view& str) : Span(&str[0], str.length())
 { }
 
 TextBlock::TextBlock(Span<char>& span) : Span(span.GetFirst(), span.GetLength())
@@ -65,7 +68,7 @@ int TextBlock::FindCount(const char ch, const char* pStart) const
 /// Finds position of the first character of the first matching occurence of 
 /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
 /// </summary>
-char* TextBlock::Find(const string_view& substr, const char* pStart)
+const char* TextBlock::Find(const string_view& substr, const char* pStart)
 {
     return Find(&substr[0], (int)substr.length(), pStart);
 }
@@ -74,7 +77,7 @@ char* TextBlock::Find(const string_view& substr, const char* pStart)
 /// Finds position of the first character of the first matching occurence of 
 /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
 /// </summary>
-char* TextBlock::Find(const TextBlock& substr, const char* pStart)
+const char* TextBlock::Find(const TextBlock& substr, const char* pStart)
 {
     return Find(substr.pStart, (int)substr.length, pStart);
 }
@@ -118,7 +121,7 @@ const char* TextBlock::Find(const char* substr, int subLen, const char* pStart) 
     return nullptr;
 }
 
-char* TextBlock::Find(const char* substr, int subLen, const char* pStart)
+const char* TextBlock::Find(const char* substr, int subLen, const char* pStart)
 {
     if (pStart == nullptr)
         pStart = this->pStart;
@@ -156,7 +159,7 @@ char* TextBlock::Find(const char* substr, int subLen, const char* pStart)
 /// <summary>
 /// Returns pointer to first character in a word found in the text after the given start
 /// </summary>
-char* TextBlock::FindStart(const char* pStart, const string_view& breakFilter, char min, char max)
+const char* TextBlock::FindStart(const char* pStart, const string_view& breakFilter, char min, char max)
 {
     pStart = ClampPtr(pStart, GetFirst(), GetLast());
 
@@ -169,7 +172,7 @@ char* TextBlock::FindStart(const char* pStart, const string_view& breakFilter, c
 /// <summary>
 /// Returns the position of the last character in the word starting at the given pointer
 /// </summary>
-char* TextBlock::FindEnd(const char* pStart, const string_view& breakFilter, char min, char max)
+const char* TextBlock::FindEnd(const char* pStart, const string_view& breakFilter, char min, char max)
 {
     pStart = ClampPtr(pStart, GetFirst(), GetLast());
     const char* pCh = pStart;
@@ -186,7 +189,7 @@ char* TextBlock::FindEnd(const char* pStart, const string_view& breakFilter, cha
 /// <summary>
 /// Returns pointer to first character in a word found in the text before the given start
 /// </summary>
-char* TextBlock::FindLastStart(const char* pStart, const string_view& breakFilter, char min, char max)
+const char* TextBlock::FindLastStart(const char* pStart, const string_view& breakFilter, char min, char max)
 {
     pStart = ClampPtr(pStart, GetFirst(), GetLast());
     const char* pCh = pStart;
@@ -202,18 +205,6 @@ char* TextBlock::FindLastStart(const char* pStart, const string_view& breakFilte
     while (pCh >= GetFirst() && GetIsRangeChar(*pCh, breakFilter, min, max));
 
     return (char*)pStart;
-}
-
-/// <summary>
-/// Replaces any occurance of the given character in the string with the char given
-/// </summary>
-void TextBlock::Replace(char target, char ch)
-{
-    for (int i = 0; i < length; i++)
-    {
-        if (pStart[i] == target)
-            pStart[i] = ch;
-    }
 }
 
 /// <summary>
