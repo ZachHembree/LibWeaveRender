@@ -148,6 +148,22 @@ namespace Replica
 		}
 
 		/// <summary>
+		/// Initializes a new dynamic array using an initializer list.
+		/// </summary>
+		DynamicArrayBase(std::initializer_list<T>&& list) noexcept :
+			length(list.size()),
+			data(new T[length])
+		{
+			int i = 0;
+			
+			for (auto& entry : list)
+			{
+				data[i] = (T&&)(entry);
+				i++;
+			}
+		}
+
+		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
 		DynamicArrayBase(size_t length) :
@@ -353,6 +369,13 @@ namespace Replica
 		{ }
 
 		/// <summary>
+		/// Initializes a new dynamic array from an initializer list.
+		/// </summary>
+		DynamicArray(std::initializer_list<T>&& initializerList) noexcept :
+			DynamicArrayBase<T>((std::initializer_list<T>&&)(initializerList))
+		{ }
+
+		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
 		DynamicArray(size_t length) : 
@@ -457,6 +480,13 @@ namespace Replica
 		/// </summary>
 		UniqueArray(const std::initializer_list<T>& initializerList) noexcept :
 			DynamicArrayBase<T>(initializerList)
+		{ }
+
+		/// <summary>
+		/// Initializes a new unique array from an initializer list.
+		/// </summary>
+		UniqueArray(std::initializer_list<T>&& initializerList) noexcept :
+			DynamicArrayBase<T>((std::initializer_list<T>&&)(initializerList))
 		{ }
 
 		/// <summary>
@@ -565,6 +595,13 @@ namespace Replica
 		/// </summary>
 		Vector(const std::initializer_list<T>& initializerList) noexcept :
 			std::vector<T>(initializerList)
+		{ }
+
+		/// <summary>
+		/// Initializes a new unique vector from an initializer list.
+		/// </summary>
+		Vector(std::initializer_list<T>&& initializerList) noexcept :
+			std::vector<T>((std::initializer_list<T>&&)(initializerList))
 		{ }
 
 		/// <summary>
