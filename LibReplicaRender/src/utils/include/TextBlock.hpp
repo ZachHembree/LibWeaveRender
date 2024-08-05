@@ -96,7 +96,7 @@ namespace Replica
         /// Returns pointer to first character in a word found in the text after the 
         /// given start, with the given bounding characters.
         /// </summary>
-        const char* FindWord(const char* pStart, const string_view& breakFilter = "")
+        const char* FindWord(const char* pStart, const string_view& breakFilter = "") const
         {
             return FindStart(pStart, breakFilter, '!', '~');
         }
@@ -105,7 +105,7 @@ namespace Replica
         /// Returns pointer to last character in a word found in the text after the 
         /// given start, with the given bounding characters.
         /// </summary>
-        const char* FindWordEnd(const char* pStart, const string_view& breakFilter = "")
+        const char* FindWordEnd(const char* pStart, const string_view& breakFilter = "") const
         {
             return FindEnd(pStart, breakFilter, '!', '~');
         }
@@ -114,19 +114,19 @@ namespace Replica
         /// Returns pointer to first character in a word found in the text before the 
         /// given start, with the given bounding characters.
         /// </summary>
-        const char* FindLastWord(const char* pStart, const string_view& breakFilter = "")
+        const char* FindLastWord(const char* pStart, const string_view& breakFilter = "") const
         {
             return FindLastStart(pStart, breakFilter, '!', '~');
         }
 
-        TextBlock GetWord(const char* pStart, const string_view& breakFilter = "", char min = '!', char max = '~')
+        TextBlock GetWord(const char* pStart, const string_view& breakFilter = "", char min = '!', char max = '~') const
         {
             pStart = FindStart(pStart, breakFilter, min, max);
             const char* pEnd = FindEnd(pStart, breakFilter, min, max);
             return TextBlock(pStart, pEnd);
         }
 
-        TextBlock GetLastWord(const char* pStart, const string_view& breakFilter = "", char min = '!', char max = '~')
+        TextBlock GetLastWord(const char* pStart, const string_view& breakFilter = "", char min = '!', char max = '~') const
         {
             pStart = FindLastStart(pStart, breakFilter, min, max);
             const char* pEnd = FindEnd(pStart, breakFilter, min, max);
@@ -139,12 +139,6 @@ namespace Replica
         /// </summary>
         const char* Find(const string_view& substr, const char* pStart = nullptr);
 
-        //// <summary>
-        /// Finds position of the first character of the first matching occurence of 
-        /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
-        /// </summary>
-        const char* Find(const TextBlock& substr, const char* pStart = nullptr);
-
         /// <summary>
         /// Finds position of the first character of the first matching occurence of 
         /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
@@ -155,19 +149,19 @@ namespace Replica
         /// Returns pointer to first character in a range found in the text after the 
         /// given start, with the given bounding characters.
         /// </summary>
-        const char* FindStart(const char* pStart, const string_view& breakFilter = "", char min = '\0', char max = (char)127);
+        const char* FindStart(const char* pStart, const string_view& breakFilter = "", char min = '\0', char max = (char)127) const;
 
         /// <summary>
         /// Returns pointer to first character in a range found in the text after the 
         /// given start, with the given bounding characters.
         /// </summary>
-        const char* FindEnd(const char* pStart, const string_view& breakFilter = "", char min = '\0', char max = (char)127);
+        const char* FindEnd(const char* pStart, const string_view& breakFilter = "", char min = '\0', char max = (char)127) const;
 
         /// <summary>
         /// Returns pointer to first character in a range found in the text before the 
         /// given start, with the given bounding characters.
         /// </summary>
-        const char* FindLastStart(const char* pStart, const string_view& breakFilter = "", char min = '\0', char max = (char)127);
+        const char* FindLastStart(const char* pStart, const string_view& breakFilter = "", char min = '\0', char max = (char)127) const;
 
         /// <summary>
         /// Finds position of the first character of the first matching occurence of 

@@ -73,15 +73,6 @@ const char* TextBlock::Find(const string_view& substr, const char* pStart)
     return Find(&substr[0], (int)substr.length(), pStart);
 }
 
-//// <summary>
-/// Finds position of the first character of the first matching occurence of 
-/// the given substring, starting from the given pointer. Doesn't stop on '\0'.
-/// </summary>
-const char* TextBlock::Find(const TextBlock& substr, const char* pStart)
-{
-    return Find(substr.pStart, (int)substr.length, pStart);
-}
-
 /// <summary>
 /// Finds position of the first character of the first matching occurence of 
 /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
@@ -159,7 +150,7 @@ const char* TextBlock::Find(const char* substr, int subLen, const char* pStart)
 /// <summary>
 /// Returns pointer to first character in a word found in the text after the given start
 /// </summary>
-const char* TextBlock::FindStart(const char* pStart, const string_view& breakFilter, char min, char max)
+const char* TextBlock::FindStart(const char* pStart, const string_view& breakFilter, char min, char max) const
 {
     pStart = ClampPtr(pStart, GetFirst(), GetLast());
 
@@ -172,7 +163,7 @@ const char* TextBlock::FindStart(const char* pStart, const string_view& breakFil
 /// <summary>
 /// Returns the position of the last character in the word starting at the given pointer
 /// </summary>
-const char* TextBlock::FindEnd(const char* pStart, const string_view& breakFilter, char min, char max)
+const char* TextBlock::FindEnd(const char* pStart, const string_view& breakFilter, char min, char max) const
 {
     pStart = ClampPtr(pStart, GetFirst(), GetLast());
     const char* pCh = pStart;
@@ -189,7 +180,7 @@ const char* TextBlock::FindEnd(const char* pStart, const string_view& breakFilte
 /// <summary>
 /// Returns pointer to first character in a word found in the text before the given start
 /// </summary>
-const char* TextBlock::FindLastStart(const char* pStart, const string_view& breakFilter, char min, char max)
+const char* TextBlock::FindLastStart(const char* pStart, const string_view& breakFilter, char min, char max) const
 {
     pStart = ClampPtr(pStart, GetFirst(), GetLast());
     const char* pCh = pStart;
