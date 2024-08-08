@@ -4,6 +4,7 @@
 #include<vector>
 #include<exception>
 #include<string>
+#include"ReplicaMath.hpp"
 
 namespace Replica
 {
@@ -18,32 +19,129 @@ namespace Replica
 	class DynIterator
 	{
 	public:
-		DynIterator(const ValueType* pData) : pData((ValueType*)pData)
-		{ }
+		typedef std::contiguous_iterator_tag iterator_category;
+		typedef ValueType value_type;
+		typedef llong difference_type;
+		typedef ValueType* pointer;
+		typedef ValueType& reference;
 
-		bool operator==(const DynIterator& other) { return pData == other.pData; }
+		DynIterator() : pData(nullptr) { }
 
-		bool operator!=(const DynIterator& other) { return pData != other.pData; }
-
-		DynIterator& operator++()
-		{
-			pData++;
-			return *this;
-		}
-
-		DynIterator operator+(int value) { return DynIterator(pData + value); }
-
-		DynIterator operator++(int) { return DynIterator(pData + 1); }
+		DynIterator(const ValueType* pData) : pData((ValueType*)pData) { }
 
 		ValueType* operator->() { return pData; }
 
 		ValueType& operator*() { return *pData; }
 
-		const DynIterator operator++(int) const { return DynIterator(pData + 1); }
+		ValueType& operator[](llong offset) { return *(pData + offset); }
 
 		const ValueType* operator->() const { return pData; }
 
 		const ValueType& operator*() const { return *pData; }
+
+		const ValueType& operator[](llong offset) const { return *(pData + offset); }
+
+		DynIterator& operator++()
+		{
+			++pData;
+			return *this;
+		}
+
+		DynIterator operator++(int)
+		{
+			DynIterator cpy(pData);
+			++pData;
+			return cpy;
+		}
+
+		DynIterator& operator--()
+		{
+			--pData;
+			return *this;
+		}
+
+		DynIterator operator--(int)
+		{
+			DynIterator cpy(pData);
+			--pData;
+			return cpy;
+		}
+
+		DynIterator& operator+=(llong offset)
+		{
+			pData += offset;
+			return *this;
+		}
+
+		DynIterator& operator-=(llong offset)
+		{
+			pData -= offset;
+			return *this;
+		}
+
+		friend bool operator==(const DynIterator& lhs, const DynIterator& rhs)
+		{
+			return lhs.pData == rhs.pData;
+		}
+
+		friend bool operator!=(const DynIterator& lhs, const DynIterator& rhs)
+		{
+			return !(lhs == rhs);
+		}
+
+		friend bool operator<(const DynIterator& lhs, const DynIterator& rhs)
+		{
+			return lhs.pData < rhs.pData;
+		}
+
+		friend bool operator>(const DynIterator& lhs, const DynIterator& rhs)
+		{
+			return rhs < lhs;
+		}
+
+		friend bool operator<=(const DynIterator& lhs, const DynIterator& rhs)
+		{
+			return !(rhs < lhs);
+		}
+
+		friend bool operator>=(const DynIterator& lhs, const DynIterator& rhs)
+		{
+			return !(lhs < rhs);
+		}
+
+		friend DynIterator operator+(const DynIterator& it, llong n)
+		{
+			DynIterator temp = it;
+			temp += n;
+			return temp;
+		}
+
+		friend DynIterator operator-(const DynIterator& it, llong offset)
+		{
+			DynIterator temp = it;
+			temp -= offset;
+			return temp;
+		}
+
+		friend llong operator-(const DynIterator& lhs, const DynIterator& rhs)
+		{
+			return lhs.pData - rhs.pData;
+		}
+
+		friend DynIterator operator+(llong offset, const DynIterator& it)
+		{
+			return it + offset;
+		}
+
+		friend ValueType&& iter_move(const DynIterator& it) noexcept
+		{
+			return std::move(*it.pData);
+		}
+
+		friend void iter_swap(const DynIterator<ValueType>& lhs, const DynIterator<ValueType>& rhs) noexcept
+		{
+			std::swap(*lhs.pData, *rhs.pData);
+		}
 
 	protected:
 		ValueType* pData;
