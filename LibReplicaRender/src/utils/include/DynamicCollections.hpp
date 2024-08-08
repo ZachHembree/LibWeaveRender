@@ -4,7 +4,6 @@
 #include<vector>
 #include<exception>
 #include<string>
-#include"ReplicaMath.hpp"
 
 namespace Replica
 {
@@ -21,10 +20,10 @@ namespace Replica
 	public:
 		typedef std::contiguous_iterator_tag iterator_category;
 		typedef ValueType value_type;
-		typedef llong difference_type;
+		typedef ptrdiff_t difference_type;
 		typedef ValueType* pointer;
 		typedef ValueType& reference;
-
+		
 		DynIterator() : pData(nullptr) { }
 
 		DynIterator(const ValueType* pData) : pData((ValueType*)pData) { }
@@ -33,13 +32,13 @@ namespace Replica
 
 		ValueType& operator*() { return *pData; }
 
-		ValueType& operator[](llong offset) { return *(pData + offset); }
+		ValueType& operator[](ptrdiff_t offset) { return *(pData + offset); }
 
 		const ValueType* operator->() const { return pData; }
 
 		const ValueType& operator*() const { return *pData; }
 
-		const ValueType& operator[](llong offset) const { return *(pData + offset); }
+		const ValueType& operator[](ptrdiff_t offset) const { return *(pData + offset); }
 
 		DynIterator& operator++()
 		{
@@ -67,68 +66,68 @@ namespace Replica
 			return cpy;
 		}
 
-		DynIterator& operator+=(llong offset)
+		DynIterator& operator+=(ptrdiff_t offset)
 		{
 			pData += offset;
 			return *this;
 		}
 
-		DynIterator& operator-=(llong offset)
+		DynIterator& operator-=(ptrdiff_t offset)
 		{
 			pData -= offset;
 			return *this;
 		}
 
-		friend bool operator==(const DynIterator& lhs, const DynIterator& rhs)
+		friend bool operator==(const DynIterator& lhs, const DynIterator& rhs) 
 		{
 			return lhs.pData == rhs.pData;
 		}
 
-		friend bool operator!=(const DynIterator& lhs, const DynIterator& rhs)
+		friend bool operator!=(const DynIterator& lhs, const DynIterator& rhs) 
 		{
 			return !(lhs == rhs);
 		}
 
-		friend bool operator<(const DynIterator& lhs, const DynIterator& rhs)
+		friend bool operator<(const DynIterator& lhs, const DynIterator& rhs) 
 		{
 			return lhs.pData < rhs.pData;
 		}
 
-		friend bool operator>(const DynIterator& lhs, const DynIterator& rhs)
+		friend bool operator>(const DynIterator& lhs, const DynIterator& rhs) 
 		{
 			return rhs < lhs;
 		}
 
-		friend bool operator<=(const DynIterator& lhs, const DynIterator& rhs)
+		friend bool operator<=(const DynIterator& lhs, const DynIterator& rhs) 
 		{
 			return !(rhs < lhs);
 		}
 
-		friend bool operator>=(const DynIterator& lhs, const DynIterator& rhs)
+		friend bool operator>=(const DynIterator& lhs, const DynIterator& rhs) 
 		{
 			return !(lhs < rhs);
 		}
 
-		friend DynIterator operator+(const DynIterator& it, llong n)
+		friend DynIterator operator+(const DynIterator& it, ptrdiff_t n)
 		{
 			DynIterator temp = it;
 			temp += n;
 			return temp;
 		}
 
-		friend DynIterator operator-(const DynIterator& it, llong offset)
+		friend DynIterator operator-(const DynIterator& it, ptrdiff_t offset)
 		{
 			DynIterator temp = it;
 			temp -= offset;
 			return temp;
 		}
 
-		friend llong operator-(const DynIterator& lhs, const DynIterator& rhs)
+		friend ptrdiff_t operator-(const DynIterator& lhs, const DynIterator& rhs)
 		{
 			return lhs.pData - rhs.pData;
 		}
 
-		friend DynIterator operator+(llong offset, const DynIterator& it)
+		friend DynIterator operator+(ptrdiff_t offset, const DynIterator& it)
 		{
 			return it + offset;
 		}
@@ -214,7 +213,7 @@ namespace Replica
 	class DynamicArrayBase : public IDynamicArray<T>
 	{
 	public:
-		using Iterator = DynIterator<T>;
+		using Iterator = IDynamicArray<T>::Iterator;
 
 	protected:
 		/// <summary>
@@ -666,7 +665,7 @@ namespace Replica
 	class Vector : public IDynamicArray<T>, private std::vector<T>
 	{
 	public:
-		using Iterator = DynIterator<T>;
+		using Iterator = IDynamicArray<T>::Iterator;
 
 		using std::vector<T>::push_back;
 		using std::vector<T>::emplace_back;
@@ -721,11 +720,129 @@ namespace Replica
 		Vector(Vector&& rhs) noexcept : std::vector<T>(std::move(rhs)) { }
 
 		/// <summary>
+		/// Adds a copy of the given value to the end of the vector
+		/// </summary>
+		void Add(const T& value)
+		{
+			this->push_back(value);
+		}
+
+		/// <summary>
+		/// Moves the given value into the end of the vector
+		/// </summary>
+		void Add(T&& value) noexcept
+		{
+			this->push_back(std::move(value));
+		}
+
+		/// <summary>
+		/// Inserts a copy of the given value at the given index
+		/// </summary>
+		void Insert(ptrdiff_t index, const T& value)
+		{
+			this->insert(std::vector<T>::begin() + index, value);
+		}
+
+		/// <summary>
+		/// Moves the given value to the given position in the vector
+		/// </summary>
+		void Insert(ptrdiff_t index, T&& value) noexcept
+		{
+			this->insert(std::vector<T>::begin() + index, std::move(value));
+		}
+
+		/// <summary>
+		/// Moves the given source range into the end of the vector
+		/// </summary>
+		void AddRange(IDynamicArray<T>&& src, ptrdiff_t srcStart = 0, ptrdiff_t count = -1) noexcept
+		{
+			InsertRange(0, std::move(src), srcStart, count);
+		}
+
+		/// <summary>
+		/// Moves the given source range into the vector at the given index
+		/// </summary>
+		void InsertRange(ptrdiff_t start, IDynamicArray<T>&& src, ptrdiff_t srcStart = 0, ptrdiff_t count = -1) noexcept
+		{
+			if (count == -1)
+				count = (ptrdiff_t)src.GetLength() - count;
+
+			if (count <= 0)
+				return;
+
+			this->insert((std::vector<T>::begin() + start), 
+				std::move_iterator(src.begin() + srcStart), 
+				std::move_iterator(src.begin() + srcStart + count)
+			);
+		}
+
+		/// <summary>
+		/// Appends a copy of the given source range to the vector
+		/// </summary>
+		void AddRange(const IDynamicArray<T>& src, ptrdiff_t srcStart = 0, ptrdiff_t count = -1)
+		{
+			InsertRange(0, src, srcStart, count);
+		}
+
+		/// <summary>
+		/// Inserts a copy of the given source range starting at the given index in the vector
+		/// </summary>
+		void InsertRange(ptrdiff_t start, const IDynamicArray<T>& src, ptrdiff_t srcStart = 0, ptrdiff_t count = -1)
+		{
+			if (count == -1)
+				count = (ptrdiff_t)src.GetLength() - count;
+
+			if (count == 0)
+				return;
+				
+			this->insert((std::vector<T>::begin() + start),
+				(src.begin() + srcStart),
+				(src.begin() + srcStart + count)
+			);
+		}
+
+		/// <summary>
 		/// Removes the member at the given index
 		/// </summary>
-		void RemoveAt(int index)
+		void RemoveAt(size_t index)
 		{
+#if _CONTAINER_DEBUG_LEVEL > 0
+			if ( index >= (this->size()) )
+			{
+				char buffer[100];
+				sprintf_s( buffer, 100, "Array index out of range. Index: %tu, Length %tu", index, (this->size()) );
+
+				throw std::exception(buffer);
+			}
+#endif
+
 			this->erase(std::vector<T>::begin() + index);
+		}
+
+		/// <summary>
+		/// Removes the specified contiguous range from the vector
+		/// </summary>
+		void RemoveRange(size_t index, size_t count)
+		{
+#if _CONTAINER_DEBUG_LEVEL > 0
+			if ( index >= (this->size()) )
+			{
+				char buffer[100];
+				sprintf_s( buffer, 100, "Array index out of range. Index: %tu, Length %tu", index, (this->size()) );
+
+				throw std::exception(buffer);
+			}
+
+			if ( (index + count) >= (this->size()) ) 
+			{
+				char buffer[100];
+				sprintf_s( buffer, 100, "Subrange count out of range. Index: %tu, Length %tu", (index + count), (this->size()) );
+
+				throw std::exception(buffer);
+			}
+#endif
+
+			this->erase(std::vector<T>::begin() + index, std::vector<T>::begin() + (index + count));
 		}
 
 		/// <summary>

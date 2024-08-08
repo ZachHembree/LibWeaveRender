@@ -24,7 +24,7 @@ namespace Replica
 	/// </summary>
 	long Delta(size_t a, size_t b)
 	{
-		long sign = 2 * (a >= b) - 1;
+		const long sign = 2 * (a >= b) - 1;
 		return sign * (long)(std::max(a, b) - std::min(a, b));
 	}
 
