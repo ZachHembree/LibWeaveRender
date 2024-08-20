@@ -756,7 +756,7 @@ namespace Replica
 		/// </summary>
 		void AddRange(IDynamicArray<T>&& src, ptrdiff_t srcStart = 0, ptrdiff_t count = -1) noexcept
 		{
-			InsertRange(0, std::move(src), srcStart, count);
+			InsertRange(this->size(), std::move(src), srcStart, count);
 		}
 
 		/// <summary>
@@ -781,7 +781,7 @@ namespace Replica
 		/// </summary>
 		void AddRange(const IDynamicArray<T>& src, ptrdiff_t srcStart = 0, ptrdiff_t count = -1)
 		{
-			InsertRange(0, src, srcStart, count);
+			InsertRange(this->size(), src, srcStart, count);
 		}
 
 		/// <summary>
@@ -790,7 +790,7 @@ namespace Replica
 		void InsertRange(ptrdiff_t start, const IDynamicArray<T>& src, ptrdiff_t srcStart = 0, ptrdiff_t count = -1)
 		{
 			if (count == -1)
-				count = (ptrdiff_t)src.GetLength() - count;
+				count = (ptrdiff_t)src.GetLength() - srcStart;
 
 			if (count == 0)
 				return;
@@ -824,6 +824,9 @@ namespace Replica
 		/// </summary>
 		void RemoveRange(size_t index, size_t count)
 		{
+			if (count == 0)
+				return;
+
 #if _CONTAINER_DEBUG_LEVEL > 0
 			if ( index >= (this->size()) )
 			{
@@ -833,7 +836,7 @@ namespace Replica
 				throw std::exception(buffer);
 			}
 
-			if ( (index + count) >= (this->size()) ) 
+			if ( (index + count) >= (this->size() + 1) ) 
 			{
 				char buffer[100];
 				sprintf_s( buffer, 100, "Subrange count out of range. Index: %tu, Length %tu", (index + count), (this->size()) );
