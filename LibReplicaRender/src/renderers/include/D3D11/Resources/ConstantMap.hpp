@@ -41,7 +41,7 @@ namespace Replica::D3D11
 		void SetMember(string_view name, const T& value)
 		{
 			if (GetMemberExists(name))
-				SetMember(name, reinterpret_cast<const byte*>(&value), typeid(T));
+				SetMember(name, reinterpret_cast<const byte*>(&value), sizeof(T));
 		}
 		
 		/// <summary>
@@ -54,13 +54,12 @@ namespace Replica::D3D11
 		/// </summary>
 		struct MapEntry
 		{
-			const type_info& type;
 			const size_t stride;
 			const size_t offset;
 
 			MapEntry();
 
-			MapEntry(const type_info& type, const size_t stride, const size_t offset);
+			MapEntry(const size_t stride, const size_t offset);
 
 			MapEntry(const MapEntry& other);
 
@@ -76,7 +75,7 @@ namespace Replica::D3D11
 
 		ConstantMap& operator=(const ConstantMap& other);
 
-		void SetMember(string_view name, const byte* src, const type_info& type);
+		void SetMember(string_view name, const byte* src, const size_t size);
 	};
 
 	/// <summary>
@@ -104,7 +103,7 @@ namespace Replica::D3D11
 		/// of the map definition.
 		/// </summary>
 		template<typename T>
-		void Add(string_view name) { Add(name, typeid(T), sizeof(T)); }
+		void Add(string_view name) { Add(name, sizeof(T)); }
 
 		/// <summary>
 		/// Clears the contents of the initializer
@@ -129,7 +128,7 @@ namespace Replica::D3D11
 		/// Adds a new constant entry with the given name and type to the end
 		/// of the map definition.
 		/// </summary>
-		void Add(string_view name, const type_info& type, const size_t stride);
+		void Add(string_view name, const size_t stride);
 	};
 
 	/// <summary>
@@ -138,12 +137,11 @@ namespace Replica::D3D11
 	struct ConstantDef
 	{
 		string_view name;
-		const type_info& type;
 		const size_t stride;
 
 		ConstantDef();
 
-		ConstantDef(string_view name, const type_info& type, const size_t stride);
+		ConstantDef(string_view name, const size_t stride);
 
 		ConstantDef(const ConstantDef& other);
 
@@ -152,7 +150,7 @@ namespace Replica::D3D11
 		template<typename T>
 		static ConstantDef Get(string_view name)
 		{
-			return ConstantDef(name, typeid(T), sizeof(T));
+			return ConstantDef(name, sizeof(T));
 		}
 	};
 }

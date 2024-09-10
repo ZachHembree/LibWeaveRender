@@ -17,7 +17,7 @@ ConstantMap::ConstantMap(const ConstantMapDef& layout) :
 	for (int i = 0; i < members.GetLength(); i++)
 	{
 		const ConstantDef& member = members[i];
-		const MapEntry entry(member.type, member.stride, offset);
+		const MapEntry entry(member.stride, offset);
 
 		defMap.emplace(member.name, entry);
 		offset += member.stride;
@@ -60,13 +60,13 @@ bool ConstantMap::GetMemberExists(string_view name)
 /// <summary>
 /// Sets member with the given name to the value given
 /// </summary>
-void ConstantMap::SetMember(string_view name, const byte* src, const type_info& type)
+void ConstantMap::SetMember(string_view name, const byte* src, const size_t size)
 {
 	const auto itr = defMap.find(name);
 	GFX_ASSERT(itr != defMap.end(), "Named constant not in buffer definition.");
 	
 	const MapEntry& entry = itr->second;
-	GFX_ASSERT(type == entry.type, "Shader constant type does not match data given.");
+	GFX_ASSERT(size == entry.stride, "Shader constant type does not match data given.");
 
 	// Calculate pointer to entry
 	byte* dst = this->data.GetPtr();
@@ -132,9 +132,9 @@ ConstantMapDef& ConstantMapDef::operator=(ConstantMapDef&& other) noexcept
 /// Adds a new constant entry with the given name and type to the end
 /// of the map definition.
 /// </summary>
-void ConstantMapDef::Add(string_view name, const type_info& type, const size_t stride)
+void ConstantMapDef::Add(string_view name, const size_t stride)
 {
-	members.emplace_back(ConstantDef(name, type, stride));
+	members.emplace_back(ConstantDef(name, stride));
 	this->stride += stride;
 }
 
@@ -157,18 +157,16 @@ const IDynamicArray<ConstantDef>& ConstantMapDef::GetMembers() const { return me
 /// </summary>
 size_t ConstantMapDef::GetStride() const { return GetAlignedByteSize(stride, 16); }
 
-ConstantDef::ConstantDef() : name(""), type(typeid(void*)), stride(0)
+ConstantDef::ConstantDef() : name(""), stride(0)
 { }
 
-ConstantDef::ConstantDef(string_view name, const type_info& type, const size_t stride) :
+ConstantDef::ConstantDef(string_view name, const size_t stride) :
 	name(name),
-	type(type),
 	stride(stride)
 { }
 
 ConstantDef::ConstantDef(const ConstantDef& other) :
 	name(other.name),
-	type(other.type),
 	stride(other.stride)
 { }
 
@@ -178,17 +176,15 @@ ConstantDef& ConstantDef::operator=(const ConstantDef& other)
 	return *this;
 }
 
-ConstantMap::MapEntry::MapEntry() : type(typeid(void*)), stride(0), offset(0)
+ConstantMap::MapEntry::MapEntry() : stride(0), offset(0)
 { }
 
-ConstantMap::MapEntry::MapEntry(const type_info& type, const size_t stride, const size_t offset) :
-	type(type),
+ConstantMap::MapEntry::MapEntry(const size_t stride, const size_t offset) :
 	stride(stride),
 	offset(offset)
 { }
 
 ConstantMap::MapEntry::MapEntry(const MapEntry& other) :
-	type(other.type),
 	stride(other.stride),
 	offset(other.offset)
 { }
