@@ -6,14 +6,12 @@ namespace Replica::D3D11
 {	
 	class Renderer;
 
-	class Device : protected MoveOnlyObjBase
+	class Device
 	{
 	public:
+		MAKE_MOVE_ONLY(Device)
+
 		Device(Renderer& renderer);
-
-		Device(Device&&) = default;
-
-		Device& operator=(Device&&) = default;
 
 		/// <summary>
 		/// Returns reference to renderer using this device

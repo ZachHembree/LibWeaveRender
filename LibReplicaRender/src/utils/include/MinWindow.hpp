@@ -12,9 +12,11 @@ namespace Replica
 	/// <summary>
 	/// Minimal wrapper class for Win32 Window
 	/// </summary>
-	class MinWindow : public MoveOnlyObjBase
+	class MinWindow
 	{
 		public:
+			MAKE_MOVE_ONLY(MinWindow)
+
 			MinWindow(
 				wstring_view name, 
 				ivec2 initSize, 
@@ -22,10 +24,6 @@ namespace Replica
 				const HINSTANCE hInst, 
 				const wchar_t* iconRes
 			);
-
-			MinWindow(MinWindow&& other) noexcept = default;
-
-			MinWindow& operator=(MinWindow&& rhs) noexcept = default;
 
 			~MinWindow();
 

@@ -306,7 +306,6 @@
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\ImguiRenderComponent.cpp" />
     <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Viewport.hpp" />
     <ClInclude Include="LibReplicaRender\src\utils\include\DataBufferHandle.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\MoveOnlyBase.hpp" />
     <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\SwapChain.hpp" />
     <ClInclude Include="LibReplicaRender\src\utils\include\GfxException.hpp" />
     <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\IndexBuffer.hpp" />

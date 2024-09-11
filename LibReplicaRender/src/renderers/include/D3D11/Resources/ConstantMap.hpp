@@ -13,7 +13,7 @@ namespace Replica::D3D11
 	/// Metadata object used to define a constant buffer whose size and layout are determined
 	/// on initialization.
 	/// </summary>
-	class ConstantMap : public MoveOnlyObjBase
+	class ConstantMap
 	{
 	public:		
 		ConstantMap();
@@ -81,7 +81,7 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Collection for initializing a new ConstantMap
 	/// </summary>
-	class ConstantMapDef : MoveOnlyObjBase
+	class ConstantMapDef
 	{
 	public:
 		ConstantMapDef();

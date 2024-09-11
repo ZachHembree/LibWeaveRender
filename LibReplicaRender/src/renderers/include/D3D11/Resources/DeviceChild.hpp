@@ -11,9 +11,11 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Base class for types representing interfaces to device resources
 	/// </summary>
-	class DeviceChild : public MoveOnlyObjBase
+	class DeviceChild
 	{
 	public:
+		MAKE_MOVE_ONLY(DeviceChild)
+
 		/// <summary>
 		/// Returns the device associated with the child object
 		/// </summary>
@@ -30,9 +32,6 @@ namespace Replica::D3D11
 		virtual bool GetIsValid() const;
 
 	protected:
-		using MoveOnlyObjBase::MoveOnlyObjBase;
-		using MoveOnlyObjBase::operator=;
-
 		Device* pDev;
 
 		DeviceChild();

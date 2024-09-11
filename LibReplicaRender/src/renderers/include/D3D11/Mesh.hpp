@@ -28,9 +28,11 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Contains an instance of a drawable mesh
 	/// </summary>
-	class Mesh : public IDrawable, public MoveOnlyObjBase
+	class Mesh : public IDrawable
 	{
 	public:
+		MAKE_MOVE_ONLY(Mesh)
+
 		template <typename Vert_T>
 		Mesh(
 			Device& device,
@@ -57,10 +59,6 @@ namespace Replica::D3D11
 		);
 
 		Mesh();
-
-		Mesh(Mesh&&) = default;
-
-		Mesh& operator=(Mesh&&) = default;
 
 		/// <summary>
 		/// Updates any resources needed prior to drawing

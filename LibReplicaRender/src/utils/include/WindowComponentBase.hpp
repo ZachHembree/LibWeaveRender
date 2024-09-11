@@ -1,6 +1,5 @@
 #pragma once
 #include "RepWinException.hpp"
-#include "MoveOnlyBase.hpp"
 
 namespace Replica
 {
@@ -9,13 +8,12 @@ namespace Replica
 	/// <summary>
 	/// Base class for window components
 	/// </summary>
-	class WindowComponentBase : protected MoveOnlyObjBase
+	class WindowComponentBase
 	{
 	friend MinWindow;
 
 	public:
-		WindowComponentBase(WindowComponentBase&&) = default;
-		WindowComponentBase& operator=(WindowComponentBase&&) = default;
+		MAKE_MOVE_ONLY(WindowComponentBase)
 
 		/// <summary>
 		/// Returns pointer to parent window

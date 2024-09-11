@@ -15,13 +15,12 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Interface for types that can be drawn
 	/// </summary>
-	class RenderComponentBase : private MoveOnlyObjBase
+	class RenderComponentBase
 	{
 	friend Renderer;
 
 	public:
-		RenderComponentBase(RenderComponentBase&&) = delete;
-		RenderComponentBase& operator=(RenderComponentBase&&) = delete;
+		MAKE_MOVE_ONLY(RenderComponentBase)
 
 		/// <summary>
 		/// Updates before draw, but after the state and resources for the previous
