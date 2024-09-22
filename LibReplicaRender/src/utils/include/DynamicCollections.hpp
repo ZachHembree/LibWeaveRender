@@ -271,7 +271,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
-		DynamicArrayBase(size_t length, T initValue) :
+		DynamicArrayBase(size_t length, const T& initValue) :
 			length(length),
 			data((length > 0) ? new T[length](initValue) : nullptr)
 		{ }
@@ -281,8 +281,8 @@ namespace Replica
 		/// Creates a copy.
 		/// </summary>
 		DynamicArrayBase(const T* data, const size_t length) :
-			length(new T[length]),
-			data(data)
+			length(length),
+			data(new T[length])
 		{ 
 			memcpy(this->data, data, length * sizeof(T));
 		}
@@ -482,7 +482,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
-		DynamicArray(size_t length, T initValue) :
+		DynamicArray(size_t length, const T& initValue) :
 			DynamicArrayBase<T>(length, initValue)
 		{ }
 
@@ -596,7 +596,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
-		UniqueArray(size_t length, T initValue) :
+		UniqueArray(size_t length, const T& initValue) :
 			DynamicArrayBase<T>(length, initValue)
 		{ }
 

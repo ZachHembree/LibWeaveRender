@@ -1,6 +1,6 @@
 #pragma once
 #include <chrono>
-#include "ReplicaMath.hpp"
+#include "ReplicaInt.hpp"
 
 namespace Replica
 {
