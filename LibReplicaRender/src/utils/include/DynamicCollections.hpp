@@ -909,12 +909,38 @@ namespace Replica
 		/// <summary>
 		/// Provides indexed access to vector member references.
 		/// </summary>
-		T& operator[](size_t index) override { return this->at(index); }
+		T& operator[](size_t index) override 
+		{ 
+#if _CONTAINER_DEBUG_LEVEL > 0
+			if (index >= this->size())
+			{
+				char buffer[100];
+				sprintf_s(buffer, 100, "Vector index out of range. Index: %tu, Length %tu", index, this->size());
+
+				throw std::exception(buffer);
+			}
+#endif
+
+			return this->at(index); 
+		}
 
 		/// <summary>
 		/// Provides indexed access to vector members using constant references.
 		/// </summary>
-		const T& operator[](size_t index) const override { return this->at(index); }
+		const T& operator[](size_t index) const override 
+		{ 
+#if _CONTAINER_DEBUG_LEVEL > 0
+			if (index >= this->size())
+			{
+				char buffer[100];
+				sprintf_s(buffer, 100, "Vector index out of range. Index: %tu, Length %tu", index, this->size());
+
+				throw std::exception(buffer);
+			}
+#endif
+
+		return this->at(index); 
+		}
 	};
 
 	/// <summary>
