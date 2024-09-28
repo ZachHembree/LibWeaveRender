@@ -1,9 +1,10 @@
 #ifndef DynamicCollections
 #define DynamicCollections
 
-#include<vector>
-#include<exception>
-#include<string>
+#include <vector>
+#include <exception>
+#include <string>
+#include <iterator>
 
 namespace Replica
 {
@@ -154,6 +155,7 @@ namespace Replica
 	{
 	public:
 		using Iterator = DynIterator<T>;
+		using RevIterator = std::reverse_iterator<DynIterator<T>>;
 
 		/// <summary>
 		/// Returns the length of the array.
@@ -204,6 +206,26 @@ namespace Replica
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
 		virtual const Iterator end() const = 0;
+
+		/// <summary>
+		/// Returns iterator pointing to the start of the collection
+		/// </summary>
+		virtual RevIterator rbegin() { return RevIterator(begin()); }
+
+		/// <summary>
+		/// Returns iterator pointing to the end of the collection
+		/// </summary>
+		virtual RevIterator rend() { return RevIterator(end()); }
+
+		/// <summary>
+		/// Returns iterator pointing to the start of the collection
+		/// </summary>
+		virtual const RevIterator rbegin() const { return RevIterator(begin()); }
+
+		/// <summary>
+		/// Returns iterator pointing to the end of the collection
+		/// </summary>
+		virtual const RevIterator rend() const { return RevIterator(end()); }
 	};
 
 	/// <summary>
@@ -214,6 +236,7 @@ namespace Replica
 	{
 	public:
 		using Iterator = IDynamicArray<T>::Iterator;
+		using RevIterator = IDynamicArray<T>::RevIterator;
 
 	protected:
 		/// <summary>
@@ -245,22 +268,6 @@ namespace Replica
 		}
 
 		/// <summary>
-		/// Initializes a new dynamic array using an initializer list.
-		/// </summary>
-		DynamicArrayBase(std::initializer_list<T>&& list) noexcept :
-			length(list.size()),
-			data(new T[length])
-		{
-			int i = 0;
-			
-			for (auto& entry : list)
-			{
-				data[i] = (T&&)(entry);
-				i++;
-			}
-		}
-
-		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
 		DynamicArrayBase(size_t length) :
@@ -284,7 +291,7 @@ namespace Replica
 			length(length),
 			data(new T[length])
 		{ 
-			memcpy(this->data, data, length * sizeof(T));
+			std::copy(data, data + length, this->data);
 		}
 
 		/// <summary>
@@ -303,7 +310,7 @@ namespace Replica
 			length(rhs.length),
 			data(new T[rhs.length])
 		{
-			memcpy(data, rhs.data, length * sizeof(T));
+			std::copy(rhs.data, rhs.data + length, this->data);
 		}
 
 		/// <summary>
@@ -355,7 +362,7 @@ namespace Replica
 				}
 
 				length = rhs.length;
-				memcpy(data, rhs.data, length * sizeof(T));
+				std::copy(rhs.data, rhs.data + length, data);
 			}
 
 			return *this;
@@ -466,13 +473,6 @@ namespace Replica
 		{ }
 
 		/// <summary>
-		/// Initializes a new dynamic array from an initializer list.
-		/// </summary>
-		DynamicArray(std::initializer_list<T>&& initializerList) noexcept :
-			DynamicArrayBase<T>((std::initializer_list<T>&&)(initializerList))
-		{ }
-
-		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
 		DynamicArray(size_t length) : 
@@ -580,13 +580,6 @@ namespace Replica
 		{ }
 
 		/// <summary>
-		/// Initializes a new unique array from an initializer list.
-		/// </summary>
-		UniqueArray(std::initializer_list<T>&& initializerList) noexcept :
-			DynamicArrayBase<T>((std::initializer_list<T>&&)(initializerList))
-		{ }
-
-		/// <summary>
 		/// Initializes a unique array with the given length.
 		/// </summary>
 		UniqueArray(size_t length) :
@@ -666,6 +659,7 @@ namespace Replica
 	{
 	public:
 		using Iterator = IDynamicArray<T>::Iterator;
+		using RevIterator = IDynamicArray<T>::RevIterator;
 
 		using std::vector<T>::push_back;
 		using std::vector<T>::emplace_back;
@@ -692,13 +686,6 @@ namespace Replica
 		/// </summary>
 		Vector(const std::initializer_list<T>& initializerList) noexcept :
 			std::vector<T>(initializerList)
-		{ }
-
-		/// <summary>
-		/// Initializes a new unique vector from an initializer list.
-		/// </summary>
-		Vector(std::initializer_list<T>&& initializerList) noexcept :
-			std::vector<T>((std::initializer_list<T>&&)(initializerList))
 		{ }
 
 		/// <summary>
@@ -769,11 +756,17 @@ namespace Replica
 
 			if (count <= 0)
 				return;
-
+				
 			this->insert((std::vector<T>::begin() + start), 
 				std::move_iterator(src.begin() + srcStart), 
 				std::move_iterator(src.begin() + srcStart + count)
 			);
+		}
+
+		template <class InputIterator>
+		void InsertRange(ptrdiff_t start, InputIterator first, InputIterator last)
+		{
+			this->insert((std::vector<T>::begin() + start), first, last);
 		}
 
 		/// <summary>
