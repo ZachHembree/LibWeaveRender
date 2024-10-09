@@ -321,7 +321,7 @@ namespace Replica
 			data(rhs.data)
 		{
 			rhs.data = nullptr;
-			rhs.length = -1;
+			rhs.length = 0;
 		}
 
 	public:
