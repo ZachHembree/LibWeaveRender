@@ -19,132 +19,51 @@ namespace Replica
 	class DynIterator
 	{
 	public:
-		typedef std::contiguous_iterator_tag iterator_category;
-		typedef ValueType value_type;
-		typedef ptrdiff_t difference_type;
-		typedef ValueType* pointer;
-		typedef ValueType& reference;
-		
+		using iterator_category = std::contiguous_iterator_tag;
+		using value_type = ValueType;
+		using difference_type = ptrdiff_t;
+		using pointer = ValueType*;
+		using reference = ValueType&;
+
 		DynIterator() : pData(nullptr) { }
 
-		DynIterator(const ValueType* pData) : pData((ValueType*)pData) { }
+		template <typename T = ValueType, typename = std::enable_if_t<!std::is_const<T>::value>>
+		DynIterator(T* pData) : pData(pData) { }
 
-		ValueType* operator->() { return pData; }
+		DynIterator(const ValueType* pData) : pData(const_cast<ValueType*>(pData)) { }
 
-		ValueType& operator*() { return *pData; }
+		// Dereference operators
+		reference operator*() const { return *pData; }
+		pointer operator->() const { return pData; }
 
-		ValueType& operator[](ptrdiff_t offset) { return *(pData + offset); }
+		// Random access element access
+		reference operator[](difference_type offset) const { return *(pData + offset); }
 
-		const ValueType* operator->() const { return pData; }
+		// Arithmetic operators
+		DynIterator& operator++() { ++pData; return *this; }
+		DynIterator operator++(int) { DynIterator temp = *this; ++(*this); return temp; }
 
-		const ValueType& operator*() const { return *pData; }
+		DynIterator& operator--() { --pData; return *this; }
+		DynIterator operator--(int) { DynIterator temp = *this; --(*this); return temp; }
 
-		const ValueType& operator[](ptrdiff_t offset) const { return *(pData + offset); }
+		DynIterator operator+(difference_type offset) const { return DynIterator(pData + offset); }
+		DynIterator operator-(difference_type offset) const { return DynIterator(pData - offset); }
 
-		DynIterator& operator++()
-		{
-			++pData;
-			return *this;
-		}
+		DynIterator& operator+=(difference_type offset) { pData += offset; return *this; }
+		DynIterator& operator-=(difference_type offset) { pData -= offset; return *this; }
 
-		DynIterator operator++(int)
-		{
-			DynIterator cpy(pData);
-			++pData;
-			return cpy;
-		}
+		difference_type operator-(const DynIterator& other) const { return pData - other.pData; }
 
-		DynIterator& operator--()
-		{
-			--pData;
-			return *this;
-		}
-
-		DynIterator operator--(int)
-		{
-			DynIterator cpy(pData);
-			--pData;
-			return cpy;
-		}
-
-		DynIterator& operator+=(ptrdiff_t offset)
-		{
-			pData += offset;
-			return *this;
-		}
-
-		DynIterator& operator-=(ptrdiff_t offset)
-		{
-			pData -= offset;
-			return *this;
-		}
-
-		friend bool operator==(const DynIterator& lhs, const DynIterator& rhs) 
-		{
-			return lhs.pData == rhs.pData;
-		}
-
-		friend bool operator!=(const DynIterator& lhs, const DynIterator& rhs) 
-		{
-			return !(lhs == rhs);
-		}
-
-		friend bool operator<(const DynIterator& lhs, const DynIterator& rhs) 
-		{
-			return lhs.pData < rhs.pData;
-		}
-
-		friend bool operator>(const DynIterator& lhs, const DynIterator& rhs) 
-		{
-			return rhs < lhs;
-		}
-
-		friend bool operator<=(const DynIterator& lhs, const DynIterator& rhs) 
-		{
-			return !(rhs < lhs);
-		}
-
-		friend bool operator>=(const DynIterator& lhs, const DynIterator& rhs) 
-		{
-			return !(lhs < rhs);
-		}
-
-		friend DynIterator operator+(const DynIterator& it, ptrdiff_t n)
-		{
-			DynIterator temp = it;
-			temp += n;
-			return temp;
-		}
-
-		friend DynIterator operator-(const DynIterator& it, ptrdiff_t offset)
-		{
-			DynIterator temp = it;
-			temp -= offset;
-			return temp;
-		}
-
-		friend ptrdiff_t operator-(const DynIterator& lhs, const DynIterator& rhs)
-		{
-			return lhs.pData - rhs.pData;
-		}
-
-		friend DynIterator operator+(ptrdiff_t offset, const DynIterator& it)
-		{
-			return it + offset;
-		}
-
-		friend ValueType&& iter_move(const DynIterator& it) noexcept
-		{
-			return std::move(*it.pData);
-		}
-
-		friend void iter_swap(const DynIterator<ValueType>& lhs, const DynIterator<ValueType>& rhs) noexcept
-		{
-			std::swap(*lhs.pData, *rhs.pData);
-		}
+		// Comparison operators
+		bool operator==(const DynIterator& other) const { return pData == other.pData; }
+		bool operator!=(const DynIterator& other) const { return pData != other.pData; }
+		bool operator<(const DynIterator& other) const { return pData < other.pData; }
+		bool operator>(const DynIterator& other) const { return pData > other.pData; }
+		bool operator<=(const DynIterator& other) const { return pData <= other.pData; }
+		bool operator>=(const DynIterator& other) const { return pData >= other.pData; }
 
 	protected:
-		ValueType* pData;
+		pointer pData;
 	};
 
 	/// <summary>
