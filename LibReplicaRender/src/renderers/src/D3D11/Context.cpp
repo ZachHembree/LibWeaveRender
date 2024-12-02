@@ -105,10 +105,10 @@ void Context::Reset()
 	currentDSV = nullptr;
 	currentDSS = nullptr;
 
-	memset(currentVPs.GetPtr(), 0, currentVPs.GetSize());
+	memset(currentVPs.GetPtr(), 0, GetArrSize(currentVPs));
 	vpCount = 0;
 
-	memset(currentRTVs.GetPtr(), 0, currentRTVs.GetSize());
+	memset(currentRTVs.GetPtr(), 0, GetArrSize(currentRTVs));
 	rtvCount = 0;
 
 	vpSpan = Span<Viewport>();
@@ -174,7 +174,7 @@ void Context::SetViewports(const IDynamicArray<Viewport>& viewports, int offset)
 	GFX_ASSERT((offset + viewports.GetLength()) <= D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
 		"Number of viewports supplied exceeds limit.")
 
-	memcpy(currentVPs.GetPtr() + glm::max(offset, 0), viewports.GetPtr(), viewports.GetSize());
+	memcpy(currentVPs.GetPtr() + glm::max(offset, 0), viewports.GetPtr(), GetArrSize(viewports));
 
 	vpCount = std::max(vpCount, (uint)(offset + viewports.GetLength()));
 	pContext->RSSetViewports(vpCount, (D3D11_VIEWPORT*)currentVPs.GetPtr());

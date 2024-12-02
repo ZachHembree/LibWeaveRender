@@ -82,11 +82,6 @@ namespace Replica
 		virtual size_t GetLength() const = 0;
 
 		/// <summary>
-		/// Returns the size of the array in bytes
-		/// </summary>
-		virtual size_t GetSize() const = 0;
-
-		/// <summary>
 		/// Provides indexed access to array member references.
 		/// </summary>
 		virtual T& operator[](size_t index) = 0;
@@ -148,6 +143,18 @@ namespace Replica
 	};
 
 	/// <summary>
+	/// Returns the size of the array in bytes
+	/// </summary>
+	template<typename T>
+	size_t GetArrSize(const IDynamicArray<T>& arr) { return arr.GetLength() * sizeof(T); }
+
+	/// <summary>
+	/// Returns the size of the array in bytes
+	/// </summary>
+	template<typename T>
+	size_t GetArrSize(const std::vector<T>& arr) { return arr.GetLength() * sizeof(T); }
+
+	/// <summary>
 	/// Dynamically allocated array with members of type T and a fixed length.
 	/// </summary>
 	template<typename T>
@@ -189,9 +196,9 @@ namespace Replica
 		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
-		DynamicArrayBase(size_t length) :
+		explicit DynamicArrayBase(size_t length) :
 			length(length),
-			data((length > 0) ? new T[length] : nullptr)
+			data((length > 0) ? new T[length]() : nullptr)
 		{ }
 
 		/// <summary>
@@ -244,7 +251,6 @@ namespace Replica
 		}
 
 	public:
-
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
@@ -303,7 +309,6 @@ namespace Replica
 			return *this;
 		}
 
-	public:
 		/// <summary>
 		/// Deallocates the memory backing the array.
 		/// </summary>
@@ -319,11 +324,6 @@ namespace Replica
 		/// Returns the length of the array.
 		/// </summary>
 		size_t GetLength() const override { return length; }
-
-		/// <summary>
-		/// Returns the size of the array in bytes
-		/// </summary>
-		size_t GetSize() const override { return length * sizeof(T); }
 
 		/// <summary>
 		/// Provides indexed access to array member references.
@@ -394,7 +394,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
-		DynamicArray(size_t length) : 
+		explicit DynamicArray(size_t length) : 
 			DynamicArrayBase<T>(length) 
 		{ }
 
@@ -501,7 +501,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a unique array with the given length.
 		/// </summary>
-		UniqueArray(size_t length) :
+		explicit UniqueArray(size_t length) :
 			DynamicArrayBase<T>(length) 
 		{ }
 
@@ -610,7 +610,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a new unique vector with the given capacity.
 		/// </summary>
-		Vector(size_t capacity)
+		explicit Vector(size_t capacity)
 		{
 			this->reserve(capacity);
 		}
@@ -766,11 +766,6 @@ namespace Replica
 		size_t GetLength() const override { return this->size(); }
 
 		/// <summary>
-		/// Returns the size of the vector in bytes
-		/// </summary>
-		size_t GetSize() const override { return this->size() * sizeof(T); }
-
-		/// <summary>
 		/// Returns a copy of the pointer to the backing the vector.
 		/// </summary>
 		T* GetPtr() override { return this->data(); }
@@ -893,7 +888,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a new unique vector with the given capacity.
 		/// </summary>
-		UniqueVector(size_t capacity)
+		explicit UniqueVector(size_t capacity)
 		{
 			this->reserve(capacity);
 		}

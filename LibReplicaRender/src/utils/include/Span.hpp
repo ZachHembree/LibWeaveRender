@@ -51,11 +51,6 @@ namespace Replica
 		size_t GetLength() const override { return length; }
 
 		/// <summary>
-		/// Returns the size of the span in bytes
-		/// </summary>
-		size_t GetSize() const override { return length * sizeof(T); }
-
-		/// <summary>
 		/// Returns pointer to the first member in the span
 		/// </summary>
 		T* GetFirst() { return pStart; }
