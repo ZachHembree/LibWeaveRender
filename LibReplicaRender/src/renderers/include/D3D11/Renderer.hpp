@@ -2,7 +2,7 @@
 #include <unordered_map>
 
 #include <string_view>
-#include "../src/utils/include/WindowComponentBase.hpp"
+#include "WindowComponentBase.hpp"
 #include "SwapChain.hpp"
 #include "Device.hpp"
 #include "RenderComponent.hpp"

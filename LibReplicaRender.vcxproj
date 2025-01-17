@@ -99,7 +99,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)$(ProjectName)\res;$(ProjectDir)$(ProjectName)\include;$(ProjectDir)$(ProjectName)\libs;$(ProjectDir)$(ProjectName)\libs\imgui;$(ProjectDir)$(ProjectName)\libs\imgui\backends;$(ProjectDir)$(ProjectName)\libs\imgui-filebrowser</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)$(ProjectName)\res;$(ProjectDir)$(ProjectName)\include;$(ProjectDir)$(ProjectName)\libs;$(ProjectDir)$(ProjectName)\libs\imgui;$(ProjectDir)$(ProjectName)\libs\imgui\backends;$(ProjectDir)$(ProjectName)\libs\imgui-filebrowser;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaUtils\include\glm;$(SolutionDir)LibReplicaUtils\include\cereal\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -123,7 +123,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)$(ProjectName)\res;$(ProjectDir)$(ProjectName)\include;$(ProjectDir)$(ProjectName)\libs;$(ProjectDir)$(ProjectName)\libs\imgui;$(ProjectDir)$(ProjectName)\libs\imgui\backends;$(ProjectDir)$(ProjectName)\libs\imgui-filebrowser</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)$(ProjectName)\res;$(ProjectDir)$(ProjectName)\include;$(ProjectDir)$(ProjectName)\libs;$(ProjectDir)$(ProjectName)\libs\imgui;$(ProjectDir)$(ProjectName)\libs\imgui\backends;$(ProjectDir)$(ProjectName)\libs\imgui-filebrowser;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaUtils\include\glm;$(SolutionDir)LibReplicaUtils\include\cereal\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -148,7 +148,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)$(ProjectName)\res;$(ProjectDir)$(ProjectName)\include;$(ProjectDir)$(ProjectName)\libs;$(ProjectDir)$(ProjectName)\libs\imgui;$(ProjectDir)$(ProjectName)\libs\imgui\backends;$(ProjectDir)$(ProjectName)\libs\imgui-filebrowser</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)$(ProjectName)\res;$(ProjectDir)$(ProjectName)\include;$(ProjectDir)$(ProjectName)\libs;$(ProjectDir)$(ProjectName)\libs\imgui;$(ProjectDir)$(ProjectName)\libs\imgui\backends;$(ProjectDir)$(ProjectName)\libs\imgui-filebrowser;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaUtils\include\glm;$(SolutionDir)LibReplicaUtils\include\cereal\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
     </ClCompile>
@@ -175,7 +175,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)$(ProjectName)\res;$(ProjectDir)$(ProjectName)\include;$(ProjectDir)$(ProjectName)\libs;$(ProjectDir)$(ProjectName)\libs\imgui;$(ProjectDir)$(ProjectName)\libs\imgui\backends;$(ProjectDir)$(ProjectName)\libs\imgui-filebrowser</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)$(ProjectName)\res;$(ProjectDir)$(ProjectName)\include;$(ProjectDir)$(ProjectName)\libs;$(ProjectDir)$(ProjectName)\libs\imgui;$(ProjectDir)$(ProjectName)\libs\imgui\backends;$(ProjectDir)$(ProjectName)\libs\imgui-filebrowser;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaUtils\include\glm;$(SolutionDir)LibReplicaUtils\include\cereal\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -210,7 +210,6 @@
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\RenderComponent.cpp" />
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\Texture2D.cpp" />
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Shaders\ComputeShader.cpp" />
-    <ClCompile Include="LibReplicaRender\src\utils\src\ReplicaMath.cpp" />
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\ConstantMap.cpp" />
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\ConstantBuffer.cpp" />
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Shaders\ShaderBase.cpp" />
@@ -228,27 +227,13 @@
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Resources\BufferBase.cpp" />
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Device.cpp" />
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\Renderer.cpp" />
-    <ClCompile Include="LibReplicaRender\src\utils\src\ReplicaWinUtils.cpp" />
-    <ClCompile Include="LibReplicaRender\src\utils\src\TextUtils.cpp" />
-    <ClCompile Include="LibReplicaRender\src\utils\src\Utils.cpp" />
-    <ClCompile Include="LibReplicaRender\src\utils\src\TextBlock.cpp" />
     <ClCompile Include="LibReplicaRender\src\utils\src\GfxException.cpp" />
     <ClCompile Include="LibReplicaRender\src\utils\src\Input.cpp" />
-    <ClCompile Include="LibReplicaRender\src\utils\src\RepExeption.cpp" />
-    <ClCompile Include="LibReplicaRender\src\utils\src\MinWindow.cpp" />
-    <ClCompile Include="LibReplicaRender\src\utils\src\RepWinException.cpp" />
-    <ClCompile Include="LibReplicaRender\src\utils\src\Stopwatch.cpp" />
-    <ClCompile Include="LibReplicaRender\src\utils\src\WindowComponentBase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LibReplicaRender\include\ReplicaD3D11.hpp" />
-    <ClInclude Include="LibReplicaRender\include\ReplicaInt.hpp" />
     <ClInclude Include="LibReplicaRender\include\ReplicaInternalD3D11.hpp" />
     <ClInclude Include="LibReplicaRender\include\ReplicaImgui.hpp" />
-    <ClInclude Include="LibReplicaRender\include\ReplicaMath.hpp" />
-    <ClInclude Include="LibReplicaRender\include\ReplicaUtils.hpp" />
-    <ClInclude Include="LibReplicaRender\include\ReplicaWin32.hpp" />
-    <ClInclude Include="LibReplicaRender\include\ReplicaWinUtils.hpp" />
     <ClInclude Include="LibReplicaRender\libs\imgui\backends\imgui_impl_dx11.h" />
     <ClInclude Include="LibReplicaRender\libs\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="LibReplicaRender\libs\imgui\imconfig.h" />
@@ -305,24 +290,12 @@
     <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\ResourceMap.hpp" />
     <ClCompile Include="LibReplicaRender\src\renderers\src\D3D11\ImguiRenderComponent.cpp" />
     <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Viewport.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\DataBufferHandle.hpp" />
     <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\SwapChain.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\GfxException.hpp" />
     <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\IndexBuffer.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\Input.hpp" />
     <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Renderer.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\RepLeanWin.h" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\RepException.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\MinWindow.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\RepWinException.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\DynamicCollections.hpp" />
     <ClInclude Include="LibReplicaRender\src\renderers\include\D3D11\Resources\VertexBuffer.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\Span.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\Stopwatch.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\TextBlock.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\TextUtils.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\Utils.hpp" />
-    <ClInclude Include="LibReplicaRender\src\utils\include\WindowComponentBase.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\GfxException.hpp" />
+    <ClInclude Include="LibReplicaRender\src\utils\include\Input.hpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="LibReplicaRender\res\BuiltInShaders\CS_TexCopy2D.hlsl">
