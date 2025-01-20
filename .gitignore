@@ -353,3 +353,13 @@ MigrationBackup/
 ReplicaRenderer/src/renderers/include/D3D11/ShaderSrc/
 
 LibReplicaRender/src/renderers/include/D3D11/ShaderSrc/
+
+Notes.md
+
+ReplicaDebug
+
+ReplicaEffectsPreprocessor
+
+ReplicaRenderer.code-workspace
+
+LibReplicaDevelop.sln
