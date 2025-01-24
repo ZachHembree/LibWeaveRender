@@ -1,6 +1,6 @@
 #pragma once
 #include <concepts>
-#include <cereal/include/cereal/cereal.hpp>
+#include <cereal/cereal.hpp>
 #include "ReplicaUtils.hpp"
 
 namespace Replica

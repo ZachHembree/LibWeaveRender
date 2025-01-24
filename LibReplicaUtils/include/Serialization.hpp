@@ -24,7 +24,7 @@ namespace Replica::Effects
 	using Serializer = cereal::PortableBinaryOutputArchive;
 }
 #else
-#include <cereal/include/cereal/archives/binary.hpp>
+#include <cereal/archives/binary.hpp>
 
 namespace Replica::Effects
 {
@@ -33,5 +33,5 @@ namespace Replica::Effects
 }
 
 #endif
-#include <cereal/include/cereal/types/string.hpp>
+#include <cereal/types/string.hpp>
 #include "internal/DynCollectionSerializers.hpp"

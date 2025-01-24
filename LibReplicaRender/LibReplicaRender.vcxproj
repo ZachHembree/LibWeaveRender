@@ -60,15 +60,19 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SharedPaths.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SharedPaths.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SharedPaths.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SharedPaths.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -99,7 +103,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(SolutionDir)libs\imgui\imgui;$(SolutionDir)libs\imgui\imgui\backends;$(SolutionDir)libs\imgui\imgui-filebrowser;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaUtils\include\glm;$(SolutionDir)LibReplicaUtils\include\cereal\include;$(ProjectDir)src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaEffects\include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
@@ -125,7 +129,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(SolutionDir)libs\imgui\imgui;$(SolutionDir)libs\imgui\imgui\backends;$(SolutionDir)libs\imgui\imgui-filebrowser;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaUtils\include\glm;$(SolutionDir)LibReplicaUtils\include\cereal\include;$(ProjectDir)src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaEffects\include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
@@ -152,7 +156,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(SolutionDir)libs\imgui\imgui;$(SolutionDir)libs\imgui\imgui\backends;$(SolutionDir)libs\imgui\imgui-filebrowser;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaUtils\include\glm;$(SolutionDir)LibReplicaUtils\include\cereal\include;$(ProjectDir)src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaEffects\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -181,7 +185,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(SolutionDir)libs\imgui\imgui;$(SolutionDir)libs\imgui\imgui\backends;$(SolutionDir)libs\imgui\imgui-filebrowser;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaUtils\include\glm;$(SolutionDir)LibReplicaUtils\include\cereal\include;$(ProjectDir)src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaEffects\include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
@@ -299,19 +303,19 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)Src</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename)Src</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)Src</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)Src</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
     </FxCompile>
@@ -320,16 +324,16 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)Src</VariableName>
@@ -342,16 +346,16 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)Src</VariableName>
@@ -377,12 +381,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)Src</VariableName>
@@ -395,16 +399,16 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)Src</VariableName>
@@ -421,16 +425,16 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)Src</VariableName>
@@ -443,16 +447,16 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)Src</VariableName>
@@ -465,16 +469,16 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)Src</VariableName>
@@ -487,16 +491,16 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)Src</VariableName>
@@ -522,12 +526,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)Src</VariableName>
@@ -540,16 +544,16 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)$(ProjectName)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\src\renderers\include\D3D11\ShaderSrc\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)Src</VariableName>
