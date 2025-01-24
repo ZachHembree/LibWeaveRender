@@ -1,5 +1,4 @@
-#include <algorithm>
-#include <format>
+#include "pch.hpp"
 #include "ShaderLibGen.hpp"
 #include "ShaderLibGen/ShaderGenerator.hpp"
 #include "ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"

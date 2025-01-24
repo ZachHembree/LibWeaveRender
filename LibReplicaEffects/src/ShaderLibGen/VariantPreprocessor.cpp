@@ -1,6 +1,5 @@
-#include "ShaderLibGen/WaveConfig.hpp"
+#include "pch.hpp"
 #include "ShaderLibGen/VariantPreprocessor.hpp"
-#include "ParseExcept.hpp"
 
 namespace Replica::Effects
 { 

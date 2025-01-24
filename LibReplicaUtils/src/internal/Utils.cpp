@@ -1,5 +1,5 @@
+#include "pch.hpp"
 #include "internal/Utils.hpp"
-#include <algorithm>
 
 namespace Replica
 {

@@ -1,5 +1,5 @@
+#include "pch.hpp"
 #include "RepWinException.hpp"
-#include <sstream>
 #include <winnls.h>
 
 using namespace std;

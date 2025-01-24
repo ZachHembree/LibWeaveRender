@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include "ShaderLibGen/SymbolHandles.hpp"
 #include "ShaderLibGen/ShaderParser/ScopeBuilder.hpp"
 #include "ShaderLibGen/ShaderParser/SymbolData.hpp"

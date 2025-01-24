@@ -6,6 +6,7 @@
 #define BOOST_WAVE_SUPPORT_CPP1Z 0
 #define BOOST_WAVE_SUPPORT_CPP2A 0
 #define BOOST_WAVE_SUPPORT_MS_EXTENSIONS 0
+#define BOOST_ALLOW_DEPRECATED_HEADERS
 
 #include <boost/wave.hpp>
 #include <boost/wave/cpplexer/cpp_lex_token.hpp>

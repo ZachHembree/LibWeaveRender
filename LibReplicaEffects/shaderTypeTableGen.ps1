@@ -64,9 +64,8 @@ Param(
 
 [string]$header = 
 @"
+#include "pch.hpp"
 #include "ShaderLibGen/ShaderParser/ShaderTypeInfo.hpp"
-#include "ReplicaMath.hpp"
-#include <unordered_map>
 
 namespace Replica::Effects
 {

@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include <unordered_map>
 #include "ShaderLibGen/ShaderParser/SymbolEnums.hpp"
 

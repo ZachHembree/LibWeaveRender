@@ -1,4 +1,4 @@
-#include "ParseExcept.hpp"
+#include "pch.hpp"
 #include "ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"
 #include "ShaderLibGen/ShaderParser/ShaderTypeInfo.hpp"
 #include "ShaderLibGen/ShaderParser/ScopeBuilder.hpp"

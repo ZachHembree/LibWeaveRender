@@ -3,8 +3,6 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <filesystem>
-#include <cassert>
 #include <mutex>
 #include "ReplicaUtils.hpp"
 #include "ObjectPool.hpp"

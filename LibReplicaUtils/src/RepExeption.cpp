@@ -1,5 +1,5 @@
+#include "pch.hpp"
 #include "RepException.hpp"
-#include <sstream>
 
 using namespace std;
 using namespace Replica;

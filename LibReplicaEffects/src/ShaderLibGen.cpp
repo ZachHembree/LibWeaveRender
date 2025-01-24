@@ -1,12 +1,11 @@
 #pragma once
-#include "ParseExcept.hpp"
+#include "pch.hpp"
 #include "ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"
 #include "ShaderLibGen/SymbolTable.hpp"
 #include "ShaderLibGen/ShaderGenerator.hpp"
 #include "ShaderLibGen/ShaderCompiler.hpp"
 #include "ShaderLibGen/VariantPreprocessor.hpp"
 #include "ShaderLibGen.hpp"
-#include "Logger.hpp"
 
 using namespace Replica::Effects;
 

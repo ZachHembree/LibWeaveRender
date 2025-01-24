@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include "ShaderLibGen/ShaderLibrary.hpp"
 
 /* Variant ID generation

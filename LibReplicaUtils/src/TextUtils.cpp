@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include "../include/TextUtils.hpp"
 #include <stdarg.h>
 #include <stdio.h>

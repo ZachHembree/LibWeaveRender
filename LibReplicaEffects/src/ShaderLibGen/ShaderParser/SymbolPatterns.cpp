@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include "ShaderLibGen/ShaderParser/SymbolPatterns.hpp"
 
 using namespace Replica;

@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include "ReplicaWin32.hpp"
 #include <ShellScalingApi.h>
 

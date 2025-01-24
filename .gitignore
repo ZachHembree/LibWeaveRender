@@ -363,3 +363,5 @@ ReplicaEffectsPreprocessor
 ReplicaRenderer.code-workspace
 
 LibReplicaDevelop.sln
+
+imgui/imgui/.github/
