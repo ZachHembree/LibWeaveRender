@@ -25,10 +25,10 @@
     <ClInclude Include="include\ShaderLibGen\ShaderDataSerializers.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderEntrypoint.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderGenerator.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderLibrary.hpp" />
+    <ClInclude Include="include\ShaderLibGen\ShaderLibMap.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderParser\BlockAnalyzer.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderParser\ScopeBuilder.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderParser\ShaderData.hpp" />
+    <ClInclude Include="include\ShaderLibGen\ShaderData.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderParser\ShaderTypeInfo.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderParser\SymbolData.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderParser\SymbolEnums.hpp" />
@@ -44,7 +44,7 @@
     <ClCompile Include="src\ShaderLibGen.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderCompilerD3D11.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderGenerator.cpp" />
-    <ClCompile Include="src\ShaderLibGen\ShaderLibrary.cpp" />
+    <ClCompile Include="src\ShaderLibGen\ShaderLibMap.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderParser\BlockAnalyzer.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderParser\MatchingPatterns.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderParser\ScopeBuilder.cpp" />

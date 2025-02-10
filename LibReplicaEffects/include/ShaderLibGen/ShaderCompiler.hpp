@@ -1,6 +1,6 @@
 #pragma once
 #define RPFX_D3D11_FEATURE_LEVEL "5_0"
-#include "ShaderParser/ShaderData.hpp"
+#include "ShaderData.hpp"
 
 namespace Replica::Effects
 { 

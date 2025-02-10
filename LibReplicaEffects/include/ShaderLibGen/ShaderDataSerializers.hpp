@@ -1,7 +1,7 @@
 #pragma once
 #include <concepts>
 #include "Serialization.hpp"
-#include "ShaderLibGen/ShaderParser/ShaderData.hpp"
+#include "ShaderLibGen/ShaderData.hpp"
 
 namespace Replica::Effects
 {
@@ -14,13 +14,19 @@ namespace Replica::Effects
 	template <class Archive>
 	void serialize(Archive& ar, IOElementDef& def)
 	{
-		ar(def.semanticName, def.semanticIndex, def.size);
+		ar(def.semanticName, def.semanticIndex, def.dataType, def.componentCount, def.size);
 	}
 
 	template <class Archive>
 	void serialize(Archive& ar, ResourceDef& def)
 	{
 		ar(def.name, def.type, def.slot);
+	}
+
+	template <class Archive>
+	void serialize(Archive& ar, ConstBufLayout& def)
+	{
+		ar(def.name, def.members, def.size);
 	}
 
 	template <class Archive>

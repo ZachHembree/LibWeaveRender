@@ -1,8 +1,8 @@
 #pragma once
 #include "ReplicaMath.hpp"
-#include "SymbolEnums.hpp"
-#include "ShaderTypeInfo.hpp"
 #include "ParseExcept.hpp"
+#include "ShaderParser/SymbolEnums.hpp"
+#include "ShaderParser/ShaderTypeInfo.hpp"
 
 namespace Replica::Effects
 {
@@ -25,13 +25,41 @@ namespace Replica::Effects
 			offset(offset),
 			size(size)
 		{ }
+
+		template<typename T>
+		static ConstDef Get(string_view name)
+		{
+			return ConstDef(name, 0, sizeof(T));
+		}
 	};
 
 	/// <summary>
 	/// Array of constant buffer member definitions used in conjunction with corresponding resource
 	/// definition to define a constant buffer
 	/// </summary>
-	typedef UniqueArray<ConstDef> ConstBufLayout;
+	struct ConstBufLayout
+	{
+		string name;
+		DynamicArray<ConstDef> members;
+		size_t size;
+
+		static ConstBufLayout GetLayout(const std::initializer_list<ConstDef>& members, string_view name = "", size_t alignment = 1)
+		{
+			ConstBufLayout layout;
+			layout.name = name;
+			layout.members = DynamicArray<ConstDef>(members);
+			layout.size = 0;
+			
+			for (ConstDef& member : layout.members)
+			{
+				member.offset = layout.size;
+				layout.size += member.size;
+			}
+
+			layout.size = GetAlignedByteSize(layout.size, alignment);
+			return layout;
+		}
+	};
 
 	/// <summary>
 	/// Element describing types used for input and output on a given stage
@@ -49,18 +77,32 @@ namespace Replica::Effects
 		uint semanticIndex;
 
 		/// <summary>
+		/// Scalar type
+		/// </summary>
+		uint dataType;
+
+		/// <summary>
+		/// Number of components
+		/// </summary>
+		uint componentCount;
+
+		/// <summary>
 		/// Type size of the element
 		/// </summary>
 		size_t size;
 
 		IOElementDef() :
 			semanticIndex(0),
-			size(0)
+			size(0),
+			dataType(0),
+			componentCount(0)
 		{ }
 
-		IOElementDef(string_view semantic, uint semanticIndex, size_t size) :
+		IOElementDef(string_view semantic, uint semanticIndex, uint dataType, uint componentCount, size_t size) :
 			semanticName(semantic),
 			semanticIndex(semanticIndex),
+			dataType(dataType),
+			componentCount(componentCount),
 			size(size)
 		{ }
 	};
@@ -68,7 +110,7 @@ namespace Replica::Effects
 	/// <summary>
 	/// Defines the layout of data used for input/output to shader stages
 	/// </summary>
-	typedef UniqueArray<IOElementDef> IOLayoutDef;
+	typedef DynamicArray<IOElementDef> IOLayoutDef;
 
 	/// <summary>
 	/// Defines a shader resource, like a cbuf, texture or sampler
@@ -106,8 +148,6 @@ namespace Replica::Effects
 	/// </summary>
 	struct ShaderDef
 	{
-		MAKE_MOVE_ONLY(ShaderDef)
-
 		/// <summary>
 		/// File path of original source
 		/// </summary>
@@ -116,7 +156,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Precompiled source binary
 		/// </summary>
-		UniqueArray<byte> binSrc;
+		DynamicArray<byte> binSrc;
 
 		/// <summary>
 		/// Main function name
@@ -146,23 +186,18 @@ namespace Replica::Effects
 		/// <summary>
 		/// Stage resources
 		/// </summary>
-		UniqueArray<ResourceDef> res;
+		DynamicArray<ResourceDef> res;
 
 		/// <summary>
 		/// Constant buffer resource subtype data
 		/// </summary>
-		UniqueArray<ConstBufLayout> constBufs;
+		DynamicArray<ConstBufLayout> constBufs;
 
 		/// <summary>
 		/// Identifier corresponding unique variant configuration
 		/// </summary>
 		uint variantID;
 
-		ShaderDef() :
-			stage(ShadeStages::Unknown),
-			threadGroupSize(0, 0, 0),
-			variantID(0)
-		{ }
 	};
 
 	struct EffectPass
@@ -171,7 +206,7 @@ namespace Replica::Effects
 		/// Shaders used in the pass, in the order they are executed. ShaderStage determined
 		/// by ShaderDef referenced by ID.
 		/// </summary>
-		UniqueArray<int> shaderIDs;
+		DynamicArray<int> shaderIDs;
 	};
 
 	struct EffectDef
@@ -184,7 +219,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Effect passes in execution order
 		/// </summary>
-		UniqueArray<EffectPass> passes;
+		DynamicArray<EffectPass> passes;
 
 		/// <summary>
 		/// Identifier corresponding unique variant configuration

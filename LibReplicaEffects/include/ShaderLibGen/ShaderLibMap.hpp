@@ -1,30 +1,40 @@
 #pragma once
 #include <unordered_map>
-#include "ShaderParser/ShaderData.hpp"
+#include "ShaderData.hpp"
 
 namespace Replica::Effects
 {
 	/// <summary>
 	/// Faciltates retrieval of serialized and precompiled shaders and effects
 	/// </summary>
-	class ShaderLibrary
+	class ShaderLibMap
 	{
 	public:
-		MAKE_MOVE_ONLY(ShaderLibrary)
+		MAKE_MOVE_ONLY(ShaderLibMap)
 
-		ShaderLibrary();
+		ShaderLibMap();
 
-		ShaderLibrary(const ShaderLibDef* pDef);
-
-		/// <summary>
-		/// Returns the shader by name and variantID
-		/// </summary>
-		const ShaderDef* TryGetShader(string_view name, int vID = 0) const;
+		ShaderLibMap(const ShaderLibDef* pDef);
 
 		/// <summary>
-		/// Returns the effect with the given name and variantID
+		/// Returns the shader by shaderID and variantID
 		/// </summary>
-		const EffectDef* TryGetEffect(string_view name, int vID = 0) const;
+		const ShaderDef& GetShader(int shaderID, int vID = 0) const { return pDef->variants[vID].shaders[shaderID]; }
+
+		/// <summary>
+		/// Returns the effect with the given effectID and variantID
+		/// </summary>
+		const EffectDef& GetEffect(int effectID, int vID = 0) const { return pDef->variants[vID].effects[effectID]; }
+
+		/// <summary>
+		/// Returns the shaderID by name and variantID, -1 on fail
+		/// </summary>
+		int TryGetShaderID(string_view name, int vID = 0) const;
+
+		/// <summary>
+		/// Returns the effectID with the given name and variantID, -1 on fail
+		/// </summary>
+		int TryGetEffectID(string_view name, int vID = 0) const;
 
 		/// <summary>
 		/// Finds the shader variant modeID corresponding to the given mode name

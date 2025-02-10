@@ -24,7 +24,7 @@
     <ClInclude Include="include\ShaderLibGen\ShaderParser\ScopeBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ShaderLibGen\ShaderParser\ShaderData.hpp">
+    <ClInclude Include="include\ShaderLibGen\ShaderData.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ShaderLibGen\ShaderParser\ShaderTypeInfo.hpp">
@@ -54,7 +54,7 @@
     <ClInclude Include="include\ShaderLibGen\ShaderGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ShaderLibGen\ShaderLibrary.hpp">
+    <ClInclude Include="include\ShaderLibGen\ShaderLibMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ShaderLibGen\SymbolHandles.hpp">
@@ -110,7 +110,7 @@
     <ClCompile Include="src\ShaderLibGen\ShaderGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderLibrary.cpp">
+    <ClCompile Include="src\ShaderLibGen\ShaderLibMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderLibGen\VariantPreprocessor.cpp">

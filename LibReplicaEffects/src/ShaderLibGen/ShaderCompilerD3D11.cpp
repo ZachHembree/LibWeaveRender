@@ -128,26 +128,28 @@ static void GetPrecompShaderD3D11(string_view srcFile, string_view srcText, Shad
 	def.name = mainName;
 	def.stage = stage;
 	// Copy binary to definition
-	def.binSrc = UniqueArray<byte>(static_cast<const byte*>(binSrc->GetBufferPointer()), binSrc->GetBufferSize());
+	def.binSrc = DynamicArray<byte>(static_cast<const byte*>(binSrc->GetBufferPointer()), binSrc->GetBufferSize());
 }
 
 static uint GetParamSize(const D3D11_SIGNATURE_PARAMETER_DESC& paramDesc)
 {
-	const uint componentSize = 4;
-	PARSE_ASSERT_MSG(paramDesc.ComponentType != D3D_REGISTER_COMPONENT_UNKNOWN, "Unsupported component type")
 	uint componentCount = 0;
 
 	for (int i = 0; i < 4; i++)
 		componentCount += (paramDesc.Mask >> i) & 1;
 
-	return componentCount * componentSize;
+	return componentCount;
 }
 
 static void GetIOElementDef(IOElementDef& layout, const D3D11_SIGNATURE_PARAMETER_DESC& paramDesc)
 {
+	const uint componentSize = (paramDesc.ComponentType != D3D_REGISTER_COMPONENT_UNKNOWN) ? 4 : 0;
+
 	layout.semanticName = paramDesc.SemanticName;
 	layout.semanticIndex = paramDesc.SemanticIndex;
-	layout.size = GetParamSize(paramDesc);
+	layout.dataType = paramDesc.ComponentType;
+	layout.componentCount = GetParamSize(paramDesc);
+	layout.size = layout.componentCount * 4;
 }
 
 static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DESC& shaderDesc, ShaderDef& shaderDef)
@@ -186,8 +188,8 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 	// Constant buffers
 	if (shaderDesc.ConstantBuffers > 0)
 	{
-		shaderDef.constBufs = UniqueArray<ConstBufLayout>(shaderDesc.ConstantBuffers);
-		UniqueArray<ConstBufLayout>& constBufs = shaderDef.constBufs;
+		shaderDef.constBufs = DynamicArray<ConstBufLayout>(shaderDesc.ConstantBuffers);
+		DynamicArray<ConstBufLayout>& constBufs = shaderDef.constBufs;
 
 		for (uint i = 0; i < shaderDesc.ConstantBuffers; i++)
 		{
@@ -196,7 +198,9 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 			WIN_THROW_HR(cbuf.GetDesc(&cbufDesc));
 
 			ConstBufLayout& layout = constBufs[i];
-			layout = ConstBufLayout(cbufDesc.Variables);
+			layout.name = cbufDesc.Name;
+			layout.members = DynamicArray<ConstDef>(cbufDesc.Variables);
+			layout.size = cbufDesc.Size;
 
 			for (uint j = 0; j < cbufDesc.Variables; j++)
 			{
@@ -204,7 +208,7 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 				D3D11_SHADER_VARIABLE_DESC varDesc;
 				WIN_THROW_HR(var.GetDesc(&varDesc));
 
-				ConstDef& varDef = layout[j];
+				ConstDef& varDef = layout.members[j];
 				varDef.name = varDesc.Name;
 				varDef.offset = varDesc.StartOffset;
 				varDef.size = varDesc.Size;
@@ -221,8 +225,8 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 	// Resources
 	if (resourceCount > 0)
 	{
-		shaderDef.res = UniqueArray<ResourceDef>(resourceCount);
-		UniqueArray<ResourceDef>& resources = shaderDef.res;
+		shaderDef.res = DynamicArray<ResourceDef>(resourceCount);
+		DynamicArray<ResourceDef>& resources = shaderDef.res;
 		uint resIndex = 0;
 
 		for (uint i = 0; i < shaderDesc.BoundResources; i++)

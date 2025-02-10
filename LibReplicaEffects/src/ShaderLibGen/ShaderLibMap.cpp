@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "ShaderLibGen/ShaderLibrary.hpp"
+#include "ShaderLibGen/ShaderLibMap.hpp"
 
 /* Variant ID generation
 
@@ -25,10 +25,10 @@
 
 namespace Replica::Effects
 {
-	ShaderLibrary::ShaderLibrary() : pDef(nullptr)
+	ShaderLibMap::ShaderLibMap() : pDef(nullptr)
 	{ }
 
-	ShaderLibrary::ShaderLibrary(const ShaderLibDef* pDef) : pDef(pDef)
+	ShaderLibMap::ShaderLibMap(const ShaderLibDef* pDef) : pDef(pDef)
 	{
 		// Initialize tables
 		// Compile flags
@@ -69,7 +69,8 @@ namespace Replica::Effects
 			}
 		}
 	}
-	const ShaderDef* ShaderLibrary::TryGetShader(string_view name, int vID) const
+
+	int ShaderLibMap::TryGetShaderID(string_view name, int vID) const
 	{
 		const NameIndexMap& nameMap = variantMaps[vID].nameShaderMap;
 		const auto& it = nameMap.find(name);
@@ -78,13 +79,13 @@ namespace Replica::Effects
 		{
 			const VariantDef& variantDef = pDef->variants[vID];
 			const int shaderID = it->second;
-			return &variantDef.shaders[shaderID];
+			return shaderID;
 		}
 		else
-			return nullptr;
+			return -1;
 	}
 
-	const EffectDef* ShaderLibrary::TryGetEffect(string_view name, int vID) const
+	int ShaderLibMap::TryGetEffectID(string_view name, int vID) const
 	{
 		const NameIndexMap& nameMap = variantMaps[vID].effectNameMap;
 		const auto& it = nameMap.find(name);
@@ -93,13 +94,13 @@ namespace Replica::Effects
 		{
 			const VariantDef& variantDef = pDef->variants[vID];
 			const int effectID = it->second;
-			return &variantDef.effects[effectID];
+			return effectID;
 		}
 		else
-			return nullptr;
+			return -1;
 	}
 
-	int ShaderLibrary::TryGetMode(const string_view name) const
+	int ShaderLibMap::TryGetMode(const string_view name) const
 	{
 		const auto& result = modeNameMap.find(name);
 
@@ -109,25 +110,25 @@ namespace Replica::Effects
 		return -1;
 	}
 
-	size_t ShaderLibrary::GetFlagVariantCount() const { return (1ull << pDef->flagNames.GetLength()); }
+	size_t ShaderLibMap::GetFlagVariantCount() const { return (1ull << pDef->flagNames.GetLength()); }
 
-	size_t ShaderLibrary::GetModeCount() const { return pDef->modeNames.GetLength(); }
+	size_t ShaderLibMap::GetModeCount() const { return pDef->modeNames.GetLength(); }
 
-	size_t ShaderLibrary::GetVariantCount() const { return pDef->modeNames.GetLength() * GetFlagVariantCount(); }
+	size_t ShaderLibMap::GetVariantCount() const { return pDef->modeNames.GetLength() * GetFlagVariantCount(); }
 
-	int ShaderLibrary::GetFlagID(const int variantID) const
+	int ShaderLibMap::GetFlagID(const int variantID) const
 	{
 		PARSE_ASSERT_MSG(variantID >= 0, "Invalid variant ID");
 		return variantID % (int)GetFlagVariantCount();
 	}
 
-	int ShaderLibrary::GetModeID(const int variantID) const
+	int ShaderLibMap::GetModeID(const int variantID) const
 	{
 		PARSE_ASSERT_MSG(variantID >= 0, "Invalid variant ID");
 		return variantID / (int)GetFlagVariantCount();
 	}
 
-	int ShaderLibrary::GetVariantID(const int flagID, const int modeID) const
+	int ShaderLibMap::GetVariantID(const int flagID, const int modeID) const
 	{
 		PARSE_ASSERT_MSG(flagID >= 0 && modeID >= 0, "Invalid flag or mode ID");
 		return flagID + (modeID * (int)GetFlagVariantCount());
