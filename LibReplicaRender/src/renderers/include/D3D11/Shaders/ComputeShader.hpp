@@ -5,11 +5,6 @@ namespace Replica::D3D11
 {
 	class RWTexture2D;
 
-	struct ComputeShaderDef : public ShaderDefBase
-	{
-		ResourceMap<ID3D11UnorderedAccessView> uavBuffers;
-	};
-
 	class ComputeShader : public ShaderBase
 	{
 	public:
@@ -19,7 +14,7 @@ namespace Replica::D3D11
 
 		ComputeShader();
 
-		ComputeShader(Device& dev, const ComputeShaderDef& csDef);
+		ComputeShader(Device& dev, const ShaderDef& csDef);
 
 		ID3D11ComputeShader* Get() const;
 

@@ -241,7 +241,7 @@ namespace Replica::D3D11::Primitives
 	template<typename Vert_T>
 	MeshDef<Vert_T> GeneratePlane(ivec2 subdiv = ivec2(0), float scale = 1.0f)
 	{
-		subdiv++;
+		++subdiv;
 
 		const vec2 incr(scale / vec2(subdiv));
 		const ivec2 dim = subdiv + 1;
@@ -283,7 +283,7 @@ namespace Replica::D3D11::Primitives
 	template<typename Vert_T>
 	MeshDef<Vert_T> GenerateCube(ivec2 subdiv = ivec2(0))
 	{
-		subdiv++;
+		++subdiv;
 
 		const ivec2 dim = subdiv + 1;
 		const vec2 incr = 1.0f / vec2(subdiv);

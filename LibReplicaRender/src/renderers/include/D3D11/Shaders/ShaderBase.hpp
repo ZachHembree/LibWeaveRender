@@ -4,25 +4,17 @@
 #include "../Resources/ConstantBuffer.hpp"
 #include "../Resources/ConstantMap.hpp"
 #include "../ResourceMap.hpp"
+#include "ShaderLibGen/ShaderData.hpp"
 
 namespace Replica::D3D11
 {
+	using Effects::ShaderDef;
+
 	class Sampler;
 	class Texture2D;
 	class ConstantBuffer;
 	class ConstantMap;
 	class ConstantMapDef;
-
-	struct ShaderDefBase
-	{
-		wstring_view file;
-		byte* srcBin;
-		size_t srcSize;
-
-		ConstantMapDef constMap;
-		ResourceMap<ID3D11SamplerState> samplerMap;
-		ResourceMap<ID3D11ShaderResourceView> textureMap;
-	};
 
 	class ShaderBase : public DeviceChild
 	{
@@ -50,11 +42,31 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Sets the value corresponding to the given name to the
 		/// given value.
+		void SetBuffer(string_view name, const byte* pSrc, const size_t size)
+		{
+			const auto it = constants.find(name);
+
+			if (it != constants.end())
+			{
+				it->second.SetData(pSrc, size);
+			}
+		}
+
+		/// <summary>
+		/// Sets the value corresponding to the given name to the
+		/// given value.
 		/// </summary>
 		template<typename T>
 		void SetConstant(string_view name, const T& value)
 		{
-			constants.SetMember(name, value);
+			for (auto& pair : constants)
+			{
+				if (pair.second.GetMemberExists(name))
+				{
+					pair.second.SetMember(name, value);
+					break;
+				}
+			}
 		}
 
 		/// <summary>
@@ -64,7 +76,16 @@ namespace Replica::D3D11
 		template<>
 		void SetConstant<mat4>(string_view name, const mat4& value)
 		{
-			constants.SetMember(name, transpose(value));
+			const mat4 x = transpose(value);
+
+			for (auto& pair : constants)
+			{
+				if (pair.second.GetMemberExists(name))
+				{
+					pair.second.SetMember(name, x);
+					break;
+				}
+			}
 		}
 
 		/// <summary>
@@ -74,7 +95,16 @@ namespace Replica::D3D11
 		template<>
 		void SetConstant<mat3>(string_view name, const mat3& value)
 		{
-			constants.SetMember(name, transpose(value));
+			const mat3 x = transpose(value);
+
+			for (auto& pair : constants)
+			{
+				if (pair.second.GetMemberExists(name))
+				{
+					pair.second.SetMember(name, x);
+					break;
+				}
+			}
 		}
 
 		/// <summary>
@@ -88,11 +118,11 @@ namespace Replica::D3D11
 		virtual void SetTexture(string_view name, ITexture2D& tex);
 
 	protected:
-		ConstantMap constants;
+		std::unordered_map<string_view, ConstantMap> constants;
 		ResourceMap<ID3D11SamplerState> samplers;
 		ResourceMap<ID3D11ShaderResourceView> textures;
 
-		ConstantBuffer cBuf;
+		UniqueArray<ConstantBuffer> cBuffers;
 		Context* pCtx;
 		bool isBound;
 
@@ -100,7 +130,7 @@ namespace Replica::D3D11
 
 		ShaderBase(Device& dev);
 
-		ShaderBase(Device& dev, const ShaderDefBase& def);
+		ShaderBase(Device& dev, const ShaderDef& def);
 
 		ShaderBase(ShaderBase&& other) noexcept;
 

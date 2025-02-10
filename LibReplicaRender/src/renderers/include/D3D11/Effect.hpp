@@ -1,72 +1,75 @@
 #pragma once
 #include "IAsset.hpp"
-#include "Shaders/VertexShader.hpp"
-#include "Shaders/PixelShader.hpp"
+#include "ShaderLibrary.hpp"
 
 namespace Replica::D3D11
 {
-	struct EffectDef
-	{
-		VertexShaderDef vsDef;
-		PixelShaderDef psDef;
-	};
-
 	class Effect : public IAsset
 	{
 	public:
 		Effect() {}
 
 		Effect(
-			Device& dev, 
+			ShaderLibrary& lib,
 			const EffectDef& effectDef
 		) :
-			vs(dev, effectDef.vsDef),
-			ps(dev, effectDef.psDef)
+			pLib(&lib),
+			pDef(&effectDef)
 		{ }
+
+		string_view GetName() const { return pDef->name; }
+
+		uint GetVariantID() const { return pDef->variantID; }
+
+		const IDynamicArray<int>& GetShaderIDs(int pass) const { return pDef->passes[pass].shaderIDs; }
+
+		int GetPassCount() const { return pDef->passes.GetLength(); }
+
+		ShaderBase& GetShader(int shaderID) { return pLib->GetShader(shaderID, GetVariantID()); }
 
 		/// <summary>
 		/// Sets the value corresponding to the given name to the
 		/// given value.
 		/// </summary>
 		template<typename T>
-		void SetConstant(string_view name, const T& value)
+		void SetConstant(string_view name, const T& value, int pass = 0)
 		{
-			vs.SetConstant(name, value);
-			ps.SetConstant(name, value);
+			for (int shaderID : GetShaderIDs(pass))
+				GetShader(shaderID).SetConstant(name, value);
 		}
 
 		/// <summary>
 		/// Sets sampler 
 		/// </summary>
-		void SetSampler(string_view name, Sampler& samp)
+		void SetSampler(string_view name, Sampler& samp, int pass = 0)
 		{
-			vs.SetSampler(name, samp);
-			ps.SetSampler(name, samp);
+			for (int shaderID : GetShaderIDs(pass))
+				GetShader(shaderID).SetSampler(name, samp);
 		}
 
 		/// <summary>
 		/// Sets Texture2D
 		/// </summary>
-		void SetTexture(string_view name, ITexture2D& tex)
+		void SetTexture(string_view name, ITexture2D& tex, int pass = 0)
 		{
-			vs.SetTexture(name, tex);
-			ps.SetTexture(name, tex);
+			for (int shaderID : GetShaderIDs(pass))
+				GetShader(shaderID).SetTexture(name, tex);
 		}
 
-		void Setup(Context& ctx) override
+		void Setup(Context& ctx) override // To-Do: multi-pass support
 		{
-			vs.Bind(ctx);
-			ps.Bind(ctx);
+			for (int shaderID : GetShaderIDs(0))
+				GetShader(shaderID).Bind(ctx);
 		}
 
-		void Reset()
+		void Reset(int pass = 0)
 		{
-			vs.Unbind();
-			ps.Unbind();
+			for (int shaderID : GetShaderIDs(pass))
+				GetShader(shaderID).Unbind();
 		}
 
 	private:
-		VertexShader vs;
-		PixelShader ps;
+		ShaderLibrary* pLib;
+		const EffectDef* pDef;
 	};
 }

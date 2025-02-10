@@ -14,3 +14,8 @@
 #include "../src/renderers/include/D3D11/Context.hpp"
 #include "../src/renderers/include/D3D11/SwapChain.hpp"
 #include "../src/renderers/include/D3D11/Resources/RTHandle.hpp"
+
+namespace Replica::D3D11
+{
+	constexpr size_t g_ConstantBufferAlignment = 16;
+}

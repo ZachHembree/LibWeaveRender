@@ -4,11 +4,6 @@
 
 namespace Replica::D3D11
 { 
-	struct VertexShaderDef : public ShaderDefBase
-	{
-		DynamicArray<IAElement> iaLayout;
-	};
-
 	class VertexShader : public ShaderBase
 	{
 	public:
@@ -18,7 +13,7 @@ namespace Replica::D3D11
 
 		VertexShader();
 
-		VertexShader(Device& dev, const VertexShaderDef& vsDef );
+		VertexShader(Device& dev, const ShaderDef& vsDef );
 
 		ID3D11VertexShader* Get() const;
 

@@ -10,25 +10,12 @@ VertexShader::VertexShader()
 
 VertexShader::VertexShader(
 	Device& dev, 
-	const VertexShaderDef& vsDef
+	const ShaderDef& vsDef
 ) :
 	ShaderBase(dev, vsDef)
 {
-	if (vsDef.file.size() > 0)
-	{
-		ComPtr<ID3DBlob> vsBlob;
-		GFX_THROW_FAILED(D3DReadFileToBlob(vsDef.file.data(), &vsBlob));
-		GFX_THROW_FAILED(dev->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &pVS));
-
-		this->layout = InputLayout(dev, (byte*)vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), vsDef.iaLayout);
-	}
-	else if (vsDef.srcSize > 0)
-	{
-		GFX_THROW_FAILED(dev->CreateVertexShader(vsDef.srcBin, vsDef.srcSize, nullptr, &pVS));
-		this->layout = InputLayout(dev, vsDef.srcBin, vsDef.srcSize, vsDef.iaLayout);
-	}
-	else
-		GFX_THROW("A shader cannot be instantiated without valid source.")
+	GFX_THROW_FAILED(dev->CreateVertexShader(vsDef.binSrc.GetPtr(), vsDef.binSrc.GetLength(), nullptr, &pVS));
+	this->layout = InputLayout(dev, vsDef.binSrc.GetPtr(), vsDef.binSrc.GetLength(), vsDef.inLayout);
 }
 
 ID3D11VertexShader* VertexShader::Get() const { return pVS.Get(); }
@@ -47,7 +34,15 @@ void VertexShader::Bind(Context& ctx)
 
 		ctx->VSSetSamplers(0, (UINT)ss.GetLength(), ss.GetPtr());
 		ctx->VSSetShaderResources(0, (UINT)tex.GetLength(), tex.GetPtr());		
-		ctx->VSSetConstantBuffers(0u, 1, cBuf.GetAddressOf());
+
+		ID3D11Buffer* pCBs[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT](nullptr);
+
+		for (int i = 0; i < cBuffers.GetLength(); i++)
+		{
+			pCBs[i] = cBuffers[i].Get();
+		}
+
+		ctx->VSSetConstantBuffers(0u, (uint)cBuffers.GetLength(), reinterpret_cast<ID3D11Buffer**>(&pCBs));
 		layout.Bind(ctx);
 
 		isBound = true;
@@ -55,7 +50,13 @@ void VertexShader::Bind(Context& ctx)
 
 	if (ctx.GetIsVsBound(this))
 	{
-		constants.UpdateConstantBuffer(cBuf, ctx);
+		int i = 0;
+
+		for (const auto& pair : constants)
+		{
+			pair.second.UpdateConstantBuffer(cBuffers[i], ctx);
+			i++;
+		}
 	}
 }
 

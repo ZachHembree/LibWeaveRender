@@ -6,9 +6,6 @@ namespace Replica::D3D11
 	class Texture2D;
 	class Sampler;
 
-	struct PixelShaderDef : public ShaderDefBase
-	{ };
-
 	class PixelShader : public ShaderBase
 	{
 	public:
@@ -18,7 +15,7 @@ namespace Replica::D3D11
 
 		PixelShader();
 
-		PixelShader(Device& dev, const PixelShaderDef& psDef);
+		PixelShader(Device& dev, const ShaderDef& psDef);
 
 		ID3D11PixelShader* Get() const;
 

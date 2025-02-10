@@ -8,21 +8,10 @@ using namespace Microsoft::WRL;
 PixelShader::PixelShader()
 { }
 
-PixelShader::PixelShader(Device& dev, const PixelShaderDef& psDef) :
+PixelShader::PixelShader(Device& dev, const ShaderDef& psDef) :
 	ShaderBase(dev, psDef)
 {
-	if (psDef.file.size() > 0)
-	{
-		ComPtr<ID3DBlob> psBlob;
-		GFX_THROW_FAILED(D3DReadFileToBlob(psDef.file.data(), &psBlob));
-		GFX_THROW_FAILED(dev->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pPS));
-	}
-	else if (psDef.srcSize > 0)
-	{
-		GFX_THROW_FAILED(dev->CreatePixelShader(psDef.srcBin, psDef.srcSize, nullptr, &pPS));
-	}
-	else
-		GFX_THROW("A shader cannot be instantiated without valid source.")
+	GFX_THROW_FAILED(dev->CreatePixelShader(psDef.binSrc.GetPtr(), psDef.binSrc.GetLength(), nullptr, &pPS));
 }
 
 ID3D11PixelShader* PixelShader::Get() const
@@ -39,7 +28,15 @@ void PixelShader::Bind(Context& ctx)
 
 		ctx->PSSetSamplers(0, (UINT)ss.GetLength(), ss.GetPtr());
 		ctx->PSSetShaderResources(0, (UINT)tex.GetLength(), tex.GetPtr());
-		ctx->PSSetConstantBuffers(0u, 1, cBuf.GetAddressOf());
+
+		ID3D11Buffer* pCBs[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT](nullptr);
+
+		for (int i = 0; i < cBuffers.GetLength(); i++)
+		{
+			pCBs[i] = cBuffers[i].Get();
+		}
+
+		ctx->PSSetConstantBuffers(0u, (uint)cBuffers.GetLength(), reinterpret_cast<ID3D11Buffer**>(&pCBs));
 
 		this->pCtx = &ctx;
 		ctx.SetPS(this);
@@ -48,7 +45,13 @@ void PixelShader::Bind(Context& ctx)
 
 	if (ctx.GetIsPsBound(this))
 	{
-		constants.UpdateConstantBuffer(cBuf, ctx);
+		int i = 0;
+
+		for (const auto& pair : constants)
+		{
+			pair.second.UpdateConstantBuffer(cBuffers[i], ctx);
+			i++;
+		}
 	}
 }
 

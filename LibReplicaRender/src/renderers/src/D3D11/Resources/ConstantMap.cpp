@@ -2,48 +2,34 @@
 #include "ReplicaInternalD3D11.hpp"
 
 using namespace Replica;
+using namespace Replica::Effects;
 using namespace Replica::D3D11;
 
 ConstantMap::ConstantMap() : stride(0)
 { }
 
-ConstantMap::ConstantMap(const ConstantMapDef& layout) :
-	stride(layout.GetStride()),
-	data(layout.GetStride())
+ConstantMap::ConstantMap(const Effects::ConstBufLayout& layout) :
+	stride(GetAlignedByteSize(layout.size, g_ConstantBufferAlignment)),
+	data(stride)
 {
-	const IDynamicArray<ConstantDef>& members = layout.GetMembers();
+	const IDynamicArray<ConstDef>& members = layout.members;
 	size_t offset = 0;
 	defMap.reserve(members.GetLength());
 
 	for (int i = 0; i < members.GetLength(); i++)
 	{
-		const ConstantDef& member = members[i];
-		const MapEntry entry(member.stride, offset);
+		const ConstDef& member = members[i];
+		const MapEntry entry(member.size, offset);
 
 		defMap.emplace(member.name, entry);
-		offset += member.stride;
+		offset += member.size;
 	}
-}
-
-ConstantMap::ConstantMap(const ConstantMap& other) :
-	data(other.data.GetCopy()),
-	defMap(other.defMap),
-	stride(other.stride)
-{ }
-
-ConstantMap& ConstantMap::operator=(const ConstantMap& other)
-{
-	this->data = other.data.GetCopy();
-	this->defMap = std::unordered_map<string_view, MapEntry>(other.defMap);
-	this->stride = other.stride;
-
-	return *this;
 }
 
 /// <summary>
 /// Writes contents of the constant map to the given constant buffer
 /// </summary>
-void ConstantMap::UpdateConstantBuffer(ConstantBuffer& cb, Context& ctx)
+void ConstantMap::UpdateConstantBuffer(ConstantBuffer& cb, Context& ctx) const
 {
 	GFX_ASSERT(cb.GetSize() >= GetArrSize(data), "Destination constant buffer cannot be smaller than the source.");
 	cb.SetData(ctx, data.GetPtr());
@@ -52,7 +38,7 @@ void ConstantMap::UpdateConstantBuffer(ConstantBuffer& cb, Context& ctx)
 /// <summary>
 /// Returns true if a member with the given name is registered to the map
 /// </summary>
-bool ConstantMap::GetMemberExists(string_view name)
+bool ConstantMap::GetMemberExists(string_view name) const
 {
 	auto pair = defMap.find(name);
 	return pair != defMap.end();
@@ -67,7 +53,7 @@ void ConstantMap::SetMember(string_view name, const byte* src, const size_t size
 	GFX_ASSERT(itr != defMap.end(), "Named constant not in buffer definition.");
 	
 	const MapEntry& entry = itr->second;
-	GFX_ASSERT(size == entry.stride, "Shader constant type does not match data given.");
+	GFX_ASSERT(size == entry.stride, "Shader constant size does not match data given.");
 
 	// Calculate pointer to entry
 	byte* dst = this->data.GetPtr();
@@ -78,104 +64,17 @@ void ConstantMap::SetMember(string_view name, const byte* src, const size_t size
 }
 
 /// <summary>
+/// Writes the given data to the buffer
+/// </summary>
+void ConstantMap::SetData(const byte* pData, size_t size)
+{
+	memcpy_s(data.GetPtr(), data.GetLength(), pData, size);
+}
+
+/// <summary>
 /// Returns the size of the buffer in bytes
 /// </summary>
-size_t ConstantMap::GetStride() { return stride; }
-
-/// <summary>
-/// Initializes a new map definition
-/// </summary>
-ConstantMapDef::ConstantMapDef() :
-	stride(0)
-{
-	members.reserve(10);
-}
-
-ConstantMapDef::ConstantMapDef(const IDynamicArray<ConstantDef>& definition) :
-	members(definition),
-	stride(0)
-{
-	for (ConstantDef& def : members)
-		stride += def.stride;
-}
-
-ConstantMapDef::ConstantMapDef(const std::initializer_list<ConstantDef>& definition) :
-	ConstantMapDef(UniqueArray(definition))
-{ }
-
-ConstantMapDef::ConstantMapDef(const ConstantMapDef& other) noexcept :
-	members(other.members.GetCopy()),
-	stride(other.stride)
-{ }
-
-ConstantMapDef::ConstantMapDef(ConstantMapDef&& other) noexcept :
-	members(std::move(other.members)),
-	stride(other.stride)
-{ }
-
-ConstantMapDef& ConstantMapDef::operator=(const ConstantMapDef& other) noexcept
-{
-	this->members = other.members.GetCopy();
-	this->stride = other.stride;
-
-	return *this;
-}
-
-ConstantMapDef& ConstantMapDef::operator=(ConstantMapDef&& other) noexcept
-{
-	this->members = std::move(other.members);
-	this->stride = other.stride;
-
-	return *this;
-}
-
-/// <summary>
-/// Adds a new constant entry with the given name and type to the end
-/// of the map definition.
-/// </summary>
-void ConstantMapDef::Add(string_view name, const size_t stride)
-{
-	members.emplace_back(ConstantDef(name, stride));
-	this->stride += stride;
-}
-
-/// <summary>
-/// Clears the contents of the initializer
-/// </summary>
-void ConstantMapDef::Clear()
-{
-	members.clear();
-	stride = 0;
-}
-
-/// <summary>
-/// Returns a list of the constants defined by the map definition
-/// </summary>
-const IDynamicArray<ConstantDef>& ConstantMapDef::GetMembers() const { return members; }
-
-/// <summary>
-/// Returns the size of the buffer defined by the definition, in bytes.
-/// </summary>
-size_t ConstantMapDef::GetStride() const { return GetAlignedByteSize(stride, 16); }
-
-ConstantDef::ConstantDef() : name(""), stride(0)
-{ }
-
-ConstantDef::ConstantDef(string_view name, const size_t stride) :
-	name(name),
-	stride(stride)
-{ }
-
-ConstantDef::ConstantDef(const ConstantDef& other) :
-	name(other.name),
-	stride(other.stride)
-{ }
-
-ConstantDef& ConstantDef::operator=(const ConstantDef& other)
-{
-	memcpy(this, &other, sizeof(ConstantDef));
-	return *this;
-}
+size_t ConstantMap::GetBufferSize() const { return stride; }
 
 ConstantMap::MapEntry::MapEntry() : stride(0), offset(0)
 { }

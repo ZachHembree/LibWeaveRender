@@ -103,7 +103,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaEffects\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaEffects\include;$(ProjectDir)src\renderers\include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
@@ -129,7 +129,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaEffects\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaEffects\include;$(ProjectDir)src\renderers\include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
@@ -156,7 +156,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaEffects\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaEffects\include;$(ProjectDir)src\renderers\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -185,7 +185,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaEffects\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;$(SolutionDir)LibReplicaEffects\include;$(ProjectDir)src\renderers\include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
@@ -243,6 +243,7 @@
     <ClInclude Include="src\renderers\include\D3D11\Resources\RWTexture2D.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\StagingTexture2D.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\Texture2D.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\ShaderLibrary.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ShaderSrc\CS_TexCopy2D.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ShaderSrc\CS_TexCopySamp2D.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ShaderSrc\CS_TexCopyScaledSamp2D.hpp" />
@@ -570,6 +571,11 @@
     <Import Project="..\packages\Microsoft.XAudio2.Redist.1.2.11\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('..\packages\Microsoft.XAudio2.Redist.1.2.11\build\native\Microsoft.XAudio2.Redist.targets')" />
     <Import Project="..\packages\directxtex_desktop_2019.2024.10.29.1\build\native\directxtex_desktop_2019.targets" Condition="Exists('..\packages\directxtex_desktop_2019.2024.10.29.1\build\native\directxtex_desktop_2019.targets')" />
     <Import Project="..\packages\directxtk_desktop_2019.2024.10.29.1\build\native\directxtk_desktop_2019.targets" Condition="Exists('..\packages\directxtk_desktop_2019.2024.10.29.1\build\native\directxtk_desktop_2019.targets')" />
+    <Import Project="..\packages\boost.1.87.0\build\boost.targets" Condition="Exists('..\packages\boost.1.87.0\build\boost.targets')" />
+    <Import Project="..\packages\boost_wave-vc143.1.87.0\build\boost_wave-vc143.targets" Condition="Exists('..\packages\boost_wave-vc143.1.87.0\build\boost_wave-vc143.targets')" />
+    <Import Project="..\packages\boost_thread-vc143.1.87.0\build\boost_thread-vc143.targets" Condition="Exists('..\packages\boost_thread-vc143.1.87.0\build\boost_thread-vc143.targets')" />
+    <Import Project="..\packages\boost_filesystem-vc143.1.87.0\build\boost_filesystem-vc143.targets" Condition="Exists('..\packages\boost_filesystem-vc143.1.87.0\build\boost_filesystem-vc143.targets')" />
+    <Import Project="..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets" Condition="Exists('..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -578,5 +584,10 @@
     <Error Condition="!Exists('..\packages\Microsoft.XAudio2.Redist.1.2.11\build\native\Microsoft.XAudio2.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.XAudio2.Redist.1.2.11\build\native\Microsoft.XAudio2.Redist.targets'))" />
     <Error Condition="!Exists('..\packages\directxtex_desktop_2019.2024.10.29.1\build\native\directxtex_desktop_2019.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtex_desktop_2019.2024.10.29.1\build\native\directxtex_desktop_2019.targets'))" />
     <Error Condition="!Exists('..\packages\directxtk_desktop_2019.2024.10.29.1\build\native\directxtk_desktop_2019.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2019.2024.10.29.1\build\native\directxtk_desktop_2019.targets'))" />
+    <Error Condition="!Exists('..\packages\boost.1.87.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.87.0\build\boost.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_wave-vc143.1.87.0\build\boost_wave-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_wave-vc143.1.87.0\build\boost_wave-vc143.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_thread-vc143.1.87.0\build\boost_thread-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_thread-vc143.1.87.0\build\boost_thread-vc143.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_filesystem-vc143.1.87.0\build\boost_filesystem-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_filesystem-vc143.1.87.0\build\boost_filesystem-vc143.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets'))" />
   </Target>
 </Project>

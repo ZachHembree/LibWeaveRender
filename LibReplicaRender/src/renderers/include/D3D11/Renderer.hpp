@@ -15,8 +15,6 @@
 
 namespace Replica::D3D11
 { 
-	using std::unordered_map;
-
 	class Device;
 	class BufferBase;
 	class VertexBuffer;
@@ -24,6 +22,7 @@ namespace Replica::D3D11
 	class ConstantBuffer;
 	class SwapChain;
 	class Sampler;
+	class ShaderLibrary;
 
 	class Renderer : public WindowComponentBase
 	{
@@ -123,10 +122,9 @@ namespace Replica::D3D11
 		bool UnregisterComponent(RenderComponentBase& component);
 
 	private:
-		unordered_map<string_view, Effect> defaultEffects;
-		unordered_map<string_view, ComputeShader> defaultCompute;
-		unordered_map<string_view, Mesh> defaultMeshes;
-		unordered_map<string_view, Sampler> defaultSamplers;
+		std::unique_ptr<ShaderLibrary> pDefaultShaders;
+		std::unordered_map<string_view, Mesh> defaultMeshes;
+		std::unordered_map<string_view, Sampler> defaultSamplers;
 
 		UniqueVector<RenderComponentBase*> pComponents;
 		Device device;

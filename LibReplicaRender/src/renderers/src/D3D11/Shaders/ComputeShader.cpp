@@ -8,22 +8,11 @@ using namespace Microsoft::WRL;
 ComputeShader::ComputeShader() 
 { }
 
-ComputeShader::ComputeShader(Device& dev, const ComputeShaderDef& csDef) :
+ComputeShader::ComputeShader(Device& dev, const ShaderDef& csDef) :
 	ShaderBase(dev, csDef),
-	uavBuffers(csDef.uavBuffers)
+	uavBuffers(csDef.res, ShaderTypes::RandomWrite)
 {
-	if (csDef.file.size() > 0)
-	{
-		ComPtr<ID3DBlob> csBlob;
-		GFX_THROW_FAILED(D3DReadFileToBlob(csDef.file.data(), &csBlob));
-		GFX_THROW_FAILED(dev->CreateComputeShader(csBlob->GetBufferPointer(), csBlob->GetBufferSize(), nullptr, &pCS));
-	}
-	else if (csDef.srcSize > 0)
-	{
-		GFX_THROW_FAILED(dev->CreateComputeShader(csDef.srcBin, csDef.srcSize, nullptr, &pCS));
-	}
-	else
-		GFX_THROW("A shader cannot be instantiated without valid source.")
+	GFX_THROW_FAILED(dev->CreateComputeShader(csDef.binSrc.GetPtr(), csDef.binSrc.GetLength(), nullptr, &pCS));
 }
 
 ID3D11ComputeShader* ComputeShader::Get() const
@@ -66,15 +55,29 @@ void ComputeShader::Bind(Context& ctx)
 
 		ctx->CSSetSamplers(0, (UINT)ss.GetLength(), ss.GetPtr());
 		ctx->CSSetShaderResources(0, (UINT)tex.GetLength(), tex.GetPtr());
-		ctx->CSSetConstantBuffers(0u, 1, cBuf.GetAddressOf());
 		ctx->CSSetUnorderedAccessViews(0u, (UINT)uav.GetLength(), uav.GetPtr(), 0);
+
+		ID3D11Buffer* pCBs[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT](nullptr);
+
+		for (int i = 0; i < cBuffers.GetLength(); i++)
+		{
+			pCBs[i] = cBuffers[i].Get();
+		}
+
+		ctx->CSSetConstantBuffers(0u, (uint)cBuffers.GetLength(), reinterpret_cast<ID3D11Buffer**>(&pCBs));
 
 		isBound = true;
 	}
 
 	if (ctx.GetIsCsBound(this))
 	{
-		constants.UpdateConstantBuffer(cBuf, ctx);
+		int i = 0;
+
+		for (const auto& pair : constants)
+		{
+			pair.second.UpdateConstantBuffer(cBuffers[i], ctx);
+			i++;
+		}
 	}
 }
 

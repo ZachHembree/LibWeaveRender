@@ -1,4 +1,5 @@
 #pragma once
+#include "ShaderLibGen/ShaderData.hpp"
 #include "../Effect.hpp"
 #include "../Shaders/ComputeShader.hpp"
 #include "../ShaderSrc/CS_TexCopy2D.hpp"
@@ -13,236 +14,8 @@
 #include "../ShaderSrc/VS_Textured2D.hpp"
 #include "../ShaderSrc/VS_Textured3D.hpp"
 
-namespace Replica::D3D11
+namespace Replica::Effects
 {
-	// Compute Shaders
-
-	const ComputeShaderDef g_CS_TexCopy2D
-	{
-		{
-			L"",
-			// Source binary
-			(byte*)&CS_TexCopy2DSrc,
-			sizeof(CS_TexCopy2DSrc),
-			// Constants
-			{ 
-				ConstantDef::Get<ivec2>("SrcOffset"),
-				ConstantDef::Get<ivec2>("DstOffset"),
-			},
-			// Samplers
-			{ },
-			// Textures
-			{
-				"SrcTex",
-			},
-		},
-		// RWTextures
-		{
-			"DstTex"
-		}
-	};
-
-	const ComputeShaderDef g_CS_TexCopySamp2D
-	{
-		{
-			L"",
-			// Source binary
-			(byte*)&CS_TexCopySamp2DSrc,
-			sizeof(CS_TexCopySamp2DSrc),
-			// Constants
-			{
-				ConstantDef::Get<ivec2>("SrcOffset"),
-				ConstantDef::Get<ivec2>("DstOffset"),
-				ConstantDef::Get<vec4>("DstTexelSize"),
-			},
-			// Samplers
-			{
-				"Samp",
-			},
-			// Textures
-			{
-				"SrcTex",
-			},
-		},
-		// RWTextures
-		{
-			"DstTex"
-		}
-	};
-
-	// Compute Shaders
-	const ComputeShaderDef g_CS_TexCopyScaledSamp2D
-	{
-		{
-			L"",
-			// Source binary
-			(byte*)&CS_TexCopyScaledSamp2DSrc,
-			sizeof(CS_TexCopyScaledSamp2DSrc),
-			// Constants
-			{
-				ConstantDef::Get<vec4>("DstTexelSize"),
-				ConstantDef::Get<vec2>("Scale"),
-				ConstantDef::Get<vec2>("Offset"),
-			},
-			// Samplers
-			{
-				"Samp",
-			},
-			// Textures
-			{
-				"SrcTex",
-			},
-		},
-		// RWTextures
-		{
-			"DstTex"
-		}
-	};
-
-	// Vertex Shaders
-	const VertexShaderDef g_VS_Default =
-	{
-		// Source binary
-		{ 
-			L"",
-			// Source binary
-			(byte*)&VS_DefaultSrc,
-			sizeof(VS_DefaultSrc)
-		},
-		// Vertex Layout
-		{
-			{ "Position", Formats::R32G32_FLOAT },
-		},
-	};
-
-	const VertexShaderDef g_VS_PosTextured =
-	{
-		// Source binary
-		{
-			L"",
-			// Source binary
-			(byte*)&VS_PosTexturedSrc,
-			sizeof(VS_PosTexturedSrc)
-		},
-		// Vertex Layout
-		{
-			{ "Position", Formats::R32G32_FLOAT },
-		},
-	};
-
-	const VertexShaderDef g_VS_Textured2D =
-	{
-		// Source binary
-		{
-			L"",
-			// Source binary
-			(byte*)&VS_Textured2DSrc,
-			sizeof(VS_Textured2DSrc)
-		},		
-		// Vertex Layout
-		{
-			{ "Position", Formats::R32G32_FLOAT },
-			{ "TexCoord", Formats::R32G32_FLOAT },
-		},
-	};
-
-	const VertexShaderDef g_VS_3D =
-	{
-		{
-			L"",
-			// Source binary
-			(byte*)&VS_3DSrc,
-			sizeof(VS_3DSrc),
-			{ ConstantDef::Get<mat4>("mvp"), }
-		},
-		// Vertex Layout
-		{
-			{ "Position", Formats::R32G32B32_FLOAT },
-		},
-	};
-
-	const VertexShaderDef g_VS_Textured3D =
-	{
-		{
-			L"",
-			// Source binary
-			(byte*)&VS_Textured3DSrc,
-			sizeof(VS_Textured3DSrc),
-			// Constants
-			{ ConstantDef::Get<mat4>("mvp"), }
-		},
-		// Vertex Layout
-		{
-			{ "Position", Formats::R32G32B32_FLOAT },
-			{ "TexCoord", Formats::R32G32_FLOAT },
-		},
-	};
-
-	// Pixel Shaders
-	const PixelShaderDef g_PS_Default =
-	{
-		L"",
-		// Source binary
-		(byte*)&PS_DefaultSrc,
-		sizeof(PS_DefaultSrc)
-	};
-
-	const PixelShaderDef g_PS_Flat3D =
-	{
-		L"",
-		// Source binary
-		(byte*)&PS_Flat3DSrc,
-		sizeof(PS_Flat3DSrc)
-	};
-
-	const PixelShaderDef g_PS_Textured =
-	{
-		L"",
-		// Source binary
-		(byte*)&PS_TexturedSrc,
-		sizeof(PS_TexturedSrc),
-		// Constants
-		{ 
-			ConstantDef::Get<vec2>("Scale"),
-			ConstantDef::Get<vec2>("Offset"),
-		},
-		// Samplers
-		{ "samp" },
-		// Textures
-		{ "tex" },
-	};
-
-	// Effects
-	const EffectDef g_DefaultEffect =
-	{
-		g_VS_Default,
-		g_PS_Default
-	};
-
-	const EffectDef g_PosTextured2DEffect
-	{
-		g_VS_PosTextured,
-		g_PS_Textured
-	};
-
-	const EffectDef g_Textured2DEffect
-	{
-		g_VS_Textured2D,
-		g_PS_Textured
-	};
-
-	const EffectDef g_DebugFlat3DEffect
-	{
-		g_VS_3D,
-		g_PS_Flat3D
-	};
-
-	const EffectDef g_Textured3DEffect
-	{
-		g_VS_Textured3D,
-		g_PS_Textured
-	};
-
 	// Common Vertex Formats
 	struct VertexPos3D
 	{
@@ -264,5 +37,287 @@ namespace Replica::D3D11
 	{
 		vec2 pos;
 		vec2 uv;
+	};
+
+	const ShaderLibDef g_BuiltInShaders = 
+	{
+		.platform = 
+		{
+			.compilerVersion = "FXC 10.1",
+			.shaderModel = "SM 5.0",
+			.target = PlatformTargets::DirectX11
+		},
+		.flagNames = { },
+		.modeNames = { },
+		.variants = 
+		{
+			VariantDef
+			{
+				.effects = 
+				{
+					{
+						.name = "Default",
+						.passes =
+						{
+							EffectPass { .shaderIDs = { 0, 5 } }
+						},
+						.variantID = 0
+					},
+					{
+						.name = "PosTextured2D",
+						.passes =
+						{
+							EffectPass {.shaderIDs = { 1, 7 } }
+						},
+						.variantID = 0
+					},
+					{
+						.name = "Textured2D",
+						.passes =
+						{
+							EffectPass {.shaderIDs = { 2, 7 } }
+						},
+						.variantID = 0
+					},
+					{
+						.name = "DebugFlat3D",
+						.passes =
+						{
+							EffectPass {.shaderIDs = { 3, 6 } }
+						},
+						.variantID = 0
+					},
+					{
+						.name = "Textured3D",
+						.passes =
+						{
+							EffectPass {.shaderIDs = { 4, 7 } }
+						},
+						.variantID = 0
+					},
+				},
+				.shaders
+				{
+					// VS_DefaultSrc - 0
+					{
+						.fileName = "",
+						.binSrc = { (byte*)&VS_DefaultSrc, sizeof(VS_DefaultSrc), },
+						.name = "VS_DefaultSrc",
+						.stage = ShadeStages::Vertex,
+						.threadGroupSize = tvec3<uint> { },
+						.inLayout = IOLayoutDef
+						{
+							{ "Position", 0u, 0u, DXGI_FORMAT_R32G32_FLOAT, sizeof(vec2) }
+						},
+						.outLayout = IOLayoutDef { },
+						.res = { },
+						.constBufs = { },
+						.variantID = 0
+					},
+					// VS_PosTexturedSrc - 1
+					{
+						.fileName = "",
+						.binSrc = { (byte*)&VS_PosTexturedSrc, sizeof(VS_PosTexturedSrc), },
+						.name = "VS_PosTexturedSrc",
+						.stage = ShadeStages::Vertex,
+						.threadGroupSize = tvec3<uint> { },
+						.inLayout = IOLayoutDef
+						{
+							{ "Position", 0u, 0u, DXGI_FORMAT_R32G32_FLOAT, sizeof(vec2) }
+						},
+						.outLayout = IOLayoutDef { },
+						.res = { },
+						.constBufs = { },
+						.variantID = 0
+					},
+					// VS_Textured2D - 2
+					{
+						.fileName = "",
+						.binSrc = { (byte*)&VS_Textured2DSrc, sizeof(VS_Textured2DSrc), },
+						.name = "VS_Textured2D",
+						.stage = ShadeStages::Vertex,
+						.threadGroupSize = tvec3<uint> { },
+						.inLayout = IOLayoutDef
+						{
+							{ "Position", 0u, 0u, DXGI_FORMAT_R32G32_FLOAT, sizeof(vec2) },
+							{ "TexCoord", 0u, 0u, DXGI_FORMAT_R32G32_FLOAT, sizeof(vec2) }
+						},
+						.outLayout = IOLayoutDef { },
+						.res = { },
+						.constBufs = { },
+						.variantID = 0
+					},
+					// VS_3D - 3
+					{
+						.fileName = "",
+						.binSrc = { (byte*)&VS_3DSrc, sizeof(VS_3DSrc), },
+						.name = "VS_3D",
+						.stage = ShadeStages::Vertex,
+						.threadGroupSize = tvec3<uint> { },
+						.inLayout = IOLayoutDef
+						{
+							{ "Position", 0u, 0u, DXGI_FORMAT_R32G32B32_FLOAT, sizeof(vec3) }
+						},
+						.outLayout = IOLayoutDef { },
+						.res = { },
+						.constBufs = 
+						{
+							ConstBufLayout::GetLayout(
+							{
+								ConstDef::Get<mat4>("mvp")
+							})
+						},
+						.variantID = 0
+					},
+					// VS_Textured3DSrc - 4
+					{
+						.fileName = "",
+						.binSrc = { (byte*)&VS_Textured3DSrc, sizeof(VS_Textured3DSrc), },
+						.name = "VS_Textured3DSrc",
+						.stage = ShadeStages::Vertex,
+						.threadGroupSize = tvec3<uint> { },
+						.inLayout = IOLayoutDef
+						{
+							{ "Position", 0u, 0u, DXGI_FORMAT_R32G32B32_FLOAT, sizeof(vec3) },
+							{ "TexCoord", 0u, 0u, DXGI_FORMAT_R32G32_FLOAT,  sizeof(vec2) }
+						},
+						.outLayout = IOLayoutDef { },
+						.res = { },
+						.constBufs = 
+						{
+							ConstBufLayout::GetLayout(
+							{
+								ConstDef::Get<mat4>("mvp")
+							})
+						},
+						.variantID = 0
+					},
+					// PS_DefaultSrc - 5
+					{
+						.fileName = "",
+						.binSrc = { (byte*)&PS_DefaultSrc, sizeof(PS_DefaultSrc), },
+						.name = "PS_DefaultSrc",
+						.stage = ShadeStages::Pixel,
+						.threadGroupSize = tvec3<uint> { },
+						.inLayout = IOLayoutDef { },
+						.outLayout = IOLayoutDef { },
+						.res = { },
+						.constBufs = { },
+						.variantID = 0
+					},
+					// PS_Flat3DSrc - 6
+					{
+						.fileName = "",
+						.binSrc = { (byte*)&PS_Flat3DSrc, sizeof(PS_Flat3DSrc), },
+						.name = "PS_Flat3DSrc",
+						.stage = ShadeStages::Pixel,
+						.threadGroupSize = tvec3<uint> { },
+						.inLayout = IOLayoutDef { },
+						.outLayout = IOLayoutDef { },
+						.res = { },
+						.constBufs = { },
+						.variantID = 0
+					},
+					// PS_TexturedSrc - 7
+					{
+						.fileName = "",
+						.binSrc = { (byte*)&PS_TexturedSrc, sizeof(PS_TexturedSrc), },
+						.name = "PS_TexturedSrc",
+						.stage = ShadeStages::Pixel,
+						.threadGroupSize = tvec3<uint> { },
+						.inLayout = IOLayoutDef { },
+						.outLayout = IOLayoutDef { },
+						.res =
+						{
+							ResourceDef { "tex", ShaderTypes::Texture2D },
+							ResourceDef { "samp", ShaderTypes::Sampler }
+						},
+						.constBufs =
+						{
+							ConstBufLayout::GetLayout(
+							{
+								ConstDef::Get<vec2>("Scale"),
+								ConstDef::Get<vec2>("Offset"),
+							})
+						},
+						.variantID = 0
+					},
+					// Compute Shaders
+					{
+						.fileName = "",
+						.binSrc = { (byte*)&CS_TexCopy2DSrc, sizeof(CS_TexCopy2DSrc) },
+						.name = "CS_TexCopy2D",
+						.stage = ShadeStages::Compute,
+						.threadGroupSize = tvec3<uint> { 1, 1, 1 },
+						.inLayout = IOLayoutDef { },
+						.outLayout = IOLayoutDef { },
+						.res =
+						{
+							ResourceDef { "SrcTex", ShaderTypes::Texture2D },
+							ResourceDef { "DstTex", ShaderTypes::RWTexture2D }
+						},
+						.constBufs =
+						{
+							ConstBufLayout::GetLayout(
+							{
+								ConstDef::Get<ivec2>("SrcOffset"),
+								ConstDef::Get<ivec2>("DstOffset")
+							})
+						},
+						.variantID = 0
+					},
+					{
+						.fileName = "",
+						.binSrc = { (byte*)&CS_TexCopySamp2DSrc, sizeof(CS_TexCopySamp2DSrc) },
+						.name = "CS_TexCopySamp2D",
+						.stage = ShadeStages::Compute,
+						.threadGroupSize = tvec3<uint> { 1, 1, 1 },
+						.inLayout = IOLayoutDef { },
+						.outLayout = IOLayoutDef { },
+						.res =
+						{
+							ResourceDef { "SrcTex", ShaderTypes::Texture2D },
+							ResourceDef { "DstTex", ShaderTypes::RWTexture2D },
+							ResourceDef { "samp", ShaderTypes::Sampler }
+						},
+						.constBufs =
+						{
+							ConstBufLayout::GetLayout(
+							{
+								ConstDef::Get<ivec2>("SrcOffset"),
+								ConstDef::Get<ivec2>("DstOffset"),
+								ConstDef::Get<vec4>("DstTexelSize")
+							})
+						},
+						.variantID = 0
+					},
+					{
+						.fileName = "",
+						.binSrc = { (byte*)&CS_TexCopyScaledSamp2DSrc, sizeof(CS_TexCopyScaledSamp2DSrc) },
+						.name = "CS_TexCopyScaledSamp2D",
+						.stage = ShadeStages::Compute,
+						.threadGroupSize = tvec3<uint> { 1, 1, 1 },
+						.inLayout = IOLayoutDef { },
+						.outLayout = IOLayoutDef { },
+						.res =
+						{
+							ResourceDef { "SrcTex", ShaderTypes::Texture2D },
+							ResourceDef { "DstTex", ShaderTypes::RWTexture2D },
+							ResourceDef { "samp", ShaderTypes::Sampler }
+						},
+						.constBufs =
+						{
+							ConstBufLayout::GetLayout(
+							{
+								ConstDef::Get<vec4>("DstTexelSize"),
+								ConstDef::Get<vec2>("Scale"),
+								ConstDef::Get<vec2>("Offset"),
+							})
+						},
+						.variantID = 0
+					}
+				}
+			}
+		}
 	};
 }

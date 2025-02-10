@@ -1,38 +1,46 @@
 #pragma once
 #include "ReplicaUtils.hpp"
+#include "ShaderLibGen/ShaderData.hpp"
 #include <unordered_map>
-#include <typeinfo>
 
 namespace Replica::D3D11
 {
-	struct ConstantDef;
-	class ConstantMapDef;
+	using Effects::ConstBufLayout;
+
 	class ConstantBuffer;
 
 	/// <summary>
-	/// Metadata object used to define a constant buffer whose size and layout are determined
-	/// on initialization.
+	/// The ConstantMap class defines the layout and storage of a constant buffer.
+    /// It uses a dynamically sized byte array to store constant values and an internal
+    /// mapping from constant names (as string_view) to their corresponding offset and size.
 	/// </summary>
 	class ConstantMap
 	{
-	public:		
-		ConstantMap();
-
-		ConstantMap(const ConstantMapDef& layout);
-
-		ConstantMap(ConstantMap&&) = default;
-
-		ConstantMap& operator=(ConstantMap&&) = default;
+	public:
+		MAKE_MOVE_ONLY(ConstantMap)
 
 		/// <summary>
-		/// Writes contents of the constant map to the given constant buffer
+		/// Default constructor. Initializes an empty constant map.
 		/// </summary>
-		void UpdateConstantBuffer(ConstantBuffer& cb, Context& ctx);
+		ConstantMap();
+
+		/// <summary>
+		/// Constructs a ConstantMap using the provided constant buffer layout.
+		/// The layout defines the total size and the metadata (offset and size)
+		/// for each constant stored in the map.
+		/// </summary>
+		ConstantMap(const ConstBufLayout& layout);
+
+		/// <summary>
+		/// Writes the current contents of this constant map to the provided constant buffer.
+		/// The destination constant buffer must be large enough to hold the data.
+		/// </summary>
+		void UpdateConstantBuffer(ConstantBuffer& cb, Context& ctx) const;
 
 		/// <summary>
 		/// Returns true if a member with the given name is registered to the map
 		/// </summary>
-		bool GetMemberExists(string_view name);
+		bool GetMemberExists(string_view name) const;
 
 		/// <summary>
 		/// Sets member with the given name to the value given
@@ -43,14 +51,22 @@ namespace Replica::D3D11
 			if (GetMemberExists(name))
 				SetMember(name, reinterpret_cast<const byte*>(&value), sizeof(T));
 		}
+
+		/// <summary>
+		/// Writes the given data to the buffer
+		/// </summary>
+		void SetData(const byte* pData, size_t size);
 		
 		/// <summary>
 		/// Returns the size of the buffer in bytes
 		/// </summary>
-		size_t GetStride();
+		size_t GetBufferSize() const;
 
+	private:
 		/// <summary>
-		/// Defines the properties and location of a constant in a ConstantMap
+		/// MapEntry holds metadata for a single constant within the buffer,
+		/// including its size (stride) and its offset (in bytes) within the data array.
+		/// These fields are immutable once a MapEntry is constructed.
 		/// </summary>
 		struct MapEntry
 		{
@@ -66,91 +82,10 @@ namespace Replica::D3D11
 			MapEntry& operator=(MapEntry& other);
 		};
 
-	private:
 		UniqueArray<byte> data;
 		std::unordered_map<string_view, MapEntry> defMap;
 		size_t stride;
 
-		ConstantMap(const ConstantMap& other);
-
-		ConstantMap& operator=(const ConstantMap& other);
-
 		void SetMember(string_view name, const byte* src, const size_t size);
-	};
-
-	/// <summary>
-	/// Collection for initializing a new ConstantMap
-	/// </summary>
-	class ConstantMapDef
-	{
-	public:
-		ConstantMapDef();
-
-		ConstantMapDef(const IDynamicArray<ConstantDef>& definition);;
-
-		ConstantMapDef(const std::initializer_list<ConstantDef>& definition);
-
-		ConstantMapDef(const ConstantMapDef& other) noexcept;
-
-		ConstantMapDef& operator=(const ConstantMapDef& other) noexcept;
-
-		ConstantMapDef(ConstantMapDef&& other) noexcept;
-
-		ConstantMapDef& operator=(ConstantMapDef&& other) noexcept;
-
-		/// <summary>
-		/// Adds a new constant entry with the given name and type to the end
-		/// of the map definition.
-		/// </summary>
-		template<typename T>
-		void Add(string_view name) { Add(name, sizeof(T)); }
-
-		/// <summary>
-		/// Clears the contents of the initializer
-		/// </summary>
-		void Clear();
-
-		/// <summary>
-		/// Returns the size of the buffer defined by the definition, in bytes.
-		/// </summary>
-		size_t GetStride() const;
-
-		/// <summary>
-		/// Returns a list of the constants defined by the map definition
-		/// </summary>
-		const IDynamicArray<ConstantDef>& GetMembers() const;
-
-	private:
-		UniqueVector<ConstantDef> members;
-		size_t stride;
-
-		/// <summary>
-		/// Adds a new constant entry with the given name and type to the end
-		/// of the map definition.
-		/// </summary>
-		void Add(string_view name, const size_t stride);
-	};
-
-	/// <summary>
-	/// Defines the properties of an individual constant in a ConstantMapDef
-	/// </summary>
-	struct ConstantDef
-	{
-		string_view name;
-		const size_t stride;
-
-		ConstantDef();
-
-		ConstantDef(string_view name, const size_t stride);
-
-		ConstantDef(const ConstantDef& other);
-
-		ConstantDef& operator=(const ConstantDef& other);
-
-		template<typename T>
-		static ConstantDef Get(string_view name)
-		{
-			return ConstantDef(name, sizeof(T));
-		}
 	};
 }

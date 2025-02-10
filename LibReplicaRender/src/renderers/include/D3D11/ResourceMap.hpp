@@ -1,9 +1,16 @@
 #pragma once
 #include "ReplicaUtils.hpp"
+#include "ShaderLibGen/ShaderData.hpp"
 #include <unordered_map>
 
 namespace Replica::D3D11
 {
+	using Effects::ResourceDef;
+	using Effects::ShaderTypes;
+
+	/// <summary>
+	/// Maps names to COM objects, but doesn't own them.
+	/// </summary>
 	template<typename T>
 	class ResourceMap
 	{
@@ -14,18 +21,19 @@ namespace Replica::D3D11
 		ResourceMap& operator=(const ResourceMap& other) = default;
 		ResourceMap& operator=(ResourceMap&& other) = default;
 
-		ResourceMap(const IDynamicArray<string_view>& def) :
-			resources(def.GetLength())
+		ResourceMap(const IDynamicArray<ResourceDef>& resources, ShaderTypes type, ShaderTypes constraints = ShaderTypes::Void)
 		{
-			for (uint i = 0; i < def.GetLength(); i++)
+			uint count = 0;
+
+			for (const ResourceDef& res : resources)
 			{
-				resourceMap.emplace(def[i], i);
+				if (res.GetHasFlags(type) && !res.GetHasFlags(constraints))
+				{
+					resourceMap.emplace(res.name, count);
+					count++;
+				}
 			}
 		}
-
-		ResourceMap(const std::initializer_list<string_view>& list) :
-			ResourceMap(UniqueArray(list))
-		{ }
 
 		void SetResource(string_view name, T* pRes)
 		{

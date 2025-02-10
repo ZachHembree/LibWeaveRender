@@ -1,7 +1,10 @@
 #include "pch.hpp"
+#include "ShaderLibGen/ShaderData.hpp"
 #include "ReplicaInternalD3D11.hpp"
 
+using namespace Replica::Effects;
 using namespace Replica::D3D11;
+using namespace Replica;
 
 ShaderBase::ShaderBase() : 
 	DeviceChild(),
@@ -15,17 +18,19 @@ ShaderBase::ShaderBase(Device& dev) :
 	isBound(false)
 { }
 
-ShaderBase::ShaderBase(Device& dev, const ShaderDefBase& def) :
+ShaderBase::ShaderBase(Device& dev, const ShaderDef& def) :
 	DeviceChild(dev),
 	pCtx(&dev.GetContext()),
 	isBound(false),
-	samplers(def.samplerMap),
-	textures(def.textureMap)
+	samplers(def.res, ShaderTypes::Sampler),
+	textures(def.res, ShaderTypes::Texture, ShaderTypes::RandomWrite),
+	cBuffers(def.constBufs.GetLength())
 {
-	if (def.constMap.GetStride() > 0)
-	{ 
-		constants = ConstantMap(def.constMap);
-		cBuf = ConstantBuffer(dev, constants.GetStride());
+	for (int i = 0; i < def.constBufs.GetLength(); i++)
+	{
+		const ConstBufLayout layout = def.constBufs[i];
+		constants.emplace(string_view(layout.name), ConstantMap(layout));
+		cBuffers[i] = ConstantBuffer(dev, layout.size);
 	}
 }
 
@@ -34,7 +39,7 @@ ShaderBase::ShaderBase(ShaderBase&& other) noexcept :
 	constants(std::move(other.constants)),
 	samplers(std::move(other.samplers)),
 	textures(std::move(other.textures)),
-	cBuf(std::move(other.cBuf)),
+	cBuffers(std::move(other.cBuffers)),
 	pCtx(other.pCtx),
 	isBound(other.isBound)
 {
@@ -47,7 +52,7 @@ ShaderBase& ShaderBase::operator=(ShaderBase&& other) noexcept
 	this->constants = std::move(other.constants);
 	this->samplers = std::move(other.samplers);
 	this->textures = std::move(other.textures);
-	this->cBuf = std::move(other.cBuf);
+	this->cBuffers = std::move(other.cBuffers);
 	this->pCtx = other.pCtx;
 	this->isBound = other.isBound;
 	other.pCtx = nullptr;

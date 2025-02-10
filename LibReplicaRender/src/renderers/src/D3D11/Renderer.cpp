@@ -1,9 +1,11 @@
 #include "pch.hpp"
 #include "ReplicaWin32.hpp"
 #include "ReplicaInternalD3D11.hpp"
+#include "D3D11/ShaderLibrary.hpp"
 
 using namespace Replica;
 using namespace Replica::D3D11;
+using namespace Replica::Effects;
 
 Renderer::Renderer(MinWindow& window) :
 	WindowComponentBase(window),
@@ -11,20 +13,11 @@ Renderer::Renderer(MinWindow& window) :
 	swap(window, device), // Create swap chain for window
 	defaultDS(device, swap.GetSize()),
 	useDefaultDS(true),
-	fitToWindow(true)
+	fitToWindow(true),
+	pDefaultShaders(new ShaderLibrary(device, g_BuiltInShaders))
 { 
 	MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
 	defaultMeshes["FSQuad"] = Mesh(device, quadDef);
-
-	defaultEffects["Default"] = Effect(device, g_DefaultEffect);
-	defaultEffects["PosTextured2D"] = Effect(device, g_PosTextured2DEffect);
-	defaultEffects["Textured2D"] = Effect(device, g_Textured2DEffect);
-	defaultEffects["DebugFlat3D"] = Effect(device, g_DebugFlat3DEffect);
-	defaultEffects["Textured3D"] = Effect(device, g_Textured3DEffect);
-
-	defaultCompute["TexCopyScaledSamp2D"] = ComputeShader(device, g_CS_TexCopyScaledSamp2D);
-	defaultCompute["TexCopySamp2D"] = ComputeShader(device, g_CS_TexCopySamp2D);
-	defaultCompute["TexCopy2D"] = ComputeShader(device, g_CS_TexCopy2D);
 
 	defaultSamplers["PointClamp"] = Sampler(device, TexFilterMode::POINT, TexClampMode::CLAMP);
 	defaultSamplers["PointMirror"] = Sampler(device, TexFilterMode::POINT, TexClampMode::MIRROR);
@@ -120,7 +113,7 @@ void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
 /// </summary>
 Effect& Renderer::GetDefaultEffect(string_view name) const
 {
-	return (Effect&)defaultEffects.at(name);
+	return pDefaultShaders->GetEffect(name);
 }
 
 /// <summary>
@@ -128,7 +121,7 @@ Effect& Renderer::GetDefaultEffect(string_view name) const
 /// </summary>
 ComputeShader& Renderer::GetDefaultCompute(string_view name) const
 {
-	return (ComputeShader&)defaultCompute.at(name);
+	return (ComputeShader&)(pDefaultShaders->GetShader(name));
 }
 
 /// <summary>
