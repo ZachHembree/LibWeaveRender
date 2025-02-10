@@ -18,7 +18,6 @@ namespace Replica
 
 	size_t GetAlignedByteSize(size_t size, size_t alignment)
 	{
-		size_t alignedSize = size / alignment;
-		return alignment * (alignedSize + ((size % alignment) > 0));
+		return (size + alignment - 1) / alignment * alignment;
 	}
 }

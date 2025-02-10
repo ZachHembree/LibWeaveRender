@@ -36,7 +36,7 @@ namespace Replica
 	constexpr double g_PiD = glm::pi<double>();
 	constexpr float g_Tau = 2.0f * glm::pi<float>();
 	constexpr float g_Pi = glm::pi<float>();
-
+	
 	fquat QuatFromAxis(vec3 axis, float rad);
 	size_t GetAlignedByteSize(size_t size, size_t alignment);
 }
