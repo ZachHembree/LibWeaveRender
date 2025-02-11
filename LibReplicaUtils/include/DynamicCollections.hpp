@@ -5,6 +5,7 @@
 #include <exception>
 #include <string>
 #include <iterator>
+#include <memory>
 
 namespace Replica
 {
@@ -152,7 +153,7 @@ namespace Replica
 	/// Returns the size of the array in bytes
 	/// </summary>
 	template<typename T>
-	size_t GetArrSize(const std::vector<T>& arr) { return arr.GetLength() * sizeof(T); }
+	size_t GetArrSize(const std::vector<T>& arr) { return arr.size() * sizeof(T); }
 
 	/// <summary>
 	/// Dynamically allocated array with members of type T and a fixed length.
@@ -222,11 +223,10 @@ namespace Replica
 
 		/// <summary>
 		/// Initializes a new dynamic array object using the given pointer and length.
-		/// Takes ownership of the pointer's content.
+		/// Takes ownership of the pointer.
 		/// </summary>
-		DynamicArrayBase(T*&& data, const size_t length) :
-			length(length),
-			data(data)
+		DynamicArrayBase(std::unique_ptr<T[]>&& ptr, size_t length)
+			: length(length), data(ptr.release())
 		{ }
 
 		/// <summary>
@@ -314,10 +314,7 @@ namespace Replica
 		/// </summary>
 		virtual ~DynamicArrayBase()
 		{
-			if (data != nullptr)
-				delete[] data;
-
-			data = nullptr;
+			delete[] data;
 		}
 
 		/// <summary>
@@ -417,8 +414,8 @@ namespace Replica
 		/// Initializes a new dynamic array object using the given pointer and length.
 		/// Takes ownership of the pointer.
 		/// </summary>
-		DynamicArray(T*&& data, const size_t length) :
-			DynamicArrayBase<T>(std::move(data), length) 
+		DynamicArray(std::unique_ptr<T[]>&& ptr, size_t length) :
+			DynamicArrayBase<T>(std::move(ptr), length) 
 		{ }
 
 		/// <summary>
@@ -524,8 +521,8 @@ namespace Replica
 		/// Creates a new unique array using the given pointer and length.
 		/// Takes ownership of the pointer.
 		/// </summary>
-		UniqueArray(T*&& data, const size_t length) :
-			DynamicArrayBase<T>(std::move(data), length) 
+		UniqueArray(std::unique_ptr<T[]>&& ptr, size_t length) :
+			DynamicArrayBase<T>(std::move(ptr), length) 
 		{ }
 
 		/// <summary>
