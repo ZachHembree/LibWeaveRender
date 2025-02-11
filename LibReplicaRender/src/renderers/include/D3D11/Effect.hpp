@@ -7,7 +7,7 @@ namespace Replica::D3D11
 	class Effect : public IAsset
 	{
 	public:
-		Effect() {}
+		Effect() : pLib(nullptr), pDef(nullptr) {}
 
 		Effect(
 			ShaderLibrary& lib,

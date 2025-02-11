@@ -82,9 +82,9 @@ namespace Replica::D3D11
 			MapEntry& operator=(MapEntry& other);
 		};
 
+		size_t stride;
 		UniqueArray<byte> data;
 		std::unordered_map<string_view, MapEntry> defMap;
-		size_t stride;
 
 		void SetMember(string_view name, const byte* src, const size_t size);
 	};
