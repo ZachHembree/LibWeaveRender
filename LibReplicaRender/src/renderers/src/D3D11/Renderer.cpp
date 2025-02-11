@@ -14,7 +14,7 @@ Renderer::Renderer(MinWindow& window) :
 	defaultDS(device, swap.GetSize()),
 	useDefaultDS(true),
 	fitToWindow(true),
-	pDefaultShaders(new ShaderLibrary(device, g_BuiltInShaders))
+	pDefaultShaders(new ShaderLibrary(device, GetBuiltInShaders()))
 { 
 	MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
 	defaultMeshes["FSQuad"] = Mesh(device, quadDef);

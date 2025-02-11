@@ -212,6 +212,7 @@
     <ClCompile Include="src\renderers\src\D3D11\ImguiHandler.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\RenderComponent.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\Texture2D.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Shaders\BuiltInShaders.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Shaders\ComputeShader.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\ConstantMap.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\ConstantBuffer.cpp" />
