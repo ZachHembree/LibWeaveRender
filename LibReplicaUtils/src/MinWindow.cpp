@@ -90,6 +90,7 @@ MinWindow::~MinWindow()
 {
 	if (hWnd != nullptr)
 	{
+		isInitialized = false;
 		UnregisterClass(name.data(), hInst);
 		DestroyWindow(hWnd);
 	}
