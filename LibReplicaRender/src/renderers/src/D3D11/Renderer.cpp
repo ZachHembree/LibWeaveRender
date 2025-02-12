@@ -111,34 +111,22 @@ void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
 /// <summary>
 /// Returns reference to a default effect
 /// </summary>
-Effect& Renderer::GetDefaultEffect(string_view name) const
-{
-	return pDefaultShaders->GetEffect(name);
-}
+Effect& Renderer::GetDefaultEffect(string_view name) const { return pDefaultShaders->GetEffect(name); }
 
 /// <summary>
 /// Returns reference to a default compute shader
 /// </summary>
-ComputeShader& Renderer::GetDefaultCompute(string_view name) const
-{
-	return (ComputeShader&)(pDefaultShaders->GetShader(name));
-}
+ComputeShader& Renderer::GetDefaultCompute(string_view name) const { return dynamic_cast<ComputeShader&>(pDefaultShaders->GetShader(name)); }
 
 /// <summary>
 /// Retursn a reference to a default mesh
 /// </summary>
-Mesh& Renderer::GetDefaultMesh(string_view name) const
-{
-	return (Mesh&)defaultMeshes.at(name);
-}
+Mesh& Renderer::GetDefaultMesh(string_view name) const { return const_cast<Mesh&>(defaultMeshes.at(name)); }
 
 /// <summary>
 /// Retursn a reference to a default texture sampler
 /// </summary>
-Sampler& Renderer::GetDefaultSampler(string_view name) const
-{
-	return (Sampler&)defaultSamplers.at(name);
-}
+Sampler& Renderer::GetDefaultSampler(string_view name) const { return const_cast<Sampler&>(defaultSamplers.at(name)); }
 
 bool Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 { 

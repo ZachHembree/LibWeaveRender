@@ -23,7 +23,7 @@ ShaderBase::ShaderBase(Device& dev, const ShaderDef& def) :
 	pCtx(&dev.GetContext()),
 	isBound(false),
 	samplers(def.res, ShaderTypes::Sampler),
-	textures(def.res, ShaderTypes::Texture, ShaderTypes::RandomWrite),
+	textures(def.res, ShaderTypes::Texture),
 	cBuffers(def.constBufs.GetLength())
 {
 	for (int i = 0; i < def.constBufs.GetLength(); i++)

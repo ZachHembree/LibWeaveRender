@@ -21,19 +21,20 @@ namespace Replica::D3D11
 		ResourceMap& operator=(const ResourceMap& other) = default;
 		ResourceMap& operator=(ResourceMap&& other) = default;
 
-		ResourceMap(const IDynamicArray<ResourceDef>& resources, ShaderTypes type, ShaderTypes constraints = ShaderTypes::Void) :
-			resources(resources.GetLength())
+		ResourceMap(const IDynamicArray<ResourceDef>& resources, ShaderTypes type)
 		{
 			uint count = 0;
 
 			for (const ResourceDef& res : resources)
 			{
-				if (res.GetHasFlags(type) && !res.GetHasFlags(constraints))
+				if ( res.GetHasFlags(type) )
 				{
 					resourceMap.emplace(res.name, count);
 					count++;
 				}
 			}
+
+			this->resources = DynamicArray<T*>(count);
 		}
 
 		void SetResource(string_view name, T* pRes)
