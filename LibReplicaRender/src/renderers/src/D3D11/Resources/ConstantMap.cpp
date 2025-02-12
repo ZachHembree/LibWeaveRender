@@ -8,7 +8,7 @@ using namespace Replica::D3D11;
 ConstantMap::ConstantMap() : stride(0)
 { }
 
-ConstantMap::ConstantMap(const Effects::ConstBufLayout& layout) :
+ConstantMap::ConstantMap(const ConstBufLayout& layout) :
 	stride(GetAlignedByteSize(layout.size, g_ConstantBufferAlignment)),
 	data(stride)
 {

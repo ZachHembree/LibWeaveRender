@@ -28,7 +28,7 @@ ShaderBase::ShaderBase(Device& dev, const ShaderDef& def) :
 {
 	for (int i = 0; i < def.constBufs.GetLength(); i++)
 	{
-		const ConstBufLayout layout = def.constBufs[i];
+		const ConstBufLayout& layout = def.constBufs[i];
 		constants.emplace(string_view(layout.name), ConstantMap(layout));
 		cBuffers[i] = ConstantBuffer(dev, layout.size);
 	}
@@ -66,6 +66,16 @@ void ShaderBase::Bind() { Bind(pDev->GetContext()); }
 /// Returns true if the shader is bound
 /// </summary>
 bool ShaderBase::GetIsBound() { return isBound; }
+
+void ShaderBase::SetBuffer(string_view name, const byte* pSrc, const size_t size)
+{
+	const auto it = constants.find(name);
+
+	if (it != constants.end())
+	{
+		it->second.SetData(pSrc, size);
+	}
+}
 
 void ShaderBase::SetSampler(string_view name, Sampler& samp)
 {

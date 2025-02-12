@@ -42,15 +42,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Sets the value corresponding to the given name to the
 		/// given value.
-		void SetBuffer(string_view name, const byte* pSrc, const size_t size)
-		{
-			const auto it = constants.find(name);
-
-			if (it != constants.end())
-			{
-				it->second.SetData(pSrc, size);
-			}
-		}
+		void SetBuffer(string_view name, const byte* pSrc, const size_t size);
 
 		/// <summary>
 		/// Sets the value corresponding to the given name to the
