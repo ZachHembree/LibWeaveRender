@@ -19,8 +19,6 @@ using namespace Replica;
 using namespace Replica::Effects;
 using namespace Replica::D3D11;
 
-const string s_NameTest = "VS_DefaultSrc";
-
 const ShaderLibDef s_BuiltInShaders =
 {
 	.platform =
@@ -84,7 +82,7 @@ const ShaderLibDef s_BuiltInShaders =
 				{
 					.fileName = "",
 					.binSrc = { (byte*)&VS_DefaultSrc, sizeof(VS_DefaultSrc), },
-					.name = "VS_DefaultSrc",
+					.name = "VS_Default",
 					.stage = ShadeStages::Vertex,
 					.threadGroupSize = tvec3<uint> { },
 					.inLayout = IOLayoutDef
@@ -100,7 +98,7 @@ const ShaderLibDef s_BuiltInShaders =
 				{
 					.fileName = "",
 					.binSrc = { (byte*)&VS_PosTexturedSrc, sizeof(VS_PosTexturedSrc), },
-					.name = "VS_PosTexturedSrc",
+					.name = "VS_PosTextured",
 					.stage = ShadeStages::Vertex,
 					.threadGroupSize = tvec3<uint> { },
 					.inLayout = IOLayoutDef
@@ -155,7 +153,7 @@ const ShaderLibDef s_BuiltInShaders =
 				{
 					.fileName = "",
 					.binSrc = { (byte*)&VS_Textured3DSrc, sizeof(VS_Textured3DSrc), },
-					.name = "VS_Textured3DSrc",
+					.name = "VS_Textured3D",
 					.stage = ShadeStages::Vertex,
 					.threadGroupSize = tvec3<uint> { },
 					.inLayout = IOLayoutDef
@@ -178,7 +176,7 @@ const ShaderLibDef s_BuiltInShaders =
 				{
 					.fileName = "",
 					.binSrc = { (byte*)&PS_DefaultSrc, sizeof(PS_DefaultSrc), },
-					.name = "PS_DefaultSrc",
+					.name = "PS_Default",
 					.stage = ShadeStages::Pixel,
 					.threadGroupSize = tvec3<uint> { },
 					.inLayout = IOLayoutDef { },
@@ -191,7 +189,7 @@ const ShaderLibDef s_BuiltInShaders =
 				{
 					.fileName = "",
 					.binSrc = { (byte*)&PS_Flat3DSrc, sizeof(PS_Flat3DSrc), },
-					.name = "PS_Flat3DSrc",
+					.name = "PS_Flat3D",
 					.stage = ShadeStages::Pixel,
 					.threadGroupSize = tvec3<uint> { },
 					.inLayout = IOLayoutDef { },
@@ -204,7 +202,7 @@ const ShaderLibDef s_BuiltInShaders =
 				{
 					.fileName = "",
 					.binSrc = { (byte*)&PS_TexturedSrc, sizeof(PS_TexturedSrc), },
-					.name = "PS_TexturedSrc",
+					.name = "PS_Textured",
 					.stage = ShadeStages::Pixel,
 					.threadGroupSize = tvec3<uint> { },
 					.inLayout = IOLayoutDef { },
@@ -260,7 +258,7 @@ const ShaderLibDef s_BuiltInShaders =
 					{
 						ResourceDef { "SrcTex", ShaderTypes::Texture2D },
 						ResourceDef { "DstTex", ShaderTypes::RWTexture2D },
-						ResourceDef { "samp", ShaderTypes::Sampler }
+						ResourceDef { "Samp", ShaderTypes::Sampler }
 					},
 					.constBufs =
 					{
@@ -285,7 +283,7 @@ const ShaderLibDef s_BuiltInShaders =
 					{
 						ResourceDef { "SrcTex", ShaderTypes::Texture2D },
 						ResourceDef { "DstTex", ShaderTypes::RWTexture2D },
-						ResourceDef { "samp", ShaderTypes::Sampler }
+						ResourceDef { "Samp", ShaderTypes::Sampler }
 					},
 					.constBufs =
 					{
