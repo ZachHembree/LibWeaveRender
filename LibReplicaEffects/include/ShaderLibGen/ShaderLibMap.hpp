@@ -14,17 +14,19 @@ namespace Replica::Effects
 
 		ShaderLibMap();
 
-		ShaderLibMap(const ShaderLibDef* pDef);
+		ShaderLibMap(const ShaderLibDef& def);
+
+		ShaderLibMap(ShaderLibDef&& def);
 
 		/// <summary>
 		/// Returns the shader by shaderID and variantID
 		/// </summary>
-		const ShaderDef& GetShader(int shaderID, int vID = 0) const { return pDef->variants[vID].shaders[shaderID]; }
+		const ShaderDef& GetShader(int shaderID, int vID = 0) const;
 
 		/// <summary>
 		/// Returns the effect with the given effectID and variantID
 		/// </summary>
-		const EffectDef& GetEffect(int effectID, int vID = 0) const { return pDef->variants[vID].effects[effectID]; }
+		const EffectDef& GetEffect(int effectID, int vID = 0) const;
 
 		/// <summary>
 		/// Returns the shaderID by name and variantID, -1 on fail
@@ -88,6 +90,26 @@ namespace Replica::Effects
 		int TryGetFlags(const T&... args) const { return TryGetFlags(std::initializer_list<string_view>{ args... }); }
 
 		/// <summary>
+		/// Calculates the bit flag configuration used from a given variant ID
+		/// </summary>
+		int GetFlagID(const int variantID) const;
+
+		/// <summary>
+		/// Calculates the modeID from a given variant ID
+		/// </summary>
+		int GetModeID(const int variantID) const;
+
+		/// <summary>
+		/// Calculates variantID from the given flag and mode configuration. Required for variant lookup.
+		/// </summary>
+		int GetVariantID(const int flagID, const int modeID) const;
+
+		/// <summary>
+		/// Returns true if the given flag or mode is set for the given vID
+		/// </summary>
+		bool GetIsDefined(string_view name, const int vID) const;
+
+		/// <summary>
 		/// Returns the total number of flag combinations used for variant generation
 		/// </summary>
 		size_t GetFlagVariantCount() const;
@@ -103,19 +125,14 @@ namespace Replica::Effects
 		size_t GetVariantCount() const;
 
 		/// <summary>
-		/// Calculates the bit flag configuration used from a given variant ID
+		/// Returns the number of shaders in a given variant
 		/// </summary>
-		int GetFlagID(const int variantID) const;
+		size_t GetShaderCount(int vID = 0) const;
 
 		/// <summary>
-		/// Calculates the modeID from a given variant ID
+		/// Returns the number of effects in a given variant
 		/// </summary>
-		int GetModeID(const int variantID) const;
-
-		/// <summary>
-		/// Calculates variantID from the given flag and mode configuration. Required for variant lookup.
-		/// </summary>
-		int GetVariantID(const int flagID, const int modeID) const;
+		size_t GetEffectCount(int vID = 0) const;
 
 	private:
 		using NameIndexMap = std::unordered_map<string_view, int>;
@@ -139,7 +156,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Pointer to serializable library data
 		/// </summary>
-		const ShaderLibDef* const pDef;
+		std::unique_ptr<ShaderLibDef> pDef;
 
 		/// <summary>
 		/// Flag names used for static shader variant generation
@@ -155,5 +172,9 @@ namespace Replica::Effects
 		/// Stores shader and effect variant lookup tables
 		/// </summary>
 		UniqueArray<VariantNameMap> variantMaps;
+
+		void InitMap();
+
+		const VariantDef& GetVariant(const int vID) const;
 	};
 }
