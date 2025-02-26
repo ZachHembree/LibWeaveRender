@@ -25,11 +25,11 @@ namespace Replica::D3D11
 			ResourceAccessFlags cpuAccess = ResourceAccessFlags::None
 		);
 
-		VertexBuffer() : count(0), stride(0) { }
+		VertexBuffer();
 
-		VertexBuffer(VertexBuffer&&) = default;
+		VertexBuffer(VertexBuffer&&);
 
-		VertexBuffer& operator=(VertexBuffer&&) = default;
+		VertexBuffer& operator=(VertexBuffer&&);
 
 		/// <summary>
 		/// Returns the number of elements in the buffer

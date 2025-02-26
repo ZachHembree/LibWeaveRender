@@ -1,6 +1,8 @@
 #include "pch.hpp"
-#include <d3d11.h>
 #include "ReplicaInternalD3D11.hpp"
+#include "D3D11/Resources/BufferBase.hpp"
+#include "D3D11/Context.hpp"
+#include "D3D11/Device.hpp"
 
 using namespace Replica::D3D11;
 

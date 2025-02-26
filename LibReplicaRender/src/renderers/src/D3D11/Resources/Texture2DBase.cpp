@@ -2,6 +2,9 @@
 #include <WICTextureLoader.h>
 #include <DirectXTex.h>
 #include "ReplicaInternalD3D11.hpp"
+#include "D3D11/Device.hpp"
+#include "D3D11/Context.hpp"
+#include "D3D11/Resources/Texture2DBase.hpp"
 
 using namespace DirectX;
 using namespace Replica;
@@ -100,7 +103,7 @@ void Texture2DBase::UpdateMapUnmap(Context& ctx, void* data)
 void Texture2DBase::UpdateSubresource(Context& ctx, void* data, size_t stride)
 {
 	const ivec2 size = GetSize();
-	pixelStride = stride;
+	pixelStride = (int)stride;
 
 	D3D11_BOX dstBox;
 	dstBox.left = 0;

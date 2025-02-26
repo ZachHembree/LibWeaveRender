@@ -2,6 +2,8 @@
 #include <WICTextureLoader.h>
 #include <DirectXTex.h>
 #include "ReplicaInternalD3D11.hpp"
+#include "D3D11/Resources/StagingTexture2D.hpp"
+#include "D3D11/Device.hpp"
 
 using namespace DirectX;
 using namespace Replica;

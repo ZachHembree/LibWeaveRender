@@ -5,6 +5,8 @@ namespace Replica::D3D11
 {
 	class Material
 	{
+	public:
 
+	private:
 	};
 }

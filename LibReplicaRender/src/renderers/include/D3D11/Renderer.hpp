@@ -5,7 +5,10 @@
 #include "WindowComponentBase.hpp"
 #include "SwapChain.hpp"
 #include "Device.hpp"
+#include "ShaderLibrary.hpp"
+#include "Shaders/ComputeShader.hpp"
 #include "RenderComponent.hpp"
+#include "Viewport.hpp"
 #include "Resources/DepthStencilTexture.hpp"
 
 #pragma comment(lib, "d3d11.lib")
@@ -22,7 +25,6 @@ namespace Replica::D3D11
 	class ConstantBuffer;
 	class SwapChain;
 	class Sampler;
-	class ShaderLibrary;
 
 	class Renderer : public WindowComponentBase
 	{
@@ -84,7 +86,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns reference to a default effect
 		/// </summary>
-		Effect& GetDefaultEffect(string_view name) const;
+		EffectVariant& GetDefaultEffect(string_view name) const;
 
 		/// <summary>
 		/// Returns reference to a default compute shader
@@ -123,6 +125,7 @@ namespace Replica::D3D11
 
 	private:
 		std::unique_ptr<ShaderLibrary> pDefaultShaders;
+		mutable std::unordered_map<string_view, ComputeShader> defaultCompute;
 		std::unordered_map<string_view, Mesh> defaultMeshes;
 		std::unordered_map<string_view, Sampler> defaultSamplers;
 

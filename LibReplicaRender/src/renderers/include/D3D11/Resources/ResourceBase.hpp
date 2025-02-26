@@ -1,7 +1,8 @@
 #pragma once
 #pragma warning(disable: 4250)
 
-#include "ReplicaD3D11.hpp"
+#include "ReplicaMath.hpp"
+#include <d3d11.h>
 #include "DeviceChild.hpp"
 #include "ResourceEnums.hpp"
 #include "Formats.hpp"
@@ -27,23 +28,15 @@ namespace Replica::D3D11
 	public:
 
 	protected:
-		ResourceBase() : DeviceChild() { }
+		MAKE_NO_COPY(ResourceBase)
 
-		ResourceBase(Device& dev) : DeviceChild(dev) { }
+		ResourceBase();
 
-		ResourceBase(ResourceBase&& other) noexcept : 
-			DeviceChild(std::move(other)) 
-		{ }
+		ResourceBase(Device& dev);
 
-		ResourceBase& operator=(ResourceBase&& other) noexcept
-		{
-			DeviceChild::operator=(std::move(other));
-			return *this;
-		}
+		ResourceBase(ResourceBase&& other) noexcept;
 
-		ResourceBase(const ResourceBase& other) = delete;
-
-		ResourceBase& operator=(const ResourceBase& other) = delete;
+		ResourceBase& operator=(ResourceBase&& other) noexcept;
 	};
 
 	/// <summary>

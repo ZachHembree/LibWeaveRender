@@ -1,23 +1,26 @@
 #pragma once
-#include "ReplicaD3D11.hpp"
 #include "Resources/DeviceChild.hpp"
 #include "Resources/ResourceBase.hpp"
+#include "ShaderLibGen/ShaderData.hpp"
+#include "Viewport.hpp"
 
 namespace Replica::D3D11
 {
+	using Effects::ShadeStages;
 	class Renderer;
 
 	class BufferBase;
 	class VertexBuffer;
 	class IndexBuffer;
 	class ConstantBuffer;
+
 	class SwapChain;
 	class InputLayout;
 
 	class VertexShader;
 	class PixelShader;
 	class ComputeShader;
-	class Effect;
+	class EffectVariant;
 
 	class Texture2D;
 	class RWTexture2D;
@@ -52,32 +55,55 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Binds the given vertex shader
 		/// </summary>
-		void SetVS(VertexShader* vs);
+		void BindShader(VertexShader& vs);
 
 		/// <summary>
 		/// Binds the given pixel shader
 		/// </summary>
-		void SetPS(PixelShader* ps);
+		void BindShader(PixelShader& ps);
 
 		/// <summary>
 		/// Binds the given compute shader
 		/// </summary>
-		void SetCS(ComputeShader* cs);
+		void BindShader(ComputeShader& cs);
+
+		/// <summary>
+		/// Clears the given vertex shader
+		/// </summary>
+		void UnbindShader(ShadeStages stage);
 
 		/// <summary>
 		/// Returns true if the given shader is bound
 		/// </summary>
-		bool GetIsVsBound(VertexShader* vs) const;
+		bool GetIsBound(VertexShader* vs) const;
 
 		/// <summary>
 		/// Returns true if the given shader is bound
 		/// </summary>
-		bool GetIsPsBound(PixelShader* ps) const;
+		bool GetIsBound(PixelShader* ps) const;
 
 		/// <summary>
 		/// Returns true if the given shader is bound
 		/// </summary>
-		bool GetIsCsBound(ComputeShader* cs) const;
+		bool GetIsBound(ComputeShader* cs) const;
+
+		void Dispatch(ComputeShader& cs, ivec3 groups);
+
+		void SetSamplers(const IDynamicArray<ID3D11SamplerState*>& samplers, ShadeStages stage);
+
+		void SetUAVs(const IDynamicArray<ID3D11UnorderedAccessView*>& uavs);
+
+		void SetSRVs(const IDynamicArray<ID3D11ShaderResourceView*>& srvs, ShadeStages stage);
+
+		void SetConstants(IDynamicArray<ConstantBuffer>& cBuffers, ShadeStages stage);
+
+		void ClearSamplers(const uint start, const uint count, ShadeStages stage);
+
+		void ClearUAVs(const uint start, const uint count);
+
+		void ClearSRVs(const uint start, const uint count, ShadeStages stage);
+
+		void ClearConstants(const uint start, const uint count, ShadeStages stage);
 
 		/// <summary>
 		/// Unbinds all resources
@@ -214,12 +240,12 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Draws an indexed, non-instanced triangle meshes using the given effect
 		/// </summary>
-		void Draw(Mesh& mesh, Effect& effect);
+		void Draw(Mesh& mesh, EffectVariant& effect);
 
 		/// <summary>
 		/// Draws a group of indexed, non-instanced triangle meshes using the given effect
 		/// </summary>
-		void Draw(IDynamicArray<Mesh>& meshes, Effect& effect);
+		void Draw(IDynamicArray<Mesh>& meshes, EffectVariant& effect);
 
 	private:
 		ComPtr<ID3D11DeviceContext> pContext;

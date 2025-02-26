@@ -2,6 +2,15 @@
 #include "ReplicaWin32.hpp"
 #include "ReplicaInternalD3D11.hpp"
 #include "D3D11/ShaderLibrary.hpp"
+#include "D3D11/Renderer.hpp"
+#include "D3D11/EffectVariant.hpp"
+#include "D3D11/Resources/Sampler.hpp"
+#include "D3D11/Shaders/VertexShader.hpp"
+#include "D3D11/Shaders/PixelShader.hpp"
+#include "D3D11/Shaders/ComputeShader.hpp"
+#include "D3D11/Shaders/BuiltInShaders.hpp"
+#include "D3D11/Mesh.hpp"
+#include "D3D11/Primitives.hpp"
 
 using namespace Replica;
 using namespace Replica::D3D11;
@@ -111,12 +120,33 @@ void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
 /// <summary>
 /// Returns reference to a default effect
 /// </summary>
-Effect& Renderer::GetDefaultEffect(string_view name) const { return pDefaultShaders->GetEffect(name); }
+EffectVariant& Renderer::GetDefaultEffect(string_view name) const { return pDefaultShaders->GetEffect(name); }
 
 /// <summary>
 /// Returns reference to a default compute shader
 /// </summary>
-ComputeShader& Renderer::GetDefaultCompute(string_view name) const { return dynamic_cast<ComputeShader&>(pDefaultShaders->GetShader(name)); }
+ComputeShader& Renderer::GetDefaultCompute(string_view name) const 
+{
+	auto it = defaultCompute.find(name);
+
+	if (it != defaultCompute.end())
+	{
+		return it->second;
+	}
+	else
+	{
+		const int shaderID = pDefaultShaders->GetLibMap().TryGetShaderID(name);
+
+		if (shaderID != -1)
+		{
+			const auto& cs = pDefaultShaders->GetShader<ComputeShaderVariant>(shaderID);
+			defaultCompute.emplace(name, ComputeShader(cs));
+			return defaultCompute[name];
+		}
+		else
+			GFX_THROW("Default shader undefined");
+	}
+}
 
 /// <summary>
 /// Retursn a reference to a default mesh

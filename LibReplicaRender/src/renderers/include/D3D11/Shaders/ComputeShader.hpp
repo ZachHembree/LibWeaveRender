@@ -3,20 +3,15 @@
 
 namespace Replica::D3D11
 {
-	class RWTexture2D;
-
-	class ComputeShader : public ShaderBase
+	class ComputeShader : public ShaderInstance<ID3D11ComputeShader>
 	{
 	public:
-		using ShaderBase::Bind;
-		using ShaderBase::SetSampler;
-		using ShaderBase::SetTexture;
+		using ShaderInstance::SetSampler;
+		using ShaderInstance::SetTexture;
 
 		ComputeShader();
 
-		ComputeShader(Device& dev, const ShaderDef& csDef);
-
-		ID3D11ComputeShader* Get() const;
+		ComputeShader(const ComputeShaderVariant& cs);
 
 		/// <summary>
 		/// Sets RWTexture2D using last context
@@ -49,10 +44,11 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Unbinds compute shader
 		/// </summary>
-		void Unbind() override;
+		void Unbind(Context& ctx) override;
+
+		void UnmapResources(Context& ctx) override;
 
 	private:
-		ComPtr<ID3D11ComputeShader> pCS;
 		ResourceMap<ID3D11UnorderedAccessView> uavBuffers;
 	};
 }

@@ -1,6 +1,6 @@
 #include "pch.hpp"
 #include "ReplicaInternalD3D11.hpp"
-#include "D3D11/Effect.hpp"
+#include "D3D11/EffectVariant.hpp"
 #include "D3D11/Shaders/ComputeShader.hpp"
 #include "D3D11/ShaderSrc/CS_TexCopy2D.hpp"
 #include "D3D11/ShaderSrc/CS_TexCopySamp2D.hpp"

@@ -1,5 +1,7 @@
 #include "pch.hpp"
 #include "ReplicaInternalD3D11.hpp"
+#include "D3D11/Device.hpp"
+#include "D3D11/Resources/VertexBuffer.hpp"
 
 using namespace Replica::D3D11;
 
@@ -15,6 +17,12 @@ VertexBuffer::VertexBuffer(
 	stride((UINT)stride),
 	BufferBase(ResourceBindFlags::Vertex, usage, cpuAccess, device, data, (UINT)(stride * count))
 { }
+
+VertexBuffer::VertexBuffer() : count(0), stride(0) {}
+
+VertexBuffer::VertexBuffer(VertexBuffer&&) = default;
+
+VertexBuffer& VertexBuffer::operator=(VertexBuffer&&) = default;
 
 /// <summary>
 /// Returns the number of elements in the buffer

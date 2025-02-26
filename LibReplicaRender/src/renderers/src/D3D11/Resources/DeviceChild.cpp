@@ -1,5 +1,7 @@
 #include "pch.hpp"
 #include "ReplicaInternalD3D11.hpp"
+#include "D3D11/Resources/DeviceChild.hpp"
+#include "D3D11/Device.hpp"
 
 using namespace Replica::D3D11;
 

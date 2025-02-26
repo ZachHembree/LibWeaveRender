@@ -1,5 +1,8 @@
 #include "pch.hpp"
 #include "ReplicaInternalD3D11.hpp"
+#include "D3D11/Context.hpp"
+#include "D3D11/Resources/ConstantMap.hpp"
+#include "D3D11/Resources/ConstantBuffer.hpp"
 
 using namespace Replica;
 using namespace Replica::Effects;

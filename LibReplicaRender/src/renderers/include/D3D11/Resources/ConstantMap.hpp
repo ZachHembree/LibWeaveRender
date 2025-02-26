@@ -7,6 +7,7 @@ namespace Replica::D3D11
 {
 	using Effects::ConstBufLayout;
 
+	class Context;
 	class ConstantBuffer;
 
 	/// <summary>
@@ -52,6 +53,8 @@ namespace Replica::D3D11
 				SetMember(name, reinterpret_cast<const byte*>(&value), sizeof(T));
 		}
 
+		void SetMember(string_view name, const byte* src, const size_t size);
+
 		/// <summary>
 		/// Writes the given data to the buffer
 		/// </summary>
@@ -85,7 +88,5 @@ namespace Replica::D3D11
 		size_t stride;
 		UniqueArray<byte> data;
 		std::unordered_map<string_view, MapEntry> defMap;
-
-		void SetMember(string_view name, const byte* src, const size_t size);
 	};
 }

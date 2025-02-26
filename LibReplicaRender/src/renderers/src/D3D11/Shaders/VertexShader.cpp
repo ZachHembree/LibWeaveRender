@@ -1,82 +1,52 @@
 #include "pch.hpp"
-#include <d3dcompiler.h>
 #include "ReplicaInternalD3D11.hpp"
+#include "D3D11/Shaders/VertexShader.hpp"
 
 using namespace Replica::D3D11;
-using namespace Microsoft::WRL;
 
-VertexShader::VertexShader()
-{ }
+VertexShader::VertexShader() = default;
 
-VertexShader::VertexShader(
-	Device& dev, 
-	const ShaderDef& vsDef
-) :
-	ShaderBase(dev, vsDef)
+VertexShader::VertexShader(const VertexShaderVariant& vs) :
+	ShaderInstance(vs)
 {
-	GFX_THROW_FAILED(dev->CreateVertexShader(vsDef.binSrc.GetPtr(), vsDef.binSrc.GetLength(), nullptr, &pVS));
-	this->layout = InputLayout(dev, vsDef.binSrc.GetPtr(), vsDef.binSrc.GetLength(), vsDef.inLayout);
+	const ShaderDef& vsDef = vs.GetDefinition();
+	this->layout = InputLayout(vs.GetDevice(), vsDef.binSrc.GetPtr(), vsDef.binSrc.GetLength(), vsDef.inLayout);
 }
-
-ID3D11VertexShader* VertexShader::Get() const { return pVS.Get(); }
 
 const InputLayout& VertexShader::GetLayout() const { return layout; }
 
 void VertexShader::Bind(Context& ctx)
 {
-	if (!ctx.GetIsVsBound(this))
+	if (!ctx.GetIsBound(this))
 	{
-		ctx.SetVS(this);
-		this->pCtx = &ctx;
-
-		const auto& ss = samplers.GetResources();
-		const auto& tex = textures.GetResources();
-
-		ctx->VSSetSamplers(0, (UINT)ss.GetLength(), ss.GetPtr());
-		ctx->VSSetShaderResources(0, (UINT)tex.GetLength(), tex.GetPtr());		
-
-		ID3D11Buffer* pCBs[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT](nullptr);
-
-		for (int i = 0; i < cBuffers.GetLength(); i++)
-		{
-			pCBs[i] = cBuffers[i].Get();
-		}
-
-		ctx->VSSetConstantBuffers(0u, (uint)cBuffers.GetLength(), reinterpret_cast<ID3D11Buffer**>(&pCBs));
+		ctx.SetSamplers(samplers.GetResources(), ShadeStages::Vertex);
+		ctx.SetSRVs(textures.GetResources(), ShadeStages::Vertex);
+		ctx.SetConstants(cBuffers, ShadeStages::Vertex);
 		layout.Bind(ctx);
-
-		isBound = true;
+		
+		ctx.BindShader(*this);
 	}
 
-	if (ctx.GetIsVsBound(this))
+	if (ctx.GetIsBound(this))
 	{
-		int i = 0;
-
-		for (const auto& pair : constants)
-		{
-			pair.second.UpdateConstantBuffer(cBuffers[i], ctx);
-			i++;
-		}
+		UpdateConstants(ctx);
 	}
 }
 
-void VertexShader::Unbind()
+void VertexShader::Unbind(Context& ctx)
 {
-	if (isBound && pCtx->GetIsVsBound(this))
+	if (ctx.GetIsBound(this))
 	{
-		isBound = false;
-		pCtx->SetVS(nullptr);	
-		ID3D11DeviceContext& ctx = pCtx->Get();
+		ctx.UnbindShader(ShadeStages::Vertex);
+	}
+}
 
-		ID3D11SamplerState* nullSamp[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT](nullptr);
-		ctx.VSSetSamplers(0, samplers.GetCount(), nullSamp);
-
-		ID3D11ShaderResourceView* nullSRV[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT](nullptr);
-		ctx.VSSetShaderResources(0, textures.GetCount(), nullSRV);
-
-		ID3D11Buffer* nullCB[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT](nullptr);
-		ctx.VSSetConstantBuffers(0, 1, nullCB);
-	
-		pCtx = nullptr;
+void VertexShader::UnmapResources(Context& ctx)
+{
+	if (ctx.GetIsBound(this))
+	{
+		ctx.ClearSamplers(0, (int)samplers.GetCount(), ShadeStages::Vertex);
+		ctx.ClearSRVs(0, (int)textures.GetCount(), ShadeStages::Vertex);
+		ctx.ClearConstants(0, (int)cBuffers.GetLength(), ShadeStages::Vertex);
 	}	
 }

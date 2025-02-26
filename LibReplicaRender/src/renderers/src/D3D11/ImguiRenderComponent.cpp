@@ -1,6 +1,7 @@
 #include "pch.hpp"
-#include "ReplicaD3D11.hpp"
-#include "../src/renderers/include/D3D11/ImguiRenderComponent.hpp"
+#include "ReplicaInternalD3D11.hpp"
+#include "D3D11/ImguiRenderComponent.hpp"
+#include "D3D11/Renderer.hpp"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>

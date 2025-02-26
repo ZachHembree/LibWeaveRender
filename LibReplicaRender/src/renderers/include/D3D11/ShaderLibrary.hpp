@@ -1,8 +1,7 @@
 #pragma once
-#include "Shaders/VertexShader.hpp"
-#include "Shaders/PixelShader.hpp"
-#include "Shaders/ComputeShader.hpp"
 #include "ShaderLibGen/ShaderLibMap.hpp"
+#include "../D3D11/EffectVariant.hpp"
+#include "../D3D11/Shaders/ShaderVariantBase.hpp"
 
 namespace Replica::D3D11
 {
@@ -11,124 +10,62 @@ namespace Replica::D3D11
 	using Effects::ShadeStages;
 	using Effects::EffectDef;
 
+	class Device;
+
 	class ShaderLibrary
 	{
 	public:
-		ShaderLibrary() :
-			pDev(nullptr)
-		{ }
+		MAKE_NO_COPY(ShaderLibrary)
 
-		ShaderLibrary(Device& device, const ShaderLibDef& def) :
-			pDev(&device),
-			libDef(def),
-			libMap(&libDef)
-		{ }
+		ShaderLibrary();
 
-		ShaderLibrary(Device& device, ShaderLibDef&& def) :
-			pDev(&device),
-			libDef(std::move(def)),
-			libMap(&libDef)
-		{ }
+		ShaderLibrary(Device& device, const ShaderLibDef& def);
 
-		ShaderBase& GetShader(int shaderID, int vID = 0)
+		ShaderLibrary(Device& device, ShaderLibDef&& def);
+
+		bool TryGetShader(const int shaderID, const VertexShaderVariant*& pVS, const int vID = 0);
+
+		bool TryGetShader(const int shaderID, const PixelShaderVariant*& pPS, const int vID = 0);
+
+		bool TryGetShader(const int shaderID, const ComputeShaderVariant*& pCS, const int vID = 0);
+
+		EffectVariant& GetEffect(const int effectID, const int vID = 0);
+
+		EffectVariant& GetEffect(string_view name, const int vID = 0);
+
+		/// <summary>
+		/// Retrieves interface for querying shader definitions
+		/// </summary>
+		const ShaderLibMap& GetLibMap() const;
+
+		template<typename ShaderT> const ShaderT& GetShader(const int shaderID, const int vID = 0)
 		{
-			Variant& variant = GetVariant(vID);
-			const int shaderCount = libDef.variants[vID].shaders.GetLength();
+			const ShaderT* pShader = nullptr;
 
-			if (variant.shaders.GetLength() == 0)
-				variant.shaders = UniqueArray<ShaderBase*>(shaderCount, nullptr);
-
-			GFX_ASSERT(shaderID >= 0 && shaderID < variant.shaders.GetLength(), "ShaderID out of range");
-
-			if (variant.shaders[shaderID] == nullptr)
-			{
-				const ShaderDef& def = libMap.GetShader(shaderID, vID);
-				ShaderBase* pShader = nullptr;
-
-				switch (def.stage)
-				{
-				case ShadeStages::Vertex:
-					pShader = &vertexShaders.emplace_back(*pDev, def);
-					break;
-				case ShadeStages::Pixel:
-					pShader = &pixelShaders.emplace_back(*pDev, def);
-					break;
-				case ShadeStages::Compute:
-					pShader = &computeShaders.emplace_back(*pDev, def);
-					break;
-				}
-
-				variant.shaders[shaderID] = pShader;
-			}
-
-			return *variant.shaders[shaderID];
-		}
-
-		Effect& GetEffect(int effectID, int vID = 0)
-		{
-			Variant& variant = GetVariant(vID);
-			const int effectCount = libDef.variants[vID].effects.GetLength();
-
-			if (variant.effects.GetLength() != effectCount)
-				variant.effects = UniqueArray<Effect*>(effectCount, nullptr);
-
-			GFX_ASSERT(effectID >= 0 && effectID < variant.effects.GetLength(), "EffectID out of range");
-
-			if (variant.effects[effectID] == nullptr)
-			{
-				const EffectDef& def = libMap.GetEffect(effectID, vID);
-				variant.effects[effectID] = &effects.emplace_back(*this, def);
-			}
-			
-			return *variant.effects[effectID];
-		}
-
-		ShaderBase& GetShader(string_view name, int vID = 0)
-		{
-			const int shaderID = libMap.TryGetShaderID(name, vID);
-
-			if (shaderID != -1)
-				return GetShader(shaderID, vID);
+			if (TryGetShader(shaderID, pShader, vID))
+				return *pShader;
 			else
-				GFX_THROW("Shader name invalid");
+				GFX_THROW("Invalid shader specified");
 		}
 
-		Effect& GetEffect(string_view name, int vID = 0)
+		template<typename ShaderT> const ShaderT& GetShader(string_view name, const int vID = 0)
 		{
-			const int effectID = libMap.TryGetEffectID(name, vID);
-
-			if (effectID != -1)
-				return GetEffect(effectID, vID);
-			else
-				GFX_THROW("Effect name invalid");
+			return GetShader<ShaderT>(libMap.TryGetShaderID(name, vID), vID);
 		}
 
 	private:
 		struct Variant
 		{		
-			UniqueArray<ShaderBase*> shaders;
-			UniqueArray<Effect*> effects;		
+			std::unordered_map<int, VertexShaderVariant> vertexShaders;
+			std::unordered_map<int, PixelShaderVariant> pixelShaders;
+			std::unordered_map<int, ComputeShaderVariant> computeShaders;
+			std::unordered_map<int, EffectVariant> effects;	
 		};
 
-		UniqueVector<VertexShader> vertexShaders;
-		UniqueVector<PixelShader> pixelShaders;
-		UniqueVector<ComputeShader> computeShaders;
-		UniqueVector<Effect> effects;
-
 		std::unordered_map<int, Variant> variants;
-		ShaderLibDef libDef;
 		ShaderLibMap libMap;
 		Device* pDev;
 
-		Variant& GetVariant(const int vID)
-		{
-			GFX_ASSERT(vID >= 0 && vID < libDef.variants.GetLength(), "Shader variant configuration invalid")
-
-			// Create variant if not instantiated
-			if (!variants.contains(vID))
-				variants.emplace(vID, Variant());
-
-			return variants[vID];
-		}
+		Variant& GetVariant(const int vID);
 	};
 }

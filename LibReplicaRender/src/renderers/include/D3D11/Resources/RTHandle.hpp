@@ -3,6 +3,8 @@
 
 namespace Replica::D3D11
 {
+	class SwapChain;
+
 	/// <summary>
 	/// Handle to internally managed Render Texture handle
 	/// </summary>

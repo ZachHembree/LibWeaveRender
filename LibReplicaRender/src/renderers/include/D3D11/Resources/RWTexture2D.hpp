@@ -1,5 +1,8 @@
 #pragma once
 #include "ResizeableTexture2D.hpp"
+#include "../Resources/RWTexture2D.hpp"
+#include "../Device.hpp"
+#include "../Context.hpp"
 
 namespace Replica::D3D11
 {

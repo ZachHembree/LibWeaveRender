@@ -1,5 +1,7 @@
 #include "pch.hpp"
 #include "ReplicaInternalD3D11.hpp"
+#include "D3D11/Device.hpp"
+#include "D3D11/Resources/IndexBuffer.hpp"
 
 using namespace Replica::D3D11;
 
@@ -11,6 +13,12 @@ IndexBuffer::IndexBuffer(Device& device,
 	count((UINT)data.GetLength()),
 	BufferBase(ResourceBindFlags::Index, usage, cpuAccess, device, data)
 { }
+
+IndexBuffer::IndexBuffer() : count(0) {}
+
+IndexBuffer::IndexBuffer(IndexBuffer&&) = default;
+
+IndexBuffer& IndexBuffer::operator=(IndexBuffer&&) = default;
 
 /// <summary>
 /// Returns the number of elements in the buffer

@@ -32,7 +32,7 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Draws the object
 	/// </summary>
-	void Mesh::Draw(Context& ctx, Effect& effect)
+	void Mesh::Draw(Context& ctx, EffectVariant& effect)
 	{
 		ctx.Draw(*this, effect);
 	}

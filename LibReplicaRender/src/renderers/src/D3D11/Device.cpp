@@ -42,3 +42,18 @@ ID3D11Device* Device::operator->() { return pDev.Get(); }
 /// Returns reference to main device context
 /// </summary>
 Context& Device::GetContext() { return this->context; }
+
+void Device::CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11VertexShader>& pVS)
+{
+	GFX_THROW_FAILED(pDev->CreateVertexShader(binSrc.GetPtr(), binSrc.GetLength(), nullptr, &pVS));
+}
+
+void Device::CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11PixelShader>& pPS)
+{
+	GFX_THROW_FAILED(pDev->CreatePixelShader(binSrc.GetPtr(), binSrc.GetLength(), nullptr, &pPS));
+}
+
+void Device::CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11ComputeShader>& pCS)
+{
+	GFX_THROW_FAILED(pDev->CreateComputeShader(binSrc.GetPtr(), binSrc.GetLength(), nullptr, &pCS));
+}

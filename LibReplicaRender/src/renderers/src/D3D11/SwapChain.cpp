@@ -3,6 +3,7 @@
 #include <wrl.h>
 #include "ReplicaWin32.hpp"
 #include "ReplicaInternalD3D11.hpp"
+#include "D3D11/SwapChain.hpp"
 
 using namespace Replica;
 using namespace Replica::D3D11;

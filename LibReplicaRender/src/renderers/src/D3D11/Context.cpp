@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include <d3dcompiler.h>
 #include "ReplicaD3D11.hpp"
 
 using namespace glm;
@@ -39,65 +40,205 @@ Renderer& Context::GetRenderer()
 	return GetDevice().GetRenderer();
 }
 
-void Context::SetVS(VertexShader* vs)
+void Context::SetSamplers(const IDynamicArray<ID3D11SamplerState*>& samplers, ShadeStages stage)
 {
-	if (vs != currentVS || currentVS == nullptr || vs == nullptr)
+	switch (stage)
 	{
-		if ((vs != currentVS) && currentVS != nullptr)
-			currentVS->Unbind();
-
-		ID3D11VertexShader* pVs = vs != nullptr ? vs->Get() : nullptr;
-		Get().VSSetShader(pVs, nullptr, 0);
-		currentVS = vs;
+	case ShadeStages::Vertex:
+		Get().VSSetSamplers(0, (UINT)samplers.GetLength(), samplers.GetPtr());
+		break;
+	case ShadeStages::Pixel:
+		Get().PSSetSamplers(0, (UINT)samplers.GetLength(), samplers.GetPtr());
+		break;
+	case ShadeStages::Compute:
+		Get().CSSetSamplers(0, (UINT)samplers.GetLength(), samplers.GetPtr());
+		break;
 	}
 }
 
-void Context::SetPS(PixelShader* ps)
+void Context::SetUAVs(const IDynamicArray<ID3D11UnorderedAccessView*>& uavs)
 {
-	if (ps != currentPS || currentPS == nullptr || ps == nullptr)
-	{ 
-		if ((ps != currentPS) && currentPS != nullptr)
-			currentPS->Unbind();
-
-		ID3D11PixelShader* pPs = ps != nullptr ? ps->Get() : nullptr;
-		Get().PSSetShader(pPs, nullptr, 0);
-		currentPS = ps;
-	}
+	Get().CSSetUnorderedAccessViews(0, (UINT)uavs.GetLength(), uavs.GetPtr(), 0);
 }
 
-void Context::SetCS(ComputeShader* cs)
+void Context::SetSRVs(const IDynamicArray<ID3D11ShaderResourceView*>& srvs, ShadeStages stage)
 {
-	if (cs != currentCS || currentCS == nullptr || cs == nullptr)
+	switch (stage)
 	{
-		if ((cs != currentCS) && currentCS != nullptr)
-			currentCS->Unbind();
-
-		ID3D11ComputeShader* pCS = cs != nullptr ? cs->Get() : nullptr;
-		Get().CSSetShader(pCS, nullptr, 0);
-		currentCS = cs;
+	case ShadeStages::Vertex:
+		Get().VSSetShaderResources(0, (UINT)srvs.GetLength(), srvs.GetPtr());
+		break;
+	case ShadeStages::Pixel:
+		Get().PSSetShaderResources(0, (UINT)srvs.GetLength(), srvs.GetPtr());
+		break;
+	case ShadeStages::Compute:
+		Get().CSSetShaderResources(0, (UINT)srvs.GetLength(), srvs.GetPtr());
+		break;
 	}
 }
 
-bool Context::GetIsVsBound(VertexShader* vs) const
+void Context::SetConstants(IDynamicArray<ConstantBuffer>& cBuffers, ShadeStages stage)
 {
-	return currentVS != nullptr && vs == currentVS;
+	ID3D11Buffer* pCBs[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT](nullptr);
+
+	for (int i = 0; i < cBuffers.GetLength(); i++)
+		pCBs[i] = cBuffers[i].Get();
+
+	switch (stage)
+	{
+	case ShadeStages::Vertex:
+		Get().VSSetConstantBuffers(0u, (uint)cBuffers.GetLength(), reinterpret_cast<ID3D11Buffer**>(&pCBs));
+		break;
+	case ShadeStages::Pixel:
+		Get().PSSetConstantBuffers(0u, (uint)cBuffers.GetLength(), reinterpret_cast<ID3D11Buffer**>(&pCBs));
+		break;
+	case ShadeStages::Compute:
+		Get().CSSetConstantBuffers(0u, (uint)cBuffers.GetLength(), reinterpret_cast<ID3D11Buffer**>(&pCBs));
+		break;
+	}
 }
 
-bool Context::GetIsPsBound(PixelShader* ps) const
+void Context::ClearSamplers(const uint start, const uint count, ShadeStages stage)
 {
-	return currentPS != nullptr && ps == currentPS;
+	ID3D11SamplerState* nullSamp[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT](nullptr);
+
+	switch (stage)
+	{
+	case ShadeStages::Vertex:
+		Get().VSSetSamplers(start, count, nullSamp);
+		break;
+	case ShadeStages::Pixel:
+		Get().PSSetSamplers(start, count, nullSamp);
+		break;
+	case ShadeStages::Compute:
+		Get().CSSetSamplers(start, count, nullSamp);
+		break;
+	}
 }
 
-bool Context::GetIsCsBound(ComputeShader* cs) const
+void Context::ClearUAVs(const uint start, const uint count)
 {
-	return currentCS != nullptr && cs == currentCS;
+	ID3D11UnorderedAccessView* nullUAVs[D3D11_1_UAV_SLOT_COUNT](nullptr);
+	Get().CSSetUnorderedAccessViews(start, count, nullUAVs, 0);
 }
+
+void Context::ClearSRVs(const uint start, const uint count, ShadeStages stage)
+{
+	ID3D11ShaderResourceView* nullSRV[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT](nullptr);
+
+	switch (stage)
+	{
+	case ShadeStages::Vertex:
+		Get().VSSetShaderResources(start, count, nullSRV);
+		break;
+	case ShadeStages::Pixel:
+		Get().PSSetShaderResources(start, count, nullSRV);
+		break;
+	case ShadeStages::Compute:
+		Get().CSSetShaderResources(start, count, nullSRV);
+		break;
+	}
+}
+
+void Context::ClearConstants(const uint start, const uint count, ShadeStages stage)
+{
+	ID3D11Buffer* nullCBs[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT](nullptr);
+
+	switch (stage)
+	{
+	case ShadeStages::Vertex:
+		Get().VSSetConstantBuffers(start, count, nullCBs);
+		break;
+	case ShadeStages::Pixel:
+		Get().PSSetConstantBuffers(start, count, nullCBs);
+		break;
+	case ShadeStages::Compute:
+		Get().CSSetConstantBuffers(start, count, nullCBs);
+		break;
+	}
+}
+
+void Context::BindShader(VertexShader& vs)
+{
+	if (&vs != currentVS || currentVS == nullptr)
+	{
+		UnbindShader(ShadeStages::Vertex);
+		Get().VSSetShader(vs.Get(), nullptr, 0);
+		currentVS = &vs;
+	}
+}
+
+void Context::BindShader(PixelShader& ps)
+{
+	if (&ps != currentPS || currentPS == nullptr)
+	{
+		UnbindShader(ShadeStages::Pixel);
+		Get().PSSetShader(ps.Get(), nullptr, 0);
+		currentPS = &ps;
+	}
+}
+
+void Context::BindShader(ComputeShader& cs)
+{
+	// If different or not set
+	if (&cs != currentCS || currentCS == nullptr)
+	{
+		UnbindShader(ShadeStages::Compute);
+		Get().CSSetShader(cs.Get(), nullptr, 0);
+		currentCS = &cs;
+	}
+}
+
+void Context::UnbindShader(ShadeStages stage)
+{
+	switch (stage)
+	{
+	case ShadeStages::Vertex:
+		if (currentVS != nullptr)
+		{
+			currentVS->UnmapResources(*this); // Clear resources
+			Get().VSSetShader(nullptr, nullptr, 0); // Clear shader
+			currentVS = nullptr;
+		}
+		break;
+	case ShadeStages::Pixel:
+		if (currentPS != nullptr)
+		{
+			currentPS->UnmapResources(*this);
+			Get().PSSetShader(nullptr, nullptr, 0);
+			currentPS = nullptr;
+		}
+		break;
+	case ShadeStages::Compute:
+		if (currentCS != nullptr)
+		{
+			currentCS->UnmapResources(*this);
+			Get().CSSetShader(nullptr, nullptr, 0);
+			currentCS = nullptr;
+		}
+		break;
+	}
+}
+
+void Context::Dispatch(ComputeShader& cs, ivec3 groups)
+{
+	cs.Bind(*this);
+	Get().Dispatch(groups.x, groups.y, groups.z);
+	UnbindShader(ShadeStages::Compute);
+}
+
+bool Context::GetIsBound(VertexShader* vs) const { return currentVS != nullptr && vs == currentVS; }
+
+bool Context::GetIsBound(PixelShader* ps) const { return currentPS != nullptr && ps == currentPS; }
+
+bool Context::GetIsBound(ComputeShader* cs) const { return currentCS != nullptr && cs == currentCS; }
 
 void Context::Reset()
 {
-	SetVS(nullptr);
-	SetPS(nullptr);
-	SetCS(nullptr);
+	UnbindShader(ShadeStages::Vertex);
+	UnbindShader(ShadeStages::Pixel);
+	UnbindShader(ShadeStages::Compute);
+
 	pContext->OMSetRenderTargets(0, nullptr, nullptr);
 	pContext->RSSetViewports(0, nullptr);
 	pContext->OMSetDepthStencilState(nullptr, 0);
@@ -117,19 +258,19 @@ void Context::Reset()
 }
 
 /// <summary>
-/// Returns pointer to context interface
+/// Returns reference to context interface
 /// </summary>
 ID3D11DeviceContext& Context::Get() const { return *pContext.Get(); }
 
 /// <summary>
-/// Returns reference to context interface
+/// Returns pointer to context interface
 /// </summary>
 ID3D11DeviceContext* Context::operator->() const { return pContext.Get(); }
 
 /// <summary>
 /// Returns the number of viewports currently bound
 /// </summary>
-const int  Context::GetViewportCount() const
+const int Context::GetViewportCount() const
 {
 	return vpCount;
 }
@@ -326,7 +467,7 @@ void Context::IASetVertexBuffers(IDynamicArray<VertexBuffer>& vertBuffers, int s
 	}
 }
 
-void ValidateResourceBounds(
+static void ValidateResourceBounds(
 	IColorBuffer2D& src, 
 	IColorBuffer2D& dst, 
 	ivec4& srcBox, 
@@ -369,7 +510,7 @@ void ValidateResourceBounds(
 	}
 }
 
-bool CanDirectCopy(ITexture2DBase& src, ITexture2DBase& dst, const ivec4& srcBox, const ivec4& dstBox)
+static bool CanDirectCopy(ITexture2DBase& src, ITexture2DBase& dst, const ivec4& srcBox, const ivec4& dstBox)
 {
 	if (srcBox != ivec4(0) || dstBox != ivec4(0))
 	{
@@ -387,7 +528,7 @@ bool CanDirectCopy(ITexture2DBase& src, ITexture2DBase& dst, const ivec4& srcBox
 	}
 }
 
-void CopySubresource(Context& ctx, ITexture2DBase& src, ITexture2DBase& dst, ivec4& srcBox, ivec4& dstBox)
+static void CopySubresource(Context& ctx, ITexture2DBase& src, ITexture2DBase& dst, ivec4& srcBox, ivec4& dstBox)
 {
 	if (srcBox != ivec4(0) || dstBox != ivec4(0))
 	{ 
@@ -551,7 +692,7 @@ void Context::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 
 	Renderer& renderer = GetRenderer();
 	Mesh& quad = renderer.GetDefaultMesh("FSQuad");
-	Effect& quadFX = renderer.GetDefaultEffect("PosTextured2D");
+	EffectVariant& quadFX = renderer.GetDefaultEffect("PosTextured2D");
 
 	ID3D11RenderTargetView* const lastRTV = GetRenderTarget(0);
 	const Viewport& lastVP = GetViewport(0);
@@ -581,29 +722,33 @@ void Context::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 /// <summary>
 /// Draw indexed, non-instanced triangle meshes using the given effect
 /// </summary>
-void Context::Draw(Mesh& mesh, Effect& effect)
+void Context::Draw(Mesh& mesh, EffectVariant& effect)
 {
-	effect.Setup(*this);
 	mesh.Setup(*this);
 
-	pContext->DrawIndexed(mesh.GetIndexCount(), 0, 0);
-
-	effect.Reset();
+	for (int pass = 0; pass < effect.GetPassCount(); pass++)
+	{
+		effect.Setup(*this, pass);
+		pContext->DrawIndexed(mesh.GetIndexCount(), 0, 0);
+		effect.Reset(*this, pass);
+	}
 }
 
 /// <summary>
 /// Draws a group of indexed, non-instanced triangle meshes using the given effect
 /// </summary>
-void Context::Draw(IDynamicArray<Mesh>& meshes, Effect& effect)
+void Context::Draw(IDynamicArray<Mesh>& meshes, EffectVariant& effect)
 {
-	effect.Setup(*this);
-
 	for (Mesh& mesh : meshes)
 	{
 		mesh.Setup(*this);
-		pContext->DrawIndexed(mesh.GetIndexCount(), 0, 0);
-	}
 
-	effect.Reset();
+		for (int pass = 0; pass < effect.GetPassCount(); pass++)
+		{
+			effect.Setup(*this, pass);
+			pContext->DrawIndexed(mesh.GetIndexCount(), 0, 0);
+			effect.Reset(*this, pass);
+		}
+	}
 }
 

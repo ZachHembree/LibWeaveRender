@@ -4,18 +4,16 @@
 
 namespace Replica::D3D11
 { 
-	class VertexShader : public ShaderBase
+	class VertexShader : public ShaderInstance<ID3D11VertexShader>
 	{
 	public:
-		using ShaderBase::Bind;
-		using ShaderBase::SetSampler;
-		using ShaderBase::SetTexture;
+		using ShaderInstance::Bind;
+		using ShaderInstance::SetSampler;
+		using ShaderInstance::SetTexture;
 
 		VertexShader();
 
-		VertexShader(Device& dev, const ShaderDef& vsDef );
-
-		ID3D11VertexShader* Get() const;
+		VertexShader(const VertexShaderVariant& vs);
 
 		/// <summary>
 		/// Returns reference to vertex input layout
@@ -27,13 +25,11 @@ namespace Replica::D3D11
 		/// </summary>
 		void Bind(Context& ctx) override;
 
-		/// <summary>
-		/// Unbinds vertex shader;
-		/// </summary>
-		void Unbind() override;
+		void Unbind(Context& ctx) override;
+
+		void UnmapResources(Context& ctx) override;
 
 	private:
 		InputLayout layout;
-		ComPtr<ID3D11VertexShader> pVS;
 	};
 }

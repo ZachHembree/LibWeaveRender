@@ -65,4 +65,13 @@ namespace Replica::D3D11
 		std::unordered_map<string_view, uint> resourceMap;
 
 	};
+
+	class SamplerMap : public ResourceMap<ID3D11SamplerState>
+	{ };
+
+	class ResourceViewMap : public ResourceMap<ID3D11ShaderResourceView>
+	{ };
+
+	class UnorderedAccessMap : public ResourceMap<ID3D11UnorderedAccessView>
+	{ };
 }

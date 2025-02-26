@@ -205,6 +205,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\renderers\src\D3D11\Resources\ResizeableTexture2D.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\ResourceBase.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\StagingTexture2D.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\DeviceChild.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\RWTexture2D.cpp" />
@@ -212,6 +213,7 @@
     <ClCompile Include="src\renderers\src\D3D11\ImguiHandler.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\RenderComponent.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\Texture2D.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\ShaderLibrary.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Shaders\BuiltInShaders.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Shaders\ComputeShader.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\ConstantMap.cpp" />
@@ -227,10 +229,12 @@
     <ClCompile Include="src\renderers\src\D3D11\Shaders\VertexShader.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\InputLayout.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Mesh.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Shaders\ShaderVariantBase.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\SwapChain.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\BufferBase.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Device.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Renderer.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\EffectVariant.cpp" />
     <ClCompile Include="src\utils\src\GfxException.cpp" />
     <ClCompile Include="src\utils\src\Input.cpp" />
   </ItemGroup>
@@ -278,9 +282,10 @@
     <ClInclude Include="src\renderers\include\D3D11\Resources\Sampler.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Shaders\ShaderBase.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\Texture2DBase.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Shaders\ShaderVariantBase.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Shaders\VertexShader.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\IDrawable.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\Effect.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\EffectVariant.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Material.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Mesh.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Primitives.hpp" />

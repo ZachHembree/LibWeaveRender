@@ -1,5 +1,9 @@
 #include "pch.hpp"
 #include "ReplicaInternalD3D11.hpp"
+#include "D3D11/Resources/RTHandle.hpp"
+#include "D3D11/SwapChain.hpp"
+#include "D3D11/Device.hpp"
+#include "D3D11/Context.hpp"
 
 using namespace Replica;
 using namespace Replica::D3D11;
