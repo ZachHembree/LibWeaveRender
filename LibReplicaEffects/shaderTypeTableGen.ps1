@@ -276,9 +276,33 @@ function Write-Tables
 
 	# Add footer and write to file
 	[void]$sb.AppendLine($footer);
-	Set-Content -Path $TablePath -Value $sb.ToString()
 
-	Write-Host "Tables written to: $($TablePath)"
+	# Convert to string and check against existing file
+    $newContent = $sb.ToString()
+
+    if (Test-Path $TablePath) 
+	{
+		$existingContent = (Get-Content -Path $TablePath | Out-String).Trim()
+		$newContent = $newContent.Trim()
+
+		if ($existingContent -ne $newContent) 
+		{
+			# Content is different
+			Set-Content -Path $TablePath -Value $newContent
+			Write-Host "Tables written to: $($TablePath)"
+		} 
+		else 
+		{
+			# Content is the same
+			Write-Host "Tables unmodfied. Update skipped."
+		}
+	} 
+	else 
+	{
+		# File doesn't exist, write the new content
+		Set-Content -Path $TablePath -Value $newContent
+		Write-Host "Tables written to: $($TablePath)"
+	}
 }
 
 # Run main
