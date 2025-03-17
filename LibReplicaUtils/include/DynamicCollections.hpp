@@ -6,12 +6,31 @@
 #include <string>
 #include <iterator>
 #include <memory>
+#include <functional>
 
 namespace Replica
 {
 	template<typename T> class DynamicArrayBase;
 	template<typename T> class DynamicArray;
 	template<typename T> class UniqueArray;
+
+	/// <summary>
+	/// Returns a hash for an arbitrary number of hashable values
+	/// </summary>
+	template<typename... Ts>
+	inline size_t GetCombinedHash(const Ts&... values)
+	{
+		size_t seed = 0;
+		auto combine_one = [&seed](const auto& value)
+		{
+			seed ^= std::hash<std::decay_t<decltype(value)>>{}(value)+0x9e3779b9 + (seed << 6) + (seed >> 2);
+		};
+
+		// Use fold expression to invoke lambda for each variadic argument
+		(combine_one(values), ...);
+
+		return seed;
+	}
 
 	/// <summary>
 	/// Basic iterator template for contiguous collections
@@ -143,6 +162,19 @@ namespace Replica
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
 		virtual const RevIterator rend() const { return RevIterator(end()); }
+
+		/// <summary>
+		/// Calculates a combined hash of the current contents of the array
+		/// </summary>
+		size_t GetHash() const
+		{
+			size_t seed = 0;
+
+			for (const T& value : *this)
+				seed ^= std::hash<T>{}(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+
+			return seed;
+		}
 	};
 
 	/// <summary>
@@ -150,6 +182,25 @@ namespace Replica
 	/// </summary>
 	template<typename T>
 	size_t GetArrSize(const IDynamicArray<T>& arr) { return arr.GetLength() * sizeof(T); }
+
+	/// <summary>
+	/// Returns true if the contents of the arrays are equal
+	/// </summary>
+	template<typename T>
+	bool GetIsArrDataEqual(const IDynamicArray<T>& left, const IDynamicArray<T>& right)
+	{
+		return &left == &right || 
+		(
+			left.GetLength() == right.GetLength() &&
+			memcmp( left.GetPtr(), right.GetPtr(), GetArrSize(left) ) == 0
+		);
+	}
+
+	/// <summary>
+	/// Returns true if the contents of the arrays are equal
+	/// </summary>
+	template<typename T>
+	bool operator==(const IDynamicArray<T>& left, const IDynamicArray<T>& right) { return GetIsArrDataEqual(left, right); }
 
 	/// <summary>
 	/// Returns the size of the array in bytes
@@ -482,7 +533,6 @@ namespace Replica
 		{ }
 
 	public:
-
 		/// <summary>
 		/// Initializes an empty array with a null pointer.
 		/// </summary>
@@ -923,6 +973,6 @@ namespace Replica
 			return UniqueVector(*this);
 		}
 	};
-
 }
+
 #endif
