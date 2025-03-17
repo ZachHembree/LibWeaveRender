@@ -77,6 +77,8 @@ namespace Replica
 		using Iterator = DynIterator<T>;
 		using RevIterator = std::reverse_iterator<DynIterator<T>>;
 
+		virtual ~IDynamicArray() = default;
+
 		/// <summary>
 		/// Returns the length of the array.
 		/// </summary>

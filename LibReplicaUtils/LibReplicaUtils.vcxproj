@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="include\Logger.hpp" />
     <ClInclude Include="include\ObjectPool.hpp" />
+    <ClInclude Include="include\StringIDBuilder.hpp" />
     <ClInclude Include="src\pch.hpp" />
     <ClInclude Include="include\Serialization.hpp" />
     <ClInclude Include="include\internal\DynCollectionSerializers.hpp" />
@@ -41,6 +42,7 @@
     <ClInclude Include="include\ReplicaUtils.hpp" />
     <ClInclude Include="include\ReplicaWin32.hpp" />
     <ClInclude Include="include\ReplicaWinUtils.hpp" />
+    <ClInclude Include="include\StringIDMap.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Logger.cpp" />
@@ -50,6 +52,8 @@
     <ClCompile Include="src\ReplicaWinUtils.cpp" />
     <ClCompile Include="src\RepWinException.cpp" />
     <ClCompile Include="src\Stopwatch.cpp" />
+    <ClCompile Include="src\StringIDBuilder.cpp" />
+    <ClCompile Include="src\StringIDMap.cpp" />
     <ClCompile Include="src\TextBlock.cpp" />
     <ClCompile Include="src\TextUtils.cpp" />
     <ClCompile Include="src\internal\Utils.cpp" />
