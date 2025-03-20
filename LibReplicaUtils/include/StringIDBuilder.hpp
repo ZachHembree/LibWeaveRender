@@ -53,7 +53,12 @@ namespace Replica
         /// <summary>
         /// Returns a copy of the ID generator's current state in a compact, serializable format
         /// </summary>
-        StringIDMapDef GetExportedData() const;
+        StringIDMapDef ExportDefinition() const;
+
+        /// <summary>
+        /// Clears all strings from the builder
+        /// </summary>
+        void Clear();
 
     private:
         // String storage; ID -> string

@@ -11,7 +11,7 @@ namespace Replica
     /// </summary>
     struct StringIDMapDef
     {
-        static constexpr uint INVALID_ID = std::numeric_limits<uint>::max();
+        static constexpr uint INVALID_ID = -1;
 
         MAKE_NO_COPY(StringIDMapDef)
 
@@ -46,7 +46,7 @@ namespace Replica
     public:
         MAKE_NO_COPY(StringIDMap)
 
-            static constexpr uint INVALID_ID = StringIDMapDef::INVALID_ID;
+        static constexpr uint INVALID_ID = StringIDMapDef::INVALID_ID;
 
         StringIDMap(StringIDMapDef&& def) noexcept;
 

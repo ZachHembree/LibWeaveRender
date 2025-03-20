@@ -84,7 +84,7 @@ uint StringIDBuilder::GetStringCount() const { return static_cast<uint>(strings.
 /// <summary>
 /// Returns a copy of the ID generator's current state in a compact, serializable format
 /// </summary>
-StringIDMapDef StringIDBuilder::GetExportedData() const
+StringIDMapDef StringIDBuilder::ExportDefinition() const
 {
     const uint count = GetStringCount();
     uint charCount = 0;
@@ -114,4 +114,10 @@ StringIDMapDef StringIDBuilder::GetExportedData() const
     }
 
     return def;
+}
+
+void StringIDBuilder::Clear()
+{
+    strings.clear();
+    idMap.clear();
 }
