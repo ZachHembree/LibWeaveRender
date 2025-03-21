@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include "ShaderData.hpp"
+#include "ShaderDataHandles.hpp"
 
 namespace Replica::Effects
 {
@@ -18,15 +19,19 @@ namespace Replica::Effects
 
 		ShaderLibMap(ShaderLibDef&& def);
 
+		~ShaderLibMap();
+
+		string_view GetString(uint stringID) const;
+
 		/// <summary>
 		/// Returns the shader by shaderID and variantID
 		/// </summary>
-		const ShaderDef& GetShader(int shaderID, int vID = 0) const;
+		ShaderDefHandle GetShader(int shaderID, int vID = 0) const;
 
 		/// <summary>
 		/// Returns the effect with the given effectID and variantID
 		/// </summary>
-		const EffectDef& GetEffect(int effectID, int vID = 0) const;
+		EffectDefHandle GetEffect(int effectID, int vID = 0) const;
 
 		/// <summary>
 		/// Returns the shaderID by name and variantID, -1 on fail
@@ -109,6 +114,8 @@ namespace Replica::Effects
 		/// </summary>
 		bool GetIsDefined(string_view name, const int vID) const;
 
+		const IDynamicArray<string_view>& GetDefines(const int vID) const;
+
 		/// <summary>
 		/// Returns the total number of flag combinations used for variant generation
 		/// </summary>
@@ -154,9 +161,29 @@ namespace Replica::Effects
 		};
 
 		/// <summary>
-		/// Pointer to serializable library data
+		/// Pointer to queryable unique library data
 		/// </summary>
-		std::unique_ptr<ShaderLibDef> pDef;
+		std::unique_ptr<ShaderRegistryMap> pRegMap;
+
+		/// <summary>
+		/// Describes the platform targeted during compilation
+		/// </summary>
+		PlatformDef platform;
+
+		/// <summary>
+		/// Flag names used for static shader variant generation
+		/// </summary>
+		DynamicArray<string> flagNames;
+
+		/// <summary>
+		/// Mutually exclusive shader modes/features used for static shader variant generation
+		/// </summary>
+		DynamicArray<string> modeNames;
+
+		/// <summary>
+		/// Array of shaders and effects for each variant
+		/// </summary>
+		DynamicArray<VariantDef> variants;
 
 		/// <summary>
 		/// Flag names used for static shader variant generation

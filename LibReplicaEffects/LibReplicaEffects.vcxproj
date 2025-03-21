@@ -20,6 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ParseExcept.hpp" />
+    <ClInclude Include="include\ShaderLibGen\ResourceMapBuilder.hpp" />
+    <ClInclude Include="include\ShaderLibGen\ShaderDataHandles.hpp" />
+    <ClInclude Include="include\ShaderLibGen\ShaderDataHashes.hpp" />
     <ClInclude Include="include\ShaderLibGen.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderCompiler.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderDataSerializers.hpp" />
@@ -34,6 +37,7 @@
     <ClInclude Include="include\ShaderLibGen\ShaderParser\SymbolEnums.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderParser\SymbolParser.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderParser\SymbolPatterns.hpp" />
+    <ClInclude Include="include\ShaderLibGen\ShaderRegistryMap.hpp" />
     <ClInclude Include="include\ShaderLibGen\SymbolHandles.hpp" />
     <ClInclude Include="include\ShaderLibGen\SymbolTable.hpp" />
     <ClInclude Include="include\ShaderLibGen\VariantPreprocessor.hpp" />
@@ -42,7 +46,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ShaderLibGen.cpp" />
+    <ClCompile Include="src\ShaderLibGen\ResourceMapBuilder.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderCompilerD3D11.cpp" />
+    <ClCompile Include="src\ShaderLibGen\ShaderDataHandles.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderGenerator.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderLibMap.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderParser\BlockAnalyzer.cpp" />
@@ -54,6 +60,7 @@
     <ClCompile Include="src\ShaderLibGen\ShaderParser\SymbolParser.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderParser\SymbolPatterns.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderParser\SymbolTable.cpp" />
+    <ClCompile Include="src\ShaderLibGen\ShaderRegistryMap.cpp" />
     <ClCompile Include="src\ShaderLibGen\VariantPreprocessor.cpp" />
   </ItemGroup>
   <ItemGroup>

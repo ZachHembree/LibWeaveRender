@@ -8,25 +8,25 @@ namespace Replica::Effects
 	template <class Archive>
 	void serialize(Archive& ar, ConstDef& def)
 	{
-		ar(def.name, def.offset, def.size);
+		ar(def.stringID, def.offset, def.size);
+	}
+
+	template <class Archive>
+	void serialize(Archive& ar, ConstBufDef& def)
+	{
+		ar(def.stringID, def.size, def.members);
 	}
 
 	template <class Archive>
 	void serialize(Archive& ar, IOElementDef& def)
 	{
-		ar(def.semanticName, def.semanticIndex, def.dataType, def.componentCount, def.size);
+		ar(def.semanticID, def.semanticIndex, def.dataType, def.componentCount, def.size);
 	}
 
 	template <class Archive>
 	void serialize(Archive& ar, ResourceDef& def)
 	{
-		ar(def.name, def.type, def.slot);
-	}
-
-	template <class Archive>
-	void serialize(Archive& ar, ConstBufLayout& def)
-	{
-		ar(def.name, def.members, def.size);
+		ar(def.stringID, def.type, def.slot);
 	}
 
 	template <class Archive>
@@ -34,9 +34,9 @@ namespace Replica::Effects
 	void serialize(Archive& ar, ShaderDef& def)
 	{
 		ar(
-			def.fileName, def.binSrc, def.name, def.stage,
+			def.fileStringID, def.binSrc, def.nameID, def.stage,
 			def.threadGroupSize.x, def.threadGroupSize.y, def.threadGroupSize.z,
-			def.inLayout, def.outLayout, def.res, def.constBufs, def.variantID
+			def.inLayoutID, def.outLayoutID, def.resLayoutID, def.cbufGroupID
 		);
 	}
 
@@ -45,9 +45,9 @@ namespace Replica::Effects
 	void save(Archive& ar, const ShaderDef& def)
 	{
 		ar(
-			def.fileName, def.name, def.stage,
+			def.fileStringID, def.nameID, def.stage,
 			def.threadGroupSize.x, def.threadGroupSize.y, def.threadGroupSize.z,
-			def.inLayout, def.outLayout, def.res, def.constBufs, def.variantID
+			def.inLayoutID, def.outLayoutID, def.resLayoutID, def.cbufGroupID
 		);
 
 		// Manual size tag
@@ -61,9 +61,9 @@ namespace Replica::Effects
 	void load(Archive& ar, ShaderDef& def)
 	{
 		ar(
-			def.fileName, def.name, def.stage,
+			def.fileStringID, def.nameID, def.stage,
 			def.threadGroupSize.x, def.threadGroupSize.y, def.threadGroupSize.z,
-			def.inLayout, def.outLayout, def.res, def.constBufs, def.variantID
+			def.inLayoutID, def.outLayoutID, def.resLayoutID, def.cbufGroupID
 		);
 
 		// Get array size
@@ -83,13 +83,36 @@ namespace Replica::Effects
 	template <class Archive>
 	void serialize(Archive& ar, EffectDef& def)
 	{
-		ar(def.name, def.passes, def.variantID);
+		ar(def.nameID, def.passes);
+	}
+
+	template <class Archive>
+	void serialize(Archive& ar, ShaderVariantDef& def)
+	{
+		ar(def.shaderID, def.variantID);
+	}
+
+	template <class Archive>
+	void serialize(Archive& ar, EffectVariantDef& def)
+	{
+		ar(def.effectID, def.variantID);
 	}
 
 	template <class Archive>
 	void serialize(Archive& ar, VariantDef& def)
 	{
 		ar(def.effects, def.shaders);
+	}
+
+	template <class Archive>
+	void serialize(Archive& ar, ShaderRegistryDef& def)
+	{
+		ar(
+			def.stringIDs, 
+			def.constants, def.cbufDefs, def.ioElements, def.resources,
+			def.cbufGroups, def.ioSignatures, def.resGroups,
+			def.shaders, def.effects
+		);
 	}
 
 	template <class Archive>
@@ -101,7 +124,7 @@ namespace Replica::Effects
 	template <class Archive>
 	void serialize(Archive& ar, ShaderLibDef& def)
 	{
-		ar(def.platform, def.flagNames, def.modeNames, def.variants);
+		ar(def.platform, def.flagNames, def.modeNames, def.variants, def.regData);
 	}
 
 	template <class Archive>

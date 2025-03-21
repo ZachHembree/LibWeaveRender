@@ -5,6 +5,7 @@
 #include "ShaderLibGen/ShaderGenerator.hpp"
 #include "ShaderLibGen/ShaderCompiler.hpp"
 #include "ShaderLibGen/VariantPreprocessor.hpp"
+#include "ShaderLibGen/ResourceMapBuilder.hpp"
 #include "ShaderLibGen.hpp"
 
 using namespace Replica::Effects;
@@ -13,7 +14,8 @@ ShaderLibGen::ShaderLibGen() :
 	pVariantGen(new VariantPreprocessor()),
 	pAnalyzer(new BlockAnalyzer()),
 	pTable(new SymbolTable()),
-	pShaderGen(new ShaderGenerator())
+	pShaderGen(new ShaderGenerator()),
+	pShaderRegistry(new ShaderRegistryBuilder())
 { }
 
 ShaderLibGen::~ShaderLibGen() = default;
@@ -30,8 +32,8 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view libPath, string_view libSrc)
 		LOG_INFO() << "Generating variant: " << vID;
 
 		// Preprocess and parse
-		pVariantGen->GetVariant(vID, libBuf, entrypoints);
-		pAnalyzer->AnalyzeSource(libBuf);
+		pVariantGen->GetVariant(vID, libTexBuf, entrypoints);
+		pAnalyzer->AnalyzeSource(libTexBuf);
 		pTable->ParseBlocks(pAnalyzer->GetBlocks());
 
 		if (vID == 0)
@@ -40,13 +42,14 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view libPath, string_view libSrc)
 		GetEntryPoints();
 		//GetEffects();
 
-		lib.variants[vID].shaders = DynamicArray<ShaderDef>(entrypoints.GetLength());
-		lib.variants[vID].effects = DynamicArray<EffectDef>();
+		lib.variants[vID].shaders = DynamicArray<ShaderVariantDef>(entrypoints.GetLength());
+		lib.variants[vID].effects = DynamicArray<EffectVariantDef>();
 
-		GetShaderDefs(libPath, lib.variants[vID].shaders);
+		GetShaderDefs(libPath, lib.variants[vID].shaders, vID);
 		ClearVariant();
 	}
 
+	lib.regData = pShaderRegistry->ExportDefinition();
 	return lib;
 }
 
@@ -54,10 +57,19 @@ void ShaderLibGen::Clear()
 {
 	ClearVariant();
 	pVariantGen->Clear();
+	pShaderRegistry->Clear();
 }
 
 void ShaderLibGen::InitLibrary(ShaderLibDef& lib)
 {
+	// Temporary
+	lib.platform = 
+	{
+		.compilerVersion = "DXC 10.1",
+		.shaderModel = "5.0",
+		.target = PlatformTargets::DirectX11
+	};
+
 	const IDynamicArray<string_view>& flags = pVariantGen->GetVariantFlags();
 	lib.flagNames = DynamicArray<string>(flags.GetLength());
 
@@ -73,7 +85,7 @@ void ShaderLibGen::InitLibrary(ShaderLibDef& lib)
 	lib.variants = DynamicArray<VariantDef>(pVariantGen->GetVariantCount());
 }
 
-void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderDef>& shaders)
+void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& shaders, const int vID)
 {
 	for (int i = 0; i < entrypoints.GetLength(); i++)
 	{
@@ -81,7 +93,9 @@ void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderDef>& s
 
 		const ShaderEntrypoint& ep = entrypoints[i];
 		pShaderGen->GetShaderSource(*pTable, pAnalyzer->GetBlocks(), ep, entrypoints, shaderBuf);
-		GetShaderDefD3D11(libPath, shaderBuf, ep.stage, ep.name, shaders[i]);
+		
+		shaders[i].shaderID = GetShaderDefD3D11(libPath, shaderBuf, ep.stage, ep.name, *pShaderRegistry);
+		shaders[i].variantID = vID;
 	}
 }
 
@@ -173,6 +187,6 @@ void ShaderLibGen::ClearVariant()
 	entrypoints.clear();
 	epSet.clear();
 
-	libBuf.clear();
+	libTexBuf.clear();
 	shaderBuf.clear();
 }
