@@ -1,16 +1,15 @@
-#ifndef DynamicCollections
-#define DynamicCollections
-
+#pragma once
 #include <vector>
 #include <exception>
 #include <string>
 #include <iterator>
 #include <memory>
 #include <functional>
+#include <concepts>
+#include "ReplicaGlobalUtils.hpp"
 
 namespace Replica
 {
-	template<typename T> class DynamicArrayBase;
 	template<typename T> class DynamicArray;
 	template<typename T> class UniqueArray;
 
@@ -163,6 +162,18 @@ namespace Replica
 		/// </summary>
 		virtual const RevIterator rend() const { return RevIterator(end()); }
 
+		virtual T& front() { return (*this)[0]; }
+
+		virtual const T& front() const { return (*this)[0]; }
+
+		virtual T& back() { return (*this)[GetLength() - 1]; }
+
+		virtual const T& back() const { return (*this)[GetLength() - 1]; }
+
+		virtual T& at(size_t index) { return (*this)[index]; }
+
+		virtual const T& at(size_t index) const { return (*this)[index]; }
+
 		/// <summary>
 		/// Calculates a combined hash of the current contents of the array
 		/// </summary>
@@ -189,11 +200,13 @@ namespace Replica
 	template<typename T>
 	bool GetIsArrDataEqual(const IDynamicArray<T>& left, const IDynamicArray<T>& right)
 	{
-		return &left == &right || 
-		(
-			left.GetLength() == right.GetLength() &&
-			memcmp( left.GetPtr(), right.GetPtr(), GetArrSize(left) ) == 0
-		);
+		if (&left == &right) return true;
+		if (left.GetLength() != right.GetLength()) return false;
+
+		if constexpr (std::is_trivially_copyable_v<T>)
+			return memcmp(left.GetPtr(), right.GetPtr(), left.GetLength() * sizeof(T)) == 0;
+		else
+			return std::equal(left.begin(), left.end(), right.begin());
 	}
 
 	/// <summary>
@@ -212,27 +225,16 @@ namespace Replica
 	/// Dynamically allocated array with members of type T and a fixed length.
 	/// </summary>
 	template<typename T>
-	class DynamicArrayBase : public IDynamicArray<T>
+	class DynamicArray : public IDynamicArray<T>
 	{
 	public:
 		using Iterator = IDynamicArray<T>::Iterator;
 		using RevIterator = IDynamicArray<T>::RevIterator;
 
-	protected:
-		/// <summary>
-		/// Array length
-		/// </summary>
-		size_t length;
-
-		/// <summary>
-		/// Array pointer
-		/// </summary>
-		T* data;
-
 		/// <summary>
 		/// Initializes an empty array with a null pointer.
 		/// </summary>
-		DynamicArrayBase() :
+		DynamicArray() :
 			length(0),
 			data(nullptr)
 		{ }
@@ -240,7 +242,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a new dynamic array using an initializer list.
 		/// </summary>
-		DynamicArrayBase(const std::initializer_list<T>& list) noexcept :
+		DynamicArray(const std::initializer_list<T>& list) noexcept :
 			length(list.size()),
 			data(new T[length])
 		{
@@ -248,17 +250,28 @@ namespace Replica
 		}
 
 		/// <summary>
+		/// Initializes a new dynamic array using an initializer list.
+		/// </summary>
+		explicit DynamicArray(const IDynamicArray<T>& arr) noexcept :
+			length(arr.GetLength()),
+			data(new T[arr.GetLength()])
+		{
+			std::copy(arr.begin(), arr.end(), data);
+		}
+
+		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
-		explicit DynamicArrayBase(size_t length) :
-			length(length),
-			data((length > 0) ? new T[length]() : nullptr)
+		template <std::integral CapT>
+		explicit DynamicArray(CapT length) :
+			length(static_cast<size_t>(length)),
+			data((length > 0) ? new T[static_cast<size_t>(length)]() : nullptr)
 		{ }
 
 		/// <summary>
 		/// Initializes a dynamic array with the given length.
 		/// </summary>
-		DynamicArrayBase(size_t length, const T& initValue) :
+		explicit DynamicArray(size_t length, const T& initValue) :
 			length(length),
 			data((length > 0) ? new T[length](initValue) : nullptr)
 		{ }
@@ -267,10 +280,10 @@ namespace Replica
 		/// Initializes a new dynamic array object using the given pointer and length.
 		/// Creates a copy.
 		/// </summary>
-		DynamicArrayBase(const T* data, const size_t length) :
+		explicit DynamicArray(const T* data, const size_t length) :
 			length(length),
 			data(new T[length])
-		{ 
+		{
 			std::copy(data, data + length, this->data);
 		}
 
@@ -278,14 +291,14 @@ namespace Replica
 		/// Initializes a new dynamic array object using the given pointer and length.
 		/// Takes ownership of the pointer.
 		/// </summary>
-		DynamicArrayBase(std::unique_ptr<T[]>&& ptr, size_t length)
+		explicit DynamicArray(std::unique_ptr<T[]>&& ptr, size_t length)
 			: length(length), data(ptr.release())
 		{ }
 
 		/// <summary>
 		/// Initializes a copy of the given dynamic array.
 		/// </summary>
-		DynamicArrayBase(const DynamicArrayBase& rhs) :
+		DynamicArray(const DynamicArray& rhs) :
 			length(rhs.length),
 			data(new T[rhs.length])
 		{
@@ -295,7 +308,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a new dynamic array by moving the contents of the given array to itself.
 		/// </summary>
-		DynamicArrayBase(DynamicArrayBase&& rhs) noexcept :
+		DynamicArray(DynamicArray&& rhs) noexcept :
 			length(rhs.length),
 			data(rhs.data)
 		{
@@ -303,7 +316,56 @@ namespace Replica
 			rhs.length = 0;
 		}
 
-	public:
+		/// <summary>
+		/// Initializes a new dynamic array by moving the contents of the given unique array to itself.
+		/// </summary>
+		explicit DynamicArray(UniqueArray<T>&& rhs) noexcept : 
+			DynamicArray<T>(std::move(reinterpret_cast<DynamicArray<T>&>(rhs)))
+		{ }
+
+		/// <summary>
+		/// Deallocates the memory backing the array.
+		/// </summary>
+		~DynamicArray() { delete[] data; }
+
+		/// <summary>
+		/// Copy assignment operator.
+		/// </summary>
+		DynamicArray& operator=(const DynamicArray& rhs)
+		{
+			if (this != &rhs)
+			{
+				if (length != rhs.length)
+				{
+					if (data != nullptr)
+						delete[] data;
+
+					data = new T[rhs.length];
+				}
+
+				length = rhs.length;
+				std::copy(rhs.data, rhs.data + length, data);
+			}
+
+			return *this;
+		}
+
+		/// <summary>
+		/// Move assignment operator.
+		/// </summary>
+		DynamicArray& operator=(DynamicArray&& rhs) noexcept
+		{
+			if (data != nullptr)
+				delete[] data;
+
+			data = rhs.data;
+			length = rhs.length;
+			rhs.data = nullptr;
+			rhs.length = 0;
+
+			return *this;
+		}
+
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
@@ -325,50 +387,24 @@ namespace Replica
 		const Iterator end() const override { return Iterator(data + length); }
 
 		/// <summary>
-		/// Copy assignment operator.
+		/// Returns the first element in the vector
 		/// </summary>
-		DynamicArrayBase& operator=(const DynamicArrayBase& rhs)
-		{
-			if (this != &rhs)
-			{
-				if (length != rhs.length)
-				{ 
-					if (data != nullptr)
-						delete[] data;
-
-					data = new T[rhs.length];
-				}
-
-				length = rhs.length;
-				std::copy(rhs.data, rhs.data + length, data);
-			}
-
-			return *this;
-		}
+		T& front() override { return data[0]; }
 
 		/// <summary>
-		/// Move assignment operator.
+		/// Returns the first element in the vector
 		/// </summary>
-		DynamicArrayBase& operator=(DynamicArrayBase&& rhs) noexcept
-		{
-			if (data != nullptr)
-				delete[] data;
-
-			data = rhs.data;
-			length = rhs.length;
-			rhs.data = nullptr;
-			rhs.length = 0;
-
-			return *this;
-		}
+		const T& front() const override { return data[0]; }
 
 		/// <summary>
-		/// Deallocates the memory backing the array.
+		/// Returns the last element in the vector
 		/// </summary>
-		virtual ~DynamicArrayBase()
-		{
-			delete[] data;
-		}
+		T& back() override { return data[length - 1]; }
+
+		/// <summary>
+		/// Returns the last element in the vector
+		/// </summary>
+		const T& back() const override { return data[length - 1]; }
 
 		/// <summary>
 		/// Returns the length of the array.
@@ -380,7 +416,7 @@ namespace Replica
 		/// </summary>
 		T& operator[](size_t index) override
 		{
-	#if _CONTAINER_DEBUG_LEVEL > 0
+#if _CONTAINER_DEBUG_LEVEL > 0
 			if (index >= length)
 			{
 				char buffer[100];
@@ -388,7 +424,7 @@ namespace Replica
 
 				throw std::exception(buffer);
 			}
-	#endif
+#endif
 
 			return data[index];
 		}
@@ -398,7 +434,7 @@ namespace Replica
 		/// </summary>
 		const T& operator[](size_t index) const override
 		{
-	#if _CONTAINER_DEBUG_LEVEL > 0
+#if _CONTAINER_DEBUG_LEVEL > 0
 			if (index >= length)
 			{
 				char buffer[100];
@@ -406,7 +442,7 @@ namespace Replica
 
 				throw std::exception(buffer);
 			}
-	#endif
+#endif
 
 			return data[index];
 		}
@@ -420,203 +456,49 @@ namespace Replica
 		/// Returns a const copy of the pointer to the backing the array.
 		/// </summary>
 		const T* GetPtr() const override { return data; }
-	};
 
-	/// <summary>
-	/// Dynamically allocated array with members of type T and a fixed length.
-	/// </summary>
-	template<typename T>
-	class DynamicArray : public DynamicArrayBase<T>
-	{
-	public:
-		/// <summary>
-		/// Initializes an empty array with a null pointer.
-		/// </summary>
-		DynamicArray() : DynamicArrayBase<T>() { }
-
-		/// <summary>
-		/// Initializes a new dynamic array from an initializer list.
-		/// </summary>
-		DynamicArray(const std::initializer_list<T>& initializerList) noexcept : 
-			DynamicArrayBase<T>(initializerList)
-		{ }
-
-		/// <summary>
-		/// Initializes a dynamic array with the given length.
-		/// </summary>
-		explicit DynamicArray(size_t length) : 
-			DynamicArrayBase<T>(length) 
-		{ }
-
-		/// <summary>
-		/// Initializes a dynamic array with the given length.
-		/// </summary>
-		DynamicArray(size_t length, const T& initValue) :
-			DynamicArrayBase<T>(length, initValue)
-		{ }
-
-		/// <summary>
-		/// Initializes a new dynamic array object using the given pointer and length.
-		/// Creates a copy.
-		/// </summary>
-		DynamicArray(const T* data, const size_t length) :
-			DynamicArrayBase<T>(data, length)
-		{ }
-
-		/// <summary>
-		/// Initializes a new dynamic array object using the given pointer and length.
-		/// Takes ownership of the pointer.
-		/// </summary>
-		DynamicArray(std::unique_ptr<T[]>&& ptr, size_t length) :
-			DynamicArrayBase<T>(std::move(ptr), length) 
-		{ }
-
-		/// <summary>
-		/// Initializes a copy of the given dynamic array.
-		/// </summary>
-		DynamicArray(const DynamicArray& rhs) : 
-			DynamicArrayBase<T>(rhs) 
-		{ }
-
-		/// <summary>
-		/// Initializes a copy of the given dynamic array.
-		/// </summary>
-		explicit DynamicArray(const UniqueArray<T>& rhs) : 
-			DynamicArrayBase<T>((DynamicArrayBase<T>&)rhs)
-		{ }
-
-		/// <summary>
-		/// Initializes a new dynamic array by moving the contents of the given array to itself.
-		/// </summary>
-		DynamicArray(DynamicArray&& rhs) noexcept : 
-			DynamicArrayBase<T>(std::move(rhs)) 
-		{ }
-
-		/// <summary>
-		/// Initializes a new dynamic array by moving the contents of the given unique array to itself.
-		/// </summary>
-		explicit DynamicArray(UniqueArray<T>&& rhs) noexcept : 
-			DynamicArrayBase<T>((DynamicArrayBase<T>&&)(rhs))
-		{ }
-
-		/// <summary>
-		/// Copy assignment operator.
-		/// </summary>
-		DynamicArray& operator=(const DynamicArray& rhs)
+		void swap(DynamicArray& other) noexcept
 		{
-			DynamicArrayBase<T>::operator=(rhs); 
-			return *this;
+			std::swap(length, other.length);
+			std::swap(data, other.data);
 		}
 
 		/// <summary>
-		/// Move assignment operator.
+		/// Returns a new copy of the array.
 		/// </summary>
-		DynamicArray& operator=(DynamicArray&& rhs) noexcept 
-		{
-			DynamicArrayBase<T>::operator=(std::move(rhs)); 
-			return *this;
-		}
+		DynamicArray GetCopy() const { return DynamicArray(*this); }
+
+	protected:
+		/// <summary>
+		/// Array length
+		/// </summary>
+		size_t length;
+
+		/// <summary>
+		/// Array pointer
+		/// </summary>
+		T* data;
 	};
 
 	/// <summary>
 	/// Unique dynamically allocated array. Implicit copy assignment disallowed.
 	/// </summary>
 	template<typename T>
-	class UniqueArray : public DynamicArrayBase<T>
+	class UniqueArray : public DynamicArray<T>
 	{
 	private:
-		/// <summary>
-		/// Initializes a copy of the given unique array.
-		/// </summary>
-		UniqueArray(const UniqueArray& rhs) : 
-			DynamicArrayBase<T>(rhs) 
-		{ }
+		MAKE_DEF_COPY(UniqueArray)
 
 	public:
-		/// <summary>
-		/// Initializes an empty array with a null pointer.
-		/// </summary>
-		UniqueArray() : 
-			DynamicArrayBase<T>()
-		{ }
-
-		/// <summary>
-		/// Initializes a new unique array from an initializer list.
-		/// </summary>
-		UniqueArray(const std::initializer_list<T>& initializerList) noexcept :
-			DynamicArrayBase<T>(initializerList)
-		{ }
-
-		/// <summary>
-		/// Initializes a unique array with the given length.
-		/// </summary>
-		explicit UniqueArray(size_t length) :
-			DynamicArrayBase<T>(length) 
-		{ }
-
-		/// <summary>
-		/// Initializes a dynamic array with the given length.
-		/// </summary>
-		UniqueArray(size_t length, const T& initValue) :
-			DynamicArrayBase<T>(length, initValue)
-		{ }
-
-		/// <summary>
-		/// Initializes a new unique array object using the given pointer and length.
-		/// Creates a copy.
-		/// </summary>
-		UniqueArray(const T* data, const size_t length) :
-			DynamicArrayBase<T>(data, length)
-		{ }
-
-		/// <summary>
-		/// Creates a new unique array using the given pointer and length.
-		/// Takes ownership of the pointer.
-		/// </summary>
-		UniqueArray(std::unique_ptr<T[]>&& ptr, size_t length) :
-			DynamicArrayBase<T>(std::move(ptr), length) 
-		{ }
+		using DynamicArray<T>::DynamicArray;
+		MAKE_DEF_MOVE(UniqueArray)
 
 		/// <summary>
 		/// Initializes a copy of the given dynamic array.
 		/// </summary>
-		explicit UniqueArray(const DynamicArray<T>& rhs) : 
-			DynamicArrayBase<T>((DynamicArrayBase<T>&)rhs)
+		UniqueArray(DynamicArray<T>&& rhs) : 
+			DynamicArray<T>(std::move(rhs))
 		{ }
-
-		/// <summary>
-		/// Initializes a new unique array by moving the contents of the given unique array to itself.
-		/// </summary>
-		UniqueArray(UniqueArray&& rhs) noexcept : 
-			DynamicArrayBase<T>(std::move(rhs)) 
-		{ }
-
-		/// <summary>
-		/// Initializes a new unique array by moving the contents of the given dynamic array to itself.
-		/// </summary>
-		explicit UniqueArray(DynamicArray<T>&& rhs) noexcept :
-			DynamicArrayBase<T>((DynamicArrayBase<T>&&)rhs)
-		{ }
-	
-		/// <summary>
-		/// Copy assignment operator. Disabled.
-		/// </summary>
-		UniqueArray& operator=(const UniqueArray& rhs) = delete;
-
-		/// <summary>
-		/// Move assignment operator.
-		/// </summary>
-		UniqueArray& operator=(UniqueArray&& rhs) noexcept 
-		{ 
-			DynamicArrayBase<T>::operator=(std::move(rhs)); 
-			return *this;
-		}
-
-		/// <summary>
-		/// Returns a new copy of the array.
-		/// </summary>
-		UniqueArray GetCopy() const
-		{ return UniqueArray(*this); }
 	};
 
 	/// <summary>
@@ -624,10 +506,13 @@ namespace Replica
 	/// </summary>
 	template<typename T>
 	class Vector : public IDynamicArray<T>, private std::vector<T>
-	{
+	{		
 	public:
 		using Iterator = IDynamicArray<T>::Iterator;
 		using RevIterator = IDynamicArray<T>::RevIterator;
+
+		using std::vector<T>::vector;
+		MAKE_DEF_MOVE_COPY(Vector)
 
 		using std::vector<T>::push_back;
 		using std::vector<T>::emplace_back;
@@ -639,56 +524,27 @@ namespace Replica
 		using std::vector<T>::reserve;
 		using std::vector<T>::empty;
 		using std::vector<T>::shrink_to_fit;
+		using std::vector<T>::swap;
 
-		Vector(const IDynamicArray<T>& other) :
+		explicit Vector(const IDynamicArray<T>& other) :
 			std::vector<T>(other.GetPtr(), other.GetPtr() + other.GetLength())
-		{ }
-
-		/// <summary>
-		/// Initializes a new unique vector.
-		/// </summary>
-		Vector() : std::vector<T>() { }
-
-		/// <summary>
-		/// Initializes a new unique vector from an initializer list.
-		/// </summary>
-		Vector(const std::initializer_list<T>& initializerList) noexcept :
-			std::vector<T>(initializerList)
 		{ }
 
 		/// <summary>
 		/// Initializes a new unique vector with the given capacity.
 		/// </summary>
-		explicit Vector(size_t capacity)
-		{
-			this->reserve(capacity);
-		}
-
-		/// <summary>
-		/// Initializes a new vector by copying the contents the given vector into itself.
-		/// </summary>
-		Vector(const Vector& rhs) noexcept : std::vector<T>(rhs) { }
-
-		/// <summary>
-		/// Initializes a new vector by moving the contents the given vector into itself.
-		/// </summary>
-		Vector(Vector&& rhs) noexcept : std::vector<T>(std::move(rhs)) { }
+		template <std::integral CapT>
+		explicit Vector(CapT capacity) { this->reserve(static_cast<size_t>(capacity)); }
 
 		/// <summary>
 		/// Adds a copy of the given value to the end of the vector
 		/// </summary>
-		void Add(const T& value)
-		{
-			this->push_back(value);
-		}
+		void Add(const T& value) { this->push_back(value); }
 
 		/// <summary>
 		/// Moves the given value into the end of the vector
 		/// </summary>
-		void Add(T&& value) noexcept
-		{
-			this->push_back(std::move(value));
-		}
+		void Add(T&& value) noexcept { this->push_back(std::move(value)); }
 
 		/// <summary>
 		/// Inserts a copy of the given value at the given index
@@ -845,22 +701,34 @@ namespace Replica
 		const Iterator end() const override { return Iterator(this->data() + this->size()); }
 
 		/// <summary>
-		/// Copy assignment operator.
+		/// Returns the first element in the vector
 		/// </summary>
-		Vector& operator=(const Vector& rhs) noexcept
-		{
-			std::vector<T>::operator=(rhs);
-			return *this;
-		}
+		T& front() override { return std::vector<T>::front(); }
 
 		/// <summary>
-		/// Move assignment operator.
+		/// Returns the first element in the vector
 		/// </summary>
-		Vector& operator=(Vector&& rhs) noexcept
-		{
-			std::vector<T>::operator=(std::move(rhs));
-			return *this;
-		}
+		const T& front() const override { return std::vector<T>::front(); }
+
+		/// <summary>
+		/// Returns the last element in the vector
+		/// </summary>
+		T& back() override { return std::vector<T>::back(); }
+
+		/// <summary>
+		/// Returns the last element in the vector
+		/// </summary>
+		const T& back() const override { return std::vector<T>::back(); }
+
+		/// <summary>
+		/// Returns the element at the given index
+		/// </summary>
+		T& at(size_t index) override { return std::vector<T>::at(index); }
+
+		/// <summary>
+		/// Returns the element at the given index
+		/// </summary>
+		const T& at(size_t index) const override { return std::vector<T>::at(index); }
 
 		/// <summary>
 		/// Provides indexed access to vector member references.
@@ -895,8 +763,13 @@ namespace Replica
 			}
 #endif
 
-		return this->at(index); 
+			return this->at(index); 
 		}
+
+		/// <summary>
+		/// Returns a new copy of the unique vector.
+		/// </summary>
+		Vector GetCopy() const { return Vector(*this); }
 	};
 
 	/// <summary>
@@ -906,48 +779,11 @@ namespace Replica
 	class UniqueVector : public Vector<T>
 	{
 	private:
-		/// <summary>
-		/// Initializes a new copy of the given unique vector.
-		/// </summary>
-		UniqueVector(const UniqueVector& rhs) :
-			Vector<T>(rhs)
-		{ };
-
-		/// <summary>
-		/// Copy assignment operator. Disabled.
-		/// </summary>
-		UniqueVector& operator=(const UniqueVector& rhs) = delete;
+		MAKE_DEF_COPY(UniqueVector)
 
 	public:
-		/// <summary>
-		/// Initializes a new unique vector.
-		/// </summary>
-		UniqueVector() : Vector<T>() { }
-
-		UniqueVector(const IDynamicArray<T>& other) : Vector<T>(other)
-		{ }
-
-		/// <summary>
-		/// Initializes a new unique vector from an initializer list.
-		/// </summary>
-		UniqueVector(const std::initializer_list<T>& initializerList) noexcept :
-			Vector<T>(initializerList)
-		{ }
-
-		/// <summary>
-		/// Initializes a new unique vector with the given capacity.
-		/// </summary>
-		explicit UniqueVector(size_t capacity)
-		{
-			this->reserve(capacity);
-		}
-
-		/// <summary>
-		/// Initializes a new vector by moving the contents the given vector into itself.
-		/// </summary>
-		UniqueVector(UniqueVector&& rhs) noexcept :
-			Vector<T>(std::move(rhs))
-		{ }
+		using Vector<T>::Vector;
+		MAKE_DEF_MOVE(UniqueVector)
 
 		/// <summary>
 		/// Initializes a new unique vector by moving the contents the given Vector into itself.
@@ -955,24 +791,5 @@ namespace Replica
 		explicit UniqueVector(Vector<T>&& rhs) noexcept :
 			Vector<T>(std::move(rhs))
 		{ }
-
-		/// <summary>
-		/// Move assignment operator.
-		/// </summary>
-		UniqueVector& operator=(UniqueVector&& rhs) noexcept
-		{
-			Vector<T>::operator=(std::move(rhs));
-			return *this;
-		}
-
-		/// <summary>
-		/// Returns a new copy of the unique vector.
-		/// </summary>
-		UniqueVector GetCopy() const
-		{
-			return UniqueVector(*this);
-		}
 	};
 }
-
-#endif

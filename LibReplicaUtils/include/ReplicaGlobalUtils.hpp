@@ -64,8 +64,8 @@
     Type(const Type&) = default; \
     Type& operator=(const Type&) = default;  
 #define MAKE_DEF_MOVE(Type) \
-    Type(Type&&) = default; \
-    Type& operator=(Type&&) = default;
+    Type(Type&&) noexcept = default; \
+    Type& operator=(Type&&) noexcept = default;
 #define MAKE_DEF_MOVE_COPY(Type) \
     MAKE_DEF_COPY(Type) \
     MAKE_DEF_MOVE(Type)
@@ -77,11 +77,9 @@
     MAKE_DEF_COPY(Type)  \
     MAKE_NO_MOVE(Type)
 // Delete copy and move
-#define MAKE_IMMOVABLE(Type)            \
-    Type(const Type&) = delete;         \
-    Type& operator=(const Type&) = delete;  \
-    Type(Type&&) = delete;             \
-    Type& operator=(Type&&) = delete;
+#define MAKE_IMMOVABLE(Type) \
+    MAKE_NO_COPY(Type) \
+    MAKE_NO_MOVE(Type)
 // Default compare
 #define USE_DEFAULT_CMP(Type) bool operator==(const Type& rhs) const = default; \
     bool operator!=(const Type& rhs) const = default;

@@ -77,7 +77,7 @@ namespace Replica
 
 	// Non-boolean raw binary read
 	template <class Archive, typename T, typename ArrT>
-	requires IsBinaryDeserializableArrNB<Archive, T> && std::derived_from<ArrT, DynamicArrayBase<T>>
+	requires IsBinaryDeserializableArrNB<Archive, T> && std::derived_from<ArrT, DynamicArray<T>>
 	inline void load(Archive& ar, ArrT& dst)
 	{ 
 		// Get array size
@@ -92,7 +92,7 @@ namespace Replica
 
 	// Non-boolean, non-binary read
 	template <class Archive, typename T, typename ArrT>
-	requires IsDeserializableArrNB<Archive, T> && std::derived_from<ArrT, DynamicArrayBase<T>>
+	requires IsDeserializableArrNB<Archive, T> && std::derived_from<ArrT, DynamicArray<T>>
 	inline void load(Archive& ar, ArrT& dst)
 	{ 
 		// Get array size
@@ -109,7 +109,7 @@ namespace Replica
 
 	// Boolean read
 	template <class Archive, typename ArrT>
-	requires std::derived_from<ArrT, DynamicArrayBase<bool>>
+	requires std::derived_from<ArrT, DynamicArray<bool>>
 	inline void load(Archive& ar, ArrT& dst)
 	{
 		// Get array size
