@@ -24,12 +24,12 @@ namespace Replica
         /// <summary>
         /// Alternating starting indices + string length. ID == index / 2
         /// </summary>
-        UniqueArray<uint> substrings;
+        DynamicArray<uint> substrings;
 
         /// <summary>
         /// Concatenated strings stored in the order they were created
         /// </summary>
-        UniqueArray<char> stringData;
+        DynamicArray<char> stringData;
     };
 
     template<class Archive>

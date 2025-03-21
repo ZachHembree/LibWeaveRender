@@ -216,6 +216,12 @@ namespace Replica
 	bool operator==(const IDynamicArray<T>& left, const IDynamicArray<T>& right) { return GetIsArrDataEqual(left, right); }
 
 	/// <summary>
+	/// Returns true if the contents of the arrays are NOT equal
+	/// </summary>
+	template<typename T>
+	bool operator!=(const IDynamicArray<T>& left, const IDynamicArray<T>& right) { return !GetIsArrDataEqual(left, right); }
+
+	/// <summary>
 	/// Returns the size of the array in bytes
 	/// </summary>
 	template<typename T>
@@ -242,7 +248,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a new dynamic array using an initializer list.
 		/// </summary>
-		DynamicArray(const std::initializer_list<T>& list) noexcept :
+		DynamicArray(const std::initializer_list<T>& list) :
 			length(list.size()),
 			data(new T[length])
 		{
@@ -252,7 +258,7 @@ namespace Replica
 		/// <summary>
 		/// Initializes a new dynamic array using an initializer list.
 		/// </summary>
-		explicit DynamicArray(const IDynamicArray<T>& arr) noexcept :
+		explicit DynamicArray(const IDynamicArray<T>& arr) :
 			length(arr.GetLength()),
 			data(new T[arr.GetLength()])
 		{
@@ -337,10 +343,9 @@ namespace Replica
 			{
 				if (length != rhs.length)
 				{
-					if (data != nullptr)
-						delete[] data;
-
-					data = new T[rhs.length];
+					T* newData = new T[rhs.length];
+					delete[] data;
+					data = newData;
 				}
 
 				length = rhs.length;
