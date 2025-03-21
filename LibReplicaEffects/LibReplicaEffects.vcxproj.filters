@@ -24,7 +24,7 @@
     <ClInclude Include="include\ShaderLibGen\ShaderParser\ScopeBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ShaderLibGen\ShaderData.hpp">
+    <ClInclude Include="include\ShaderData.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ShaderLibGen\ShaderParser\ShaderTypeInfo.hpp">
@@ -54,7 +54,7 @@
     <ClInclude Include="include\ShaderLibGen\ShaderGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ShaderLibGen\ShaderLibMap.hpp">
+    <ClInclude Include="include\ShaderLibMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ShaderLibGen\SymbolHandles.hpp">
@@ -75,7 +75,7 @@
     <ClInclude Include="src\pch.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ShaderLibGen\ResourceMapBuilder.hpp">
+    <ClInclude Include="include\ShaderLibGen\ShaderRegistryBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ShaderLibGen\ShaderDataHashes.hpp">
@@ -84,7 +84,7 @@
     <ClInclude Include="include\ShaderLibGen\ShaderRegistryMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ShaderLibGen\ShaderDataHandles.hpp">
+    <ClInclude Include="include\ShaderDataHandles.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -122,19 +122,19 @@
     <ClCompile Include="src\ShaderLibGen\ShaderGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderLibMap.cpp">
+    <ClCompile Include="src\ShaderLibMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderLibGen\VariantPreprocessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen.cpp">
+    <ClCompile Include="src\ShaderLibGen\ShaderLibGen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ResourceMapBuilder.cpp">
+    <ClCompile Include="src\ShaderLibGen\ShaderRegistryBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderDataHandles.cpp">
+    <ClCompile Include="src\ShaderDataHandles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderLibGen\ShaderRegistryMap.cpp">

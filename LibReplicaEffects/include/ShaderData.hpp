@@ -1,8 +1,8 @@
 #pragma once
 #include "ReplicaMath.hpp"
 #include "ParseExcept.hpp"
-#include "ShaderParser/SymbolEnums.hpp"
-#include "ShaderParser/ShaderTypeInfo.hpp"
+#include "ShaderLibGen/ShaderParser/SymbolEnums.hpp"
+#include "ShaderLibGen/ShaderParser/ShaderTypeInfo.hpp"
 #include "StringIDMap.hpp"
 
 namespace Replica::Effects
@@ -381,4 +381,4 @@ namespace Replica::Effects
 	};
 }
 
-#include "ShaderDataHashes.hpp"
+#include "ShaderLibGen/ShaderDataHashes.hpp"

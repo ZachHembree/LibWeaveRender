@@ -5,7 +5,7 @@
 #include "ShaderLibGen/ShaderGenerator.hpp"
 #include "ShaderLibGen/ShaderCompiler.hpp"
 #include "ShaderLibGen/VariantPreprocessor.hpp"
-#include "ShaderLibGen/ResourceMapBuilder.hpp"
+#include "ShaderLibGen/ShaderRegistryBuilder.hpp"
 #include "ShaderLibGen.hpp"
 
 using namespace Replica::Effects;

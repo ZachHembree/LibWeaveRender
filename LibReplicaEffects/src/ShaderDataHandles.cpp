@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "ShaderLibGen/ShaderDataHandles.hpp"
+#include "ShaderDataHandles.hpp"
 #include "ShaderLibGen/ShaderRegistryMap.hpp"
 
 using namespace Replica;

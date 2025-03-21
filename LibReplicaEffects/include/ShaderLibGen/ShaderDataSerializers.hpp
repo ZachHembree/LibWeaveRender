@@ -1,7 +1,7 @@
 #pragma once
 #include <concepts>
 #include "Serialization.hpp"
-#include "ShaderLibGen/ShaderData.hpp"
+#include "ShaderData.hpp"
 
 namespace Replica::Effects
 {

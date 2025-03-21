@@ -20,18 +20,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ParseExcept.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ResourceMapBuilder.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderDataHandles.hpp" />
+    <ClInclude Include="include\ShaderLibGen\ShaderRegistryBuilder.hpp" />
+    <ClInclude Include="include\ShaderDataHandles.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderDataHashes.hpp" />
     <ClInclude Include="include\ShaderLibGen.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderCompiler.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderDataSerializers.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderEntrypoint.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderGenerator.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderLibMap.hpp" />
+    <ClInclude Include="include\ShaderLibMap.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderParser\BlockAnalyzer.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderParser\ScopeBuilder.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderData.hpp" />
+    <ClInclude Include="include\ShaderData.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderParser\ShaderTypeInfo.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderParser\SymbolData.hpp" />
     <ClInclude Include="include\ShaderLibGen\ShaderParser\SymbolEnums.hpp" />
@@ -45,12 +45,12 @@
     <ClInclude Include="src\pch.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ShaderLibGen.cpp" />
-    <ClCompile Include="src\ShaderLibGen\ResourceMapBuilder.cpp" />
+    <ClCompile Include="src\ShaderLibGen\ShaderLibGen.cpp" />
+    <ClCompile Include="src\ShaderLibGen\ShaderRegistryBuilder.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderCompilerD3D11.cpp" />
-    <ClCompile Include="src\ShaderLibGen\ShaderDataHandles.cpp" />
+    <ClCompile Include="src\ShaderDataHandles.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderGenerator.cpp" />
-    <ClCompile Include="src\ShaderLibGen\ShaderLibMap.cpp" />
+    <ClCompile Include="src\ShaderLibMap.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderParser\BlockAnalyzer.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderParser\MatchingPatterns.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderParser\ScopeBuilder.cpp" />

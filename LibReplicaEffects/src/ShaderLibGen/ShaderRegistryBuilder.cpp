@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "ShaderLibGen/ResourceMapBuilder.hpp"
+#include "ShaderLibGen/ShaderRegistryBuilder.hpp"
 
 using namespace Replica;
 using namespace Replica::Effects;

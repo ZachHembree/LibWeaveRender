@@ -1,7 +1,7 @@
 #pragma once
 #define RPFX_D3D11_FEATURE_LEVEL "5_0"
 #include "ShaderData.hpp"
-#include "ResourceMapBuilder.hpp"
+#include "ShaderRegistryBuilder.hpp"
 
 namespace Replica::Effects
 { 

@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "ShaderLibGen/ShaderLibMap.hpp"
+#include "ShaderLibMap.hpp"
 #include "ShaderLibGen/ShaderRegistryMap.hpp"
 
 /* Variant ID generation

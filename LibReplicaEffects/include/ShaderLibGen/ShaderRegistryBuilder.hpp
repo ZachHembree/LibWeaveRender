@@ -1,5 +1,5 @@
 #pragma once
-#include "ShaderLibGen/ShaderData.hpp"
+#include "ShaderData.hpp"
 #include <StringIDBuilder.hpp>
 #include <unordered_set>
 #include <functional>
