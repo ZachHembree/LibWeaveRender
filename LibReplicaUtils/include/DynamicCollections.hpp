@@ -12,6 +12,7 @@ namespace Replica
 {
 	template<typename T> class DynamicArray;
 	template<typename T> class UniqueArray;
+	template<typename T> class UniqueVector;
 
 	/// <summary>
 	/// Returns a hash for an arbitrary number of hashable values
@@ -311,6 +312,11 @@ namespace Replica
 			std::copy(rhs.data, rhs.data + length, this->data);
 		}
 
+		// Disallow implicit copies of unique wrappers
+		DynamicArray(const UniqueArray<T>& other) = delete;
+
+		DynamicArray& operator=(const UniqueArray<T>& rhs) = delete;
+
 		/// <summary>
 		/// Initializes a new dynamic array by moving the contents of the given array to itself.
 		/// </summary>
@@ -540,6 +546,11 @@ namespace Replica
 		/// </summary>
 		template <std::integral CapT>
 		explicit Vector(CapT capacity) { this->reserve(static_cast<size_t>(capacity)); }
+
+		// Disallow implicit copies of unique wrappers
+		Vector(const UniqueVector<T>& other) = delete;
+
+		Vector& operator=(const UniqueVector<T>& other) = delete;
 
 		/// <summary>
 		/// Adds a copy of the given value to the end of the vector

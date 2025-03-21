@@ -91,7 +91,7 @@ StringIDMapDef StringIDBuilder::ExportDefinition() const
 
     // Calculate concatenated string buffer size and substring layout
     StringIDMapDef def = {};
-    def.substrings = UniqueArray<uint>(2 * count);
+    def.substrings = DynamicArray<uint>(2 * count);
 
     for (uint i = 0; i < count; i++)
     {
@@ -102,7 +102,7 @@ StringIDMapDef StringIDBuilder::ExportDefinition() const
     }
 
     // Copy strings into concatenated buffer
-    def.stringData = UniqueArray<char>(charCount);
+    def.stringData = DynamicArray<char>(charCount);
     uint charStart = 0;
 
     for (uint i = 0; i < count; i++)
