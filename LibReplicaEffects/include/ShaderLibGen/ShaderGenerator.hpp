@@ -30,7 +30,7 @@ namespace Replica::Effects
 	public:
 		ShaderGenerator();
 
-		void GetShaderSource(const SymbolTable& table, const UniqueVector<LexBlock>& srcBlocks, const ShaderEntrypoint& main,
+		void GetShaderSource(const SymbolTable& table, const IDynamicArray<LexBlock>& srcBlocks, const ShaderEntrypoint& main,
 			const IDynamicArray<ShaderEntrypoint>& shaders, std::string& srcOut);
 
 		void Clear();
@@ -43,7 +43,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Writes a copy of the source with masking applied
 		/// </summary>
-		void GetMaskedSource(const UniqueVector<LexBlock>& srcBlocks, std::string& srcOut);
+		void GetMaskedSource(const IDynamicArray<LexBlock>& srcBlocks, std::string& srcOut);
 
 		/// <summary>
 		/// Identifies all loose global variable symbols within the scopes visible to the given entrypoint
@@ -54,14 +54,14 @@ namespace Replica::Effects
 		/// <summary>
 		/// Generates source masks needed to produce native HLSL for the given shader
 		/// </summary>
-		void GetSourceMask(const SymbolTable& table, const UniqueVector<LexBlock>& srcBlocks, 
+		void GetSourceMask(const SymbolTable& table, const IDynamicArray<LexBlock>& srcBlocks,
 			const ShaderEntrypoint& main, const IDynamicArray<ShaderEntrypoint>& shaders);
 
 		/// <summary>
 		/// Dynamically generates a cbuffer for loose/global cbuffer variables, and masks out
 		/// the originals.
 		/// </summary>
-		void GenerateGlobalCBuffer(const SymbolTable& table, const UniqueVector<LexBlock>& srcBlocks);
+		void GenerateGlobalCBuffer(const SymbolTable& table, const IDynamicArray<LexBlock>& srcBlocks);
 
 		/// <summary>
 		/// Masks out a scope along with its declaring symbol. Masks content of the scope unless
@@ -73,6 +73,6 @@ namespace Replica::Effects
 		/// Appends the given range of blocks to the output, while ensuring the line numbers
 		/// of the output remain consistent
 		/// </summary>
-		void AddBlockRange(const UniqueVector<LexBlock>& srcBlocks, int start, const int end, std::string& srcOut, int& line);
+		void AddBlockRange(const IDynamicArray<LexBlock>& srcBlocks, int start, const int end, std::string& srcOut, int& line);
 	};
 }

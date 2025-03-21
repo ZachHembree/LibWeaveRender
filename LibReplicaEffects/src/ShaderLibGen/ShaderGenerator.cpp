@@ -18,7 +18,7 @@ int SourceMask::GetLastBlock() const { return startBlock + blockCount - 1; }
 ShaderGenerator::ShaderGenerator()
 { }
 
-void ShaderGenerator::GetShaderSource(const SymbolTable& table, const UniqueVector<LexBlock>& srcBlocks, const ShaderEntrypoint& main,
+void ShaderGenerator::GetShaderSource(const SymbolTable& table, const IDynamicArray<LexBlock>& srcBlocks, const ShaderEntrypoint& main,
 	const IDynamicArray<ShaderEntrypoint>& shaders, std::string & srcOut)
 {
 	Clear();
@@ -43,7 +43,7 @@ static void GetCorrectedMask(SourceMask& a, const SourceMask& b)
 	a.startBlock = std::min(a.startBlock, maxLastBlock);
 }
 
-void ShaderGenerator::GetMaskedSource(const UniqueVector<LexBlock>& srcBlocks, std::string& srcOut)
+void ShaderGenerator::GetMaskedSource(const IDynamicArray<LexBlock>& srcBlocks, std::string& srcOut)
 {
 	// Sort masks in ascending order
 	std::sort(sourceMasks.begin(), sourceMasks.end(), [](const SourceMask& a, const SourceMask& b)
@@ -113,7 +113,7 @@ void ShaderGenerator::GetGlobalVariables(const SymbolTable& table, const int mai
 	std::sort(globalVarBuf.begin(), globalVarBuf.end());
 }
 
-void ShaderGenerator::GetSourceMask(const SymbolTable& table, const UniqueVector<LexBlock>& srcBlocks, 
+void ShaderGenerator::GetSourceMask(const SymbolTable& table, const IDynamicArray<LexBlock>& srcBlocks,
 	const ShaderEntrypoint& main, const IDynamicArray<ShaderEntrypoint>& shaders)
 {
 	sourceMasks.clear();
@@ -152,7 +152,7 @@ void ShaderGenerator::GetSourceMask(const SymbolTable& table, const UniqueVector
 		GenerateGlobalCBuffer(table, srcBlocks);
 }
 
-void ShaderGenerator::GenerateGlobalCBuffer(const SymbolTable& table, const UniqueVector<LexBlock>& srcBlocks)
+void ShaderGenerator::GenerateGlobalCBuffer(const SymbolTable& table, const IDynamicArray<LexBlock>& srcBlocks)
 {
 	globalVarDefBuf.clear();
 	globalVarDefBuf.append("cbuffer _EffectGlobals\n{\n");
@@ -210,7 +210,7 @@ void ShaderGenerator::AddScopeMask(SymbolHandle symbol, bool isContentMasked)
 	}
 }
 
-void ShaderGenerator::AddBlockRange(const UniqueVector<LexBlock>& srcBlocks, int start, const int end, std::string& srcOut, int& line)
+void ShaderGenerator::AddBlockRange(const IDynamicArray<LexBlock>& srcBlocks, int start, const int end, std::string& srcOut, int& line)
 {
 	while (start <= end)
 	{
