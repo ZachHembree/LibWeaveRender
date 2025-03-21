@@ -798,3 +798,32 @@ namespace Replica
 		{ }
 	};
 }
+
+/// <summary>
+/// std::hash specializations
+/// </summary>
+namespace std
+{
+	template<typename T>
+	struct hash<Replica::DynamicArray<T>>
+	{
+		size_t operator()(const Replica::DynamicArray<T>& arr) const noexcept { return arr.GetHash(); }
+	};
+
+	template<typename T>
+	struct hash<Replica::UniqueArray<T>>
+	{
+		size_t operator()(const Replica::UniqueArray<T>& arr) const noexcept { return arr.GetHash(); }
+	};
+
+	template<typename T>
+	struct hash<Replica::Vector<T>> {
+		size_t operator()(const Replica::Vector<T>& vec) const noexcept { return vec.GetHash(); }
+	};
+
+	template<typename T>
+	struct hash<Replica::UniqueVector<T>>
+	{
+		size_t operator()(const Replica::UniqueVector<T>& vec) const noexcept { return vec.GetHash(); }
+	};
+}
