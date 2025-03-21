@@ -33,19 +33,38 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view libPath, string_view libSrc)
 
 		// Preprocess and parse
 		pVariantGen->GetVariant(vID, libTexBuf, entrypoints);
-		pAnalyzer->AnalyzeSource(libTexBuf);
-		pTable->ParseBlocks(pAnalyzer->GetBlocks());
+		const bool isDuplicate = libTexBuf == libTexLast;
 
-		if (vID == 0)
-			InitLibrary(lib);
+		if (!isDuplicate)
+		{
+			pAnalyzer->AnalyzeSource(libTexBuf);
+			pTable->ParseBlocks(pAnalyzer->GetBlocks());
 
-		GetEntryPoints();
-		//GetEffects();
+			if (vID == 0)
+				InitLibrary(lib);
 
-		lib.variants[vID].shaders = DynamicArray<ShaderVariantDef>(entrypoints.GetLength());
-		lib.variants[vID].effects = DynamicArray<EffectVariantDef>();
+			GetEntryPoints();
+			//GetEffects();
 
-		GetShaderDefs(libPath, lib.variants[vID].shaders, vID);
+			lib.variants[vID].shaders = DynamicArray<ShaderVariantDef>(entrypoints.GetLength());
+			lib.variants[vID].effects = DynamicArray<EffectVariantDef>();
+
+			GetShaderDefs(libPath, lib.variants[vID].shaders, vID);
+		}
+		else
+		{
+			LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Skipping...";
+
+			// Copy variant mappings and update ID
+			lib.variants[vID] = lib.variants[vID - 1];
+
+			for (ShaderVariantDef& shader : lib.variants[vID].shaders)
+				shader.variantID = vID;
+
+			for (EffectVariantDef& effect : lib.variants[vID].effects)
+				effect.variantID = vID;
+		}
+
 		ClearVariant();
 	}
 
@@ -56,6 +75,7 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view libPath, string_view libSrc)
 void ShaderLibGen::Clear()
 {
 	ClearVariant();
+	libTexLast.clear();
 	pVariantGen->Clear();
 	pShaderRegistry->Clear();
 }
@@ -187,6 +207,7 @@ void ShaderLibGen::ClearVariant()
 	entrypoints.clear();
 	epSet.clear();
 
+	std::swap(libTexBuf, libTexLast);
 	libTexBuf.clear();
 	shaderBuf.clear();
 }

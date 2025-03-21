@@ -39,9 +39,10 @@ namespace Replica::Effects
 		unique_ptr<ShaderGenerator> pShaderGen;
 
 		string libTexBuf;
+		string libTexLast;
+		string shaderBuf;
 		std::unordered_set<string_view> epSet;
 		UniqueVector<ShaderEntrypoint> entrypoints;
-		string shaderBuf;
 
 		/// <summary>
 		/// Initializes the library variants and corresponding flags
