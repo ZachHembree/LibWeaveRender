@@ -11,7 +11,7 @@ Stopwatch::Stopwatch() :
 /// <summary>
 /// Start or resume timer
 /// </summary>
-void Stopwatch::Start(llong offsetNS)
+void Stopwatch::Start(slong offsetNS)
 {
 	if (!isRunning)
 	{
@@ -24,7 +24,7 @@ void Stopwatch::Start(llong offsetNS)
 /// <summary>
 /// Reset and restart timer
 /// </summary>
-void Stopwatch::Restart(llong offsetNS)
+void Stopwatch::Restart(slong offsetNS)
 {
 	Reset(offsetNS);
 	isRunning = true;
@@ -46,7 +46,7 @@ void Stopwatch::Stop()
 /// <summary>
 /// Reset time
 /// </summary>
-void Stopwatch::Reset(llong offsetNS)
+void Stopwatch::Reset(slong offsetNS)
 {
 	reference = Clock::now() - Duration(offsetNS);
 	elapsedTime = Duration(0);
@@ -76,7 +76,7 @@ double Stopwatch::GetElapsedMS() const
 /// <summary>
 /// Returns elapsed time in nanoseconds
 /// </summary>
-llong Stopwatch::GetElapsedNS() const
+slong Stopwatch::GetElapsedNS() const
 {
 	if (isRunning)
 		elapsedTime = Clock::now() - reference;

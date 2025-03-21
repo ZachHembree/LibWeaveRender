@@ -10,7 +10,7 @@ namespace Replica
 	class Stopwatch
 	{
 		using Clock = std::chrono::high_resolution_clock;
-		using Duration = std::chrono::duration<llong, std::nano>;
+		using Duration = std::chrono::duration<slong, std::nano>;
 		using TimePoint = std::chrono::high_resolution_clock::time_point;
 
 	public:
@@ -19,12 +19,12 @@ namespace Replica
 		/// <summary>
 		/// Start or resume timer
 		/// </summary>
-		void Start(llong offsetNS = 0ull);
+		void Start(slong offsetNS = 0ull);
 
 		/// <summary>
 		/// Reset and restart timer
 		/// </summary>
-		void Restart(llong offsetNS = 0ull);
+		void Restart(slong offsetNS = 0ull);
 
 		/// <summary>
 		/// Stop timer
@@ -34,7 +34,7 @@ namespace Replica
 		/// <summary>
 		/// Reset time
 		/// </summary>
-		void Reset(llong offsetNS = 0ull);
+		void Reset(slong offsetNS = 0ull);
 
 		/// <summary>
 		/// Returns true if the stopwatch is rnning
@@ -54,7 +54,7 @@ namespace Replica
 		/// <summary>
 		/// Returns elapsed time in nanoseconds
 		/// </summary>
-		llong GetElapsedNS() const;
+		slong GetElapsedNS() const;
 
 	private:
 		mutable Duration elapsedTime;
