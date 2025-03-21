@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="include\Logger.hpp" />
     <ClInclude Include="include\ObjectPool.hpp" />
+    <ClInclude Include="include\ReplicaGlobalUtils.hpp" />
     <ClInclude Include="include\StringIDBuilder.hpp" />
     <ClInclude Include="src\pch.hpp" />
     <ClInclude Include="include\Serialization.hpp" />

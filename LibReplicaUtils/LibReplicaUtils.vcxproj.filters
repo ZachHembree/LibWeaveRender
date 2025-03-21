@@ -87,6 +87,9 @@
     <ClInclude Include="include\StringIDMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ReplicaGlobalUtils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\internal\Utils.cpp">
