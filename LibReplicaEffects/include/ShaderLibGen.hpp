@@ -12,9 +12,10 @@ namespace Replica::Effects
 	class BlockAnalyzer;
 	class SymbolTable;
 	class ShaderGenerator;
+	class ShaderRegistryBuilder;
 
 	/// <summary>
-	/// Generates preprocessed and precompiled shader and effect variants and corresponding
+	/// Generates preprocessed and precompiled shader and effect variants with corresponding
 	/// metadata from source
 	/// </summary>
 	class ShaderLibGen
@@ -31,12 +32,13 @@ namespace Replica::Effects
 		void Clear();
 
 	private:
+		unique_ptr<ShaderRegistryBuilder> pShaderRegistry;
 		unique_ptr<VariantPreprocessor> pVariantGen;
 		unique_ptr<BlockAnalyzer> pAnalyzer;
 		unique_ptr<SymbolTable> pTable;
 		unique_ptr<ShaderGenerator> pShaderGen;
 
-		string libBuf;
+		string libTexBuf;
 		std::unordered_set<string_view> epSet;
 		UniqueVector<ShaderEntrypoint> entrypoints;
 		string shaderBuf;
@@ -49,7 +51,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Generates shader definitions for every shader in a variant
 		/// </summary>
-		void GetShaderDefs(string_view libPath, DynamicArray<ShaderDef>& shaders);
+		void GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& shaders, const int vID);
 
 		/// <summary>
 		/// Identifies shaders in the source and buffers their entrypoint symbols

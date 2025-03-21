@@ -3,6 +3,7 @@
 #include "ParseExcept.hpp"
 #include "ShaderParser/SymbolEnums.hpp"
 #include "ShaderParser/ShaderTypeInfo.hpp"
+#include "StringIDMap.hpp"
 
 namespace Replica::Effects
 {
@@ -11,54 +12,36 @@ namespace Replica::Effects
 	/// </summary>
 	struct ConstDef
 	{
-		string name;
-		size_t offset;
-		size_t size;
+		USE_DEFAULT_CMP(ConstDef)
+
+		uint stringID;
+		uint offset;
+		uint size;
 
 		ConstDef() :
 			offset(0),
-			size(0)
+			size(0),
+			stringID(0)
 		{ }
 
-		ConstDef(string_view name, size_t offset, size_t size) :
-			name(name),
+		ConstDef(uint stringID, uint offset, uint size) :
+			stringID(stringID),
 			offset(offset),
 			size(size)
 		{ }
-
-		template<typename T>
-		static ConstDef Get(string_view name)
-		{
-			return ConstDef(name, 0, sizeof(T));
-		}
 	};
 
 	/// <summary>
 	/// Array of constant buffer member definitions used in conjunction with corresponding resource
 	/// definition to define a constant buffer
 	/// </summary>
-	struct ConstBufLayout
+	struct ConstBufDef
 	{
-		string name;
-		DynamicArray<ConstDef> members;
-		size_t size;
+		USE_DEFAULT_CMP(ConstBufDef);
 
-		static ConstBufLayout GetLayout(const std::initializer_list<ConstDef>& members, string_view name = "", size_t alignment = 1)
-		{
-			ConstBufLayout layout;
-			layout.name = name;
-			layout.members = DynamicArray<ConstDef>(members);
-			layout.size = 0;
-			
-			for (ConstDef& member : layout.members)
-			{
-				member.offset = layout.size;
-				layout.size += member.size;
-			}
-
-			layout.size = GetAlignedByteSize(layout.size, alignment);
-			return layout;
-		}
+		uint stringID;
+		uint size;
+		DynamicArray<uint> members;
 	};
 
 	/// <summary>
@@ -66,10 +49,12 @@ namespace Replica::Effects
 	/// </summary>
 	struct IOElementDef
 	{
+		USE_DEFAULT_CMP(IOElementDef);
+
 		/// <summary>
 		/// Semantic associated with the element
 		/// </summary>
-		string semanticName;
+		uint semanticID;
 
 		/// <summary>
 		/// Optional index modifying the name. Ex: SV_Target2, Color1...
@@ -89,17 +74,18 @@ namespace Replica::Effects
 		/// <summary>
 		/// Type size of the element
 		/// </summary>
-		size_t size;
+		uint size;
 
 		IOElementDef() :
+			semanticID(0),
 			semanticIndex(0),
 			size(0),
 			dataType(0),
 			componentCount(0)
 		{ }
 
-		IOElementDef(string_view semantic, uint semanticIndex, uint dataType, uint componentCount, size_t size) :
-			semanticName(semantic),
+		IOElementDef(uint semantic, uint semanticIndex, uint dataType, uint componentCount, uint size) :
+			semanticID(semantic),
 			semanticIndex(semanticIndex),
 			dataType(dataType),
 			componentCount(componentCount),
@@ -108,34 +94,32 @@ namespace Replica::Effects
 	};
 
 	/// <summary>
-	/// Defines the layout of data used for input/output to shader stages
-	/// </summary>
-	typedef DynamicArray<IOElementDef> IOLayoutDef;
-
-	/// <summary>
-	/// Defines a shader resource, like a cbuf, texture or sampler
+	/// Defines a shader resource, like a texture or sampler
 	/// </summary>
 	struct ResourceDef
 	{
+		USE_DEFAULT_CMP(ResourceDef)
+
 		/// <summary>
-		/// Name of the resource declared in the source
+		/// StringID of the resource declared in the source
 		/// </summary>
-		string name;
+		uint stringID;
 
 		/// <summary>
 		/// Type of resource
 		/// </summary>
 		ShaderTypes type;
 
-		int slot;
+		uint slot;
 
 		ResourceDef() :
 			type(ShaderTypes::Void),
-			slot(-1)
+			slot(-1),
+			stringID(-1)
 		{ }
 
-		ResourceDef(string_view name, ShaderTypes type, int slot = -1) :
-			name(name),
+		ResourceDef(uint stringID, ShaderTypes type, uint slot = -1) :
+			stringID(stringID),
 			type(type),
 			slot(slot)
 		{ }
@@ -148,10 +132,12 @@ namespace Replica::Effects
 	/// </summary>
 	struct ShaderDef
 	{
+		USE_DEFAULT_CMP(ShaderDef)
+
 		/// <summary>
-		/// File path of original source
+		/// StringID for the path of the original source
 		/// </summary>
-		string fileName;
+		uint fileStringID;
 
 		/// <summary>
 		/// Precompiled source binary
@@ -159,9 +145,9 @@ namespace Replica::Effects
 		DynamicArray<byte> binSrc;
 
 		/// <summary>
-		/// Main function name
+		/// StringID corresponding to shader name
 		/// </summary>
-		string name;
+		uint nameID;
 
 		/// <summary>
 		/// Shading stage
@@ -174,52 +160,72 @@ namespace Replica::Effects
 		tvec3<uint> threadGroupSize;
 
 		/// <summary>
-		/// Stage input
+		/// Handle ID for stage input layout
 		/// </summary>
-		IOLayoutDef inLayout;
+		uint inLayoutID;
 
 		/// <summary>
-		/// Stage output (return)
+		/// Handle ID for stage output layout
 		/// </summary>
-		IOLayoutDef outLayout;
+		uint outLayoutID;
 
 		/// <summary>
-		/// Stage resources
+		/// Handle ID for resource group used
 		/// </summary>
-		DynamicArray<ResourceDef> res;
+		uint resLayoutID;
 
 		/// <summary>
-		/// Constant buffer resource subtype data
+		/// Handle ID for constant buffer group used
 		/// </summary>
-		DynamicArray<ConstBufLayout> constBufs;
-
-		/// <summary>
-		/// Identifier corresponding unique variant configuration
-		/// </summary>
-		uint variantID;
+		uint cbufGroupID;
 
 	};
 
 	struct EffectPass
 	{
+		USE_DEFAULT_CMP(EffectPass)
+
 		/// <summary>
 		/// Shaders used in the pass, in the order they are executed. ShaderStage determined
 		/// by ShaderDef referenced by ID.
 		/// </summary>
-		DynamicArray<int> shaderIDs;
+		DynamicArray<uint> shaderIDs;
 	};
 
 	struct EffectDef
 	{
+		USE_DEFAULT_CMP(EffectDef)
+
 		/// <summary>
-		/// Name of the effect
+		/// StringID corresponding to effect name
 		/// </summary>
-		string name;
-		
+		uint nameID;
+
 		/// <summary>
 		/// Effect passes in execution order
 		/// </summary>
 		DynamicArray<EffectPass> passes;
+	};
+
+	struct ShaderVariantDef
+	{
+		/// <summary>
+		/// Unique shader associated with the variant
+		/// </summary>
+		uint shaderID;
+
+		/// <summary>
+		/// Identifier corresponding unique variant configuration
+		/// </summary>
+		uint variantID;
+	};
+
+	struct EffectVariantDef
+	{
+		/// <summary>
+		/// Unique effect associated with the variant
+		/// </summary>
+		uint effectID;
 
 		/// <summary>
 		/// Identifier corresponding unique variant configuration
@@ -233,14 +239,70 @@ namespace Replica::Effects
 	struct VariantDef
 	{
 		/// <summary>
-		/// Stores all effects and effect variants in the library
+		/// Stores all shaders and effects in the variant
 		/// </summary>
-		DynamicArray<EffectDef> effects;
+		DynamicArray<EffectVariantDef> effects;
 
 		/// <summary>
-		/// Stores all shaders and shader variants in the library
+		/// Stores all shaders and effects in the variant
+		/// </summary>
+		DynamicArray<ShaderVariantDef> shaders;
+	};
+
+	/// <summary>
+	/// Serializable definition for all unique data contained within a shader library
+	/// </summary>
+	struct ShaderRegistryDef
+	{
+		/// <summary>
+		/// Unique strings
+		/// </summary>
+		StringIDMapDef stringIDs;
+
+		/// <summary>
+		/// Unique constant buffer members
+		/// </summary>
+		DynamicArray<ConstDef> constants;
+
+		/// <summary>
+		/// Unique constant buffers
+		/// </summary>
+		DynamicArray<ConstBufDef> cbufDefs;
+
+		/// <summary>
+		/// Unique individual input/output members for a stage
+		/// </summary>
+		DynamicArray<IOElementDef> ioElements;
+
+		/// <summary>
+		/// Unique textures, buffers and samplers
+		/// </summary>
+		DynamicArray<ResourceDef> resources;
+
+		/// <summary>
+		/// Unique groups of constant buffers used in a shader
+		/// </summary>
+		DynamicArray<DynamicArray<uint>> cbufGroups;
+
+		/// <summary>
+		/// Unique stage input/output signatures for a shader
+		/// </summary>
+		DynamicArray<DynamicArray<uint>> ioSignatures;
+
+		/// <summary>
+		/// Unique groups of textures, buffers and samplers used in a shader
+		/// </summary>
+		DynamicArray<DynamicArray<uint>> resGroups;
+
+		/// <summary>
+		/// Unique shaders and associated resources
 		/// </summary>
 		DynamicArray<ShaderDef> shaders;
+
+		/// <summary>
+		/// Unique effects and associated resources
+		/// </summary>
+		DynamicArray<EffectDef> effects;
 	};
 
 	/// <summary>
@@ -299,6 +361,12 @@ namespace Replica::Effects
 		/// Array of shaders and effects for each variant
 		/// </summary>
 		DynamicArray<VariantDef> variants;
+
+		/// <summary>
+		/// Stores a serializable collection of all unique effects, shaders and requisite metadata
+		/// required by the library definition.
+		/// </summary>
+		ShaderRegistryDef regData;
 	};
 
 	/// <summary>
@@ -312,3 +380,5 @@ namespace Replica::Effects
 		DynamicArray<ShaderLibDef> libraries;
 	};
 }
+
+#include "ShaderDataHashes.hpp"

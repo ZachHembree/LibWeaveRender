@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "ShaderLibGen/ShaderLibMap.hpp"
+#include "ShaderLibGen/ShaderRegistryMap.hpp"
 
 /* Variant ID generation
 
@@ -25,77 +26,95 @@
 
 namespace Replica::Effects
 {
-	ShaderLibMap::ShaderLibMap() : pDef(nullptr)
+	ShaderLibMap::ShaderLibMap()
 	{ }
 
-	ShaderLibMap::ShaderLibMap(const ShaderLibDef& def) : pDef(new ShaderLibDef(def))
+	ShaderLibMap::ShaderLibMap(const ShaderLibDef& def) : 
+		pRegMap(new ShaderRegistryMap(def.regData)),
+		platform(def.platform),
+		flagNames(def.flagNames),
+		modeNames(def.modeNames),
+		variants(def.variants)
 	{
 		InitMap();
 	}
 
-	ShaderLibMap::ShaderLibMap(ShaderLibDef&& def) : pDef(std::move(&def))
+	ShaderLibMap::ShaderLibMap(ShaderLibDef&& def) : 
+		pRegMap(new ShaderRegistryMap(std::move(def.regData))),
+		platform(std::move(def.platform)),
+		flagNames(std::move(def.flagNames)),
+		modeNames(std::move(def.modeNames)),
+		variants(std::move(def.variants))
 	{
 		InitMap();
 	}
+
+	ShaderLibMap::~ShaderLibMap() = default;
 
 	void ShaderLibMap::InitMap()
 	{
 		// Initialize tables
 		// Compile flags
-		for (int i = 0; i < pDef->flagNames.GetLength(); i++)
+		for (int i = 0; i < flagNames.GetLength(); i++)
 		{
-			const string& name = pDef->flagNames[i];
+			const string& name = flagNames[i];
 			flagNameMap.emplace(name, i);
 		}
 		// Shader modes
-		for (int i = 0; i < pDef->modeNames.GetLength(); i++)
+		for (int i = 0; i < modeNames.GetLength(); i++)
 		{
-			const string& name = pDef->flagNames[i];
+			const string& name = modeNames[i];
 			modeNameMap.emplace(name, i);
 		}
 
 		// Variant lookup tables
-		variantMaps = UniqueArray<VariantNameMap>(pDef->variants.GetLength());
+		variantMaps = UniqueArray<VariantNameMap>(variants.GetLength());
 
-		for (int vID = 0; vID < pDef->variants.GetLength(); vID++)
+		for (int vID = 0; vID < variants.GetLength(); vID++)
 		{
-			const auto& variant = pDef->variants[vID];
+			const auto& variant = variants[vID];
 			variantMaps[vID] = VariantNameMap();
 
 			// Shaders
 			for (int i = 0; i < variant.shaders.GetLength(); i++)
 			{
-				const ShaderDef& shader = variant.shaders[i];
+				const ShaderVariantDef& vidPair = variant.shaders[i];
+				const ShaderDef& shader = pRegMap->GetShader(vidPair.shaderID);
 				NameIndexMap& map = variantMaps[vID].nameShaderMap;
-				map.emplace(shader.name, i);
+				map.emplace(GetString(shader.nameID), i);
 			}
 
 			// Effects
 			for (int i = 0; i < variant.effects.GetLength(); i++)
 			{
-				const EffectDef& effect = variant.effects[i];
+				const EffectVariantDef& vidPair = variant.effects[i];
+				const EffectDef& effect = pRegMap->GetEffect(vidPair.effectID);
 				NameIndexMap& map = variantMaps[vID].effectNameMap;
-				map.emplace(effect.name, i);
+				map.emplace(GetString(effect.nameID), i);
 			}
 		}
 	}
 
+	string_view ShaderLibMap::GetString(uint stringID) const { return pRegMap->GetString(stringID); }
+
 	/// <summary>
 	/// Returns the shader by shaderID and variantID
 	/// </summary>
-	const ShaderDef& ShaderLibMap::GetShader(int shaderID, int vID) const 
+	ShaderDefHandle ShaderLibMap::GetShader(int shaderID, int vID) const
 	{ 
 		REP_ASSERT_MSG(shaderID >= 0 && shaderID < GetVariant(vID).shaders.GetLength(), "Shader ID invalid");
-		return GetVariant(vID).shaders[shaderID];
+		const ShaderVariantDef& def = GetVariant(vID).shaders[shaderID];
+		return ShaderDefHandle(*pRegMap, def.shaderID);
 	}
 
 	/// <summary>
 	/// Returns the effect with the given effectID and variantID
 	/// </summary>
-	const EffectDef& ShaderLibMap::GetEffect(int effectID, int vID) const 
+	EffectDefHandle ShaderLibMap::GetEffect(int effectID, int vID) const
 	{ 
 		REP_ASSERT_MSG(effectID >= 0 && effectID < GetVariant(vID).effects.GetLength(), "Effect ID invalid");
-		return GetVariant(vID).effects[effectID];
+		const EffectVariantDef& def = GetVariant(vID).effects[effectID];
+		return EffectDefHandle(*pRegMap, def.effectID);
 	}
 
 	int ShaderLibMap::TryGetShaderID(string_view name, int vID) const
@@ -138,11 +157,11 @@ namespace Replica::Effects
 		return -1;
 	}
 
-	size_t ShaderLibMap::GetFlagVariantCount() const { return (1ull << pDef->flagNames.GetLength()); }
+	size_t ShaderLibMap::GetFlagVariantCount() const { return (1ull << flagNames.GetLength()); }
 
-	size_t ShaderLibMap::GetModeCount() const { return pDef->modeNames.GetLength(); }
+	size_t ShaderLibMap::GetModeCount() const { return modeNames.GetLength(); }
 
-	size_t ShaderLibMap::GetVariantCount() const { return pDef->modeNames.GetLength() * GetFlagVariantCount(); }
+	size_t ShaderLibMap::GetVariantCount() const { return modeNames.GetLength() * GetFlagVariantCount(); }
 
 	size_t ShaderLibMap::GetShaderCount(int vID) const { return GetVariant(vID).shaders.GetLength(); }
 
@@ -191,7 +210,7 @@ namespace Replica::Effects
 
 	const VariantDef& ShaderLibMap::GetVariant(const int vID) const
 	{
-		REP_ASSERT_MSG(vID >= 0 && vID < pDef->variants.GetLength(), "Variant ID invalid");
-		return pDef->variants[vID];
+		REP_ASSERT_MSG(vID >= 0 && vID < variants.GetLength(), "Variant ID invalid");
+		return variants[vID];
 	}
 }
