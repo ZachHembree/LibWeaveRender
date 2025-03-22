@@ -1,6 +1,5 @@
 #pragma once
 #include <unordered_map>
-#include "ShaderData.hpp"
 #include "ShaderDataHandles.hpp"
 
 namespace Replica::Effects
@@ -21,7 +20,10 @@ namespace Replica::Effects
 
 		~ShaderLibMap();
 
-		string_view GetString(uint stringID) const;
+		/// <summary>
+		/// Returns string ID lookup map
+		/// </summary>
+		const StringIDMap& GetStringMap() const;
 
 		/// <summary>
 		/// Returns the shader by shaderID and variantID
@@ -34,19 +36,19 @@ namespace Replica::Effects
 		EffectDefHandle GetEffect(int effectID, int vID = 0) const;
 
 		/// <summary>
-		/// Returns the shaderID by name and variantID, -1 on fail
+		/// Returns the shaderID by name ID and variantID, -1 on fail
 		/// </summary>
-		int TryGetShaderID(string_view name, int vID = 0) const;
+		int TryGetShaderID(uint nameID, int vID = 0) const;
 
 		/// <summary>
-		/// Returns the effectID with the given name and variantID, -1 on fail
+		/// Returns the effectID with the given name ID and variantID, -1 on fail
 		/// </summary>
-		int TryGetEffectID(string_view name, int vID = 0) const;
+		int TryGetEffectID(uint nameID, int vID = 0) const;
 
 		/// <summary>
 		/// Finds the shader variant modeID corresponding to the given mode name
 		/// </summary>
-		int TryGetMode(const string_view name) const;
+		int TryGetMode(uint nameID) const;
 
 		/// <summary>
 		/// Gets bit flag configuration using the given flag name(s)
@@ -59,12 +61,19 @@ namespace Replica::Effects
 			for (Iterator it = begin; it != end; ++it)
 			{
 				const string_view& name = *it;
-				const auto& result = flagNameMap.find(name);
+				uint stringID;
 
-				if (result != flagNameMap.end())
-				{
-					uint index = (uint)result->second;
-					flags |= (1u << index);
+				if (GetStringMap().TryGetStringID(name, stringID))
+				{ 
+					const auto& result = flagNameMap.find(stringID);
+
+					if (result != flagNameMap.end())
+					{
+						uint index = (uint)result->second;
+						flags |= (1u << index);
+					}
+					else
+						return -1;
 				}
 				else
 					return -1;
@@ -112,7 +121,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Returns true if the given flag or mode is set for the given vID
 		/// </summary>
-		bool GetIsDefined(string_view name, const int vID) const;
+		bool GetIsDefined(uint nameID, const int vID) const;
 
 		const IDynamicArray<string_view>& GetDefines(const int vID) const;
 
@@ -142,7 +151,7 @@ namespace Replica::Effects
 		size_t GetEffectCount(int vID = 0) const;
 
 	private:
-		using NameIndexMap = std::unordered_map<string_view, int>;
+		using NameIndexMap = std::unordered_map<uint, int>;
 
 		struct VariantNameMap
 		{
@@ -161,7 +170,7 @@ namespace Replica::Effects
 		};
 
 		/// <summary>
-		/// Pointer to queryable unique library data
+		/// Pointer to unique shader data map
 		/// </summary>
 		std::unique_ptr<ShaderRegistryMap> pRegMap;
 
@@ -173,12 +182,12 @@ namespace Replica::Effects
 		/// <summary>
 		/// Flag names used for static shader variant generation
 		/// </summary>
-		DynamicArray<string> flagNames;
+		DynamicArray<uint> flagIDs;
 
 		/// <summary>
 		/// Mutually exclusive shader modes/features used for static shader variant generation
 		/// </summary>
-		DynamicArray<string> modeNames;
+		DynamicArray<uint> modeIDs;
 
 		/// <summary>
 		/// Array of shaders and effects for each variant

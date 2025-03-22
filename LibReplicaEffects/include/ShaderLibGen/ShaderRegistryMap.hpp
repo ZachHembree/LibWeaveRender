@@ -15,6 +15,11 @@ namespace Replica::Effects
 		ShaderRegistryMap(const ShaderRegistryDef& def);
 
 		/// <summary>
+		/// Returns string ID lookup map
+		/// </summary>
+		const StringIDMap& GetStringMap() const;
+
+		/// <summary>
 		/// Returns true if the string exists in the map and retrieves its ID
 		/// </summary>
 		bool TryGetStringID(string_view str, uint& id) const;

@@ -91,16 +91,16 @@ void ShaderLibGen::InitLibrary(ShaderLibDef& lib)
 	};
 
 	const IDynamicArray<string_view>& flags = pVariantGen->GetVariantFlags();
-	lib.flagNames = DynamicArray<string>(flags.GetLength());
+	lib.flagIDs = DynamicArray<uint>(flags.GetLength());
 
 	for (int i = 0; i < flags.GetLength(); i++)
-		lib.flagNames[i] = flags[i];
+		lib.flagIDs[i] = pShaderRegistry->GetOrAddStringID(flags[i]);
 
 	const IDynamicArray<string_view>& modes = pVariantGen->GetVariantModes();
-	lib.modeNames = DynamicArray<string>(modes.GetLength());
+	lib.modeIDs = DynamicArray<uint>(modes.GetLength());
 
 	for (int i = 0; i < modes.GetLength(); i++)
-		lib.modeNames[i] = modes[i];
+		lib.modeIDs[i] = pShaderRegistry->GetOrAddStringID(modes[i]);
 
 	lib.variants = DynamicArray<VariantDef>(pVariantGen->GetVariantCount());
 }

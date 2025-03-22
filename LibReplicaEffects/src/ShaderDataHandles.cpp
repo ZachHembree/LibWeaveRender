@@ -5,6 +5,7 @@
 using namespace Replica;
 using namespace Replica::Effects;
 
+// ConstBuf
 ConstBufDefHandle::ConstBufDefHandle() :
 	pMap(nullptr), pDef(nullptr)
 { }
@@ -17,10 +18,11 @@ uint ConstBufDefHandle::GetNameID() const { return pDef->stringID; }
 
 uint ConstBufDefHandle::GetSize() const { return pDef->size; }
 
-const ConstDef& ConstBufDefHandle::GetConstant(int index) const { return pMap->GetConstant(pDef->members[index]); }
+const ConstDef& ConstBufDefHandle::operator[](ptrdiff_t index) const { return pMap->GetConstant(pDef->members[index]); }
 
-uint ConstBufDefHandle::GetConstantCount() const { return (uint)pDef->members.GetLength(); }
+size_t ConstBufDefHandle::GetLength() const { return pDef->members.GetLength(); }
 
+// ShaderDef
 ShaderDefHandle::ShaderDefHandle() :
 	pMap(nullptr), pDef(nullptr)
 { }
@@ -39,38 +41,15 @@ ShadeStages ShaderDefHandle::GetStage() const { return pDef->stage; }
 
 tvec3<uint> ShaderDefHandle::GetThreadGroupSize() const { return pDef->threadGroupSize; }
 
-const IOElementDef& ShaderDefHandle::GetInElement(int index) const
-{
-	const IDynamicArray<uint>& layoutIDs = pMap->GetIOLayout(pDef->inLayoutID);
-	return pMap->GetIOElement(layoutIDs[index]);
-}
+IOLayoutHandle ShaderDefHandle::GetInLayout() const { return IOLayoutHandle(*pMap, pDef->inLayoutID); }
 
-uint ShaderDefHandle::GetInLayoutLength() const { return (uint)pMap->GetIOLayout(pDef->inLayoutID).GetLength(); }
+IOLayoutHandle ShaderDefHandle::GetOutLayout() const { return IOLayoutHandle(*pMap, pDef->outLayoutID); }
 
-const IOElementDef& ShaderDefHandle::GetOutElement(int index) const
-{
-	const IDynamicArray<uint>& layoutIDs = pMap->GetIOLayout(pDef->outLayoutID);
-	return pMap->GetIOElement(layoutIDs[index]);
-}
+ResourceGroupHandle ShaderDefHandle::GetResources() const { return ResourceGroupHandle(*pMap, pDef->resLayoutID); }
 
-uint ShaderDefHandle::GetOutLayoutLength() const { return (uint)pMap->GetIOLayout(pDef->outLayoutID).GetLength(); }
+ConstBufGroupHandle ShaderDefHandle::GetConstantBuffers() const { return ConstBufGroupHandle(*pMap, pDef->cbufGroupID); }
 
-const ResourceDef& ShaderDefHandle::GetResource(int index) const
-{
-	const IDynamicArray<uint>& resIDs = pMap->GetResourceGroup(pDef->resLayoutID);
-	return pMap->GetResource(resIDs[index]);
-}
-
-uint ShaderDefHandle::GetResourceCount() const { return (uint)pMap->GetResourceGroup(pDef->resLayoutID).GetLength(); }
-
-ConstBufDefHandle ShaderDefHandle::GetConstantBuffer(int index) const
-{
-	const IDynamicArray<uint>& bufGroup = pMap->GetCBufGroup(pDef->cbufGroupID);
-	return ConstBufDefHandle(*pMap, bufGroup[index]);
-}
-
-uint ShaderDefHandle::GetConstBufCount() const { return (uint)pMap->GetCBufGroup(pDef->cbufGroupID).GetLength(); }
-
+// EffectDef
 EffectDefHandle::EffectDefHandle() :
 	pMap(nullptr), pDef(nullptr)
 {}
@@ -90,3 +69,45 @@ ShaderDefHandle EffectDefHandle::GetShader(int pass, int shader) const
 uint EffectDefHandle::GetShaderCount(int pass) const { return (uint)pDef->passes[pass].shaderIDs.GetLength(); }
 
 uint EffectDefHandle::GetPassCount() const { return (uint)pDef->passes.GetLength(); }
+
+// IO layout
+IOLayoutHandle::IOLayoutHandle() :
+	pMap(nullptr), pLayout(nullptr)
+{ }
+
+IOLayoutHandle::IOLayoutHandle(const ShaderRegistryMap& map, uint layoutID) :
+	pMap(&map), pLayout(&map.GetIOLayout(layoutID))
+{ }
+
+const IOElementDef& IOLayoutHandle::operator[](const ptrdiff_t index) const { return pMap->GetIOElement(pLayout->operator[](index)); }
+
+size_t IOLayoutHandle::GetLength() const { return pLayout->GetLength(); }
+
+// Resource layout
+ResourceGroupHandle::ResourceGroupHandle() :
+	pMap(nullptr), pLayout(nullptr)
+{ }
+
+ResourceGroupHandle::ResourceGroupHandle(const ShaderRegistryMap& map, uint layoutID) :
+	pMap(&map), pLayout(&map.GetResourceGroup(layoutID))
+{ }
+
+const ResourceDef& ResourceGroupHandle::operator[](const ptrdiff_t index) const { return pMap->GetResource(pLayout->operator[](index)); }
+
+size_t ResourceGroupHandle::GetLength() const { return pLayout->GetLength(); }
+
+// Cbuf group
+ConstBufGroupHandle::ConstBufGroupHandle() :
+	pMap(nullptr), pLayout(nullptr)
+{ }
+
+ConstBufGroupHandle::ConstBufGroupHandle(const ShaderRegistryMap& map, uint groupID) :
+	pMap(&map), pLayout(&map.GetCBufGroup(groupID))
+{}
+
+ConstBufDefHandle ConstBufGroupHandle::operator[](const ptrdiff_t index) const { return ConstBufDefHandle(*pMap, pLayout->operator[](index)); }
+
+/// <summary>
+/// Returns the total number of buffers in the group
+/// </summary>
+size_t ConstBufGroupHandle::GetLength() const { return pLayout->GetLength(); }

@@ -350,12 +350,12 @@ namespace Replica::Effects
 		/// <summary>
 		/// Flag names used for static shader variant generation
 		/// </summary>
-		DynamicArray<string> flagNames;
+		DynamicArray<uint> flagIDs;
 
 		/// <summary>
 		/// Mutually exclusive shader modes/features used for static shader variant generation
 		/// </summary>
-		DynamicArray<string> modeNames;
+		DynamicArray<uint> modeIDs;
 
 		/// <summary>
 		/// Array of shaders and effects for each variant

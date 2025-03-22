@@ -32,6 +32,8 @@ ShaderRegistryMap::ShaderRegistryMap(const ShaderRegistryDef& def) :
 	effects(def.effects)
 { }
 
+const StringIDMap& ShaderRegistryMap::GetStringMap() const { return stringMap; }
+
 bool ShaderRegistryMap::TryGetStringID(string_view str, uint& id) const
 {
 	return stringMap.TryGetStringID(str, id);
