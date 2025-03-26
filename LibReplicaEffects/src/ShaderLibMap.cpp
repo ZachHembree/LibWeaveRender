@@ -81,7 +81,7 @@ namespace Replica::Effects
 				const ShaderVariantDef& vidPair = variant.shaders[i];
 				const ShaderDef& shader = pRegMap->GetShader(vidPair.shaderID);
 				NameIndexMap& map = variantMaps[vID].nameShaderMap;
-				map.emplace(shader.nameID, i);
+				map.emplace(shader.nameID, vidPair.shaderID);
 			}
 
 			// Effects
@@ -90,7 +90,7 @@ namespace Replica::Effects
 				const EffectVariantDef& vidPair = variant.effects[i];
 				const EffectDef& effect = pRegMap->GetEffect(vidPair.effectID);
 				NameIndexMap& map = variantMaps[vID].effectNameMap;
-				map.emplace(effect.nameID, i);
+				map.emplace(effect.nameID, vidPair.effectID);
 			}
 		}
 	}
@@ -100,24 +100,22 @@ namespace Replica::Effects
 	/// <summary>
 	/// Returns the shader by shaderID and variantID
 	/// </summary>
-	ShaderDefHandle ShaderLibMap::GetShader(int shaderID, int vID) const
+	ShaderDefHandle ShaderLibMap::GetShader(uint shaderID) const
 	{ 
-		REP_ASSERT_MSG(shaderID >= 0 && shaderID < GetVariant(vID).shaders.GetLength(), "Shader ID invalid");
-		const ShaderVariantDef& def = GetVariant(vID).shaders[shaderID];
-		return ShaderDefHandle(*pRegMap, def.shaderID);
+		REP_ASSERT_MSG(shaderID != -1, "Shader ID invalid");
+		return ShaderDefHandle(*pRegMap, shaderID);
 	}
 
 	/// <summary>
 	/// Returns the effect with the given effectID and variantID
 	/// </summary>
-	EffectDefHandle ShaderLibMap::GetEffect(int effectID, int vID) const
+	EffectDefHandle ShaderLibMap::GetEffect(uint effectID) const
 	{ 
-		REP_ASSERT_MSG(effectID >= 0 && effectID < GetVariant(vID).effects.GetLength(), "Effect ID invalid");
-		const EffectVariantDef& def = GetVariant(vID).effects[effectID];
-		return EffectDefHandle(*pRegMap, def.effectID);
+		REP_ASSERT_MSG(effectID != -1, "Effect ID invalid");
+		return EffectDefHandle(*pRegMap, effectID);
 	}
 
-	int ShaderLibMap::TryGetShaderID(uint nameID, int vID) const
+	uint ShaderLibMap::TryGetShaderID(uint nameID, int vID) const
 	{
 		const NameIndexMap& nameMap = variantMaps[vID].nameShaderMap;
 		const auto& it = nameMap.find(nameID);
@@ -125,14 +123,14 @@ namespace Replica::Effects
 		if (it != nameMap.end())
 		{
 			const VariantDef& variantDef = GetVariant(vID);
-			const int shaderID = it->second;
+			const uint shaderID = it->second;
 			return shaderID;
 		}
 		else
 			return -1;
 	}
 
-	int ShaderLibMap::TryGetEffectID(uint nameID, int vID) const
+	uint ShaderLibMap::TryGetEffectID(uint nameID, int vID) const
 	{
 		const NameIndexMap& nameMap = variantMaps[vID].effectNameMap;
 		const auto& it = nameMap.find(nameID);
@@ -140,7 +138,7 @@ namespace Replica::Effects
 		if (it != nameMap.end())
 		{
 			const VariantDef& variantDef = GetVariant(vID);
-			const int effectID = it->second;
+			const uint effectID = it->second;
 			return effectID;
 		}
 		else
@@ -207,6 +205,8 @@ namespace Replica::Effects
 				return false;
 		}
 	}
+
+	const IDynamicArray<VariantDef>& ShaderLibMap::GetVariants() const { return variants; }
 
 	const VariantDef& ShaderLibMap::GetVariant(const int vID) const
 	{

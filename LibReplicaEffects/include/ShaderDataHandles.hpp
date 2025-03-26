@@ -191,9 +191,14 @@ namespace Replica::Effects
 		uint GetNameID() const;
 
 		/// <summary>
-		/// Returns a shader used by the effect for the given pass and index
+		/// Returns a shader definition used by the effect for the given pass and index
 		/// </summary>
 		ShaderDefHandle GetShader(int pass, int shader) const;
+
+		/// <summary>
+		/// Returns shaders for the given pass
+		/// </summary>
+		const EffectPass& GetPass(int pass) const;
 
 		/// <summary>
 		/// Returns the number of shaders used by the given pass

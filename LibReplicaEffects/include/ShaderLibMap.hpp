@@ -28,22 +28,22 @@ namespace Replica::Effects
 		/// <summary>
 		/// Returns the shader by shaderID and variantID
 		/// </summary>
-		ShaderDefHandle GetShader(int shaderID, int vID = 0) const;
+		ShaderDefHandle GetShader(uint shaderID) const;
 
 		/// <summary>
 		/// Returns the effect with the given effectID and variantID
 		/// </summary>
-		EffectDefHandle GetEffect(int effectID, int vID = 0) const;
+		EffectDefHandle GetEffect(uint effectID) const;
 
 		/// <summary>
 		/// Returns the shaderID by name ID and variantID, -1 on fail
 		/// </summary>
-		int TryGetShaderID(uint nameID, int vID = 0) const;
+		uint TryGetShaderID(uint nameID, int vID = 0) const;
 
 		/// <summary>
 		/// Returns the effectID with the given name ID and variantID, -1 on fail
 		/// </summary>
-		int TryGetEffectID(uint nameID, int vID = 0) const;
+		uint TryGetEffectID(uint nameID, int vID = 0) const;
 
 		/// <summary>
 		/// Finds the shader variant modeID corresponding to the given mode name
@@ -125,6 +125,8 @@ namespace Replica::Effects
 
 		const IDynamicArray<string_view>& GetDefines(const int vID) const;
 
+		const IDynamicArray<VariantDef>& GetVariants() const;
+
 		/// <summary>
 		/// Returns the total number of flag combinations used for variant generation
 		/// </summary>
@@ -151,7 +153,7 @@ namespace Replica::Effects
 		size_t GetEffectCount(int vID = 0) const;
 
 	private:
-		using NameIndexMap = std::unordered_map<uint, int>;
+		using NameIndexMap = std::unordered_map<uint, uint>;
 
 		struct VariantNameMap
 		{

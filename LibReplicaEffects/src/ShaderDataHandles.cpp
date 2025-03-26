@@ -66,6 +66,8 @@ ShaderDefHandle EffectDefHandle::GetShader(int pass, int shader) const
 	return ShaderDefHandle(*pMap, shaders[shader]);
 }
 
+const EffectPass& EffectDefHandle::GetPass(int pass) const { return pDef->passes[pass]; }
+
 uint EffectDefHandle::GetShaderCount(int pass) const { return (uint)pDef->passes[pass].shaderIDs.GetLength(); }
 
 uint EffectDefHandle::GetPassCount() const { return (uint)pDef->passes.GetLength(); }
