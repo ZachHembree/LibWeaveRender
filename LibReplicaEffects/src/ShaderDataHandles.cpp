@@ -1,6 +1,7 @@
 #include "pch.hpp"
 #include "ShaderDataHandles.hpp"
 #include "ShaderLibGen/ShaderRegistryMap.hpp"
+#include "StringIDMap.hpp"
 
 using namespace Replica;
 using namespace Replica::Effects;
@@ -21,6 +22,8 @@ uint ConstBufDefHandle::GetSize() const { return pDef->size; }
 const ConstDef& ConstBufDefHandle::operator[](ptrdiff_t index) const { return pMap->GetConstant(pDef->members[index]); }
 
 size_t ConstBufDefHandle::GetLength() const { return pDef->members.GetLength(); }
+
+const StringIDMap& ConstBufDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
 
 // ShaderDef
 ShaderDefHandle::ShaderDefHandle() :
@@ -49,6 +52,8 @@ ResourceGroupHandle ShaderDefHandle::GetResources() const { return ResourceGroup
 
 ConstBufGroupHandle ShaderDefHandle::GetConstantBuffers() const { return ConstBufGroupHandle(*pMap, pDef->cbufGroupID); }
 
+const StringIDMap& ShaderDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
+
 // EffectDef
 EffectDefHandle::EffectDefHandle() :
 	pMap(nullptr), pDef(nullptr)
@@ -72,6 +77,8 @@ uint EffectDefHandle::GetShaderCount(int pass) const { return (uint)pDef->passes
 
 uint EffectDefHandle::GetPassCount() const { return (uint)pDef->passes.GetLength(); }
 
+const StringIDMap& EffectDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
+
 // IO layout
 IOLayoutHandle::IOLayoutHandle() :
 	pMap(nullptr), pLayout(nullptr)
@@ -85,6 +92,8 @@ const IOElementDef& IOLayoutHandle::operator[](const ptrdiff_t index) const { re
 
 size_t IOLayoutHandle::GetLength() const { return pLayout->GetLength(); }
 
+const StringIDMap& IOLayoutHandle::GetStringMap() const { return pMap->GetStringMap(); }
+
 // Resource layout
 ResourceGroupHandle::ResourceGroupHandle() :
 	pMap(nullptr), pLayout(nullptr)
@@ -97,6 +106,8 @@ ResourceGroupHandle::ResourceGroupHandle(const ShaderRegistryMap& map, uint layo
 const ResourceDef& ResourceGroupHandle::operator[](const ptrdiff_t index) const { return pMap->GetResource(pLayout->operator[](index)); }
 
 size_t ResourceGroupHandle::GetLength() const { return pLayout->GetLength(); }
+
+const StringIDMap& ResourceGroupHandle::GetStringMap() const { return pMap->GetStringMap(); }
 
 // Cbuf group
 ConstBufGroupHandle::ConstBufGroupHandle() :
@@ -113,3 +124,5 @@ ConstBufDefHandle ConstBufGroupHandle::operator[](const ptrdiff_t index) const {
 /// Returns the total number of buffers in the group
 /// </summary>
 size_t ConstBufGroupHandle::GetLength() const { return pLayout->GetLength(); }
+
+const StringIDMap& ConstBufGroupHandle::GetStringMap() const { return pMap->GetStringMap(); }

@@ -5,6 +5,9 @@ namespace Replica::Effects
 {
 	class VariantDefHandle;
 
+	/// <summary>
+	/// Read-only interface for deduplicated shader resources
+	/// </summary>
 	class ShaderRegistryMap
 	{
 	public:

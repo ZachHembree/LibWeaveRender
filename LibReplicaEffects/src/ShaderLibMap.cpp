@@ -165,22 +165,22 @@ namespace Replica::Effects
 
 	size_t ShaderLibMap::GetEffectCount(int vID) const { return GetVariant(vID).effects.GetLength(); }
 
-	int ShaderLibMap::GetFlagID(const int variantID) const
+	uint ShaderLibMap::GetFlagID(const int variantID) const
 	{
 		PARSE_ASSERT_MSG(variantID >= 0, "Invalid variant ID");
-		return variantID % (int)GetFlagVariantCount();
+		return (uint)variantID % (uint)GetFlagVariantCount();
 	}
 
-	int ShaderLibMap::GetModeID(const int variantID) const
+	uint ShaderLibMap::GetModeID(const int variantID) const
 	{
 		PARSE_ASSERT_MSG(variantID >= 0, "Invalid variant ID");
-		return variantID / (int)GetFlagVariantCount();
+		return (uint)variantID / (uint)GetFlagVariantCount();
 	}
 
-	int ShaderLibMap::GetVariantID(const int flagID, const int modeID) const
+	int ShaderLibMap::GetVariantID(const uint flagID, const uint modeID) const
 	{
 		PARSE_ASSERT_MSG(flagID >= 0 && modeID >= 0, "Invalid flag or mode ID");
-		return flagID + (modeID * (int)GetFlagVariantCount());
+		return (int)flagID + ((int)modeID * (int)GetFlagVariantCount());
 	}
 
 	bool ShaderLibMap::GetIsDefined(uint nameID, const int vID) const
@@ -206,11 +206,124 @@ namespace Replica::Effects
 		}
 	}
 
+	bool ShaderLibMap::GetIsDefined(string_view name, const int vID) const
+	{
+		uint id = -1;
+
+		if (GetStringMap().TryGetStringID(name, id))
+			return GetIsDefined(id, vID);
+		else
+			return false;
+	}
+
 	const IDynamicArray<VariantDef>& ShaderLibMap::GetVariants() const { return variants; }
 
 	const VariantDef& ShaderLibMap::GetVariant(const int vID) const
 	{
 		REP_ASSERT_MSG(vID >= 0 && vID < variants.GetLength(), "Variant ID invalid");
 		return variants[vID];
+	}
+
+	int ShaderLibMap::TryGetFlags(const std::initializer_list<string_view>& defines) const { return TryGetFlags(defines.begin(), defines.end()); }
+
+	int ShaderLibMap::TryGetFlags(const IDynamicArray<string_view>& defines) const { return TryGetFlags(defines.begin(), defines.end()); }
+
+	int ShaderLibMap::TryGetFlags(const std::initializer_list<uint>& defines) const { return TryGetFlags(defines.begin(), defines.end()); }
+
+	int ShaderLibMap::TryGetFlags(const IDynamicArray<uint>& defines) const { return TryGetFlags(defines.begin(), defines.end()); }
+
+	void ShaderLibMap::GetDefines(const int vID, Vector<uint>& defines) const
+	{
+		const uint flags = GetFlagID(vID);
+		const uint mode = GetModeID(vID);
+
+		if (mode > 0)
+			defines.Add(modeIDs[mode]);
+
+		for (uint i = 0; i < flagIDs.GetLength(); i++)
+		{
+			const uint flag = (1u << i);
+
+			if ((flags & flag) == flag)
+				defines.Add(flagIDs[i]);
+		}
+	}
+
+	void ShaderLibMap::GetDefines(const int vID, Vector<string_view>& defines) const
+	{
+		const uint flags = GetFlagID(vID);
+		const uint mode = GetModeID(vID);
+
+		if (mode > 0)
+			defines.Add(GetStringMap().GetString(modeIDs[mode]));
+
+		for (uint i = 0; i < flagIDs.GetLength(); i++)
+		{
+			const uint flag = (1u << i);
+
+			if ((flags & flag) == flag)
+				defines.Add(GetStringMap().GetString(flagIDs[i]));
+		}
+	}
+
+	int ShaderLibMap::SetFlag(uint nameID, bool value, int vID) const
+	{
+		const auto& flagIt = flagNameMap.find(nameID);
+
+		if (flagIt != flagNameMap.end())
+		{
+			const uint flag = flagIt->second;
+			const uint mode = GetModeID(vID);
+			uint flags = GetFlagID(vID);
+
+			if (value)
+				flags |= flag;
+			else
+				flags &= ~flag;
+
+			return GetVariantID(flags, mode);
+		}
+		else
+			return -1;
+	}
+
+	int ShaderLibMap::SetFlag(string_view name, bool value, int vID) const
+	{
+		uint id = -1;
+
+		if (GetStringMap().TryGetStringID(name, id))
+			return SetFlag(id, value, vID);
+		else
+			return -1;
+	}
+
+	int ShaderLibMap::SetMode(uint nameID, int vID) const
+	{
+		const auto modeIt = modeNameMap.find(nameID);
+
+		if (modeIt != modeNameMap.end())
+		{
+			const uint mode = modeIt->second;
+			const uint flags = GetFlagID(vID);
+			return GetVariantID(flags, mode);
+		}
+		else
+			return -1;
+	}
+
+	int ShaderLibMap::ResetMode(int vID) const
+	{
+		const uint flags = GetFlagID(vID);
+		return GetVariantID(flags, 0u);
+	}
+
+	int ShaderLibMap::SetMode(string_view name, int vID) const
+	{
+		uint id = -1;
+
+		if (GetStringMap().TryGetStringID(name, id))
+			return SetMode(id, vID);
+		else
+			return -1;
 	}
 }

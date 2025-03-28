@@ -35,6 +35,11 @@ namespace Replica::Effects
 		/// </summary>
 		size_t GetLength() const;
 
+		/// <summary>
+		/// Map for stringID lookup
+		/// </summary>
+		const StringIDMap& GetStringMap() const;
+
 	private:
 		const ShaderRegistryMap* pMap;
 		const ConstBufDef* pDef;
@@ -59,6 +64,11 @@ namespace Replica::Effects
 		/// Returns the total number of members/params for a given stage IO
 		/// </summary>
 		size_t GetLength() const;
+
+		/// <summary>
+		/// Map for stringID lookup
+		/// </summary>
+		const StringIDMap& GetStringMap() const;
 
 	private:
 		const ShaderRegistryMap* pMap;
@@ -85,6 +95,11 @@ namespace Replica::Effects
 		/// </summary>
 		size_t GetLength() const;
 
+		/// <summary>
+		/// Map for stringID lookup
+		/// </summary>
+		const StringIDMap& GetStringMap() const;
+
 	private:
 		const ShaderRegistryMap* pMap;
 		const IDynamicArray<uint>* pLayout;
@@ -109,6 +124,11 @@ namespace Replica::Effects
 		/// Returns the total number of buffers in the group
 		/// </summary>
 		size_t GetLength() const;
+
+		/// <summary>
+		/// Map for stringID lookup
+		/// </summary>
+		const StringIDMap& GetStringMap() const;
 
 	private:
 		const ShaderRegistryMap* pMap;
@@ -170,6 +190,11 @@ namespace Replica::Effects
 		/// </summary>
 		ConstBufGroupHandle GetConstantBuffers() const;
 
+		/// <summary>
+		/// Map for stringID lookup
+		/// </summary>
+		const StringIDMap& GetStringMap() const;
+
 	private:
 		const ShaderRegistryMap* pMap;
 		const ShaderDef* pDef;
@@ -209,6 +234,11 @@ namespace Replica::Effects
 		/// Returns the total number of passes
 		/// </summary>
 		uint GetPassCount() const;
+
+		/// <summary>
+		/// Map for stringID lookup
+		/// </summary>
+		const StringIDMap& GetStringMap() const;
 
 	private:
 		const ShaderRegistryMap* pMap;
