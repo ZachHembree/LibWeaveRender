@@ -1,12 +1,9 @@
 #pragma once
 #include <unordered_map>
-
-#include <string_view>
+#include "ReplicaUtils.hpp"
 #include "WindowComponentBase.hpp"
 #include "SwapChain.hpp"
 #include "Device.hpp"
-#include "ShaderLibrary.hpp"
-#include "Shaders/ComputeShader.hpp"
 #include "RenderComponent.hpp"
 #include "Viewport.hpp"
 #include "Resources/DepthStencilTexture.hpp"
@@ -25,6 +22,10 @@ namespace Replica::D3D11
 	class ConstantBuffer;
 	class SwapChain;
 	class Sampler;
+
+	class Material;
+	class ComputeInstance;
+	class ShaderLibrary;
 
 	class Renderer : public WindowComponentBase
 	{
@@ -84,14 +85,14 @@ namespace Replica::D3D11
 		void SetIsDepthStencilEnabled(bool value);
 
 		/// <summary>
-		/// Returns reference to a default effect
+		/// Returns reference to a default material
 		/// </summary>
-		EffectVariant& GetDefaultEffect(string_view name) const;
+		Material& GetDefaultMaterial(string_view name) const;
 
 		/// <summary>
 		/// Returns reference to a default compute shader
 		/// </summary>
-		ComputeShader& GetDefaultCompute(string_view name) const;
+		ComputeInstance& GetDefaultCompute(string_view name) const;
 
 		/// <summary>
 		/// Retursn a reference to a default mesh
@@ -125,7 +126,8 @@ namespace Replica::D3D11
 
 	private:
 		std::unique_ptr<ShaderLibrary> pDefaultShaders;
-		mutable std::unordered_map<string_view, ComputeShader> defaultCompute;
+		mutable std::unordered_map<uint, ComputeInstance> defaultCompute;
+		mutable std::unordered_map<uint, Material> defaultMaterials;
 		std::unordered_map<string_view, Mesh> defaultMeshes;
 		std::unordered_map<string_view, Sampler> defaultSamplers;
 

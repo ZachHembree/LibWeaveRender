@@ -1,7 +1,7 @@
 #pragma once
 #include "DeviceChild.hpp"
 #include "Formats.hpp"
-#include "ShaderLibGen/ShaderData.hpp"
+#include "ShaderDataHandles.hpp"
 
 namespace Replica::D3D11
 {
@@ -19,10 +19,11 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Constructs layout definition associated with given shader bytecode
 		/// </summary>
-		InputLayout(Device& dev,
+		InputLayout(
+			Device& dev,
 			const byte* pVS,
-			const size_t srcSize,
-			const IDynamicArray<IOElementDef>& layout
+			size_t srcSize,
+			IOLayoutHandle layout
 		);
 
 		/// <summary>
@@ -33,7 +34,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Binds the layout to the input assembler for the associated context
 		/// </summary>
-		void Bind(Context& ctx);
+		void Bind(Context& ctx) const;
 
 	private:
 		ComPtr<ID3D11InputLayout> pLayout;

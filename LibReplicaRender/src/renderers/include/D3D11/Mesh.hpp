@@ -8,7 +8,7 @@ namespace Replica::D3D11
 {
 	class Device;
 	class Context;
-	class EffectVariant;
+	class Material;
 
 	/// <summary>
 	/// Contains vertex and index data needed to instantiate a new mesh
@@ -68,7 +68,7 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Draws the object
 		/// </summary>
-		void Draw(Context& ctx, EffectVariant& effect) override;
+		void Draw(Context& ctx, Material& mat) override;
 
 		/// <summary>
 		/// Returns the number of indices in the index buffer

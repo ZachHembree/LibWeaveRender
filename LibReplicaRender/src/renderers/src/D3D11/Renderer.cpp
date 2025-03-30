@@ -1,16 +1,15 @@
 #include "pch.hpp"
 #include "ReplicaWin32.hpp"
 #include "ReplicaInternalD3D11.hpp"
-#include "D3D11/ShaderLibrary.hpp"
 #include "D3D11/Renderer.hpp"
-#include "D3D11/EffectVariant.hpp"
+#include "D3D11/Shaders/EffectVariant.hpp"
 #include "D3D11/Resources/Sampler.hpp"
-#include "D3D11/Shaders/VertexShader.hpp"
-#include "D3D11/Shaders/PixelShader.hpp"
-#include "D3D11/Shaders/ComputeShader.hpp"
 #include "D3D11/Shaders/BuiltInShaders.hpp"
 #include "D3D11/Mesh.hpp"
 #include "D3D11/Primitives.hpp"
+#include "D3D11/Shaders/Material.hpp"
+#include "D3D11/Shaders/ComputeInstance.hpp"
+#include "D3D11/ShaderLibrary.hpp"
 
 using namespace Replica;
 using namespace Replica::D3D11;
@@ -118,34 +117,55 @@ bool Renderer::GetIsDepthStencilEnabled() { return useDefaultDS; }
 void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
 
 /// <summary>
-/// Returns reference to a default effect
+/// Returns reference to a default material
 /// </summary>
-EffectVariant& Renderer::GetDefaultEffect(string_view name) const { return pDefaultShaders->GetEffect(name); }
+Material& Renderer::GetDefaultMaterial(string_view name) const 
+{ 
+	const StringIDMap& stringMap = pDefaultShaders->GetStringMap();
+	uint stringID;
+
+	if (stringMap.TryGetStringID(name, stringID))
+	{
+		const auto& it = defaultMaterials.find(stringID);
+
+		if (it != defaultMaterials.end())
+		{
+			Material& mat = it->second;
+			mat.ResetDefines();
+			return mat;
+		}
+		else
+		{
+			const auto& pair = defaultMaterials.emplace(stringID, pDefaultShaders->GetMaterial(stringID));
+			return pair.first->second;
+		}
+	}
+	else
+		GFX_THROW("Default material undefined")
+}
 
 /// <summary>
 /// Returns reference to a default compute shader
 /// </summary>
-ComputeShader& Renderer::GetDefaultCompute(string_view name) const 
+ComputeInstance& Renderer::GetDefaultCompute(string_view name) const 
 {
-	auto it = defaultCompute.find(name);
+	const StringIDMap& stringMap = pDefaultShaders->GetStringMap();
+	uint stringID;
 
-	if (it != defaultCompute.end())
+	if (stringMap.TryGetStringID(name, stringID))
 	{
-		return it->second;
+		const auto& it = defaultCompute.find(stringID);
+
+		if (it != defaultCompute.end())
+			return it->second;
+		else
+		{
+			const auto& pair = defaultCompute.emplace(stringID, pDefaultShaders->GetComputeInstance(stringID));
+			return pair.first->second;
+		}
 	}
 	else
-	{
-		const int shaderID = pDefaultShaders->GetLibMap().TryGetShaderID(name);
-
-		if (shaderID != -1)
-		{
-			const auto& cs = pDefaultShaders->GetShader<ComputeShaderVariant>(shaderID);
-			defaultCompute.emplace(name, ComputeShader(cs));
-			return defaultCompute[name];
-		}
-		else
-			GFX_THROW("Default shader undefined");
-	}
+		GFX_THROW("Default compute shader undefined")
 }
 
 /// <summary>

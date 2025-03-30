@@ -1,33 +1,52 @@
 #include "pch.hpp"
 #include "ReplicaInternalD3D11.hpp"
-#include "D3D11/Shaders/ShaderVariantBase.hpp"
 #include "D3D11/ShaderLibrary.hpp"
+#include "D3D11/Shaders/ShaderVariantBase.hpp"
 
 using namespace Replica;
 using namespace Replica::D3D11;
 
-string_view ShaderVariantBase::GetName() const { return GetDefinition().name; }
+uint ShaderVariantBase::GetNameID() const { return def.GetNameID(); }
 
-const ShaderLibrary& ShaderVariantBase::GetLibrary() const { GFX_ASSERT(pLib != nullptr, "Cannot access null shader library"); return *pLib; }
-
-ShaderLibrary& ShaderVariantBase::GetLibrary() { GFX_ASSERT(pLib != nullptr, "Cannot access null shader library"); return *pLib; }
-
-const ShaderDef& ShaderVariantBase::GetDefinition() const { GFX_ASSERT(pDef != nullptr, "Cannot access null shader definition"); return *pDef; }
-
-bool ShaderVariantBase::GetIsDefined(string_view define) const { return GetLibrary().GetLibMap().GetIsDefined(define, pDef->variantID); }
+ShaderDefHandle ShaderVariantBase::GetDefinition() const { return def; }
 
 ShaderVariantBase::ShaderVariantBase() :
-	DeviceChild(),
-	pLib(nullptr),
-	pDef(nullptr)
+	DeviceChild()
 { }
 
-ShaderVariantBase::ShaderVariantBase(Device& dev, ShaderLibrary& lib, const ShaderDef& def) :
+ShaderVariantBase::ShaderVariantBase(Device& dev, const ShaderDefHandle& def) :
 	DeviceChild(dev),
-	pLib(&lib),
-	pDef(&def)
-{ }
+	def(def),
+	sampMap(def.GetResources(), ShaderTypes::Sampler),
+	srvMap(def.GetResources(), ShaderTypes::Texture)
+{ 
+	ConstBufGroupHandle bufData = def.GetConstantBuffers();
+	cbufs = UniqueArray<ConstantBuffer>(bufData.GetLength());
+
+	for (int i = 0; i < cbufs.GetLength(); i++)
+	{
+		cbufs[i] = ConstantBuffer(dev, bufData[i].GetSize());
+	}
+}
 
 ShaderVariantBase::ShaderVariantBase(ShaderVariantBase&& other) noexcept = default;
 
 ShaderVariantBase& ShaderVariantBase::operator=(ShaderVariantBase&& other) noexcept = default;
+
+void ShaderVariantBase::MapResources(Context& ctx, const ResourceSet& res) const
+{
+	const ShadeStages stage = def.GetStage();
+	ctx.SetSamplers(res.GetSamplers(), sampMap, stage);
+	ctx.SetSRVs(res.GetSRVs(), srvMap, stage);
+
+	const IDynamicArray<Span<byte>>& constData = res.GetMappedConstants(constants);
+	ctx.SetConstants(constData, cbufs, stage);
+}
+
+void ShaderVariantBase::UnmapResources(Context& ctx) const
+{
+	const ShadeStages stage = def.GetStage();
+	ctx.ClearSamplers(0, (uint)sampMap.GetCount(), stage);
+	ctx.ClearSRVs(0, (uint)srvMap.GetCount(), stage);
+	ctx.ClearConstants(0, (uint)constants.GetBufferCount(), stage);
+}

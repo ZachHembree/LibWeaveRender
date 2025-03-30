@@ -1,11 +1,9 @@
 #include "pch.hpp"
+#include "ShaderLibGen/ShaderRegistryMap.hpp"
 #include "ReplicaInternalD3D11.hpp"
 #include "D3D11/ShaderLibrary.hpp"
-#include "D3D11/Shaders/ShaderVariantBase.hpp"
-#include "D3D11/Shaders/ShaderBase.hpp"
-#include "D3D11/Shaders/VertexShader.hpp"
-#include "D3D11/Shaders/PixelShader.hpp"
-#include "D3D11/EffectVariant.hpp"
+#include "D3D11/Shaders/Material.hpp"
+#include "D3D11/Shaders/ComputeInstance.hpp"
 
 using namespace Replica::D3D11;
 
@@ -23,24 +21,47 @@ ShaderLibrary::ShaderLibrary(Device& device, ShaderLibDef&& def) :
 	libMap(std::move(def))
 { }
 
-bool ShaderLibrary::TryGetShader(const int shaderID, const VertexShaderVariant*& pVS, const int vID)
-{
-	Variant& variant = GetVariant(vID);
-	const auto& it = variant.vertexShaders.find(shaderID);
+Material ShaderLibrary::GetMaterial(uint effectNameID) { return Material(*this, effectNameID, 0); }
 
-	if (it != variant.vertexShaders.end())
+ComputeInstance ShaderLibrary::GetComputeInstance(uint nameID) { return ComputeInstance(*this, nameID, 0); }
+
+Material ShaderLibrary::GetMaterial(string_view effectName) 
+{ 
+	uint id = -1;
+
+	if (GetStringMap().TryGetStringID(effectName, id))
+		return GetMaterial(id);
+	else
+		GFX_THROW("Invalid effect name")
+}
+
+ComputeInstance ShaderLibrary::GetComputeInstance(string_view name) 
+{
+	uint id = -1;
+
+	if (GetStringMap().TryGetStringID(name, id))
+		return GetComputeInstance(id);
+	else
+		GFX_THROW("Invalid shader name")
+}
+
+bool ShaderLibrary::TryGetShader(uint shaderID, const VertexShaderVariant*& pVS)
+{
+	const auto& it = vertexShaders.find(shaderID);
+
+	if (it != vertexShaders.end())
 	{
 		pVS = &it->second;
 		return true;
 	}
 	else
 	{
-		const ShaderDef& def = libMap.GetShader(shaderID, vID);
+		const ShaderDefHandle& def = libMap.GetShader(shaderID);
 
-		if (def.stage == ShadeStages::Vertex)
+		if (def.GetStage() == ShadeStages::Vertex)
 		{
-			variant.vertexShaders.emplace(shaderID, VertexShaderVariant(*pDev, *this, def));
-			pVS = &variant.vertexShaders[shaderID];
+			vertexShaders.emplace(shaderID, VertexShaderVariant(*pDev, def));
+			pVS = &vertexShaders[shaderID];
 			return true;
 		}
 		else
@@ -48,24 +69,23 @@ bool ShaderLibrary::TryGetShader(const int shaderID, const VertexShaderVariant*&
 	}
 }
 
-bool ShaderLibrary::TryGetShader(const int shaderID, const PixelShaderVariant*& pPS, const int vID)
+bool ShaderLibrary::TryGetShader(uint shaderID, const PixelShaderVariant*& pPS)
 {
-	Variant& variant = GetVariant(vID);
-	const auto& it = variant.pixelShaders.find(shaderID);
+	const auto& it = pixelShaders.find(shaderID);
 
-	if (it != variant.pixelShaders.end())
+	if (it != pixelShaders.end())
 	{
 		pPS = &it->second;
 		return true;
 	}
 	else
 	{
-		const ShaderDef& def = libMap.GetShader(shaderID, vID);
+		const ShaderDefHandle& def = libMap.GetShader(shaderID);
 
-		if (def.stage == ShadeStages::Pixel)
+		if (def.GetStage() == ShadeStages::Pixel)
 		{
-			variant.pixelShaders.emplace(shaderID, PixelShaderVariant(*pDev, *this, def));
-			pPS = &variant.pixelShaders[shaderID];
+			pixelShaders.emplace(shaderID, PixelShaderVariant(*pDev, def));
+			pPS = &pixelShaders[shaderID];
 			return true;
 		}
 		else
@@ -73,24 +93,23 @@ bool ShaderLibrary::TryGetShader(const int shaderID, const PixelShaderVariant*& 
 	}
 }
 
-bool ShaderLibrary::TryGetShader(const int shaderID, const ComputeShaderVariant*& pCS, const int vID)
+bool ShaderLibrary::TryGetShader(uint shaderID, const ComputeShaderVariant*& pCS)
 {
-	Variant& variant = GetVariant(vID);
-	const auto& it = variant.computeShaders.find(shaderID);
+	const auto& it = computeShaders.find(shaderID);
 
-	if (it != variant.computeShaders.end())
+	if (it != computeShaders.end())
 	{
 		pCS = &it->second;
 		return true;
 	}
 	else
 	{
-		const ShaderDef& def = libMap.GetShader(shaderID, vID);
+		const ShaderDefHandle& def = libMap.GetShader(shaderID);
 
-		if (def.stage == ShadeStages::Compute)
+		if (def.GetStage() == ShadeStages::Compute)
 		{
-			variant.computeShaders.emplace(shaderID, ComputeShaderVariant(*pDev, *this, def));
-			pCS = &variant.computeShaders[shaderID];
+			computeShaders.emplace(shaderID, ComputeShaderVariant(*pDev, def));
+			pCS = &computeShaders[shaderID];
 			return true;
 		}
 		else
@@ -98,43 +117,19 @@ bool ShaderLibrary::TryGetShader(const int shaderID, const ComputeShaderVariant*
 	}
 }
 
-EffectVariant& ShaderLibrary::GetEffect(const int effectID, const int vID)
+const EffectVariant& ShaderLibrary::GetEffect(uint effectID)
 {
-	Variant& variant = GetVariant(vID);
-	const int effectCount = (int)libMap.GetEffectCount(vID);
+	GFX_ASSERT(effectID != -1, "EffectID out of range");
+	const auto& it = effects.find(effectID);
 
-	GFX_ASSERT(effectID >= 0 && effectID < effectCount, "EffectID out of range");
-	const auto it = variant.effects.find(effectID);
-
-	if (it != variant.effects.end())
+	if (it != effects.end())
 		return it->second;
 	else
 	{
-		const EffectDef& def = libMap.GetEffect(effectID, vID);
-		variant.effects.emplace(effectID, EffectVariant(*this, def));
-		return variant.effects[effectID];
+		const EffectDefHandle& def = libMap.GetEffect(effectID);
+		effects.emplace(effectID, EffectVariant(*this, def));
+		return effects[effectID];
 	}
 }
 
-EffectVariant& ShaderLibrary::GetEffect(string_view name, const int vID)
-{
-	const int effectID = libMap.TryGetEffectID(name, vID);
-
-	if (effectID != -1)
-		return GetEffect(effectID, vID);
-	else
-		GFX_THROW("Effect name invalid");
-}
-
 const ShaderLibMap& ShaderLibrary::GetLibMap() const { return libMap; }
-
-ShaderLibrary::Variant& ShaderLibrary::GetVariant(const int vID)
-{
-	GFX_ASSERT(vID == 0 || (vID > 0 && vID < libMap.GetVariantCount()), "Shader variant configuration invalid")
-
-	// Create variant if not instantiated
-	if (!variants.contains(vID))
-		variants.emplace(vID, Variant());
-
-	return variants[vID];
-}

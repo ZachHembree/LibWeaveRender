@@ -32,9 +32,9 @@ namespace Replica::D3D11
 	/// <summary>
 	/// Draws the object
 	/// </summary>
-	void Mesh::Draw(Context& ctx, EffectVariant& effect)
+	void Mesh::Draw(Context& ctx, Material& mat)
 	{
-		ctx.Draw(*this, effect);
+		ctx.Draw(*this, mat);
 	}
 
 	/// <summary>

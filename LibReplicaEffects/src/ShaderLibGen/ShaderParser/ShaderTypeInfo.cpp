@@ -405,4 +405,3 @@ const ShaderTypeInfo* TryGetShaderTypeInfo(string_view name)
 		return nullptr;
 }
 }
-

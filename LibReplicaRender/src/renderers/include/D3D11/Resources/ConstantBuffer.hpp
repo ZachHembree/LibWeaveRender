@@ -20,6 +20,6 @@ namespace Replica::D3D11
 		ConstantBuffer& operator=(ConstantBuffer&& other) = default;
 
 	private:
-		
+
 	};
 }

@@ -12,6 +12,6 @@ namespace Replica::D3D11
 	class IDrawable : public IAsset
 	{
 	public:
-		virtual void Draw(Context& ctx, EffectVariant& effect) = 0;
+		virtual void Draw(Context& ctx, Material& mat) = 0;
 	};
 }

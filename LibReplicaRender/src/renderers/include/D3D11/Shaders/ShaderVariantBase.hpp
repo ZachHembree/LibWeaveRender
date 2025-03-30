@@ -1,11 +1,15 @@
 #pragma once
 #include "ReplicaInternalD3D11.hpp"
-#include "../Device.hpp"
-#include "../Resources/DeviceChild.hpp"
+#include "ShaderDataHandles.hpp"
+#include "D3D11/Device.hpp"
+#include "D3D11/Resources/DeviceChild.hpp"
+#include "D3D11/Resources/ConstantBuffer.hpp"
+#include "D3D11/Resources/ConstantGroupMap.hpp"
 
 namespace Replica::D3D11
 {
 	using Effects::ShaderDef;
+	using Effects::ShaderDefHandle;
 
 	class ShaderLibrary;
 
@@ -14,68 +18,32 @@ namespace Replica::D3D11
 	public:
 		MAKE_NO_COPY(ShaderVariantBase)
 
-		string_view GetName() const;
+		uint GetNameID() const;
 
-		const ShaderLibrary& GetLibrary() const;
+		ShaderDefHandle GetDefinition() const;
 
-		ShaderLibrary& GetLibrary();
+		virtual void Bind(Context& ctx, const ResourceSet& res) const = 0;
 
-		const ShaderDef& GetDefinition() const;
+		virtual void Unbind(Context& ctx) const = 0;
 
-		bool GetIsDefined(string_view define) const;
+		virtual void MapResources(Context& ctx, const ResourceSet& res) const;
+
+		virtual void UnmapResources(Context& ctx) const;
 
 	protected:
-		ShaderLibrary* pLib;
-		const ShaderDef* pDef;
+		ShaderDefHandle def;
+		ConstantGroupMap constants;
+		SamplerMap sampMap;
+		ResourceViewMap srvMap;
+
+		mutable UniqueArray<ConstantBuffer> cbufs;
 
 		ShaderVariantBase();
 
-		ShaderVariantBase(Device& dev, ShaderLibrary& lib, const ShaderDef& def);
+		ShaderVariantBase(Device& dev, const ShaderDefHandle& def);
 
 		ShaderVariantBase(ShaderVariantBase&& other) noexcept;
 
 		ShaderVariantBase& operator=(ShaderVariantBase&& other) noexcept;
-	};
-
-	template<typename ShaderT>
-	class ShaderVariant : public ShaderVariantBase
-	{
-	public:
-		ShaderVariant() : ShaderVariantBase()
-		{ }
-
-		ShaderVariant(Device& dev, ShaderLibrary& lib, const ShaderDef& def) :
-			ShaderVariantBase(dev, lib, def)
-		{
-			dev.CreateShader(def.binSrc, pShader);
-		}
-
-		ShaderT* Get() const { return pShader.Get(); }
-
-		const ShaderVariant& GetVariant(const int vID) const 
-		{
-			ShaderVariantBase& newVariant = pLib->GetShader(GetName(), vID);
-			GFX_ASSERT(newVariant.GetDefinition().stage == GetDefinition().stage, "Shader variant undefined");
-
-			return reinterpret_cast<ShaderVariant&>(newVariant);
-		}
-
-	protected:
-		ComPtr<ShaderT> pShader;
-	};
-
-	class VertexShaderVariant : public ShaderVariant<ID3D11VertexShader>
-	{ 
-		using ShaderVariant::ShaderVariant;
-	};
-
-	class PixelShaderVariant : public ShaderVariant<ID3D11PixelShader>
-	{
-		using ShaderVariant::ShaderVariant;
-	};
-
-	class ComputeShaderVariant : public ShaderVariant<ID3D11ComputeShader>
-	{
-		using ShaderVariant::ShaderVariant;
 	};
 }

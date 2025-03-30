@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "StringIDMap.hpp"
 #include "ReplicaInternalD3D11.hpp"
 #include "D3D11/Resources/InputLayout.hpp"
 #include "D3D11/Context.hpp"
@@ -46,10 +47,11 @@ static DXGI_FORMAT GetFormat(const IOElementDef& def)
 
 InputLayout::InputLayout() noexcept : DeviceChild() { }
 
-InputLayout::InputLayout(Device& dev,
+InputLayout::InputLayout(
+	Device& dev,
 	const byte* pVS,
-	const size_t srcSize,
-	const IDynamicArray<IOElementDef>& desc
+	size_t srcSize,
+	IOLayoutHandle desc
 ) : DeviceChild(dev)
 {
 	GFX_ASSERT(desc.GetLength() <= 15, "Vertex input layout size limit exceeded")
@@ -59,7 +61,7 @@ InputLayout::InputLayout(Device& dev,
 	{
 		descBuf[i].Format = GetFormat(desc[i]);
 		descBuf[i].SemanticIndex = desc[i].semanticIndex;
-		descBuf[i].SemanticName = desc[i].semanticName.data();
+		descBuf[i].SemanticName = desc.GetStringMap().GetString(desc[i].semanticID).data();
 
 		descBuf[i].InputSlot = 0u;
 		descBuf[i].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -78,7 +80,7 @@ InputLayout::InputLayout(Device& dev,
 
 ID3D11InputLayout* InputLayout::Get() const { return pLayout.Get(); };
 
-void InputLayout::Bind(Context& ctx)
+void InputLayout::Bind(Context& ctx) const
 {
 	ctx->IASetInputLayout(Get());
 }

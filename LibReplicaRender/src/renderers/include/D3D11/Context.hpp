@@ -1,8 +1,9 @@
 #pragma once
 #include "Resources/DeviceChild.hpp"
 #include "Resources/ResourceBase.hpp"
-#include "ShaderLibGen/ShaderData.hpp"
+#include "ShaderDataHandles.hpp"
 #include "Viewport.hpp"
+#include "Resources/ResourceMap.hpp"
 
 namespace Replica::D3D11
 {
@@ -17,10 +18,11 @@ namespace Replica::D3D11
 	class SwapChain;
 	class InputLayout;
 
-	class VertexShader;
-	class PixelShader;
-	class ComputeShader;
-	class EffectVariant;
+	class VertexShaderVariant;
+	class PixelShaderVariant;
+	class ComputeShaderVariant;
+	class Material;
+	class ResourceSet;
 
 	class Texture2D;
 	class RWTexture2D;
@@ -55,17 +57,17 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Binds the given vertex shader
 		/// </summary>
-		void BindShader(VertexShader& vs);
+		void BindShader(const VertexShaderVariant& vs, const ResourceSet& res);
 
 		/// <summary>
 		/// Binds the given pixel shader
 		/// </summary>
-		void BindShader(PixelShader& ps);
+		void BindShader(const PixelShaderVariant& ps, const ResourceSet& res);
 
 		/// <summary>
 		/// Binds the given compute shader
 		/// </summary>
-		void BindShader(ComputeShader& cs);
+		void BindShader(const ComputeShaderVariant& cs, const ResourceSet& res);
 
 		/// <summary>
 		/// Clears the given vertex shader
@@ -75,27 +77,27 @@ namespace Replica::D3D11
 		/// <summary>
 		/// Returns true if the given shader is bound
 		/// </summary>
-		bool GetIsBound(VertexShader* vs) const;
+		bool GetIsBound(const VertexShaderVariant* vs) const;
 
 		/// <summary>
 		/// Returns true if the given shader is bound
 		/// </summary>
-		bool GetIsBound(PixelShader* ps) const;
+		bool GetIsBound(const PixelShaderVariant* ps) const;
 
 		/// <summary>
 		/// Returns true if the given shader is bound
 		/// </summary>
-		bool GetIsBound(ComputeShader* cs) const;
+		bool GetIsBound(const ComputeShaderVariant* cs) const;
 
-		void Dispatch(ComputeShader& cs, ivec3 groups);
+		void Dispatch(const ComputeShaderVariant& cs, ivec3 groups, const ResourceSet& res);
 
-		void SetSamplers(const IDynamicArray<ID3D11SamplerState*>& samplers, ShadeStages stage);
+		void SetSamplers(const SamplerMap::DataSrc& sampMap, const SamplerMap& map, ShadeStages stage);
 
-		void SetUAVs(const IDynamicArray<ID3D11UnorderedAccessView*>& uavs);
+		void SetUAVs(const UnorderedAccessMap::DataSrc& uavs, const UnorderedAccessMap& map);
 
-		void SetSRVs(const IDynamicArray<ID3D11ShaderResourceView*>& srvs, ShadeStages stage);
+		void SetSRVs(const ResourceViewMap::DataSrc& srvMap, const ResourceViewMap& map, ShadeStages stage);
 
-		void SetConstants(IDynamicArray<ConstantBuffer>& cBuffers, ShadeStages stage);
+		void SetConstants(const IDynamicArray<Span<byte>>& cbufData, IDynamicArray<ConstantBuffer>& cBuffers, ShadeStages stage);
 
 		void ClearSamplers(const uint start, const uint count, ShadeStages stage);
 
@@ -238,21 +240,21 @@ namespace Replica::D3D11
 		void Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox = ivec4(0));
 
 		/// <summary>
-		/// Draws an indexed, non-instanced triangle meshes using the given effect
+		/// Draws an indexed, non-instanced triangle meshes using the given material
 		/// </summary>
-		void Draw(Mesh& mesh, EffectVariant& effect);
+		void Draw(Mesh& mesh, Material& mat);
 
 		/// <summary>
-		/// Draws a group of indexed, non-instanced triangle meshes using the given effect
+		/// Draws a group of indexed, non-instanced triangle meshes using the given material
 		/// </summary>
-		void Draw(IDynamicArray<Mesh>& meshes, EffectVariant& effect);
+		void Draw(IDynamicArray<Mesh>& meshes, Material& mat);
 
 	private:
 		ComPtr<ID3D11DeviceContext> pContext;
 
-		VertexShader* currentVS;
-		PixelShader* currentPS;
-		ComputeShader* currentCS;
+		const VertexShaderVariant* currentVS;
+		const PixelShaderVariant* currentPS;
+		const ComputeShaderVariant* currentCS;
 
 		ID3D11DepthStencilState* currentDSS;
 		ID3D11DepthStencilView* currentDSV;
@@ -265,8 +267,6 @@ namespace Replica::D3D11
 		UniqueArray<ID3D11RenderTargetView*> currentRTVs;
 		Span<ID3D11RenderTargetView*> rtvSpan;
 		uint rtvCount;
-
-		/* These expose raw interfaces. Fix that, then make them public. */
 
 		/// <summary>
 		/// Returns the render target view bound to the given index.
