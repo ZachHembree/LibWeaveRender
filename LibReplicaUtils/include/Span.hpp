@@ -2,6 +2,15 @@
 #include "internal/Utils.hpp"
 #include "DynamicCollections.hpp"
 
+// Allocates temporary stack allocated array with alloca, and wraps it in a span
+#define ALLOCA_SPAN(SPAN, COUNT, TYPE) \
+	ALLOCA_ARR(SPAN##_TMP_PTR, COUNT, TYPE) \
+	Span<TYPE> SPAN(SPAN##_TMP_PTR, COUNT);
+// Allocates temporary stack allocated array with alloca, fills it with nulls, and wraps it in a span
+#define ALLOCA_SPAN_NULL(SPAN, COUNT, TYPE) \
+	ALLOCA_ARR_NULL(SPAN##_TMP_PTR, COUNT, TYPE) \
+	Span<TYPE> SPAN(SPAN##_TMP_PTR, COUNT);
+
 namespace Replica
 { 
 	/// <summary>

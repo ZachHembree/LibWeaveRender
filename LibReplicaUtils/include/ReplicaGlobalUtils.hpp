@@ -87,3 +87,10 @@
 #define MAKE_DEF_ALL(Type) \
     MAKE_DEF_MOVE_COPY(Type) \
     USE_DEFAULT_CMP(Type) 
+
+// Creates an alloca stack array
+#define ALLOCA_ARR(ARR_PTR, COUNT, TYPE) TYPE* ARR_PTR = (TYPE*)alloca(COUNT * sizeof(TYPE));
+// Creates an alloca stack array and fills is with nulls
+#define ALLOCA_ARR_NULL(ARR_PTR, COUNT, TYPE) \
+    TYPE* ARR_PTR = (TYPE*)alloca(COUNT * sizeof(TYPE)); \
+    memset( ARR_PTR, 0u, (COUNT * sizeof(TYPE)) );
