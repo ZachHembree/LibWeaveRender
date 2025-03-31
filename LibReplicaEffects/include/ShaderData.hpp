@@ -328,7 +328,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Shader model used for compilation
 		/// </summary>
-		string shaderModel;
+		string featureLevel;
 
 		/// <summary>
 		/// Graphics API compiled for

@@ -7,6 +7,7 @@ namespace Replica::Effects
     static const std::unordered_map<std::string_view, TokenTypes> s_KeywordToTypeMap
     {
         { "technique", TokenTypes::TechniqueDecl },
+        { "effect", TokenTypes::TechniqueDecl },
         { "cbuffer", TokenTypes::ConstBufDecl, },
 
         { "vertex", TokenTypes::VertexShaderDecl },

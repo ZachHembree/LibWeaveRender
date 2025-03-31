@@ -2,6 +2,7 @@
 #include <d3d11shader.h>
 #include <d3dcompiler.h>
 #include <memory>
+#include <thread>
 #include <ReplicaWinUtils.hpp>
 #include "ParseExcept.hpp"
 #include "ShaderLibGen/ShaderCompiler.hpp"
@@ -9,26 +10,79 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
-#define TMP_STR_BUF(tmpName, src, size, errMsg)\
-REP_ASSERT_MSG(src.length() < size, errMsg)\
-char tmpName[size];\
-std::copy(src.begin(), src.end(), (char*)&tmpName);\
-tmpName[src.length()] = '\0';
-
 using namespace Replica;
 using namespace Replica::Effects;
 
-constexpr string_view D3D11Targets[] =
+/// <summary>
+/// Stores temporary configuration information
+/// </summary>
+class CompilerState
 {
-	"Unknown",
-	"vs_" RPFX_D3D11_FEATURE_LEVEL,
-	"hs_" RPFX_D3D11_FEATURE_LEVEL,
-	"ds_" RPFX_D3D11_FEATURE_LEVEL,
-	"gs_" RPFX_D3D11_FEATURE_LEVEL,
-	"ps_" RPFX_D3D11_FEATURE_LEVEL,
-	"cs_" RPFX_D3D11_FEATURE_LEVEL
+public:
+	CompilerState() { SetFeatureLevel("5_0"); }
+
+	/// <summary>
+	/// Updates feature level and per-stage version strings
+	/// </summary>
+	void SetFeatureLevel(string_view fl)
+	{
+		if (fl == featureLevel)
+			return;
+
+		featureLevel = fl;
+
+		for (int i = 0; i < TargetCount; i++)
+		{
+			string& target = targets[i];
+			target.clear();
+			target.append(TargetPrefixesD3D11[i]);
+			target.append(featureLevel);
+		}
+	}
+
+	/// <summary>
+	/// Returns the current feature level string
+	/// </summary>
+	string_view GetFeatureLevel() const { return featureLevel; }
+
+	/// <summary>
+	/// Returns shader model target string for the given stage
+	/// </summary>
+	string_view GetTarget(ShadeStages stage) const { return targets[(int)stage]; }
+
+	/// <summary>
+	/// Returns the total number of compile target types
+	/// </summary>
+	static constexpr size_t GetTargetCount() { return TargetCount; }
+
+private:
+	// Per stage shader model prefixes
+	static constexpr string_view TargetPrefixesD3D11[] =
+	{
+		"Unknown",
+		"vs_",
+		"hs_",
+		"ds_",
+		"gs_",
+		"ps_",
+		"cs_"
+	};
+
+	static constexpr size_t TargetCount = std::size(TargetPrefixesD3D11);
+
+	// Feature level postfix, e.g. 5_0, 4_0, 4_0_level_9_1
+	string_view featureLevel;
+	string targets[TargetCount];
 };
 
+/// <summary>
+/// Compiler state for the current thread
+/// </summary>
+static thread_local CompilerState s_State;
+
+/// <summary>
+/// Converts resource description into portable enum
+/// </summary>
 static ShaderTypes GetResourceType(const D3D11_SHADER_INPUT_BIND_DESC& resDesc)
 {
 	ShaderTypes flags = ShaderTypes::Void;
@@ -84,32 +138,31 @@ static ShaderTypes GetResourceType(const D3D11_SHADER_INPUT_BIND_DESC& resDesc)
 /// <summary>
 /// Returns precompiled shader bytecode for D3D11 with the shading stage specified, targeting SM 5.0
 /// </summary>
-static void GetPrecompShaderD3D11(string_view srcFile, string_view srcText, ShadeStages stage, string_view mainName, ShaderDef& def, ShaderRegistryBuilder& builder)
+static void GetPrecompShaderD3D11(string_view srcFile, string_view srcText, ShadeStages stage, string_view mainName, 
+	ShaderDef& def, ShaderRegistryBuilder& builder)
 {
-	REP_ASSERT_MSG((int)stage > 0 && (int)stage < std::size(D3D11Targets), "Invalid stage specified")
+	REP_ASSERT_MSG((int)stage > 0 && (int)stage < CompilerState::GetTargetCount(), "Invalid stage specified")
 
 	// Create temporary null-terminated string copies
-	TMP_STR_BUF(fileBuf, srcFile, 256, "File name length cannot exceed 255 characters");
-	TMP_STR_BUF(epBuf, mainName, 256, "Entrypoint name length cannot exceed 255 characters");
-		
+	static thread_local string tmpPath;
+	tmpPath.clear();
+	tmpPath.append(srcFile);
+	static thread_local string tmpMain;
+	tmpMain.clear();
+	tmpMain.append(mainName);
+
 	// Disallow deprecated features
-	uint compileFlags = D3DCOMPILE_ENABLE_STRICTNESS;
-
-#ifdef _DEBUG
-	compileFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
-	compileFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
-#endif
-
+	uint compileFlags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3;
+	
 	// Compile
 	ComPtr<ID3DBlob> binSrc, errors;
 	const HRESULT hr = D3DCompile
 	(
 		srcText.data(), srcText.size(),
-		(char*)&fileBuf,
+		tmpPath.c_str(),
 		NULL, NULL,
-		(char*)&epBuf, // Entrypoint name
-		D3D11Targets[(int)stage].data(), // Shader target model
+		tmpMain.c_str(), // Entrypoint name
+		s_State.GetTarget(stage).data(), // Shader target model
 		compileFlags, 0,
 		&binSrc,
 		&errors
@@ -131,6 +184,9 @@ static void GetPrecompShaderD3D11(string_view srcFile, string_view srcText, Shad
 	def.binSrc = DynamicArray<byte>(static_cast<const byte*>(binSrc->GetBufferPointer()), binSrc->GetBufferSize());
 }
 
+/// <summary>
+/// Counts the number of elements in a vector
+/// </summary>
 static uint GetParamSize(const D3D11_SIGNATURE_PARAMETER_DESC& paramDesc)
 {
 	uint componentCount = 0;
@@ -141,6 +197,9 @@ static uint GetParamSize(const D3D11_SIGNATURE_PARAMETER_DESC& paramDesc)
 	return componentCount;
 }
 
+/// <summary>
+/// Generates a serializable definition for a given parameter or return value for a given stage
+/// </summary>
 static uint GetIOElementDef(const D3D11_SIGNATURE_PARAMETER_DESC& paramDesc, ShaderRegistryBuilder& builder)
 {
 	const uint componentSize = (paramDesc.ComponentType != D3D_REGISTER_COMPONENT_UNKNOWN) ? 4 : 0;
@@ -150,12 +209,16 @@ static uint GetIOElementDef(const D3D11_SIGNATURE_PARAMETER_DESC& paramDesc, Sha
 	element.semanticIndex = paramDesc.SemanticIndex;
 	element.dataType = paramDesc.ComponentType;
 	element.componentCount = GetParamSize(paramDesc);
-	element.size = element.componentCount * 4;
+	element.size = element.componentCount * 4; // Assume 4-byte/32-bit components
 
 	return builder.GetOrAddIOElement(element);
 }
 
-static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DESC& shaderDesc, ShaderDef& def, ShaderRegistryBuilder& builder)
+/// <summary>
+/// Creates serializable input and output signatures for the given shader
+/// </summary>
+static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DESC& shaderDesc, 
+	ShaderDef& def, ShaderRegistryBuilder& builder)
 {
 	// Input params
 	if (shaderDesc.InputParameters > 0)
@@ -188,7 +251,11 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 	}
 }
 
-static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DESC& shaderDesc, ShaderDef& def, ShaderRegistryBuilder& builder)
+/// <summary>
+/// Creates serializable per-element definitions for all constant buffers used by the shader
+/// </summary>
+static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DESC& shaderDesc, 
+	ShaderDef& def, ShaderRegistryBuilder& builder)
 {
 	// Constant buffers
 	if (shaderDesc.ConstantBuffers > 0)
@@ -227,6 +294,9 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 	}
 }
 
+/// <summary>
+/// Creates serializable definitions for resources that are NOT constant buffers, includes textures and samplers.
+/// </summary>
 static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DESC& shaderDesc, ShaderDef& def, ShaderRegistryBuilder& builder)
 {
 	// Constant buffers are considered resources, but handled separately
@@ -259,6 +329,9 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 	}
 }
 
+/// <summary>
+/// Gets serializable metadata from a precompiled D3D11 shader
+/// </summary>
 static void GetReflectedMetadata(ShaderDef& def, ShaderRegistryBuilder& builder)
 {
 	// Reflect
@@ -271,7 +344,7 @@ static void GetReflectedMetadata(ShaderDef& def, ShaderRegistryBuilder& builder)
 
 	D3D11_SHADER_DESC shaderDesc;
 	WIN_THROW_HR(pReflect->GetDesc(&shaderDesc));
-
+	
 	GetIOLayout(pReflect.Get(), shaderDesc, def, builder);
 	GetConstantBuffers(pReflect.Get(), shaderDesc, def, builder);
 	GetResources(pReflect.Get(), shaderDesc, def, builder);
@@ -283,9 +356,17 @@ static void GetReflectedMetadata(ShaderDef& def, ShaderRegistryBuilder& builder)
 /// <summary>
 /// Precompiles the given HLSL source and generates metadata for resources required by the shader
 /// </summary>
-uint Replica::Effects::GetShaderDefD3D11(string_view srcFile, string_view srcText, ShadeStages stage, string_view mainName, ShaderRegistryBuilder& builder)
+uint Replica::Effects::GetShaderDefD3D11(
+	string_view srcFile, 
+	string_view srcText, 
+	string_view featureLevel, 
+	ShadeStages stage,
+	string_view mainName, 
+	ShaderRegistryBuilder& builder
+)
 {
 	ShaderDef def;
+	s_State.SetFeatureLevel(featureLevel);
 
 	// Precompile
 	GetPrecompShaderD3D11(srcFile, srcText, stage, mainName, def, builder);
@@ -294,3 +375,5 @@ uint Replica::Effects::GetShaderDefD3D11(string_view srcFile, string_view srcTex
 
 	return builder.GetOrAddShader(std::move(def));
 }
+
+string_view Replica::Effects::GetCompilerVersionD3D11() { return D3DCOMPILER_DLL_A; }

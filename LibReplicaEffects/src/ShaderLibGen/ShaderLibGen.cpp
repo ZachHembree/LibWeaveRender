@@ -15,7 +15,9 @@ ShaderLibGen::ShaderLibGen() :
 	pAnalyzer(new BlockAnalyzer()),
 	pTable(new SymbolTable()),
 	pShaderGen(new ShaderGenerator()),
-	pShaderRegistry(new ShaderRegistryBuilder())
+	pShaderRegistry(new ShaderRegistryBuilder()),
+	featureLevel("5_0"),
+	target(PlatformTargets::DirectX11)
 { }
 
 ShaderLibGen::~ShaderLibGen() = default;
@@ -29,8 +31,6 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view libPath, string_view libSrc)
 
 	for (int vID = 0; vID < pVariantGen->GetVariantCount(); vID++)
 	{
-		LOG_INFO() << "Generating variant: " << vID;
-
 		// Preprocess and parse
 		pVariantGen->GetVariant(vID, libTexBuf, entrypoints);
 		const bool isDuplicate = libTexBuf == libTexLast;
@@ -43,6 +43,7 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view libPath, string_view libSrc)
 			if (vID == 0)
 				InitLibrary(lib);
 
+			LOG_INFO() << "Generating variant: " << vID;
 			GetEntryPoints();
 			//GetEffects();
 
@@ -72,6 +73,10 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view libPath, string_view libSrc)
 	return lib;
 }
 
+void ShaderLibGen::SetTarget(PlatformTargets target) { this->target = target; }
+
+void ShaderLibGen::SetFeatureLevel(string_view featureLevel) { this->featureLevel = featureLevel; }
+
 void ShaderLibGen::Clear()
 {
 	ClearVariant();
@@ -85,9 +90,9 @@ void ShaderLibGen::InitLibrary(ShaderLibDef& lib)
 	// Temporary
 	lib.platform = 
 	{
-		.compilerVersion = "DXC 10.1",
-		.shaderModel = "5.0",
-		.target = PlatformTargets::DirectX11
+		.compilerVersion = string(GetCompilerVersionD3D11()),
+		.featureLevel = string(featureLevel),
+		.target = target
 	};
 
 	const IDynamicArray<string_view>& flags = pVariantGen->GetVariantFlags();
@@ -103,6 +108,11 @@ void ShaderLibGen::InitLibrary(ShaderLibDef& lib)
 		lib.modeIDs[i] = pShaderRegistry->GetOrAddStringID(modes[i]);
 
 	lib.variants = DynamicArray<VariantDef>(pVariantGen->GetVariantCount());
+
+	LOG_INFO() << "Compiler: " << lib.platform.compilerVersion;
+	LOG_INFO() << "Shader Model: " << lib.platform.featureLevel;
+	LOG_INFO() << "Variants declared: " << lib.variants.GetLength();
+
 }
 
 void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& shaders, const int vID)
@@ -114,7 +124,7 @@ void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariant
 		const ShaderEntrypoint& ep = entrypoints[i];
 		pShaderGen->GetShaderSource(*pTable, pAnalyzer->GetBlocks(), ep, entrypoints, shaderBuf);
 		
-		shaders[i].shaderID = GetShaderDefD3D11(libPath, shaderBuf, ep.stage, ep.name, *pShaderRegistry);
+		shaders[i].shaderID = GetShaderDefD3D11(libPath, shaderBuf, featureLevel, ep.stage, ep.name, *pShaderRegistry);
 		shaders[i].variantID = vID;
 	}
 }

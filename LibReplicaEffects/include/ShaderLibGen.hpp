@@ -29,6 +29,10 @@ namespace Replica::Effects
 
 		ShaderLibDef GetLibrary(string_view libPath, string_view libSrc);
 
+		void SetTarget(PlatformTargets target);
+
+		void SetFeatureLevel(string_view featureLevel);
+
 		void Clear();
 
 	private:
@@ -43,6 +47,9 @@ namespace Replica::Effects
 		string shaderBuf;
 		std::unordered_set<string_view> epSet;
 		UniqueVector<ShaderEntrypoint> entrypoints;
+
+		string_view featureLevel;
+		PlatformTargets target;
 
 		/// <summary>
 		/// Initializes the library variants and corresponding flags

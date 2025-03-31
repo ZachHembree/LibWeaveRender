@@ -118,7 +118,7 @@ namespace Replica::Effects
 	template <class Archive>
 	void serialize(Archive& ar, PlatformDef& def)
 	{
-		ar(def.compilerVersion, def.shaderModel, def.target);
+		ar(def.compilerVersion, def.featureLevel, def.target);
 	}
 
 	template <class Archive>
