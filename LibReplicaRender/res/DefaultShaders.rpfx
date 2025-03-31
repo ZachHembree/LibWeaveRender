@@ -1,0 +1,212 @@
+// Built-in scaling and blit utilities
+
+compute CS_TexCopy2D
+{
+	int2 SrcOffset;
+	int2 DstOffset;
+
+	Texture2D<float4> SrcTex;
+	RWTexture2D<float4> DstTex;
+
+	[numthreads(1, 1, 1)]
+	void CS_TexCopy2D(uint3 id : SV_DispatchThreadID)
+	{
+		DstTex[id.xy + DstOffset] = SrcTex[id.xy + SrcOffset];
+	}
+}
+
+compute CS_TexCopySamp2D
+{
+	float4 DstTexelSize;
+
+	Texture2D<float4> SrcTex;
+	RWTexture2D<float4> DstTex;
+	SamplerState Samp;
+
+	[numthreads(1, 1, 1)]
+	void CS_TexCopySamp2D( uint3 id : SV_DispatchThreadID )
+	{
+		const float2 uv = ((id.xy) + 0.5f) * DstTexelSize.xy;
+		DstTex[id.xy] = SrcTex.SampleLevel(Samp, uv , 0);
+	}
+}
+
+compute CS_TexCopyScaledSamp2D
+{
+	float4 DstTexelSize;
+	float2 Scale;
+	float2 Offset;
+
+	Texture2D<float4> SrcTex;
+	RWTexture2D<float4> DstTex;
+	SamplerState Samp;
+
+	[numthreads(1, 1, 1)]
+	void CS_TexCopyScaledSamp2D(uint3 id : SV_DispatchThreadID)
+	{
+		const float2 uv = Scale * (id.xy + 0.5f) * DstTexelSize.xy;
+		DstTex[id.xy] = SrcTex.SampleLevel(Samp, Offset + uv, 0);
+	}
+}
+
+vertex VS_Default
+{
+	float4 VS_Default(float2 pos : Position) : SV_Position
+	{
+		return float4(pos, 0.0f, 1.0f);
+	}
+}
+
+vertex VS_3D
+{
+	float4x4 mvp;
+
+	float4 VS_3D(float3 pos : Position) : SV_Position
+	{
+		return mul(float4(pos, 1.0f), mvp);
+	}
+}
+
+vertex VS_PosTextured
+{
+	struct VertIn
+	{
+		float2 pos : Position;
+	};
+
+	struct VertOut
+	{
+		float4 pos : SV_Position;
+		float2 uv : TexCoord;
+	};
+
+	VertOut VS_PosTextured(VertIn i)
+	{
+		VertOut o;
+		o.pos = float4(i.pos, 0.0f, 1.0f);
+		o.uv = float2(i.pos.x, -i.pos.y);
+		o.uv = 0.5f * (o.uv + 1.0f);
+
+		return o;
+	}
+}
+
+vertex VS_Textured2D
+{
+	struct VertIn
+	{
+		float2 pos : Position;
+		float2 uv : TexCoord;
+	};
+
+	struct VertOut
+	{
+		float4 pos : SV_Position;
+		float2 uv : TexCoord;
+	};
+
+	VertOut VS_Textured2D(VertIn i)
+	{
+		VertOut o;
+		o.pos = float4(i.pos, 0.0f, 1.0f);
+		o.uv = i.uv;
+
+		return o;
+	}
+}
+
+vertex VS_Textured3D
+{
+	struct VertIn
+	{
+		float3 pos : Position;
+		float2 uv : TexCoord;
+	};
+
+	struct VertOut
+	{
+		float4 pos : SV_Position;
+		float2 uv : TexCoord;
+	};
+
+	float4x4 mvp;
+
+	VertOut VS_Textured3D(VertIn i)
+	{
+		VertOut o;
+
+		o.pos = mul(float4(i.pos, 1.0f), mvp);
+		o.uv = i.pos.xy;
+
+		return o;
+	}
+}
+
+pixel PS_Default
+{
+	float4 PS_Default() : SV_Target
+	{
+		return 0.5f;
+	}
+}
+
+pixel PS_Flat3D
+{
+	float4 PS_Flat3D(float4 pos : SV_Position) : SV_Target
+	{
+		const float2 zPos = pos.xy * pos.z,
+			grad = float2(ddx(zPos.x), ddy(zPos.y));
+
+		return float4(grad, 0.5f, 1.0f);
+	}
+}
+
+pixel PS_Textured
+{
+	struct VertOut
+	{
+		float4 pos : SV_Position;
+		float2 uv : TexCoord0;
+	};
+
+	float2 Scale;
+	float2 Offset;
+
+	Texture2D tex;
+	SamplerState samp;
+
+	float4 PS_Textured(VertOut i) : SV_Target
+	{
+		return tex.Sample(samp, Scale * i.uv + Offset);
+	}
+}
+
+effect Default
+{
+	Vertex = VS_Default
+	Pixel = PS_Default
+}
+
+effect PosTextured2D
+{
+	Vertex = VS_PosTextured
+	Pixel = PS_Textured
+}
+
+effect Textured2D
+{
+	Vertex = VS_Textured2D
+	Pixel = PS_Textured
+}
+
+effect DebugFlat3D
+{
+	Vertex = VS_3D
+	Pixel = PS_Flat3D
+}
+
+effect Textured3D
+{
+	Vertex = VS_Textured3D
+	Pixel = PS_Textured
+}

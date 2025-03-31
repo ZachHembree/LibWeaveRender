@@ -97,6 +97,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
     <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+    <TargetName>rpfx</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
