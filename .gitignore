@@ -365,3 +365,7 @@ ReplicaRenderer.code-workspace
 LibReplicaDevelop.sln
 
 imgui/imgui/.github/
+
+EffectPreprocessor/ShaderTest.hpp
+
+EffectPreprocessor/ShaderTest.rpfx
