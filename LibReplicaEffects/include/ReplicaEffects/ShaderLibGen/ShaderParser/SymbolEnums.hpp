@@ -57,6 +57,7 @@ namespace Replica::Effects
         StructDecl = Struct | Keyword,
         TypedefDecl = Typedef | Keyword,
         ConstBufDecl = ConstBuf | Keyword,
+        TechniqueShaderDecl = Technique | ShaderDecl,
 
         AttribIdent = Attribute | Identifier,
         SemanticIdent = Semantic | Identifier,
@@ -67,8 +68,17 @@ namespace Replica::Effects
         TypeIdent = Typedef | Identifier,
         FuncIdent = Function | Identifier,
         RepIdent = Replica | Identifier,
+        
         ShaderIdent = Shader | RepIdent,
+        VertexIdent = Vertex | ShaderIdent,
+        HullIdent = Hull | ShaderIdent,
+        DomainIdent = Domain | ShaderIdent,
+        GeometryIdent = Geometry | ShaderIdent,
+        PixelIdent = Pixel | ShaderIdent,
+        ComputeIdent = Compute | ShaderIdent,
+
         TechniqueIdent = Technique | RepIdent,
+        TechniqueShaderIdent = Technique | ShaderIdent,
         ConstBufIdent = ConstBuf | Identifier,
 
         LiteralArg = Literal | Argument,
@@ -119,7 +129,10 @@ namespace Replica::Effects
 
         Ambiguous = 1 << 22,
         Argument = 1 << 23,
+        Anonymous = 1 << 24,
 
+        AnonScope = Anonymous | Scope,
+        AnonVariable = Anonymous | Variable,
         AmbigFuncVarDecl = Ambiguous | Function | Variable | Declaration,
 
         UserType = UserDefined | Type,
@@ -131,6 +144,7 @@ namespace Replica::Effects
         ReplicaDefinition = ReplicaBlock | ScopedDefinition,
         ShaderDef = Shader | ReplicaDefinition,
         TechniqueDef = Technique | ReplicaDefinition,
+        TechniqueShaderDecl = Technique | Shader | Declaration,
 
         VertexShaderDef = Vertex | ShaderDef,
         HullShaderDef = Hull | ShaderDef,

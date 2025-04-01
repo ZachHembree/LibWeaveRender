@@ -45,12 +45,13 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view libPath, string_view libSrc)
 
 			LOG_INFO() << "Generating variant: " << vID;
 			GetEntryPoints();
-			//GetEffects();
+			GetEffects();
 
 			lib.variants[vID].shaders = DynamicArray<ShaderVariantDef>(entrypoints.GetLength());
-			lib.variants[vID].effects = DynamicArray<EffectVariantDef>();
+			lib.variants[vID].effects = DynamicArray<EffectVariantDef>(effectBlocks.GetLength());
 
 			GetShaderDefs(libPath, lib.variants[vID].shaders, vID);
+			GetEffectDefs(lib.variants[vID].effects, vID);
 		}
 		else
 		{
@@ -113,20 +114,6 @@ void ShaderLibGen::InitLibrary(ShaderLibDef& lib)
 	LOG_INFO() << "Shader Model: " << lib.platform.featureLevel;
 	LOG_INFO() << "Variants declared: " << lib.variants.GetLength();
 
-}
-
-void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& shaders, const int vID)
-{
-	for (int i = 0; i < entrypoints.GetLength(); i++)
-	{
-		shaderBuf.clear();
-
-		const ShaderEntrypoint& ep = entrypoints[i];
-		pShaderGen->GetShaderSource(*pTable, pAnalyzer->GetBlocks(), ep, entrypoints, shaderBuf);
-		
-		shaders[i].shaderID = GetShaderDefD3D11(libPath, shaderBuf, featureLevel, ep.stage, ep.name, *pShaderRegistry);
-		shaders[i].variantID = vID;
-	}
 }
 
 void ShaderLibGen::GetEntryPoints()
@@ -208,6 +195,54 @@ void ShaderLibGen::GetEntryPoints()
 	}
 }
 
+void ShaderLibGen::GetEffects()
+{
+	for (int i = 0; i < pTable->GetSymbolCount(); i++)
+	{
+		SymbolHandle symbol = pTable->GetSymbol(i);
+
+		if (symbol.GetHasFlags(SymbolTypes::TechniqueDef))
+		{
+			string_view name = symbol.GetName();
+			effectBlocks.emplace_back(EffectBlock
+			{
+				.name = name
+			});
+		}
+	}
+}
+
+void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& shaders, const int vID)
+{
+	for (int i = 0; i < entrypoints.GetLength(); i++)
+	{
+		shaderBuf.clear();
+
+		const ShaderEntrypoint& ep = entrypoints[i];
+		pShaderGen->GetShaderSource(*pTable, pAnalyzer->GetBlocks(), ep, entrypoints, shaderBuf);
+
+		shaders[i].shaderID = GetShaderDefD3D11(libPath, shaderBuf, featureLevel, ep.stage, ep.name, *pShaderRegistry);
+		shaders[i].variantID = vID;
+	}
+}
+
+void ShaderLibGen::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const int vID)
+{
+	for (int i = 0; i < effectBlocks.GetLength(); i++)
+	{
+		const uint nameID = pShaderRegistry->GetOrAddStringID(effectBlocks[i].name);
+		const uint effectID = pShaderRegistry->GetOrAddEffect(EffectDef
+		{
+			.nameID = nameID
+		});		
+		effects[i] = EffectVariantDef 
+		{
+			.effectID = effectID,
+			.variantID = (uint)vID
+		};
+	}
+}
+
 void ShaderLibGen::ClearVariant()
 {
 	pTable->Clear();
@@ -215,6 +250,7 @@ void ShaderLibGen::ClearVariant()
 	pShaderGen->Clear();
 
 	entrypoints.clear();
+	effectBlocks.clear();
 	epSet.clear();
 
 	std::swap(libTexBuf, libTexLast);

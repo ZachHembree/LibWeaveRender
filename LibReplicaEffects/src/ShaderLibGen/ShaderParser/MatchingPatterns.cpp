@@ -169,6 +169,30 @@ static MatchNode GetNamedScopePattern(const std::initializer_list<TokenQualifier
     };
 }
 
+static MatchNode GetShaderPatterns(const std::initializer_list<TokenQualifier>& predicates, TokenTypes ident, SymbolTypes symbol) noexcept
+{
+    return MatchNode
+    {
+        {
+            // Scoped definition
+            GetNamedScopePattern(predicates, ident, symbol | SymbolTypes::ReplicaDefinition),
+            // Effect pass assignment
+            MatchNode
+            {
+                {
+                    MatchPattern { LexBlockTypes::AssignmentSeparator },
+                    MatchPattern
+                    {
+                        { LexBlockTypes::SemicolonSeparator },
+                        CapturePattern { TokenTypes::Technique | ident }
+                    }
+                }
+            }
+        },
+        MatchQualifiers::Alternation
+    };
+}
+
 static MatchNode GetVarPatterns(const CapturePattern& typeCap = {})
 {
     return MatchNode 
@@ -340,37 +364,37 @@ const UniqueArray<MatchNodeGroup> MatchNodeGroup::MatchNodeGroups =
     MatchNodeGroup
     {
         { TokenTypes::VertexShaderDecl },
-        { GetNamedScopePattern({ TokenTypes::ReplicaDecl }, TokenTypes::ShaderIdent, SymbolTypes::VertexShaderDef) }
+        { GetShaderPatterns({ TokenTypes::VertexShaderDecl }, TokenTypes::VertexIdent, SymbolTypes::Vertex) }
     },
     // Hull
     MatchNodeGroup
     {
         { TokenTypes::HullShaderDecl },
-        { GetNamedScopePattern({ TokenTypes::ReplicaDecl }, TokenTypes::ShaderIdent, SymbolTypes::HullShaderDef) }
+        { GetShaderPatterns({ TokenTypes::HullShaderDecl }, TokenTypes::HullIdent, SymbolTypes::Hull) }
     },
     // Domain
     MatchNodeGroup
     {
         { TokenTypes::DomainShaderDecl },
-        { GetNamedScopePattern({ TokenTypes::ReplicaDecl }, TokenTypes::ShaderIdent, SymbolTypes::DomainShaderDef) }
+        { GetShaderPatterns({ TokenTypes::DomainShaderDecl }, TokenTypes::DomainIdent, SymbolTypes::Domain) }
     },
     // Geometry
     MatchNodeGroup
     {
         { TokenTypes::GeometryShaderDecl },
-        { GetNamedScopePattern({ TokenTypes::ReplicaDecl }, TokenTypes::ShaderIdent, SymbolTypes::GeometryShaderDef) }
+        { GetShaderPatterns({ TokenTypes::GeometryShaderDecl }, TokenTypes::GeometryIdent, SymbolTypes::Geometry) }
     },
     // Pixel
     MatchNodeGroup
     {
         { TokenTypes::PixelShaderDecl },
-        { GetNamedScopePattern({ TokenTypes::ReplicaDecl }, TokenTypes::ShaderIdent, SymbolTypes::PixelShaderDef) }
+        { GetShaderPatterns({ TokenTypes::PixelShaderDecl }, TokenTypes::PixelIdent, SymbolTypes::Pixel) }
     },
     // Compute
     MatchNodeGroup
     {
         { TokenTypes::ComputeShaderDecl },
-        { GetNamedScopePattern({ TokenTypes::ReplicaDecl }, TokenTypes::ShaderIdent, SymbolTypes::ComputeShaderDef) }
+        { GetShaderPatterns({ TokenTypes::ComputeShaderDecl }, TokenTypes::ComputeIdent, SymbolTypes::Compute) }
     },
     // Technique
     MatchNodeGroup

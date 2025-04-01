@@ -36,6 +36,11 @@ namespace Replica::Effects
 		void Clear();
 
 	private:
+		struct EffectBlock
+		{
+			string_view name;
+		};
+
 		unique_ptr<ShaderRegistryBuilder> pShaderRegistry;
 		unique_ptr<VariantPreprocessor> pVariantGen;
 		unique_ptr<BlockAnalyzer> pAnalyzer;
@@ -47,6 +52,7 @@ namespace Replica::Effects
 		string shaderBuf;
 		std::unordered_set<string_view> epSet;
 		UniqueVector<ShaderEntrypoint> entrypoints;
+		UniqueVector<EffectBlock> effectBlocks;
 
 		string_view featureLevel;
 		PlatformTargets target;
@@ -57,14 +63,21 @@ namespace Replica::Effects
 		void InitLibrary(ShaderLibDef& lib);
 
 		/// <summary>
+		/// Identifies shaders in the source and buffers their entrypoint symbols
+		/// </summary>
+		void GetEntryPoints();
+
+		/// <summary>
+		/// Identifies effects and passes defined
+		/// </summary>
+		void GetEffects();
+
+		/// <summary>
 		/// Generates shader definitions for every shader in a variant
 		/// </summary>
 		void GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& shaders, const int vID);
 
-		/// <summary>
-		/// Identifies shaders in the source and buffers their entrypoint symbols
-		/// </summary>
-		void GetEntryPoints();
+		void GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const int vID);
 
 		/// <summary>
 		/// Resets tables for next variant
