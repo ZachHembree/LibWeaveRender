@@ -5,17 +5,18 @@
 #include "D3D11/Shaders/Material.hpp"
 #include "D3D11/Shaders/ComputeInstance.hpp"
 #include "D3D11/ShaderVariantManager.hpp"
+#include "D3D11/Renderer.hpp"
 
 using namespace Replica::D3D11;
 
 ShaderLibrary::ShaderLibrary() = default;
 
-ShaderLibrary::ShaderLibrary(Device& device, const ShaderLibDef& def) :
-	pManager(new ShaderVariantManager(device, std::move(def)))
+ShaderLibrary::ShaderLibrary(Renderer& renderer, const ShaderLibDef& def) :
+	pManager(new ShaderVariantManager(renderer.GetDevice(), std::move(def)))
 { }
 
-ShaderLibrary::ShaderLibrary(Device& device, ShaderLibDef&& def) :
-	pManager(new ShaderVariantManager(device, std::move(def)))
+ShaderLibrary::ShaderLibrary(Renderer& renderer, ShaderLibDef&& def) :
+	pManager(new ShaderVariantManager(renderer.GetDevice(), std::move(def)))
 { }
 
 ShaderLibrary::~ShaderLibrary() = default;

@@ -17,7 +17,7 @@ namespace Replica::Effects
 
 		ShaderLibMap(const ShaderLibDef& def);
 
-		ShaderLibMap(ShaderLibDef&& def);
+		ShaderLibMap(ShaderLibDef&& def) noexcept;
 
 		~ShaderLibMap();
 

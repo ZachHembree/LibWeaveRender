@@ -7,7 +7,7 @@ namespace Replica::D3D11
 {
 	using Effects::ShaderLibDef;
 
-	class Device;
+	class Renderer;
 	class ShaderVariantManager;
 
 	class ShaderLibrary
@@ -17,9 +17,9 @@ namespace Replica::D3D11
 
 		ShaderLibrary();
 
-		ShaderLibrary(Device& device, const ShaderLibDef& def);
+		ShaderLibrary(Renderer& renderer, const ShaderLibDef& def);
 
-		ShaderLibrary(Device& device, ShaderLibDef&& def);
+		ShaderLibrary(Renderer& renderer, ShaderLibDef&& def);
 
 		~ShaderLibrary();
 

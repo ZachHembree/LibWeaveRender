@@ -1,12 +1,15 @@
 #include "pch.hpp"
 #include "ReplicaWin32.hpp"
 #include "ReplicaInternalD3D11.hpp"
+#include "D3D11/Device.hpp"
+#include "D3D11/SwapChain.hpp"
 #include "D3D11/Renderer.hpp"
 #include "D3D11/Resources/Sampler.hpp"
 #include "D3D11/Shaders/BuiltInShaders.hpp"
 #include "D3D11/Mesh.hpp"
 #include "D3D11/Primitives.hpp"
 #include "D3D11/ShaderLibrary.hpp"
+#include "D3D11/RenderComponent.hpp"
 
 using namespace Replica;
 using namespace Replica::D3D11;
@@ -14,34 +17,40 @@ using namespace Replica::Effects;
 
 Renderer::Renderer(MinWindow& window) :
 	WindowComponentBase(window),
-	device(*this), // Create device and context
-	swap(window, device), // Create swap chain for window
-	defaultDS(device, swap.GetSize()),
+	pDev(new Device(*this)), // Create *pDev and context
+	pSwap(new SwapChain(window, *pDev)), // Create swap chain for window
+	pDefaultDS(new DepthStencilTexture(*pDev, pSwap->GetSize())),
 	useDefaultDS(true),
 	fitToWindow(true),
-	pDefaultShaders(new ShaderLibrary(device, GetBuiltInShaders()))
+	pDefaultShaders(new ShaderLibrary(*this, GetBuiltInShaders()))
 { 
 	MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
-	defaultMeshes["FSQuad"] = Mesh(device, quadDef);
+	defaultMeshes["FSQuad"] = Mesh(*pDev, quadDef);
 
-	defaultSamplers["PointClamp"] = Sampler(device, TexFilterMode::POINT, TexClampMode::CLAMP);
-	defaultSamplers["PointMirror"] = Sampler(device, TexFilterMode::POINT, TexClampMode::MIRROR);
-	defaultSamplers["PointBorder"] = Sampler(device, TexFilterMode::POINT, TexClampMode::BORDER);
+	defaultSamplers["PointClamp"] = Sampler(*pDev, TexFilterMode::POINT, TexClampMode::CLAMP);
+	defaultSamplers["PointMirror"] = Sampler(*pDev, TexFilterMode::POINT, TexClampMode::MIRROR);
+	defaultSamplers["PointBorder"] = Sampler(*pDev, TexFilterMode::POINT, TexClampMode::BORDER);
 
-	defaultSamplers["LinearClamp"] = Sampler(device, TexFilterMode::LINEAR, TexClampMode::CLAMP);
-	defaultSamplers["LinearMirror"] = Sampler(device, TexFilterMode::LINEAR, TexClampMode::MIRROR);
-	defaultSamplers["LinearBorder"] = Sampler(device, TexFilterMode::LINEAR, TexClampMode::BORDER);
+	defaultSamplers["LinearClamp"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::CLAMP);
+	defaultSamplers["LinearMirror"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::MIRROR);
+	defaultSamplers["LinearBorder"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::BORDER);
 }
 
+Renderer::~Renderer() = default;
+
 /// <summary>
-/// Returns the interface to the device the renderer is running on
+/// Returns the interface to the *pDev the renderer is running on
 /// </summary>
-Device& Renderer::GetDevice() { return device; }
+Device& Renderer::GetDevice() { return *pDev; }
 
 /// <summary>
 /// Returns reference to the swap chain interface
 /// </summary>
-SwapChain& Renderer::GetSwapChain() { return swap; }
+SwapChain& Renderer::GetSwapChain() { return *pSwap; }
+
+ShaderLibrary Renderer::CreateShaderLibrary(const ShaderLibDef& def) { return ShaderLibrary(*this, def); }
+
+ShaderLibrary Renderer::CreateShaderLibrary(ShaderLibDef&& def) { return ShaderLibrary(*this, std::move(def)); }
 
 /// <summary>
 /// Returns the viewport used with the back buffer
@@ -50,9 +59,9 @@ Viewport Renderer::GetMainViewport() const
 {
 	return
 	{
-		swap.GetBackBuf().GetRenderOffset(), 
-		swap.GetBackBuf().GetSize(),
-		defaultDS.GetRange() 
+		pSwap->GetBackBuf().GetRenderOffset(), 
+		pSwap->GetBackBuf().GetSize(),
+		pDefaultDS->GetRange() 
 	};
 }
 
@@ -62,8 +71,8 @@ Viewport Renderer::GetMainViewport() const
 void Renderer::SetMainViewport(Viewport& vp)
 {
 	SetOutputResolution(vp.size);
-	swap.GetBackBuf().SetRenderOffset(vp.offset);
-	defaultDS.SetRange(vp.zDepth);
+	pSwap->GetBackBuf().SetRenderOffset(vp.offset);
+	pDefaultDS->SetRange(vp.zDepth);
 }
 
 /// <summary>
@@ -71,7 +80,7 @@ void Renderer::SetMainViewport(Viewport& vp)
 /// </summary>
 ivec2 Renderer::GetOutputResolution() const 
 {
-	return swap.GetBackBuf().GetRenderSize();
+	return pSwap->GetBackBuf().GetRenderSize();
 }
 
 /// <summary>
@@ -79,16 +88,16 @@ ivec2 Renderer::GetOutputResolution() const
 /// </summary>
 void Renderer::SetOutputResolution(ivec2 res)
 {
-	const ivec2 lastBackSize = swap.GetSize(),
-		stencilSize = defaultDS.GetSize();
+	const ivec2 lastBackSize = pSwap->GetSize(),
+		stencilSize = pDefaultDS->GetSize();
 
 	if (res.x > lastBackSize.x || res.y > lastBackSize.y)
-		swap.ResizeBuffers(res);
+		pSwap->ResizeBuffers(res);
 
 	if (res.x > stencilSize.x || res.y > stencilSize.y)
-		defaultDS = DepthStencilTexture(device, res);
+		*pDefaultDS = DepthStencilTexture(*pDev, res);
 
-	swap.GetBackBuf().SetRenderSize(res);
+	pSwap->GetBackBuf().SetRenderSize(res);
 }
 
 /// <summary>
@@ -226,16 +235,16 @@ bool Renderer::UnregisterComponent(RenderComponentBase& component)
 void Renderer::Update()
 {
 	// Reset binds
-	Context& ctx = device.GetContext();
+	Context& ctx = pDev->GetContext();
 	const ivec2 bodySize = GetWindow().GetBodySize();
 
 	ctx.Reset();
 
 	// Clear back buffer
-	swap.GetBackBuf().Clear(ctx);
+	pSwap->GetBackBuf().Clear(ctx);
 
 	if (useDefaultDS)
-		defaultDS.Clear(ctx);
+		pDefaultDS->Clear(ctx);
 
 	// Set viewport bounds
 	if (fitToWindow)
@@ -243,9 +252,9 @@ void Renderer::Update()
 
 	// Bind back buffer as render target
 	if (useDefaultDS)
-		ctx.SetRenderTarget(swap.GetBackBuf(), defaultDS);
+		ctx.SetRenderTarget(pSwap->GetBackBuf(), *pDefaultDS);
 	else
-		ctx.SetRenderTarget(swap.GetBackBuf());
+		ctx.SetRenderTarget(pSwap->GetBackBuf());
 
 	BeforeDraw(ctx);
 
@@ -254,7 +263,7 @@ void Renderer::Update()
 	DrawLate(ctx);
 
 	// Present frame
-	swap.Present(1u, 0);
+	pSwap->Present(1u, 0);
 
 	AfterDraw(ctx);
 }

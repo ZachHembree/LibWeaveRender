@@ -2,11 +2,9 @@
 #include <unordered_map>
 #include "ReplicaUtils.hpp"
 #include "WindowComponentBase.hpp"
-#include "SwapChain.hpp"
-#include "Device.hpp"
-#include "RenderComponent.hpp"
 #include "Viewport.hpp"
 #include "Resources/DepthStencilTexture.hpp"
+#include "ShaderLibrary.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -22,15 +20,19 @@ namespace Replica::D3D11
 	class ConstantBuffer;
 	class SwapChain;
 	class Sampler;
+	class Mesh;
 
 	class Material;
 	class ComputeInstance;
 	class ShaderLibrary;
+	class RenderComponentBase;
 
 	class Renderer : public WindowComponentBase
 	{
 	public:
 		Renderer(MinWindow& window);
+
+		~Renderer();
 
 		/// <summary>
 		/// Returns the interface to the device the renderer is running on
@@ -85,6 +87,16 @@ namespace Replica::D3D11
 		void SetIsDepthStencilEnabled(bool value);
 
 		/// <summary>
+		/// Creates a shader library by copying the given definition
+		/// </summary>
+		ShaderLibrary CreateShaderLibrary(const ShaderLibDef& def);
+
+		/// <summary>
+		/// Creates a shader library by moving the given definition
+		/// </summary>
+		ShaderLibrary CreateShaderLibrary(ShaderLibDef&& def);
+
+		/// <summary>
 		/// Returns reference to a default material
 		/// </summary>
 		Material& GetDefaultMaterial(string_view name) const;
@@ -125,16 +137,18 @@ namespace Replica::D3D11
 		bool UnregisterComponent(RenderComponentBase& component);
 
 	private:
-		std::unique_ptr<ShaderLibrary> pDefaultShaders;
 		mutable std::unordered_map<uint, ComputeInstance> defaultCompute;
 		mutable std::unordered_map<uint, Material> defaultMaterials;
 		std::unordered_map<string_view, Mesh> defaultMeshes;
 		std::unordered_map<string_view, Sampler> defaultSamplers;
 
+		std::unique_ptr<Device> pDev;
+		mutable std::unique_ptr<SwapChain> pSwap;
+		std::unique_ptr<DepthStencilTexture> pDefaultDS;
+
+		std::unique_ptr<ShaderLibrary> pDefaultShaders;
 		UniqueVector<RenderComponentBase*> pComponents;
-		Device device;
-		mutable SwapChain swap;
-		DepthStencilTexture defaultDS;
+
 		bool fitToWindow;
 		bool useDefaultDS;
 

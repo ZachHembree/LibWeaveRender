@@ -39,7 +39,7 @@ namespace Replica::Effects
 		InitMap();
 	}
 
-	ShaderLibMap::ShaderLibMap(ShaderLibDef&& def) : 
+	ShaderLibMap::ShaderLibMap(ShaderLibDef&& def) noexcept : 
 		pRegMap(new ShaderRegistryMap(std::move(def.regData))),
 		platform(std::move(def.platform)),
 		flagIDs(std::move(def.flagIDs)),

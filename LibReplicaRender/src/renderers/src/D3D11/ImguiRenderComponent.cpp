@@ -2,6 +2,7 @@
 #include "ReplicaInternalD3D11.hpp"
 #include "D3D11/ImguiRenderComponent.hpp"
 #include "D3D11/Renderer.hpp"
+#include "D3D11/Device.hpp"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
