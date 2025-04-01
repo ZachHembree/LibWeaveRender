@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "ReplicaInternalD3D11.hpp"
+#include "D3D11/InternalD3D11.hpp"
 #include "D3D11/Shaders/EffectVariant.hpp"
 #include "D3D11/ShaderVariantManager.hpp"
 #include "D3D11/Shaders/ShaderVariantBase.hpp"

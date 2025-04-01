@@ -1,5 +1,7 @@
 #include "pch.hpp"
+#include "D3D11/InternalD3D11.hpp"
 #include "ReplicaD3D11.hpp"
+#include "D3D11/Device.hpp"
 
 using namespace glm;
 using namespace Replica;
@@ -7,15 +9,13 @@ using namespace Replica::D3D11;
 
 Device::Device(Renderer& renderer) : pRenderer(&renderer)
 {
-	const D3D_FEATURE_LEVEL level = D3D_FEATURE_LEVEL_11_1;
-
 	ComPtr<ID3D11DeviceContext> pContext;
 	GFX_THROW_FAILED(D3D11CreateDevice(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
-		D3D11_CREATE_DEVICE_DEBUG,
-		&level,
+		g_DeviceFlags,
+		&g_FeatureLevel,
 		1,
 		D3D11_SDK_VERSION,
 		&pDev,

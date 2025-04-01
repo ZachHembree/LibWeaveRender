@@ -1,6 +1,6 @@
 #include "pch.hpp"
 #include <DirectXTex.h>
-#include "ReplicaInternalD3D11.hpp"
+#include "D3D11/InternalD3D11.hpp"
 #include "D3D11/Device.hpp"
 #include "D3D11/Resources/ResizeableTexture2D.hpp"
 

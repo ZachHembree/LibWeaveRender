@@ -7,5 +7,9 @@
 
 namespace Replica::D3D11
 {
+	constexpr D3D_FEATURE_LEVEL g_FeatureLevel = D3D_FEATURE_LEVEL_11_1;
+
+	constexpr D3D11_CREATE_DEVICE_FLAG g_DeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+
 	constexpr size_t g_ConstantBufferAlignment = 16;
 }

@@ -1,5 +1,4 @@
 #pragma once
-#include "ReplicaInternalD3D11.hpp"
 #include "ResourceBase.hpp"
 
 namespace Replica::D3D11

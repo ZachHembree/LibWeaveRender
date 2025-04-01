@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "ReplicaInternalD3D11.hpp"
+#include "D3D11/InternalD3D11.hpp"
 #include "D3D11/Resources/Sampler.hpp"
 #include "D3D11/Device.hpp"
 

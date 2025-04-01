@@ -2,6 +2,7 @@
 #include "ShaderVariantBase.hpp"
 #include "../Resources/InputLayout.hpp"
 #include "../Context.hpp"
+#include "../Device.hpp"
 
 namespace Replica::D3D11
 {

@@ -5,6 +5,7 @@
 
 #include "../src/utils/include/GfxException.hpp"
 
+#include "../src/renderers/include/D3D11/Context.hpp"
 #include "../src/renderers/include/D3D11/Renderer.hpp"
 #include "../src/renderers/include/D3D11/RenderComponent.hpp"
 #include "../src/utils/include/Input.hpp"

@@ -251,9 +251,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ReplicaD3D11.hpp" />
-    <ClInclude Include="include\ReplicaInternalD3D11.hpp" />
     <ClInclude Include="include\ReplicaImgui.hpp" />
     <ClInclude Include="src\pch.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\InternalD3D11.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Shaders\ShaderInstanceBase.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\ResizeableTexture2D.hpp" />

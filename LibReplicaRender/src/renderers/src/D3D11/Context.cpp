@@ -3,6 +3,7 @@
 #include "Span.hpp"
 #include "ReplicaD3D11.hpp"
 #include "D3D11/Shaders/ShaderVariants.hpp"
+#include "D3D11/Device.hpp"
 
 using namespace glm;
 using namespace Replica;
