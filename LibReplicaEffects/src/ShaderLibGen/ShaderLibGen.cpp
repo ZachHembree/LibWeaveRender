@@ -1,12 +1,12 @@
 #pragma once
 #include "pch.hpp"
-#include "ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"
-#include "ShaderLibGen/SymbolTable.hpp"
-#include "ShaderLibGen/ShaderGenerator.hpp"
-#include "ShaderLibGen/ShaderCompiler.hpp"
-#include "ShaderLibGen/VariantPreprocessor.hpp"
-#include "ShaderLibGen/ShaderRegistryBuilder.hpp"
-#include "ShaderLibGen.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"
+#include "ReplicaEffects/ShaderLibGen/SymbolTable.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderGenerator.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderCompiler.hpp"
+#include "ReplicaEffects/ShaderLibGen/VariantPreprocessor.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderRegistryBuilder.hpp"
+#include "ReplicaEffects/ShaderLibGen.hpp"
 
 using namespace Replica::Effects;
 

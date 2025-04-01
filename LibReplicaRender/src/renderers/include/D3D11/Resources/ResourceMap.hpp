@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include "../InternalD3D11.hpp"
-#include "ShaderDataHandles.hpp"
+#include "ReplicaEffects/ShaderDataHandles.hpp"
 #include "ResourceSet.hpp"
 
 namespace Replica::D3D11

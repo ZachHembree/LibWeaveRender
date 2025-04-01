@@ -15,84 +15,84 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\DynamicCollections.hpp">
+    <ClInclude Include="include\ReplicaUtils\DynamicCollections.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\RepException.hpp">
+    <ClInclude Include="include\ReplicaUtils\RepException.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\RepLeanWin.h">
+    <ClInclude Include="include\ReplicaUtils\LeanWin.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Span.hpp">
+    <ClInclude Include="include\ReplicaUtils\Span.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Stopwatch.hpp">
+    <ClInclude Include="include\ReplicaUtils\Stopwatch.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\TextBlock.hpp">
+    <ClInclude Include="include\ReplicaUtils\TextBlock.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\TextUtils.hpp">
+    <ClInclude Include="include\ReplicaUtils\TextUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\internal\Utils.hpp">
+    <ClInclude Include="include\internal\DeltaUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DataBufferHandle.hpp">
+    <ClInclude Include="include\ReplicaUtils\DataBufferHandle.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MinWindow.hpp">
+    <ClInclude Include="include\ReplicaUtils\MinWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\RepWinException.hpp">
+    <ClInclude Include="include\ReplicaUtils\RepWinException.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\WindowComponentBase.hpp">
+    <ClInclude Include="include\ReplicaUtils\WindowComponentBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaMath.hpp">
+    <ClInclude Include="include\ReplicaUtils\Math.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaUtils.hpp">
+    <ClInclude Include="include\ReplicaUtils\Utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaWin32.hpp">
+    <ClInclude Include="include\ReplicaUtils\Win32.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaWinUtils.hpp">
+    <ClInclude Include="include\ReplicaUtils\WinUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaInt.hpp">
+    <ClInclude Include="include\ReplicaUtils\Int.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Serialization.hpp">
+    <ClInclude Include="include\ReplicaUtils\Serialization.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\internal\DynCollectionSerializers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Logger.hpp">
+    <ClInclude Include="include\ReplicaUtils\Logger.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ObjectPool.hpp">
+    <ClInclude Include="include\ReplicaUtils\ObjectPool.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\pch.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\StringIDBuilder.hpp">
+    <ClInclude Include="include\ReplicaUtils\StringIDBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\StringIDMap.hpp">
+    <ClInclude Include="include\ReplicaUtils\StringIDMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaGlobalUtils.hpp">
+    <ClInclude Include="include\ReplicaUtils\GlobalUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\internal\Utils.cpp">
+    <ClCompile Include="src\internal\DeltaUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\TextUtils.cpp">
@@ -110,7 +110,7 @@
     <ClCompile Include="src\MinWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ReplicaWinUtils.cpp">
+    <ClCompile Include="src\WinUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RepWinException.cpp">
@@ -122,7 +122,7 @@
     <ClCompile Include="src\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ReplicaMath.cpp">
+    <ClCompile Include="src\Math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\StringIDBuilder.cpp">

@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "ShaderLibGen/ShaderRegistryMap.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderRegistryMap.hpp"
 #include "D3D11/InternalD3D11.hpp"
 #include "D3D11/ShaderLibrary.hpp"
 #include "D3D11/Shaders/Material.hpp"

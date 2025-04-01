@@ -1,7 +1,7 @@
 #include "pch.hpp"
-#include "ShaderDataHandles.hpp"
-#include "ShaderLibGen/ShaderRegistryMap.hpp"
-#include "StringIDMap.hpp"
+#include "ReplicaEffects/ShaderDataHandles.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderRegistryMap.hpp"
+#include "ReplicaUtils/StringIDMap.hpp"
 
 using namespace Replica;
 using namespace Replica::Effects;

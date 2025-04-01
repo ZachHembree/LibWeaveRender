@@ -1,7 +1,7 @@
 #pragma once
 #include "Resources/DeviceChild.hpp"
 #include "Resources/ResourceBase.hpp"
-#include "ShaderDataHandles.hpp"
+#include "ReplicaEffects/ShaderDataHandles.hpp"
 #include "Viewport.hpp"
 #include "Resources/ResourceMap.hpp"
 

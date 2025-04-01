@@ -254,8 +254,8 @@
     <ClCompile Include="src\utils\src\Input.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ReplicaD3D11.hpp" />
-    <ClInclude Include="include\ReplicaImgui.hpp" />
+    <ClInclude Include="include\ReplicaRender\D3D11.hpp" />
+    <ClInclude Include="include\ReplicaRender\Imgui.hpp" />
     <ClInclude Include="src\pch.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\InternalD3D11.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp" />

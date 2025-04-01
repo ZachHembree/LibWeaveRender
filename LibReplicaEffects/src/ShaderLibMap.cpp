@@ -1,6 +1,6 @@
 #include "pch.hpp"
-#include "ShaderLibMap.hpp"
-#include "ShaderLibGen/ShaderRegistryMap.hpp"
+#include "ReplicaEffects/ShaderLibMap.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderRegistryMap.hpp"
 
 /* Variant ID generation
 

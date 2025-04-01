@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "ShaderLibGen/VariantPreprocessor.hpp"
+#include "ReplicaEffects/ShaderLibGen/VariantPreprocessor.hpp"
 
 namespace Replica::Effects
 { 

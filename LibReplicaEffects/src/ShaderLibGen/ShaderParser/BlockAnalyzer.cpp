@@ -1,6 +1,6 @@
 #include "pch.hpp"
-#include "ParseExcept.hpp"
-#include "ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"
+#include "ReplicaEffects/ParseExcept.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"
 
 using std::string;
 using std::ios;

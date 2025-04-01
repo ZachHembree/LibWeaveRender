@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "ShaderLibGen/ShaderParser/ShaderTypeInfo.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderParser/ShaderTypeInfo.hpp"
 
 namespace Replica::Effects
 {

@@ -1,7 +1,7 @@
 #pragma once
 #pragma warning(disable: 4250)
 
-#include "ReplicaMath.hpp"
+#include "ReplicaUtils/Math.hpp"
 #include <d3d11.h>
 #include "DeviceChild.hpp"
 #include "ResourceEnums.hpp"

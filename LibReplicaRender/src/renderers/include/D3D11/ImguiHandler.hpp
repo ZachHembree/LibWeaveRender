@@ -1,5 +1,5 @@
 #pragma once
-#include "WindowComponentBase.hpp"
+#include "ReplicaUtils/WindowComponentBase.hpp"
 
 namespace Replica::D3D11
 {

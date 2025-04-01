@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
-#include "ReplicaUtils.hpp"
-#include "WindowComponentBase.hpp"
+#include "ReplicaUtils/Utils.hpp"
+#include "ReplicaUtils/WindowComponentBase.hpp"
 #include "Viewport.hpp"
 #include "Resources/DepthStencilTexture.hpp"
 #include "ShaderLibrary.hpp"

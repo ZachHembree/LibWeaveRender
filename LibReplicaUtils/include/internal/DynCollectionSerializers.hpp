@@ -1,7 +1,7 @@
 #pragma once
 #include <concepts>
 #include <cereal/cereal.hpp>
-#include "ReplicaUtils.hpp"
+#include "ReplicaUtils/Utils.hpp"
 
 namespace Replica
 {

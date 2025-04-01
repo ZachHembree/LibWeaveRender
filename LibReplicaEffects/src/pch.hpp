@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <format>
 
-#include "ReplicaUtils.hpp"
-#include "ReplicaMath.hpp"
-#include "ShaderLibGen/WaveConfig.hpp"
-#include "ParseExcept.hpp"
-#include "Logger.hpp"
+#include "ReplicaUtils/Utils.hpp"
+#include "ReplicaUtils/Math.hpp"
+#include "ReplicaEffects/ShaderLibGen/WaveConfig.hpp"
+#include "ReplicaEffects/ParseExcept.hpp"
+#include "ReplicaUtils/Logger.hpp"

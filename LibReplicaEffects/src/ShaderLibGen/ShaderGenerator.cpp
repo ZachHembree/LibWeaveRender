@@ -1,7 +1,7 @@
 #include "pch.hpp"
-#include "ShaderLibGen.hpp"
-#include "ShaderLibGen/ShaderGenerator.hpp"
-#include "ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"
+#include "ReplicaEffects/ShaderLibGen.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderGenerator.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"
 
 using namespace Replica::Effects;
 

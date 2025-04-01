@@ -1,6 +1,6 @@
 #include "pch.hpp"
 #include <unordered_map>
-#include "ShaderLibGen/ShaderParser/SymbolEnums.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderParser/SymbolEnums.hpp"
 
 namespace Replica::Effects
 {

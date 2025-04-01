@@ -3,9 +3,9 @@
 #include <fstream>
 #include <filesystem>
 #include <unordered_map>
-#include "ParseExcept.hpp"
-#include "Logger.hpp"
-#include "ShaderLibGen.hpp"
+#include "ReplicaEffects/ParseExcept.hpp"
+#include "ReplicaUtils/Logger.hpp"
+#include "ReplicaEffects/ShaderLibGen.hpp"
 
 using std::cout;
 using std::cin;

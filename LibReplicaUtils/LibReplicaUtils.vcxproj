@@ -19,31 +19,31 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Logger.hpp" />
-    <ClInclude Include="include\ObjectPool.hpp" />
-    <ClInclude Include="include\ReplicaGlobalUtils.hpp" />
-    <ClInclude Include="include\StringIDBuilder.hpp" />
+    <ClInclude Include="include\ReplicaUtils\Logger.hpp" />
+    <ClInclude Include="include\ReplicaUtils\ObjectPool.hpp" />
+    <ClInclude Include="include\ReplicaUtils\GlobalUtils.hpp" />
+    <ClInclude Include="include\ReplicaUtils\StringIDBuilder.hpp" />
     <ClInclude Include="src\pch.hpp" />
-    <ClInclude Include="include\Serialization.hpp" />
+    <ClInclude Include="include\ReplicaUtils\Serialization.hpp" />
     <ClInclude Include="include\internal\DynCollectionSerializers.hpp" />
-    <ClInclude Include="include\DataBufferHandle.hpp" />
-    <ClInclude Include="include\DynamicCollections.hpp" />
-    <ClInclude Include="include\MinWindow.hpp" />
-    <ClInclude Include="include\RepException.hpp" />
-    <ClInclude Include="include\RepLeanWin.h" />
-    <ClInclude Include="include\ReplicaInt.hpp" />
-    <ClInclude Include="include\RepWinException.hpp" />
-    <ClInclude Include="include\Span.hpp" />
-    <ClInclude Include="include\Stopwatch.hpp" />
-    <ClInclude Include="include\TextBlock.hpp" />
-    <ClInclude Include="include\TextUtils.hpp" />
-    <ClInclude Include="include\internal\Utils.hpp" />
-    <ClInclude Include="include\WindowComponentBase.hpp" />
-    <ClInclude Include="include\ReplicaMath.hpp" />
-    <ClInclude Include="include\ReplicaUtils.hpp" />
-    <ClInclude Include="include\ReplicaWin32.hpp" />
-    <ClInclude Include="include\ReplicaWinUtils.hpp" />
-    <ClInclude Include="include\StringIDMap.hpp" />
+    <ClInclude Include="include\ReplicaUtils\DataBufferHandle.hpp" />
+    <ClInclude Include="include\ReplicaUtils\DynamicCollections.hpp" />
+    <ClInclude Include="include\ReplicaUtils\MinWindow.hpp" />
+    <ClInclude Include="include\ReplicaUtils\RepException.hpp" />
+    <ClInclude Include="include\ReplicaUtils\LeanWin.hpp" />
+    <ClInclude Include="include\ReplicaUtils\Int.hpp" />
+    <ClInclude Include="include\ReplicaUtils\RepWinException.hpp" />
+    <ClInclude Include="include\ReplicaUtils\Span.hpp" />
+    <ClInclude Include="include\ReplicaUtils\Stopwatch.hpp" />
+    <ClInclude Include="include\ReplicaUtils\TextBlock.hpp" />
+    <ClInclude Include="include\ReplicaUtils\TextUtils.hpp" />
+    <ClInclude Include="include\internal\DeltaUtils.hpp" />
+    <ClInclude Include="include\ReplicaUtils\WindowComponentBase.hpp" />
+    <ClInclude Include="include\ReplicaUtils\Math.hpp" />
+    <ClInclude Include="include\ReplicaUtils\Utils.hpp" />
+    <ClInclude Include="include\ReplicaUtils\Win32.hpp" />
+    <ClInclude Include="include\ReplicaUtils\WinUtils.hpp" />
+    <ClInclude Include="include\ReplicaUtils\StringIDMap.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Logger.cpp" />
@@ -53,15 +53,15 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\RepExeption.cpp" />
-    <ClCompile Include="src\ReplicaMath.cpp" />
-    <ClCompile Include="src\ReplicaWinUtils.cpp" />
+    <ClCompile Include="src\Math.cpp" />
+    <ClCompile Include="src\WinUtils.cpp" />
     <ClCompile Include="src\RepWinException.cpp" />
     <ClCompile Include="src\Stopwatch.cpp" />
     <ClCompile Include="src\StringIDBuilder.cpp" />
     <ClCompile Include="src\StringIDMap.cpp" />
     <ClCompile Include="src\TextBlock.cpp" />
     <ClCompile Include="src\TextUtils.cpp" />
-    <ClCompile Include="src\internal\Utils.cpp" />
+    <ClCompile Include="src\internal\DeltaUtils.cpp" />
     <ClCompile Include="src\WindowComponentBase.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

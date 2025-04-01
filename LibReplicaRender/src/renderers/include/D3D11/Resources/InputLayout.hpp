@@ -1,7 +1,7 @@
 #pragma once
 #include "DeviceChild.hpp"
 #include "Formats.hpp"
-#include "ShaderDataHandles.hpp"
+#include "ReplicaEffects/ShaderDataHandles.hpp"
 
 namespace Replica::D3D11
 {

@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <chrono>
 
-#include "ReplicaGlobalUtils.hpp"
-#include "ReplicaUtils.hpp"
-#include "ReplicaWinUtils.hpp"
-#include "Logger.hpp"
+#include "ReplicaUtils/GlobalUtils.hpp"
+#include "ReplicaUtils/Utils.hpp"
+#include "ReplicaUtils/WinUtils.hpp"
+#include "ReplicaUtils/Logger.hpp"

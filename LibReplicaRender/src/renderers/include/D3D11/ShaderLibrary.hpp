@@ -1,5 +1,5 @@
 #pragma once
-#include "ShaderLibMap.hpp"
+#include "ReplicaEffects/ShaderLibMap.hpp"
 #include "Shaders/Material.hpp"
 #include "Shaders/ComputeInstance.hpp"
 

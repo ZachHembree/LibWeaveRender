@@ -1,5 +1,5 @@
 #pragma once
-#include "ShaderDataHandles.hpp"
+#include "ReplicaEffects/ShaderDataHandles.hpp"
 #include "../Resources/DeviceChild.hpp"
 #include "../Resources/ConstantBuffer.hpp"
 #include "../Resources/ConstantGroupMap.hpp"

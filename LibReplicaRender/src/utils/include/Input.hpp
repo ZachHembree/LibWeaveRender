@@ -1,6 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
-#include "WindowComponentBase.hpp"
+#include "ReplicaUtils/WindowComponentBase.hpp"
 #include "Keyboard.h"
 #include "Mouse.h"
 

@@ -1,8 +1,8 @@
 #pragma once
-#include "ReplicaUtils.hpp"
-#include "ShaderDataHandles.hpp"
+#include "ReplicaUtils/Utils.hpp"
+#include "ReplicaEffects/ShaderDataHandles.hpp"
 #include "ResourceSet.hpp"
-#include "Span.hpp"
+#include "ReplicaUtils/Span.hpp"
 
 namespace Replica::D3D11
 {

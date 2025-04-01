@@ -2,7 +2,7 @@
 #include "D3D11/InternalD3D11.hpp"
 #include "D3D11/Shaders/BuiltInShaders.hpp"
 #include "D3D11/ShaderSrc/DefaultShaders.hpp"
-#include "ShaderLibGen/ShaderDataSerializers.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderDataSerializers.hpp"
 #include <sstream>
 
 using namespace Replica;

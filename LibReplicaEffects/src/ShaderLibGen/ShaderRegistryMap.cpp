@@ -1,7 +1,7 @@
 #include "pch.hpp"
-#include "ShaderDataHandles.hpp"
-#include "ShaderLibGen/ShaderRegistryMap.hpp"
-#include "ShaderLibGen/ShaderRegistryBuilder.hpp"
+#include "ReplicaEffects/ShaderDataHandles.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderRegistryMap.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderRegistryBuilder.hpp"
 
 using namespace Replica;
 using namespace Replica::Effects;

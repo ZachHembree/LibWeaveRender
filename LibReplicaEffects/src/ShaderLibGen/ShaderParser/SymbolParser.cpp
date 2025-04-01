@@ -1,8 +1,8 @@
 #include "pch.hpp"
-#include "ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"
-#include "ShaderLibGen/ShaderParser/ShaderTypeInfo.hpp"
-#include "ShaderLibGen/ShaderParser/ScopeBuilder.hpp"
-#include "ShaderLibGen/ShaderParser/SymbolParser.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderParser/ShaderTypeInfo.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderParser/ScopeBuilder.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderParser/SymbolParser.hpp"
 
 namespace Replica::Effects
 {

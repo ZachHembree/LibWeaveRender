@@ -3,9 +3,9 @@
 #include <d3dcompiler.h>
 #include <memory>
 #include <thread>
-#include <ReplicaWinUtils.hpp>
-#include "ParseExcept.hpp"
-#include "ShaderLibGen/ShaderCompiler.hpp"
+#include "ReplicaUtils/WinUtils.hpp"
+#include "ReplicaEffects/ParseExcept.hpp"
+#include "ReplicaEffects/ShaderLibGen/ShaderCompiler.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "d3dcompiler.lib")

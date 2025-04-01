@@ -19,29 +19,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ParseExcept.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderRegistryBuilder.hpp" />
-    <ClInclude Include="include\ShaderDataHandles.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderDataHashes.hpp" />
-    <ClInclude Include="include\ShaderLibGen.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderCompiler.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderDataSerializers.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderEntrypoint.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderGenerator.hpp" />
-    <ClInclude Include="include\ShaderLibMap.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderParser\BlockAnalyzer.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderParser\ScopeBuilder.hpp" />
-    <ClInclude Include="include\ShaderData.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderParser\ShaderTypeInfo.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderParser\SymbolData.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderParser\SymbolEnums.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderParser\SymbolParser.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderParser\SymbolPatterns.hpp" />
-    <ClInclude Include="include\ShaderLibGen\ShaderRegistryMap.hpp" />
-    <ClInclude Include="include\ShaderLibGen\SymbolHandles.hpp" />
-    <ClInclude Include="include\ShaderLibGen\SymbolTable.hpp" />
-    <ClInclude Include="include\ShaderLibGen\VariantPreprocessor.hpp" />
-    <ClInclude Include="include\ShaderLibGen\WaveConfig.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ParseExcept.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderRegistryBuilder.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderDataHandles.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderDataHashes.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderCompiler.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderDataSerializers.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderEntrypoint.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderGenerator.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibMap.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\BlockAnalyzer.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\ScopeBuilder.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderData.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\ShaderTypeInfo.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\SymbolData.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\SymbolEnums.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\SymbolParser.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\SymbolPatterns.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderRegistryMap.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\SymbolHandles.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\SymbolTable.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\VariantPreprocessor.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\WaveConfig.hpp" />
     <ClInclude Include="src\pch.hpp" />
   </ItemGroup>
   <ItemGroup>

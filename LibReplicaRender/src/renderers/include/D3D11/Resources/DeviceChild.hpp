@@ -1,5 +1,5 @@
 #pragma once
-#include "ReplicaUtils.hpp"
+#include "ReplicaUtils/Utils.hpp"
 
 namespace Replica::D3D11
 {

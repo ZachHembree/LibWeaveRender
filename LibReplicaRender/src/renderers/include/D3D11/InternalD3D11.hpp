@@ -1,6 +1,6 @@
 #pragma once
-#include "ReplicaWinUtils.hpp"
-#include "ReplicaMath.hpp"
+#include "ReplicaUtils/WinUtils.hpp"
+#include "ReplicaUtils/Math.hpp"
 #include <d3d11.h>
 
 #include "../src/utils/include/GfxException.hpp"
