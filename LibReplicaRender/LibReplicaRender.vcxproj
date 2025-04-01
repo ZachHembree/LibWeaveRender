@@ -301,7 +301,7 @@
     <ClInclude Include="src\renderers\include\D3D11\Resources\IndexBuffer.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Renderer.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\VertexBuffer.hpp" />
-    <ClInclude Include="src\renderers\src\D3D11\Shaders\ShaderInstanceBase.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Shaders\ShaderInstanceBase.cpp" />
     <ClInclude Include="src\utils\include\GfxException.hpp" />
     <ClInclude Include="src\utils\include\Input.hpp" />
   </ItemGroup>

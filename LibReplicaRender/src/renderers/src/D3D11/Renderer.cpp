@@ -43,6 +43,8 @@ Renderer::~Renderer() = default;
 /// </summary>
 Device& Renderer::GetDevice() { return *pDev; }
 
+IRenderTarget& Renderer::GetBackBuffer() { return pSwap->GetBackBuf(); }
+
 /// <summary>
 /// Returns reference to the swap chain interface
 /// </summary>

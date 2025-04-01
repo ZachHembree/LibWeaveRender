@@ -40,6 +40,11 @@ namespace Replica::D3D11
 		Device& GetDevice();
 
 		/// <summary>
+		/// Returns handle to the swap chain's back buffer
+		/// </summary>
+		IRenderTarget& GetBackBuffer();
+
+		/// <summary>
 		/// Returns reference to the swap chain interface
 		/// </summary>
 		SwapChain& GetSwapChain();

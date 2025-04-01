@@ -6,6 +6,7 @@
 #include "../src/utils/include/GfxException.hpp"
 
 #include "../src/renderers/include/D3D11/Context.hpp"
+#include "../src/renderers/include/D3D11/Device.hpp"
 #include "../src/renderers/include/D3D11/Renderer.hpp"
 #include "../src/renderers/include/D3D11/RenderComponent.hpp"
 #include "../src/utils/include/Input.hpp"
@@ -15,9 +16,6 @@
 #include "../src/renderers/include/D3D11/Primitives.hpp"
 
 #include "../src/renderers/include/D3D11/ShaderLibrary.hpp"
-#include "../src/renderers/include/D3D11/Shaders/ComputeInstance.hpp"
-#include "../src/renderers/include/D3D11/Shaders/Material.hpp"
-
 #include "../src/renderers/include/D3D11/Resources/RWTexture2D.hpp"
 #include "../src/renderers/include/D3D11/Resources/StagingTexture2D.hpp"
 #include "../src/renderers/include/D3D11/Resources/Sampler.hpp"

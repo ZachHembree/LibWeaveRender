@@ -30,7 +30,7 @@ namespace Replica::D3D11
 		ID3D11Device* operator->();
 
 		/// <summary>
-		/// Returns pointer to COM device context interface
+		/// Returns reference to immediate context
 		/// </summary>
 		Context& GetContext();
 
