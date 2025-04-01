@@ -7,6 +7,16 @@
 using namespace Replica;
 using namespace Replica::D3D11;
 
+ComputeInstance::ComputeInstance() = default;
+
+ComputeInstance::ComputeInstance(ShaderVariantManager& lib, uint nameID, int vID)  : 
+	ShaderInstanceBase(lib, nameID, vID)
+{ }
+
+ComputeInstance::ComputeInstance(ComputeInstance&&) noexcept = default;
+
+ComputeInstance& ComputeInstance::operator=(ComputeInstance&&) noexcept = default;
+
 void ComputeInstance::Dispatch(Context & ctx, ivec3 groups) { ctx.Dispatch(GetShader(), groups, *pRes); }
 
 void  ComputeInstance::Dispatch(Context& ctx, ivec2 groups) { Dispatch(ctx, ivec3(groups.x, groups.y, 1)); }

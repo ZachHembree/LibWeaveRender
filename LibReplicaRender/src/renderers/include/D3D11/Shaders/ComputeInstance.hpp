@@ -10,7 +10,15 @@ namespace Replica::D3D11
 	class ComputeInstance : public ShaderInstanceBase
 	{
 	public:
-		using ShaderInstanceBase::ShaderInstanceBase;
+		MAKE_NO_COPY(ComputeInstance)
+
+		ComputeInstance();
+
+		ComputeInstance(ShaderVariantManager& lib, uint nameID, int vID);
+
+		ComputeInstance(ComputeInstance&&) noexcept;
+
+		ComputeInstance& operator=(ComputeInstance&&) noexcept;
 
 		void Dispatch(Context& ctx, ivec3 groups);
 

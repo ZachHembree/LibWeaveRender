@@ -13,14 +13,6 @@ namespace Replica::D3D11
 	public:
 		MAKE_NO_COPY(ShaderInstanceBase)
 
-		ShaderInstanceBase();
-
-		ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, int vID);
-
-		ShaderInstanceBase(ShaderInstanceBase&&) noexcept;
-
-		ShaderInstanceBase& operator=(ShaderInstanceBase&&) noexcept;
-
 		/// <summary>
 		/// Returns a unique int ID associated with the name of the underlying unique resource
 		/// </summary>
@@ -196,13 +188,21 @@ namespace Replica::D3D11
 		/// </summary>
 		void ResetDefines();
 
-		virtual ~ShaderInstanceBase() = 0;
-
 	protected:
 		std::unique_ptr<ResourceSet> pRes;
 		ShaderVariantManager* pLib;
 		uint nameID;
 		int vID;
+
+		ShaderInstanceBase();
+
+		~ShaderInstanceBase();
+
+		ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, int vID);
+
+		ShaderInstanceBase(ShaderInstanceBase&&) noexcept;
+
+		ShaderInstanceBase& operator=(ShaderInstanceBase&&) noexcept;
 
 		int GetVariantID() const;
 

@@ -9,6 +9,8 @@ ShaderInstanceBase::ShaderInstanceBase() :
 	pLib(nullptr), vID(-1), nameID(-1)
 { }
 
+ShaderInstanceBase::~ShaderInstanceBase() = default;
+
 ShaderInstanceBase::ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, int vID) :
 	pLib(&lib), vID(vID), nameID(nameID)
 { }
@@ -23,9 +25,9 @@ string_view ShaderInstanceBase::GetName() const { return pLib->GetStringMap().Ge
 
 int ShaderInstanceBase::GetVariantID() const { return vID; }
 
-void ShaderInstanceBase::SetConstant(uint nameID, const byte* pSrc, const size_t size) { pRes->SetConstant(nameID, pSrc, size); }
+void ShaderInstanceBase::SetConstant(uint nameID, const byte* pSrc, const size_t size) { pRes->SetConstant(nameID, pSrc, (uint)size); }
 
-void ShaderInstanceBase::SetConstant(string_view name, const byte* pSrc, const size_t size) { pRes->SetConstant(GetStringID(name), pSrc, size); }
+void ShaderInstanceBase::SetConstant(string_view name, const byte* pSrc, const size_t size) { pRes->SetConstant(GetStringID(name), pSrc, (uint)size); }
 
 void ShaderInstanceBase::SetSampler(uint stringID, Sampler& samp) { pRes->SetSampler(stringID, samp.Get()); }
 

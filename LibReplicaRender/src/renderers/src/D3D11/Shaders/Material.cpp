@@ -7,6 +7,16 @@
 using namespace Replica;
 using namespace Replica::D3D11;
 
+Material::Material() = default;
+
+Material::Material(ShaderVariantManager& lib, uint nameID, int vID) :
+	ShaderInstanceBase(lib, nameID, vID)
+{}
+
+Material::Material(Material&&) noexcept = default;
+
+Material& Material::operator=(Material&&) noexcept = default;
+
 uint Material::GetPassCount() const { return GetEffect().GetPassCount(); }
 
 uint Material::GetShaderCount(int pass) const { return GetEffect().GetShaderCount(pass); }

@@ -10,7 +10,15 @@ namespace Replica::D3D11
 	class Material : public ShaderInstanceBase
 	{
 	public:		
-		using ShaderInstanceBase::ShaderInstanceBase;
+		MAKE_NO_COPY(Material)
+
+		Material();
+
+		Material(ShaderVariantManager& lib, uint nameID, int vID);
+
+		Material(Material&&) noexcept;
+
+		Material& operator=(Material&&) noexcept;
 
 		/// <summary>
 		/// Returns the number of passes in the effect
