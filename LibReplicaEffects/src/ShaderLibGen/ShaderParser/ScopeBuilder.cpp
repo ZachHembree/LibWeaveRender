@@ -18,7 +18,7 @@ void ScopeBuilder::Init()
     topScope = -1;
     pendingScopeSymbol = -1;
 
-    symbols.emplace_back(-1, 0, SymbolTypes::Scope);
+    symbols.emplace_back(-1, 0, SymbolTypes::AnonScope);
     AddScope(0);
 }
 
@@ -38,12 +38,6 @@ void ScopeBuilder::AddScope(const int symbolID, const int blockStart, const int 
     scopeSymbolMaps.emplace_back();
     funcOverloadMaps.emplace_back();
     scopeSymbolLists.emplace_back();
-}
-
-void ScopeBuilder::AddSymbolToTable(const string_view name, const int symbolID)
-{
-    scopeSymbolMaps[topScope].emplace(name, symbolID);
-    scopeSymbolLists[topScope].emplace_back(symbolID);
 }
 
 void ScopeBuilder::AddFuncToOverloadTable(const string_view name, const int symbolID)
@@ -367,7 +361,7 @@ void ScopeBuilder::PushScope(const int firstBlock, const int depth)
     if (pendingScopeSymbol == -1)
     {
         const int symbolID = (int)symbols.GetLength();
-        symbols.emplace_back(-1, -1, SymbolTypes::Scope);
+        symbols.emplace_back(-1, -1, SymbolTypes::AnonScope);
         pendingScopeSymbol = symbolID;
     }
 
@@ -401,6 +395,8 @@ void ScopeBuilder::PushSymbol(const int symbolID, const bool isDeferred)
 
     if (isDeferred)
         deferredSymbolBuf.push_back(symbolID);
+    else if (symbol.GetHasFlags(SymbolTypes::Anonymous))
+        scopeSymbolLists[topScope].emplace_back(symbolID);
     else
     {
         const TokenNode& token = tokens[symbol.identID];
@@ -415,12 +411,10 @@ void ScopeBuilder::PushSymbol(const int symbolID, const bool isDeferred)
         else
             name = token.value;
 
-        if (GetHasSymbol(name))
-        {
-            PARSE_ERR_FMT("Unexpected redefinition of symbol '{}'", name)
-        }
+        PARSE_ASSERT_FMT(!GetHasSymbol(name), "Unexpected redefinition of symbol '{}'", name);
 
-        AddSymbolToTable(name, symbolID);
+        scopeSymbolMaps[topScope].emplace(name, symbolID);
+        scopeSymbolLists[topScope].emplace_back(symbolID);
     }
 
     if (symbol.GetHasFlags(SymbolTypes::Scope))

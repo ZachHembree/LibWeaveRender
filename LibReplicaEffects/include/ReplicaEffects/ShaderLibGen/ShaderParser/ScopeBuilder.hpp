@@ -219,8 +219,6 @@ namespace Replica::Effects
 
         void AddScope(const int symbolID, const int blockStart = 0, const int blockCount = 0);
 
-        void AddSymbolToTable(const string_view name, const int symbolID);
-
         void AddFuncToOverloadTable(const string_view name, const int symbolID);
     };
 }

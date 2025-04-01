@@ -509,18 +509,11 @@ namespace Replica::Effects
 
             // Identifier
             ident.name = TextBlock(pStart, block.src.FindWordEnd(pStart, g_WordBreakFilter));
+            pSB->TryGetTokenFlags(ident);
 
-            if (!pSB->TryGetTokenFlags(ident) || pattern.symbolType == SymbolTypes::Unknown 
-                || pattern.GetHasFlags(SymbolTypes::FuncDefinition))
-            {
-                ident.tokenFlags |= pattern.tokenType;
-                tokenBuf.emplace_back(ident, pattern.symbolType, cap.blockID);
-                pStart = block.src.FindWord(ident.name.GetLast() + 1, g_WordBreakFilter);
-            }
-            else
-            {
-                PARSE_ERR_FMT("Unexpected expression: {}", string_view(ident.name))
-            }
+            ident.tokenFlags |= pattern.tokenType;
+            tokenBuf.emplace_back(ident, pattern.symbolType, cap.blockID);
+            pStart = block.src.FindWord(ident.name.GetLast() + 1, g_WordBreakFilter);
         }
 
         PARSE_ASSERT_MSG((tokenBuf.GetLength() - tokenStart) == patterns.GetLength(), "Expected an identifier");

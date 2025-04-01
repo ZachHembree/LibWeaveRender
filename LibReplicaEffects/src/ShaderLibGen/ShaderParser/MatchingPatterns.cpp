@@ -175,7 +175,7 @@ static MatchNode GetShaderPatterns(const std::initializer_list<TokenQualifier>& 
     {
         {
             // Scoped definition
-            GetNamedScopePattern(predicates, ident, symbol | SymbolTypes::ReplicaDefinition),
+            GetNamedScopePattern(predicates, ident, SymbolTypes::ReplicaDefinition | symbol),
             // Effect pass assignment
             MatchNode
             {
@@ -184,7 +184,7 @@ static MatchNode GetShaderPatterns(const std::initializer_list<TokenQualifier>& 
                     MatchPattern
                     {
                         { LexBlockTypes::SemicolonSeparator },
-                        CapturePattern { TokenTypes::Technique | ident }
+                        CapturePattern { TokenTypes::Technique | ident, SymbolTypes::AnonVariable | (symbol & SymbolTypes::ShaderMask)}
                     }
                 }
             }
@@ -357,56 +357,56 @@ const UniqueArray<MatchNodeGroup> MatchNodeGroup::MatchNodeGroups =
     MatchNodeGroup
     {
         { TokenTypes::ConstBufDecl },
-        { GetNamedScopePattern({ TokenTypes::ConstBufDecl }, TokenTypes::ConstBufIdent, SymbolTypes::ConstBufDef) }
+        { GetNamedScopePattern({ TokenTypes::ConstBufDecl }, TokenTypes::ConstBufIdent, SymbolTypes::ConstBufDef | SymbolTypes::Anonymous) }
     },
     // Replica blocks
     // Vertex
     MatchNodeGroup
     {
         { TokenTypes::VertexShaderDecl },
-        { GetShaderPatterns({ TokenTypes::VertexShaderDecl }, TokenTypes::VertexIdent, SymbolTypes::Vertex) }
+        { GetShaderPatterns({ TokenTypes::VertexShaderDecl }, TokenTypes::VertexIdent, SymbolTypes::VertexShaderDef | SymbolTypes::Anonymous) }
     },
     // Hull
     MatchNodeGroup
     {
         { TokenTypes::HullShaderDecl },
-        { GetShaderPatterns({ TokenTypes::HullShaderDecl }, TokenTypes::HullIdent, SymbolTypes::Hull) }
+        { GetShaderPatterns({ TokenTypes::HullShaderDecl }, TokenTypes::HullIdent, SymbolTypes::HullShaderDef | SymbolTypes::Anonymous) }
     },
     // Domain
     MatchNodeGroup
     {
         { TokenTypes::DomainShaderDecl },
-        { GetShaderPatterns({ TokenTypes::DomainShaderDecl }, TokenTypes::DomainIdent, SymbolTypes::Domain) }
+        { GetShaderPatterns({ TokenTypes::DomainShaderDecl }, TokenTypes::DomainIdent, SymbolTypes::DomainShaderDef | SymbolTypes::Anonymous) }
     },
     // Geometry
     MatchNodeGroup
     {
         { TokenTypes::GeometryShaderDecl },
-        { GetShaderPatterns({ TokenTypes::GeometryShaderDecl }, TokenTypes::GeometryIdent, SymbolTypes::Geometry) }
+        { GetShaderPatterns({ TokenTypes::GeometryShaderDecl }, TokenTypes::GeometryIdent, SymbolTypes::GeometryShaderDef | SymbolTypes::Anonymous) }
     },
     // Pixel
     MatchNodeGroup
     {
         { TokenTypes::PixelShaderDecl },
-        { GetShaderPatterns({ TokenTypes::PixelShaderDecl }, TokenTypes::PixelIdent, SymbolTypes::Pixel) }
+        { GetShaderPatterns({ TokenTypes::PixelShaderDecl }, TokenTypes::PixelIdent, SymbolTypes::PixelShaderDef | SymbolTypes::Anonymous) }
     },
     // Compute
     MatchNodeGroup
     {
         { TokenTypes::ComputeShaderDecl },
-        { GetShaderPatterns({ TokenTypes::ComputeShaderDecl }, TokenTypes::ComputeIdent, SymbolTypes::Compute) }
+        { GetShaderPatterns({ TokenTypes::ComputeShaderDecl }, TokenTypes::ComputeIdent, SymbolTypes::ComputeShaderDef | SymbolTypes::Anonymous) }
     },
     // Technique
     MatchNodeGroup
     {
         { TokenTypes::TechniqueDecl },
-        { GetNamedScopePattern({ TokenTypes::ReplicaDecl }, TokenTypes::TechniqueIdent, SymbolTypes::TechniqueDef) }
+        { GetNamedScopePattern({ TokenTypes::ReplicaDecl }, TokenTypes::TechniqueIdent, SymbolTypes::TechniqueDef | SymbolTypes::Anonymous) }
     },
     // General rep block
     MatchNodeGroup
     {
         { TokenTypes::ReplicaDecl },
-        { GetNamedScopePattern({ TokenTypes::ReplicaDecl }, TokenTypes::RepIdent, SymbolTypes::ReplicaDefinition) }
+        { GetNamedScopePattern({ TokenTypes::ReplicaDecl }, TokenTypes::RepIdent, SymbolTypes::ReplicaDefinition | SymbolTypes::Anonymous) }
     },
     // Function or variable
     MatchNodeGroup
