@@ -1,18 +1,14 @@
 #pragma once
 #include "ShaderLibMap.hpp"
-#include "D3D11/Shaders/EffectVariant.hpp"
-#include "D3D11/Shaders/ShaderVariants.hpp"
+#include "Shaders/Material.hpp"
+#include "Shaders/ComputeInstance.hpp"
 
 namespace Replica::D3D11
 {
 	using Effects::ShaderLibDef;
-	using Effects::ShaderLibMap;
-	using Effects::ShadeStages;
-	using Effects::EffectDef;
 
 	class Device;
-	class Material;
-	class ComputeInstance;
+	class ShaderVariantManager;
 
 	class ShaderLibrary
 	{
@@ -24,6 +20,13 @@ namespace Replica::D3D11
 		ShaderLibrary(Device& device, const ShaderLibDef& def);
 
 		ShaderLibrary(Device& device, ShaderLibDef&& def);
+
+		~ShaderLibrary();
+
+		/// <summary>
+		/// Retrieves interface for querying string IDs used in library resources
+		/// </summary>
+		const StringIDMap& GetStringMap() const;
 
 		/// <summary>
 		/// Returns a new material using the given effect
@@ -45,57 +48,8 @@ namespace Replica::D3D11
 		/// </summary>
 		ComputeInstance GetComputeInstance(string_view name);
 
-		/// <summary>
-		/// Tries to retrieve the given shader as a vertex shader
-		/// </summary>
-		bool TryGetShader(uint shaderID, const VertexShaderVariant*& pVS);
-
-		/// <summary>
-		/// Tries to retrieve the given shader as a pixel shader
-		/// </summary>
-		bool TryGetShader(uint shaderID, const PixelShaderVariant*& pPS);
-
-		/// <summary>
-		/// Tries to retrieve the given shader as a compute shader
-		/// </summary>
-		bool TryGetShader(uint shaderID, const ComputeShaderVariant*& pCS);
-
-		/// <summary>
-		/// Retrieve the given shader as the given subtype
-		/// </summary>
-		template<typename ShaderT> const ShaderT& GetShader(uint shaderID)
-		{
-			const ShaderT* pShader = nullptr;
-
-			if (TryGetShader(shaderID, pShader))
-				return *pShader;
-			else
-				GFX_THROW("Invalid shader specified");
-		}
-
-		/// <summary>
-		/// Retrieves the give effect variant
-		/// </summary>
-		const EffectVariant& GetEffect(uint effectID);
-
-		/// <summary>
-		/// Retrieves interface for querying shader definitions
-		/// </summary>
-		const ShaderLibMap& GetLibMap() const;
-
-		/// <summary>
-		/// Retrieves interface for querying string IDs used in library resources
-		/// </summary>
-		const StringIDMap& GetStringMap() const { return libMap.GetStringMap(); }
-
 	private:
-		// Sparse variant instantiation
-		std::unordered_map<uint, VertexShaderVariant> vertexShaders;
-		std::unordered_map<uint, PixelShaderVariant> pixelShaders;
-		std::unordered_map<uint, ComputeShaderVariant> computeShaders;
-		std::unordered_map<uint, EffectVariant> effects;
+		std::unique_ptr<ShaderVariantManager> pManager;
 
-		ShaderLibMap libMap;
-		Device* pDev;
 	};
 }

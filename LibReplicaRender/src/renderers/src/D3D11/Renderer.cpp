@@ -2,13 +2,10 @@
 #include "ReplicaWin32.hpp"
 #include "ReplicaInternalD3D11.hpp"
 #include "D3D11/Renderer.hpp"
-#include "D3D11/Shaders/EffectVariant.hpp"
 #include "D3D11/Resources/Sampler.hpp"
 #include "D3D11/Shaders/BuiltInShaders.hpp"
 #include "D3D11/Mesh.hpp"
 #include "D3D11/Primitives.hpp"
-#include "D3D11/Shaders/Material.hpp"
-#include "D3D11/Shaders/ComputeInstance.hpp"
 #include "D3D11/ShaderLibrary.hpp"
 
 using namespace Replica;

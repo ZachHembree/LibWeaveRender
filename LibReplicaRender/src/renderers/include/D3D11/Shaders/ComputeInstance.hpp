@@ -3,7 +3,7 @@
 
 namespace Replica::D3D11
 {
-	class ShaderLibrary;
+	class ShaderVariantManager;
 	class ResourceSet;
 	class ComputeShaderVariant;
 

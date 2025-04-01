@@ -1,7 +1,7 @@
 #pragma once
 #include "ShaderDataHandles.hpp"
-#include "D3D11/Resources/ResourceBase.hpp"
-#include "D3D11/Resources/ResourceSet.hpp"
+#include "../Resources/ResourceBase.hpp"
+#include "../Resources/ResourceSet.hpp"
 
 namespace Replica::D3D11
 {
@@ -9,7 +9,7 @@ namespace Replica::D3D11
 	using Effects::EffectPass;
 
 	class Sampler;
-	class ShaderLibrary;
+	class ShaderVariantManager;
 	class ShaderVariantBase;
 
 	class EffectVariant
@@ -20,7 +20,7 @@ namespace Replica::D3D11
 		EffectVariant();
 
 		EffectVariant(
-			ShaderLibrary& lib,
+			ShaderVariantManager& lib,
 			EffectDefHandle effectDef
 		);
 

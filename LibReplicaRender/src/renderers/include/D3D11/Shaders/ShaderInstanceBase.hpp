@@ -1,10 +1,10 @@
 #pragma once
-#include "D3D11/Resources/ResourceBase.hpp"
-#include "D3D11/Resources/Sampler.hpp"
+#include "../Resources/ResourceBase.hpp"
+#include "../Resources/Sampler.hpp"
 
 namespace Replica::D3D11
 {
-	class ShaderLibrary;
+	class ShaderVariantManager;
 	class EffectVariant;
 	class ResourceSet;
 
@@ -15,7 +15,7 @@ namespace Replica::D3D11
 
 		ShaderInstanceBase();
 
-		ShaderInstanceBase(ShaderLibrary& lib, uint nameID, int vID);
+		ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, int vID);
 
 		ShaderInstanceBase(ShaderInstanceBase&&) noexcept;
 
@@ -200,7 +200,7 @@ namespace Replica::D3D11
 
 	protected:
 		std::unique_ptr<ResourceSet> pRes;
-		ShaderLibrary* pLib;
+		ShaderVariantManager* pLib;
 		uint nameID;
 		int vID;
 

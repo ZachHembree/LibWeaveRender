@@ -1,10 +1,10 @@
 #pragma once
 #include "ReplicaInternalD3D11.hpp"
 #include "ShaderDataHandles.hpp"
-#include "D3D11/Device.hpp"
-#include "D3D11/Resources/DeviceChild.hpp"
-#include "D3D11/Resources/ConstantBuffer.hpp"
-#include "D3D11/Resources/ConstantGroupMap.hpp"
+#include "../Device.hpp"
+#include "../Resources/DeviceChild.hpp"
+#include "../Resources/ConstantBuffer.hpp"
+#include "../Resources/ConstantGroupMap.hpp"
 
 namespace Replica::D3D11
 {

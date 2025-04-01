@@ -3,7 +3,7 @@
 #include "ShaderDataHandles.hpp"
 #include "ReplicaInternalD3D11.hpp"
 #include "ResourceSet.hpp"
-#include "D3D11/Context.hpp"
+#include "../Context.hpp"
 
 namespace Replica::D3D11
 {

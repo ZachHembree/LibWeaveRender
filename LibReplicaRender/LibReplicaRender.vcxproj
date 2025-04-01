@@ -239,6 +239,7 @@
     <ClCompile Include="src\renderers\src\D3D11\Shaders\ComputeInstance.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Shaders\ShaderVariantBase.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Shaders\ShaderVariants.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\ShaderVariantManager.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\SwapChain.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\BufferBase.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Device.cpp" />
@@ -303,6 +304,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="res\DefaultShaders.rpfx" />
+    <None Include="src\renderers\include\D3D11\ShaderVariantManager.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

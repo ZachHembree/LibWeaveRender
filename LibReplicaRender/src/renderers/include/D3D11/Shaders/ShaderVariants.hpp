@@ -1,7 +1,7 @@
 #pragma once
 #include "ShaderVariantBase.hpp"
-#include "D3D11/Resources/InputLayout.hpp"
-#include "D3D11/Context.hpp"
+#include "../Resources/InputLayout.hpp"
+#include "../Context.hpp"
 
 namespace Replica::D3D11
 {

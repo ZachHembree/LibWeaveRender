@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "D3D11/ShaderLibrary.hpp"
+#include "D3D11/ShaderVariantManager.hpp"
 #include "D3D11/Shaders/ShaderVariants.hpp"
 #include "D3D11/Shaders/ComputeInstance.hpp"
 #include "D3D11/Resources/ResourceSet.hpp"

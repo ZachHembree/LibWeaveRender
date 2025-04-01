@@ -1,7 +1,7 @@
 #include "pch.hpp"
 #include "D3D11/Shaders/Material.hpp"
 #include "D3D11/Shaders/EffectVariant.hpp"
-#include "D3D11/ShaderLibrary.hpp"
+#include "D3D11/ShaderVariantManager.hpp"
 #include "D3D11/Resources/ResourceSet.hpp"
 
 using namespace Replica;

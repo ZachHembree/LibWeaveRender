@@ -1,7 +1,7 @@
 #include "pch.hpp"
 #include "ReplicaInternalD3D11.hpp"
 #include "D3D11/Shaders/EffectVariant.hpp"
-#include "D3D11/ShaderLibrary.hpp"
+#include "D3D11/ShaderVariantManager.hpp"
 #include "D3D11/Shaders/ShaderVariantBase.hpp"
 
 using namespace Replica;
@@ -9,7 +9,7 @@ using namespace Replica::D3D11;
 
 EffectVariant::EffectVariant() = default;
 
-EffectVariant::EffectVariant(ShaderLibrary& lib, EffectDefHandle effectDef) :
+EffectVariant::EffectVariant(ShaderVariantManager& lib, EffectDefHandle effectDef) :
 	def(effectDef),
 	passes(effectDef.GetPassCount())
 { 

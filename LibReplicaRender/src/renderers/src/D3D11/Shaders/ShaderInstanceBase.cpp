@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "D3D11/ShaderLibrary.hpp"
+#include "D3D11/ShaderVariantManager.hpp"
 #include "D3D11/Shaders/ShaderInstanceBase.hpp"
 
 using namespace Replica;
@@ -9,7 +9,7 @@ ShaderInstanceBase::ShaderInstanceBase() :
 	pLib(nullptr), vID(-1), nameID(-1)
 { }
 
-ShaderInstanceBase::ShaderInstanceBase(ShaderLibrary& lib, uint nameID, int vID) :
+ShaderInstanceBase::ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, int vID) :
 	pLib(&lib), vID(vID), nameID(nameID)
 { }
 

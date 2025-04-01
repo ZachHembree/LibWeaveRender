@@ -13,6 +13,7 @@
 #include "../src/renderers/include/D3D11/Mesh.hpp"
 #include "../src/renderers/include/D3D11/Primitives.hpp"
 
+#include "../src/renderers/include/D3D11/ShaderLibrary.hpp"
 #include "../src/renderers/include/D3D11/Shaders/ComputeInstance.hpp"
 #include "../src/renderers/include/D3D11/Shaders/Material.hpp"
 
