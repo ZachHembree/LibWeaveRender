@@ -32,12 +32,12 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view libPath, string_view libSrc)
 	for (int vID = 0; vID < pVariantGen->GetVariantCount(); vID++)
 	{
 		// Preprocess and parse
-		pVariantGen->GetVariant(vID, libTexBuf, entrypoints);
-		const bool isDuplicate = libTexBuf == libTexLast;
+		pVariantGen->GetVariant(vID, libTextBuf, entrypoints);
+		const bool isDuplicate = libTextBuf == libTextLast;
 
 		if (!isDuplicate)
 		{
-			pAnalyzer->AnalyzeSource(libTexBuf);
+			pAnalyzer->AnalyzeSource(libTextBuf);
 			pTable->ParseBlocks(pAnalyzer->GetBlocks());
 
 			if (vID == 0)
@@ -81,7 +81,7 @@ void ShaderLibGen::SetFeatureLevel(string_view featureLevel) { this->featureLeve
 void ShaderLibGen::Clear()
 {
 	ClearVariant();
-	libTexLast.clear();
+	libTextLast.clear();
 	pVariantGen->Clear();
 	pShaderRegistry->Clear();
 }
@@ -132,11 +132,12 @@ void ShaderLibGen::GetEntryPoints()
 				if (funcIdent[j].GetHasFlags(TokenTypes::AttribShaderDecl))
 				{
 					string_view name = funcIdent.GetValue();
+					const uint nameID = pShaderRegistry->GetOrAddStringID(name);
 
-					if (!epSet.contains(name))
+					if (!epNameShaderIDMap.contains(nameID))
 					{
 						ShaderEntrypoint& ep = entrypoints.emplace_back();
-						epSet.emplace(name);
+						epNameShaderIDMap.emplace(nameID, -1);
 						ep.name = name;
 						ep.stage = GetStageFromFlags(funcIdent[j].GetFlags());
 						ep.symbolID = i;
@@ -157,9 +158,11 @@ void ShaderLibGen::GetEntryPoints()
 
 		if (pFuncs != nullptr && !pFuncs->empty())
 		{
-			if (!epSet.contains(ep.name))
+			const uint nameID = pShaderRegistry->GetOrAddStringID(ep.name);
+
+			if (!epNameShaderIDMap.contains(nameID))
 			{
-				epSet.emplace(ep.name);
+				epNameShaderIDMap.emplace(nameID, -1);
 				ep.symbolID = pFuncs->front();
 			}
 		}
@@ -180,10 +183,12 @@ void ShaderLibGen::GetEntryPoints()
 
 			if (pFuncs != nullptr && !pFuncs->empty())
 			{
-				if (!epSet.contains(name))
+				const uint nameID = pShaderRegistry->GetOrAddStringID(name);
+
+				if (!epNameShaderIDMap.contains(nameID))
 				{
 					ShaderEntrypoint& ep = entrypoints.emplace_back();
-					epSet.emplace(name);
+					epNameShaderIDMap.emplace(nameID, -1);
 					ep.name = name;
 					ep.stage = GetStageFromFlags(symbol.GetFlags());
 					ep.symbolID = pFuncs->front();
@@ -201,43 +206,121 @@ void ShaderLibGen::GetEffects()
 	{
 		SymbolHandle symbol = pTable->GetSymbol(i);
 
-		if (symbol.GetHasFlags(SymbolTypes::TechniqueDef))
+		if (symbol.GetIsScope() && symbol.GetHasFlags(SymbolTypes::TechniqueDef))
 		{
-			string_view name = symbol.GetName();
-			effectBlocks.emplace_back(EffectBlock
+			ScopeHandle effectScope = *symbol.GetScope();
+			EffectBlock& effect = effectBlocks.emplace_back();
+			effect.nameID = pShaderRegistry->GetOrAddStringID(symbol.GetName());
+			effect.passStart = (uint)effectPasses.GetLength();
+			effect.passCount = 0; 
+			bool isPassDefaulted = false;
+
+			for (int j = 0; j < effectScope.GetChildCount(); j++)
 			{
-				.name = name
-			});
+				SymbolHandle effectChild = effectScope[j];
+
+				if (!isPassDefaulted && effectChild.GetHasFlags(SymbolTypes::TechniqueShaderDecl))
+					isPassDefaulted = true;
+
+				if (effectChild.GetHasFlags(SymbolTypes::TechniquePassDecl))
+				{
+					PARSE_ASSERT_MSG(!isPassDefaulted, 
+						"Defaulted passes and explicit passes cannot be used in the same effect.")
+
+					effect.passCount++;
+				}
+			}
+
+			if (isPassDefaulted)
+			{
+				AddPass(effectScope, "DefaultedPass");
+			}
+			else
+			{
+				for (int j = 0; j < effectScope.GetChildCount(); j++)
+				{
+					SymbolHandle effectChild = effectScope[j];
+
+					if (effectChild.GetHasFlags(SymbolTypes::TechniquePassDecl))
+					{
+						ScopeHandle passScope = *effectChild.GetScope();
+						AddPass(passScope, effectChild.GetName());
+					}
+				}
+			}
 		}
 	}
+}
+
+void ShaderLibGen::AddPass(const ScopeHandle& passScope, string_view name)
+{
+	PassBlock& pass = effectPasses.emplace_back();
+	pass.nameID = pShaderRegistry->GetOrAddStringID(name);
+	pass.shaderStart = (uint)effectShaders.GetLength();
+
+	for (int j = 0; j < passScope.GetChildCount(); j++)
+	{
+		SymbolHandle effectChild = passScope[j];
+
+		if (effectChild.GetHasFlags(SymbolTypes::TechniqueShaderDecl))
+		{
+			string_view shaderName = effectChild.GetName();
+			const uint stringID = pShaderRegistry->GetOrAddStringID(shaderName);
+			const uint shaderID = epNameShaderIDMap[stringID];
+			effectShaders.emplace_back(shaderID);
+		}
+	}
+
+	pass.shaderCount = (uint)effectShaders.GetLength() - pass.shaderStart;
 }
 
 void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& shaders, const int vID)
 {
 	for (int i = 0; i < entrypoints.GetLength(); i++)
 	{
-		shaderBuf.clear();
+		hlslBuf.clear();
 
 		const ShaderEntrypoint& ep = entrypoints[i];
-		pShaderGen->GetShaderSource(*pTable, pAnalyzer->GetBlocks(), ep, entrypoints, shaderBuf);
+		pShaderGen->GetShaderSource(*pTable, pAnalyzer->GetBlocks(), ep, entrypoints, hlslBuf);
 
-		shaders[i].shaderID = GetShaderDefD3D11(libPath, shaderBuf, featureLevel, ep.stage, ep.name, *pShaderRegistry);
+		const uint shaderID = GetShaderDefD3D11(libPath, hlslBuf, featureLevel, ep.stage, ep.name, *pShaderRegistry);
+		const uint nameID = pShaderRegistry->GetShader(shaderID).nameID;
+
+		shaders[i].shaderID = shaderID;
 		shaders[i].variantID = vID;
+		// Update name -> shader ID key
+		epNameShaderIDMap[nameID] = shaderID;
 	}
 }
 
 void ShaderLibGen::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const int vID)
 {
-	for (int i = 0; i < effectBlocks.GetLength(); i++)
+	// Effects
+	for (uint i = 0; i < (uint)effectBlocks.GetLength(); i++)
 	{
-		const uint nameID = pShaderRegistry->GetOrAddStringID(effectBlocks[i].name);
-		const uint effectID = pShaderRegistry->GetOrAddEffect(EffectDef
+		const EffectBlock& block = effectBlocks[i];
+		EffectDef effect;
+		effect.nameID = block.nameID;
+		effect.passes = DynamicArray<EffectPass>(block.passCount);
+
+		// Passes
+		for (uint j = 0; j < block.passCount; j++)
 		{
-			.nameID = nameID
-		});		
+			PassBlock& pass = effectPasses[block.passStart + j];
+			DynamicArray<uint>& shaderIDs = effect.passes[j].shaderIDs;
+			shaderIDs = DynamicArray<uint>(pass.shaderCount);
+
+			// Shaders
+			for (uint k = 0; k < pass.shaderCount; k++)
+			{
+				const uint shaderIndex = pass.shaderStart + k;
+				shaderIDs[k] = effectShaders[shaderIndex];
+			}
+		}
+
 		effects[i] = EffectVariantDef 
 		{
-			.effectID = effectID,
+			.effectID = pShaderRegistry->GetOrAddEffect(std::move(effect)),
 			.variantID = (uint)vID
 		};
 	}
@@ -250,10 +333,13 @@ void ShaderLibGen::ClearVariant()
 	pShaderGen->Clear();
 
 	entrypoints.clear();
-	effectBlocks.clear();
-	epSet.clear();
+	epNameShaderIDMap.clear();
 
-	std::swap(libTexBuf, libTexLast);
-	libTexBuf.clear();
-	shaderBuf.clear();
+	effectBlocks.clear();
+	effectPasses.clear();
+	effectShaders.clear();
+
+	std::swap(libTextBuf, libTextLast);
+	libTextBuf.clear();
+	hlslBuf.clear();
 }

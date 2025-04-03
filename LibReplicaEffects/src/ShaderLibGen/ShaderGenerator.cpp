@@ -58,6 +58,13 @@ static void GetCorrectedMask(SourceMask& a, SourceMask& b)
 	}
 }
 
+/*
+	Generates final source by applying masks, first sorting them and resolving overlaps.
+	Masks are sorted ascending by last block index, then a backward pass uses GetCorrectedMask
+	on adjacent pairs to resolve overlaps. GetCorrectedMask nullifies fully contained masks
+	or truncates earlier masks in partial overlaps, ensuring a final, non-overlapping set
+	for generation before applying them to the source blocks.
+*/
 void ShaderGenerator::GetMaskedSource(const IDynamicArray<LexBlock>& srcBlocks, std::string& srcOut)
 {
 	// Sort masks in ascending order

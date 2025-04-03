@@ -1,5 +1,5 @@
 #pragma once
-#include <unordered_set>
+#include <unordered_map>
 #include <memory>
 #include "ReplicaEffects/ShaderLibGen/ShaderEntrypoint.hpp"
 #include "ReplicaEffects/ShaderLibGen/ShaderDataSerializers.hpp"
@@ -13,6 +13,7 @@ namespace Replica::Effects
 	class SymbolTable;
 	class ShaderGenerator;
 	class ShaderRegistryBuilder;
+	class ScopeHandle;
 
 	/// <summary>
 	/// Generates preprocessed and precompiled shader and effect variants with corresponding
@@ -36,26 +37,45 @@ namespace Replica::Effects
 		void Clear();
 
 	private:
-		struct EffectBlock
+		struct PassBlock
 		{
-			string_view name;
+			uint nameID;
+			uint shaderStart;
+			uint shaderCount;
 		};
 
+		struct EffectBlock
+		{
+			uint nameID;
+			uint passStart;
+			uint passCount;
+		};
+
+		// Config
+		string_view featureLevel;
+		PlatformTargets target;
+
+		// Parsing, code gen and reflection
 		unique_ptr<ShaderRegistryBuilder> pShaderRegistry;
 		unique_ptr<VariantPreprocessor> pVariantGen;
 		unique_ptr<BlockAnalyzer> pAnalyzer;
 		unique_ptr<SymbolTable> pTable;
 		unique_ptr<ShaderGenerator> pShaderGen;
 
-		string libTexBuf;
-		string libTexLast;
-		string shaderBuf;
-		std::unordered_set<string_view> epSet;
-		UniqueVector<ShaderEntrypoint> entrypoints;
-		UniqueVector<EffectBlock> effectBlocks;
+		// Variant buffers
+		string libTextBuf;
+		string libTextLast;
+		string hlslBuf;
 
-		string_view featureLevel;
-		PlatformTargets target;
+		// Shader mains
+		UniqueVector<ShaderEntrypoint> entrypoints;
+		// nameID -> shaderID
+		std::unordered_map<uint, uint> epNameShaderIDMap;
+
+		// Effect buffers
+		UniqueVector<EffectBlock> effectBlocks;
+		UniqueVector<PassBlock> effectPasses;
+		UniqueVector<uint> effectShaders;
 
 		/// <summary>
 		/// Initializes the library variants and corresponding flags
@@ -73,10 +93,18 @@ namespace Replica::Effects
 		void GetEffects();
 
 		/// <summary>
+		/// Adds an effect pass to the buffer to be later converted into a definition
+		/// </summary>
+		void AddPass(const ScopeHandle& effectScope, string_view name);
+
+		/// <summary>
 		/// Generates shader definitions for every shader in a variant
 		/// </summary>
 		void GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& shaders, const int vID);
 
+		/// <summary>
+		/// Generates effect definitions for every effect in a variant
+		/// </summary>
 		void GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const int vID);
 
 		/// <summary>

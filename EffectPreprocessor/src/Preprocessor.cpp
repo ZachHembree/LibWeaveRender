@@ -276,12 +276,24 @@ int main(int argc, char* argv[])
         for (int i = 0; i < argc; i++)
             args[i] = string_view(argv[i]);
 #else
-        DynamicArray<string_view> args
+        DynamicArray<string_view> args;
+
+        if (argc == 1)
         {
-            string_view(argv[0]),
-            "-i", "ShaderTest.rpfx", 
-            "--header"
-        };
+            args =
+            {
+                string_view(argv[0]),
+                "-i", "ShaderTest.rpfx", 
+                "--header"
+            };
+        }
+        else
+        {
+            args = DynamicArray<string_view>(argc);
+
+            for (int i = 0; i < argc; i++)
+                args[i] = string_view(argv[i]);
+        }
 #endif
 
         HandleOptions(args);

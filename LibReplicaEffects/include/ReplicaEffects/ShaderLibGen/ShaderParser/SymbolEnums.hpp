@@ -150,7 +150,7 @@ namespace Replica::Effects
         ShaderDef = Shader | ReplicaDefinition | Anonymous,
 
         TechniqueDef = Technique | ReplicaDefinition,
-        TechniquePassDecl = Technique | Pass | ReplicaDefinition | Anonymous,
+        TechniquePassDecl = Pass | ReplicaDefinition | Anonymous,
         TechniqueShaderDecl = Technique | Shader | Replica | Declaration | AnonVariable,
 
         VertexShaderDef = Vertex | ShaderDef,
