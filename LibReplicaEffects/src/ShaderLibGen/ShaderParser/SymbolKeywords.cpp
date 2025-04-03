@@ -8,6 +8,7 @@ namespace Replica::Effects
     {
         { "technique", TokenTypes::TechniqueDecl },
         { "effect", TokenTypes::TechniqueDecl },
+        { "pass", TokenTypes::PassDecl },
         { "cbuffer", TokenTypes::ConstBufDecl, },
 
         { "vertex", TokenTypes::VertexShaderDecl },

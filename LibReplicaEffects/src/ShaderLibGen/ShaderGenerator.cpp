@@ -144,7 +144,7 @@ void ShaderGenerator::GetSourceMask(const SymbolTable& table, const IDynamicArra
 	{
 		SymbolHandle symbol = table.GetSymbol(symbolID);
 
-		if (symbol.GetHasFlags(SymbolTypes::ReplicaBlock) && !symbol.GetHasFlags(SymbolTypes::Shader))
+		if (symbol.GetHasFlags(SymbolTypes::Replica) && !symbol.GetHasFlags(SymbolTypes::Shader))
 			AddScopeMask(symbol);
 	}
 

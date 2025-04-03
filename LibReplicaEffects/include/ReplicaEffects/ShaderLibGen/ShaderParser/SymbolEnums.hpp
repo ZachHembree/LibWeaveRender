@@ -7,49 +7,50 @@ namespace Replica::Effects
     {
         Unknown = 0,
 
-        Intrinsic = 1 << 0,
-        UserDefined = 1 << 1,
+        Intrinsic = 1u << 0u,
+        UserDefined = 1u << 1u,
 
-        Identifier = 1 << 2,
-        Keyword = 1 << 3,
-        Literal = 1 << 4,
+        Identifier = 1u << 2u,
+        Keyword = 1u << 3u,
+        Literal = 1u << 4u,
 
-        Alias = 1 << 5 | UserDefined,
+        Alias = 1u << 5u | UserDefined,
 
-        Attribute = 1 << 6,
-        Semantic = 1 << 7,
-        Argument = 1 << 8,
-        Parameter = 1 << 9,
-        Variable = 1 << 10,
+        Attribute = 1u << 6u,
+        Semantic = 1u << 7u,
+        Argument = 1u << 8u,
+        Parameter = 1u << 9u,
+        Variable = 1u << 10u,
 
-        TypeModifier = 1 << 11 | Keyword,
-        Type = 1 << 12,
+        TypeModifier = 1u << 11 | Keyword,
+        Type = 1u << 12u,
 
         IntrinsicType = Intrinsic | Type,
-        UserType = 1 << 13 | UserDefined | Type,
+        UserType = 1u << 13 | UserDefined | Type,
         TypeAlias = Alias | UserType,
 
-        Struct = 1 << 14 | Keyword,
-        Typedef = 1 << 15 | Keyword,
-        Function = 1 << 16,
-        Replica = 1 << 17,
+        Struct = 1u << 14 | Keyword,
+        Typedef = 1u << 15 | Keyword,
+        Function = 1u << 16u,
+        Replica = 1u << 17u,
 
-        Static = 1 << 18 | TypeModifier,
-        Const = 1 << 19 | TypeModifier,
-        GroupShared = 1 << 20,
+        Static = 1u << 18u | TypeModifier,
+        Const = 1u << 19u | TypeModifier,
+        GroupShared = 1u << 20u,
 
-        Shader = 1 << 21,
-        Technique = 1 << 22,
-        ConstBuf = 1 << 23,
+        Shader = 1u << 21u,
+        Pass = 1u << 22u,
+        Technique = 1u << 23u,
+        ConstBuf = 1u << 24u,
 
-        Vertex = 1 << 24,
-        Hull = 1 << 25,
-        Domain = 1 << 26,
-        Geometry = 1 << 27,
-        Pixel = 1 << 28,
-        Compute = 1 << 29,
+        Vertex = 1u << 25u,
+        Hull = 1u << 26u,
+        Domain = 1u << 27u,
+        Geometry = 1u << 28u,
+        Pixel = 1u << 29u,
+        Compute = 1u << 30u,
 
-        Template = 1 << 30,
+        Template = 1u << 31u,
         TemplatedType = Type | Template,
 
         ReplicaDecl = Replica | Keyword,
@@ -57,7 +58,6 @@ namespace Replica::Effects
         StructDecl = Struct | Keyword,
         TypedefDecl = Typedef | Keyword,
         ConstBufDecl = ConstBuf | Keyword,
-        TechniqueShaderDecl = Technique | ShaderDecl,
 
         AttribIdent = Attribute | Identifier,
         SemanticIdent = Semantic | Identifier,
@@ -76,24 +76,28 @@ namespace Replica::Effects
         GeometryIdent = Geometry | ShaderIdent,
         PixelIdent = Pixel | ShaderIdent,
         ComputeIdent = Compute | ShaderIdent,
-
-        TechniqueIdent = Technique | RepIdent,
-        TechniqueShaderIdent = Technique | ShaderIdent,
         ConstBufIdent = ConstBuf | Identifier,
 
-        LiteralArg = Literal | Argument,
-
+        TechniqueIdent = Technique | RepIdent,
         TechniqueDecl = Technique | ReplicaDecl,
+
+        PassIdent = Pass | RepIdent,
+        PassDecl = Pass | ReplicaDecl,
+
+        TechniqueShaderIdent = Technique | ShaderIdent,
+        TechniqueShaderDecl = Technique | ShaderDecl,
+
         VertexShaderDecl = Vertex | ShaderDecl,
         HullShaderDecl = Hull | ShaderDecl,
         DomainShaderDecl = Domain | ShaderDecl,
         GeometryShaderDecl = Geometry | ShaderDecl,
         PixelShaderDecl = Pixel | ShaderDecl,
         ComputeShaderDecl = Compute | ShaderDecl,
-
         AttribShaderDecl = Attribute | ShaderDecl,
-        TypeModifierMask = Static | Const,
-        ShaderMask = Vertex | Hull | Domain | Geometry | Pixel | Compute
+        ShaderMask = Vertex | Hull | Domain | Geometry | Pixel | Compute,
+
+        LiteralArg = Literal | Argument,
+        TypeModifierMask = Static | Const
     };
 
     BITWISE_ALL(TokenTypes, uint)
@@ -102,34 +106,35 @@ namespace Replica::Effects
     {
         Unknown = 0x0,
 
-        Scope = 1 << 0,
-        ReplicaBlock = 1 << 1,
-        Shader = 1 << 2,
-        Technique = 1 << 3,
+        Scope = 1u << 0u,
+        Replica = 1u << 1u,
+        Shader = 1u << 2u,
+        Pass = 1u << 3u,
+        Technique = 1u << 4u,
 
-        Vertex = 1 << 4,
-        Hull = 1 << 5,
-        Domain = 1 << 6,
-        Geometry = 1 << 7,
-        Pixel = 1 << 8,
-        Compute = 1 << 9,
+        Vertex = 1u << 7u,
+        Hull = 1u << 8u,
+        Domain = 1u << 9u,
+        Geometry = 1u << 10u,
+        Pixel = 1u << 11u,
+        Compute = 1u << 12u,
 
-        Declaration = 1 << 10,
-        Definition = 1 << 11,
+        Declaration = 1u << 16u,
+        Definition = 1u << 17u,
 
-        UserDefined = 1 << 12,
-        Type = 1 << 13,
+        UserDefined = 1u << 18u,
+        Type = 1u << 19u,
 
-        Alias = 1 << 16,
-        Struct = 1 << 17,
-        Function = 1 << 18,
-        Parameter = 1 << 19,
-        Variable = 1 << 20,
-        ConstBuf = 1 << 21,
+        Alias = 1u << 20u,
+        Struct = 1u << 21u,
+        Function = 1u << 22u,
+        Parameter = 1u << 23u,
+        Variable = 1u << 24u,
+        ConstBuf = 1u << 25u,
 
-        Ambiguous = 1 << 22,
-        Argument = 1 << 23,
-        Anonymous = 1 << 24,
+        Ambiguous = 1u << 26u,
+        Argument = 1u << 27u,
+        Anonymous = 1u << 28u,
 
         AnonScope = Anonymous | Scope,
         AnonVariable = Anonymous | Variable,
@@ -141,10 +146,12 @@ namespace Replica::Effects
         UserCBuf = ConstBuf | UserType,
 
         ScopedDefinition = Definition | Scope,
-        ReplicaDefinition = ReplicaBlock | ScopedDefinition,
-        ShaderDef = Shader | ReplicaDefinition,
+        ReplicaDefinition = Replica | ScopedDefinition,
+        ShaderDef = Shader | ReplicaDefinition | Anonymous,
+
         TechniqueDef = Technique | ReplicaDefinition,
-        TechniqueShaderDecl = Technique | Shader | Declaration,
+        TechniquePassDecl = Technique | Pass | ReplicaDefinition | Anonymous,
+        TechniqueShaderDecl = Technique | Shader | Replica | Declaration | AnonVariable,
 
         VertexShaderDef = Vertex | ShaderDef,
         HullShaderDef = Hull | ShaderDef,

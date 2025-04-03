@@ -214,11 +214,11 @@ static void CreateLibrary()
 
     LOG_INFO() << "Wrote library to " << outputPath;
     LOG_INFO() << "Library Stats: "
-        << "\nVariants: " << def.variants.GetLength()
-        << "\nShaders: " << def.regData.shaders.GetLength()
-        << "\nEffects: " << def.regData.effects.GetLength()
-        << "\nConstants: " << def.regData.constants.GetLength()
-        << "\nResources: " << def.regData.resources.GetLength();
+        << "Variants: " << def.variants.GetLength()
+        << " | Shaders: " << def.regData.shaders.GetLength()
+        << " | Effects: " << def.regData.effects.GetLength()
+        << " | Constants: " << def.regData.constants.GetLength()
+        << " | Resources: " << def.regData.resources.GetLength();
 }
 
 /// <summary>
@@ -266,7 +266,9 @@ int main(int argc, char* argv[])
     LOG_INFO() << "RPFX Init";
     LOG_INFO() << "Working Dir: " << argv[0];
 
+#ifndef _DEBUG
     try
+#endif
     {
 #ifndef _DEBUG
         DynamicArray<string_view> args(argc);
@@ -285,6 +287,7 @@ int main(int argc, char* argv[])
         HandleOptions(args);
         CreateLibrary();
     }
+#ifndef _DEBUG
     catch (const RepException& err)
     {
         LOG_ERROR() << "[" << err.GetType() << "] " << err.what();
@@ -305,6 +308,7 @@ int main(int argc, char* argv[])
         LOG_ERROR() << "An unknown exception has occurred.";
         code = 1;
     }
+#endif
 
     std::getchar();
     return code;

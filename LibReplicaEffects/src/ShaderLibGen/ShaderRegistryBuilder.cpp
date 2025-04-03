@@ -27,6 +27,12 @@ void ShaderRegistryBuilder::Clear()
 	uniqueResCount = 0;
 }
 
+int ShaderRegistryBuilder::GetResourceCount() const { return resCount; }
+
+int ShaderRegistryBuilder::GetUniqueResCount() const { return uniqueResCount; }
+
+uint ShaderRegistryBuilder::GetOrAddStringID(const char* str) { return GetOrAddStringID(string_view(str)); }
+
 uint ShaderRegistryBuilder::GetOrAddStringID(string&& str) { return stringIDs.GetOrAddStringID(std::move(str)); }
 
 uint ShaderRegistryBuilder::GetOrAddStringID(string_view str) { return stringIDs.GetOrAddStringID(str); }

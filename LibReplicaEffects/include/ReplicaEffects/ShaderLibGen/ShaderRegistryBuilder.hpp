@@ -92,17 +92,19 @@ namespace Replica::Effects
 		/// <summary>
 		/// Returns the total number of resources, not counting strings
 		/// </summary>
-		int GetResourceCount() const { return resCount; }
+		int GetResourceCount() const;
 
 		/// <summary>
 		/// Returns the total number of unique resources of all types, not counting strings
 		/// </summary>
-		int GetUniqueResCount() const { return uniqueResCount; }
+		int GetUniqueResCount() const;
 
 		/* GetOrAdd(Member) functions return an integer ID that uniquely corresponds to the given definition.
 		* If a definition has not been seen before, it will be added and a new ID will be generated. 
 		* 
 		* StringIDs are separate from shader definition types. */
+
+		uint GetOrAddStringID(const char* str);
 
 		uint GetOrAddStringID(string&& str);
 
