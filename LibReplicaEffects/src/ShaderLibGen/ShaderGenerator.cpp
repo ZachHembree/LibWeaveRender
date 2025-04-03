@@ -34,13 +34,28 @@ void ShaderGenerator::Clear()
 	sourceMasks.clear();
 }
 
-static void GetCorrectedMask(SourceMask& a, const SourceMask& b)
+static void GetCorrectedMask(SourceMask& a, SourceMask& b)
 {
-	const int maxLastBlock = b.startBlock - 1,
-		lastBlock = std::min(a.startBlock + a.blockCount - 1, maxLastBlock);
+	// Push superset masks back toward the front
+	if (a.startBlock > b.startBlock)
+		std::swap(a, b);
 
-	a.blockCount = std::max(lastBlock - a.startBlock + 1, 0);
-	a.startBlock = std::min(a.startBlock, maxLastBlock);
+	const int endA = a.startBlock + a.blockCount,
+		endB = b.startBlock + b.blockCount;
+
+	if (endA >= endB) // A is a superset of B
+	{
+		b.startBlock = 0;
+		b.blockCount = 0;
+	}
+	else // Partial overlap
+	{ 
+		const int maxLastBlock = b.startBlock - 1,
+			lastBlock = std::min(a.startBlock + a.blockCount - 1, maxLastBlock);
+
+		a.blockCount = std::max(lastBlock - a.startBlock + 1, 0);
+		a.startBlock = std::min(a.startBlock, maxLastBlock);
+	}
 }
 
 void ShaderGenerator::GetMaskedSource(const IDynamicArray<LexBlock>& srcBlocks, std::string& srcOut)
@@ -48,7 +63,7 @@ void ShaderGenerator::GetMaskedSource(const IDynamicArray<LexBlock>& srcBlocks, 
 	// Sort masks in ascending order
 	std::sort(sourceMasks.begin(), sourceMasks.end(), [](const SourceMask& a, const SourceMask& b)
 	{
-		return (a.startBlock + a.GetLastBlock()) < (b.startBlock + b.GetLastBlock());
+		return a.GetLastBlock() < b.GetLastBlock();
 	});
 
 	// Correct overlapping masks
