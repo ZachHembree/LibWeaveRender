@@ -10,8 +10,10 @@ using namespace Replica::D3D11;
 Material::Material() = default;
 
 Material::Material(ShaderVariantManager& lib, uint nameID, int vID) :
-	ShaderInstanceBase(lib, nameID, vID)
-{}
+	ShaderInstanceBase(lib, nameID, vID), pEffect(nullptr)
+{
+	SetVariantID(0);
+}
 
 Material::Material(Material&&) noexcept = default;
 
@@ -40,7 +42,7 @@ const EffectVariant& Material::GetEffect() const
 
 void Material::SetVariantID(int vID)
 {
-	if (vID != this->vID)
+	if (pEffect != nullptr && vID != this->vID)
 	{ 
 		const uint effectID = pLib->GetLibMap().TryGetEffectID(nameID, vID);
 		pEffect = &pLib->GetEffect(effectID);

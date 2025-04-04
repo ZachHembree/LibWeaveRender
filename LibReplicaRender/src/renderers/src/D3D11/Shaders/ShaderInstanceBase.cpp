@@ -12,7 +12,7 @@ ShaderInstanceBase::ShaderInstanceBase() :
 ShaderInstanceBase::~ShaderInstanceBase() = default;
 
 ShaderInstanceBase::ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, int vID) :
-	pLib(&lib), vID(vID), nameID(nameID)
+	pLib(&lib), vID(0), nameID(nameID), pRes(new ResourceSet())
 { }
 
 ShaderInstanceBase::ShaderInstanceBase(ShaderInstanceBase&&) noexcept = default;
