@@ -2,82 +2,69 @@
 #include "ReplicaEffects/ParseExcept.hpp"
 #include "ReplicaEffects/ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"
 
-using std::string;
-using std::ios;
-using std::stack;
-
 namespace Replica::Effects
 {
-    const string_view g_FullBreakFilter = "=,:;{}()[]<>#";
-    const string_view g_BasicBreakFilter = "=,:;{}()[]#";
+    static LexBlockTypes GetDelimiterType(const char ch)
+    {
+        switch (ch)
+        {
+        case '{':
+            return LexBlockTypes::StartScope;
+        case '(':
+            return LexBlockTypes::OpenParentheses;
+        case '[':
+            return LexBlockTypes::OpenSquareBrackets;
+        case '<':
+            return LexBlockTypes::OpenAngleBrackets;
+        case '}':
+            return LexBlockTypes::EndScope;
+        case ')':
+            return LexBlockTypes::CloseParentheses;
+        case ']':
+            return LexBlockTypes::CloseSquareBrackets;
+        case '>':
+            return LexBlockTypes::CloseAngleBrackets;
+        default:
+            return LexBlockTypes::Unknown;
+        }
+    }
+
+    const string_view s_BreakFilters[]
+    {
+        "=,:;{}()[]#", // 0 - No templates
+        "=,:;{}()[]<#", // 1 - Can start templates
+        "=,:;{}()[]<>#", // 2 - Can start or close templates
+    };
 
     /// <summary>
-    /// Exhaustively searches the given string for blocks of text enclosed by the given start and end strings
-    /// and replaces them with spaces
+    /// Returns appropriate filter based on current template instantiation or backtracking state.
     /// </summary>
-    static size_t FilterTextBlocks(
-        TextBlock text,
-        const string_view& start,
-        const string_view& end
-    )
+    string_view BlockAnalyzer::GetBreakFilter() const 
     {
-        char* pFound = (char*)text.Find(start);
-        char* pStart = nullptr;
-        size_t blockCharCount = 0;
-
-        while (pFound != nullptr)
-        {
-            if (pStart != nullptr) // Find end
-            {
-                const char* pLast = pFound + end.length();
-                size_t blockLen = UnsignedDelta(pLast, pStart);
-                blockCharCount += blockLen;
-
-                for (int i = 0; i < blockLen; i++)
-                {
-                    if (pStart[i] != '\n')
-                        pStart[i] = ' ';
-                }
-
-                pFound = (char*)text.Find(start, pFound + end.length());
-                pStart = nullptr;
-            }
-            else // Find start
-            {
-                pStart = pFound;
-                pFound = (char*)text.Find(end, pFound + start.length());
-            }
-        }
-
-        return blockCharCount;
+        const int index = (int)GetCanCloseTemplate() + (int)GetCanOpenTemplate();
+        return s_BreakFilters[index];
     }
 
-    void GetSanitizedInput(Span<char> src)
-    {
-        // Replace any non-linebreak control chars with a space
-        for (int i = 0; i < src.GetLength(); i++)
-        {
-            if (src[i] < '\n')
-                src[i] = ' ';
-        }
+    /// <summary>
+    /// Returns true if the analyzer can add a new template in its current state. If the analyzer 
+    /// has not progressed past the last backtrack pass, then it cannot handle new potential 
+    // template instances.
+    /// </summary>
+    bool BlockAnalyzer::GetCanOpenTemplate() const { return pPos > pPosOld; }
 
-        // Filter block comments
-        FilterTextBlocks(src, "/*", "*/");
-        // Filter inline comments
-        FilterTextBlocks(src, "//", "\n");
-    }
+    /// <summary>
+    /// Returns true if a template instantiation is pending completion and '>' should be considered.
+    /// </summary>
+    bool BlockAnalyzer::GetCanCloseTemplate() const { return !containers.empty() && blocks[containers.back()].GetHasFlags(LexBlockTypes::OpenAngleBrackets); }
 
-    void AnalyzeBlocks(TextBlock src, UniqueVector<LexBlock>& blocks)
-    {
-        BlockAnalyzer bb;
-        bb.AnalyzeSource(src);
-    }
+    static bool GetHasFlags(const LexBlockTypes value, const LexBlockTypes flags) { return (value & flags) == flags; }
 
     BlockAnalyzer::BlockAnalyzer() :
         containers(20),
         pPos(nullptr),
         depth(0),
-        line(1)
+        line(1),
+        pPosOld(nullptr)
     { }
 
     void BlockAnalyzer::Clear()
@@ -87,6 +74,7 @@ namespace Replica::Effects
         depth = 0;
         line = 1;
         pPos = nullptr;
+        pPosOld = nullptr;
     }
 
     void BlockAnalyzer::AnalyzeSource(TextBlock src)
@@ -95,55 +83,77 @@ namespace Replica::Effects
         this->src = src;
         pPos = src.GetFirst();
 
-        while (pPos <= src.GetLast())
-        {
-            if (*pPos <= ' ') // Skip whitespace
-            {
-                if (*pPos == '\n') // Count lines
-                    line++;
-            }
-            else // Get blocks
-            {
-                switch (*pPos)
+        while (true)
+        {            
+            // Parse
+            if (pPos <= src.GetLast())
+            { 
+                if (*pPos <= ' ') // Skip whitespace
                 {
-                case '#':
-                    AddDirective();
-                    break;
-                case '{':
-                case '[':
-                case '(':
-                case '<':
-                    StartContainer();
-                    break;
-                case '}':
-                case ']':
-                case ')':
-                case '>':
-                    EndContainer();
-                    break;
-                default:
-                    AddBlock({ pPos, src.GetLast() }, blocks.emplace_back(), g_FullBreakFilter);
-                    break;
+                    if (*pPos == '\n') // Count lines
+                        line++;
                 }
+                else // Get blocks
+                {
+                    switch (*pPos)
+                    {
+                    case '#':
+                        AddDirective();
+                        break;
+                    case '{':
+                    case '[':
+                    case '(':
+                        StartContainer();
+                        break;
+                    case '<':
+                        if (GetCanCloseTemplate() || GetCanOpenTemplate())
+                        {
+                            StartContainer();
+                            break;
+                        }
+                        [[fallthrough]];
+                    case '}':
+                    case ']':
+                    case ')':
+                        EndContainer();
+                        break;
+                    case '>':
+                        if (GetCanCloseTemplate())
+                        {
+                            EndContainer();
+                            break;
+                        }
+                        [[fallthrough]];
+                    default:
+                        AddBlock({ pPos, src.GetLast() });
+                        break;
+                    }
+                }
+
+                pPos++;
             }
-
-            pPos++;
+            // Try exit
+            else if (TryFinalizeParse())
+                break;
         }
-
-        CheckForDanglingContainers();
     }
 
     const IDynamicArray<LexBlock>& BlockAnalyzer::GetBlocks() const { return blocks; }
 
-    void BlockAnalyzer::AddBlock(const TextBlock& start, LexBlock& block, string_view filter)
+    void BlockAnalyzer::AddBlock(const TextBlock& start)
     {
+        const string_view filter = GetBreakFilter();
         const char* pNext = start.GetFirst() - 1;
 
         do
         {
             pNext = start.FindEnd(pNext + 1, filter);
-        } while (pNext < start.GetLast() && TextBlock::GetIsRangeChar(*pNext, filter));
+        } 
+        while (pNext < start.GetLast() && TextBlock::GetIsRangeChar(*pNext, filter));
 
+        // Create new non-container block
+        LexBlock& block = blocks.emplace_back();
+        
         switch (*pNext)
         {
         case '=':
@@ -159,16 +169,16 @@ namespace Replica::Effects
             block.type = LexBlockTypes::CommaSeparator;
             break;
         case '{':
-            block.type |= LexBlockTypes::ScopePreamble;
+            block.type = LexBlockTypes::ScopePreamble;
             break;
         case '(':
-            block.type |= LexBlockTypes::ParenthesesPreamble;
+            block.type = LexBlockTypes::ParenthesesPreamble;
             break;
         case '[':
-            block.type |= LexBlockTypes::SquareBracketsPreamble;
+            block.type = LexBlockTypes::SquareBracketsPreamble;
             break;
         case '<':
-            block.type |= LexBlockTypes::AngleBracketsPreamble;
+            block.type = LexBlockTypes::AngleBracketsPreamble;
             break;
         default:
             block.type = LexBlockTypes::Unterminated;
@@ -188,121 +198,121 @@ namespace Replica::Effects
         pPos = block.src.GetLast();
     }
 
-    LexBlock& BlockAnalyzer::GetTopContainer()
-    {
-        PARSE_ASSERT_MSG(!containers.empty(), "Attempted to get non-existent container reference");
-        const int i = containers[containers.GetLength() - 1];
-        return blocks[i];
-    }
+    LexBlock* BlockAnalyzer::GetTopContainer() { return !containers.empty() ? &blocks[containers.back()] : nullptr; }
 
-    bool BlockAnalyzer::TryValidateAngleBlocks()
+    void BlockAnalyzer::SetState(int blockIndex)
     {
-        const int i = !containers.empty() ? containers[containers.GetLength() - 1] : -1;
-        int last = -1;
+        const char* pLast = pPos;
 
-        // If any other bracket type is encountered while an unterminated angle container is on the stack
-        if (i != -1 && *pPos != '<' && *pPos != '>')
+        // Restart from the beginning but without template parsing
+        if (blockIndex < 0)
         {
-            const LexBlock& cont = blocks[i];
+            Clear();          
+        }
+        // Revert state to the point just after the given block was added and temporarily 
+        // disable template parsing until this point is reached again
+        else 
+        { 
+            PARSE_ASSERT_MSG(blockIndex >= 0 && blockIndex < (int)blocks.GetLength(), "Block index out of range")
 
-            if (cont.GetHasFlags(LexBlockTypes::OpenAngleBrackets))
-            {
-                last = i;
+            LexBlock& block = blocks[blockIndex];
+            pPos = block.src.GetLast();
+            // Depth is normally incremented after a container is added
+            depth = block.depth + (int)block.GetHasFlags(LexBlockTypes::StartContainer);
+            line = block.startLine + block.lineCount;
 
-                if (i > 0 && blocks[i - 1].GetHasFlags(LexBlockTypes::AngleBracketsPreamble))
-                    last = i - 1;
-
+            while (!containers.empty() && containers.back() > blockIndex)
                 containers.pop_back();
-            }
-        }
-        // Closing angle bracket without opening bracket
-        else if (*pPos == '>' && (i == -1 || !GetTopContainer().GetHasFlags(LexBlockTypes::OpenAngleBrackets)))
-        {
-            if (!blocks.empty())
-                last = (int)blocks.GetLength() - 1;
+
+            blocks.RemoveRange(blockIndex + 1, (int)blocks.GetLength() - blockIndex - 1);
         }
 
-        if (last != -1)
-        {
-            const char* pStart = pPos;
-            LexBlock& block = blocks[last];
-            depth = block.depth;
-            line = block.startLine;
-            blocks.RemoveRange(last + 1, (ptrdiff_t)blocks.GetLength() - last - 1);
-
-            AddBlock({ block.src.GetFirst(), src.GetLast() }, block, g_BasicBreakFilter);
-            pPos++;
-
-            while (pPos < pStart)
-            {
-                if (*pPos > ' ')
-                    AddBlock({ pPos, src.GetLast() }, blocks.emplace_back(), g_BasicBreakFilter);
-                else if (*pPos == '\n')
-                    line++;
-
-                pPos++;
-            }
-
-            return false;
-        }
-
-        return true;
+        pPosOld = pLast;
     }
-    
+
+    void BlockAnalyzer::RevertContainer(int blockIndex)
+    {
+        PARSE_ASSERT_MSG(blockIndex >= 0 && blockIndex < (int)blocks.GetLength(), "Block index out of range")
+        const LexBlock& block = blocks[blockIndex];
+
+        // Revert to block before container preamble
+        if (blockIndex > 0 && blocks[blockIndex - 1].GetHasFlags(LexBlockTypes::Preamble))
+            SetState(blockIndex - 2);
+        // Revert to block before container
+        else
+            SetState(blockIndex - 1);
+    }
+
     void BlockAnalyzer::StartContainer()
     {
-        LexBlockTypes type = LexBlockTypes::Container;
+        LexBlockTypes delimType = GetDelimiterType(*pPos);
 
-        if (*pPos == '<')
-        {
-            type |= LexBlockTypes::OpenAngleBrackets;
+        PARSE_ASSERT_FMT(GetHasFlags(delimType, LexBlockTypes::StartContainer),
+            "Unexpected expression {} on line: {}. Expected new container.", *pPos, line)
+
+        // If an unfinished angle bracket container is on the stack, revert it if a different container
+        // type is started. More restrictive than a normal parser, but should be an acceptable simplification.
+        if (!GetHasFlags(delimType, LexBlockTypes::OpenAngleBrackets))
+        { 
+            const LexBlock* top = GetTopContainer();
+
+            if (top != nullptr && top->GetHasFlags(LexBlockTypes::OpenAngleBrackets))
+            {
+                RevertContainer(containers.back());
+                return;
+            }
         }
-        else
-        {
-            TryValidateAngleBlocks();
 
-            if (*pPos == '{')
-                type |= LexBlockTypes::StartScope;
-            else if (*pPos == '(')
-                type |= LexBlockTypes::OpenParentheses;
-            else if (*pPos == '[')
-                type |= LexBlockTypes::OpenSquareBrackets;
-        }
-
+        // Start new container to be later finalized in LIFO order as closing braces are encountered
         containers.push_back((int)blocks.GetLength());
-        blocks.emplace_back(depth, type, pPos, line);
+        blocks.emplace_back(depth, delimType, pPos, line);
         depth++;
     }
-     
+
     void BlockAnalyzer::EndContainer()
     {
-        TryValidateAngleBlocks();
+        LexBlock* pCont = GetTopContainer();
+        PARSE_ASSERT_FMT(pCont != nullptr, "Unexpected closing '{}' on line: {}", *pPos, line);
 
-        depth--;
-        PARSE_ASSERT_FMT(depth >= 0, "Unexpected closing '{}' on line: {}", *pPos, line);
-
-        LexBlock& cont = GetTopContainer();
-
-        if (cont.GetHasFlags(LexBlockTypes::Scope))
+        // An opening '<' was previously classified as a potential template, but another container closed 
+        // before it was ready. It will need to be reverted and reclassified.
+        if (pCont->GetHasFlags(LexBlockTypes::OpenAngleBrackets) && (*pPos != '>'))
         {
-            PARSE_ASSERT_FMT(*pPos == '}', "Expected scope end '}}' on line: {}", line);
+            RevertContainer(containers.back());
         }
-        else if (cont.GetHasFlags(LexBlockTypes::Parentheses))
-        {
-            PARSE_ASSERT_FMT(*pPos == ')', "Expected closing parentheses ')' on line: {}", line);
-        }
-        else if (cont.GetHasFlags(LexBlockTypes::SquareBrackets))
-        {
-            PARSE_ASSERT_FMT(*pPos == ']', "Expected closing square bracket ']' on line: {}", line);
-        }
+        // Normal bounding {}, [], () or <> containers, closed in last-in, first-out order.
+        else
+        { 
+            LexBlockTypes delimType = GetDelimiterType(*pPos);
 
-        containers.pop_back();
-        cont.src = TextBlock(cont.src.GetFirst(), pPos);
-        cont.lineCount = line - cont.startLine;
+            if (pCont->GetHasFlags(LexBlockTypes::Scope))
+            {
+                PARSE_ASSERT_FMT(GetHasFlags(delimType, LexBlockTypes::EndScope), 
+                    "Expected scope end '}}' on line: {}", line);
+            }
+            else if (pCont->GetHasFlags(LexBlockTypes::Parentheses))
+            {
+                PARSE_ASSERT_FMT(GetHasFlags(delimType, LexBlockTypes::CloseParentheses), 
+                    "Expected closing parentheses ')' on line: {}", line);
+            }
+            else if (pCont->GetHasFlags(LexBlockTypes::SquareBrackets))
+            {
+                PARSE_ASSERT_FMT(GetHasFlags(delimType, LexBlockTypes::CloseSquareBrackets), 
+                    "Expected closing square bracket ']' on line: {}", line);
+            }
 
-        LexBlock& endContainer = blocks.emplace_back(cont);
-        endContainer.type &= ~LexBlockTypes::StartContainer;
-        endContainer.type |= LexBlockTypes::EndContainer;
+            depth--;
+            PARSE_ASSERT_FMT(depth >= 0, "Unexpected closing '{}' on line: {}", *pPos, line)
+
+            // Finalize source range and line count in container opening
+            containers.pop_back();
+            pCont->src = TextBlock(pCont->src.GetFirst(), pPos);
+            pCont->lineCount = line - pCont->startLine;
+
+            // Add duplicate ending marker with appropriate delim flags
+            LexBlock& endContainer = blocks.emplace_back(*pCont);
+            endContainer.type = delimType;
+        }
     }
 
     /// <summary>
@@ -346,26 +356,36 @@ namespace Replica::Effects
         pPos = body.src.GetLast();
     }
     
-    void BlockAnalyzer::CheckForDanglingContainers()
+    /// <summary>
+    /// Returns true if parsing has completed successfully, rasies exceptions if there are unterminated 
+    /// containers, and possibly backtracks to correct misidentifed trailing template instantiations.
+    /// </summary>
+    bool BlockAnalyzer::TryFinalizeParse()
     {
-        while (!containers.empty() && TryValidateAngleBlocks())
+        if (!containers.empty())
         {
-            LexBlock& top = GetTopContainer();
+            LexBlock& top = *GetTopContainer();
 
-            if (top.GetHasFlags(LexBlockTypes::Scope))
+            if (top.GetHasFlags(LexBlockTypes::StartScope))
             {
                 PARSE_ERR_FMT("Unterminated scope '{{' starting on line {}", top.startLine);
             }
-            else if (top.GetHasFlags(LexBlockTypes::Parentheses))
+            else if (top.GetHasFlags(LexBlockTypes::OpenParentheses))
             {
                 PARSE_ERR_FMT("Unterminated parentheses '(' starting on line {}", top.startLine);
             }
-            else if (top.GetHasFlags(LexBlockTypes::SquareBrackets))
+            else if (top.GetHasFlags(LexBlockTypes::OpenSquareBrackets))
             {
                 PARSE_ERR_FMT("Unterminated square bracket '[' starting on line {}", top.startLine);
             }
-
-            containers.pop_back();
+            else if (top.GetHasFlags(LexBlockTypes::OpenAngleBrackets))
+            {
+                RevertContainer(containers.back());
+                return false;
+            }
         }
+
+        PARSE_ASSERT_MSG(depth == 0, "Internal container parsing error.")
+        return true;
     }
 }

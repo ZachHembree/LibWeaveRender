@@ -67,31 +67,6 @@ namespace Replica::Effects
 
     BITWISE_ALL(LexBlockTypes, uint)
 
-    static const std::unordered_map<LexBlockTypes, std::string_view> g_LexFlagsToNameMap
-    {
-        { LexBlockTypes::Unterminated, "Unterminated" },
-
-        { LexBlockTypes::Directive, "Directive" },
-        { LexBlockTypes::Separator, "Separator" },
-        { LexBlockTypes::Preamble, "Preamble" },
-        { LexBlockTypes::Container, "Container" },
-
-        { LexBlockTypes::Semicolon, "Semicolon" },
-        { LexBlockTypes::Colon, "Colon" },
-        { LexBlockTypes::Assignment, "Assignment" },
-        { LexBlockTypes::Comma, "Comma" },
-
-        { LexBlockTypes::Parentheses, "Parentheses" },
-        { LexBlockTypes::SquareBrackets, "SquareBrackets" },
-        { LexBlockTypes::Scope, "Scope" },
-
-        { LexBlockTypes::Start, "Start" },
-        { LexBlockTypes::End, "End" },
-
-        { LexBlockTypes::Name, "Name" },
-        { LexBlockTypes::Body, "Body" },
-    };
-
     /// <summary>
     /// A range of source representing a group of lexemes, bounded by punctuation
     /// </summary>
@@ -138,11 +113,6 @@ namespace Replica::Effects
     };
 
     /// <summary>
-    /// Filters comments and control codes from source prior to preprocessing
-    /// </summary>
-    void GetSanitizedInput(Span<char> src);
-
-    /// <summary>
     /// Decomposes pre-sanitized source into contiguous chunks represented by LexBlocks
     /// </summary>
     class BlockAnalyzer
@@ -160,17 +130,17 @@ namespace Replica::Effects
 
     private:
         TextBlock src;
-        UniqueVector<int> containers;
         UniqueVector<LexBlock> blocks;
+        UniqueVector<int> containers;
+        const char* pPosOld;
+
         const char* pPos;
         int depth;
         int line;
 
-        void AddBlock(const TextBlock& start, LexBlock& block, string_view filter);
+        void AddBlock(const TextBlock& start);
 
-        LexBlock& GetTopContainer();
-
-        bool TryValidateAngleBlocks();
+        LexBlock* GetTopContainer();
 
         void StartContainer();
 
@@ -178,6 +148,16 @@ namespace Replica::Effects
 
         void AddDirective();
 
-        void CheckForDanglingContainers();
+        void SetState(int blockIndex);
+
+        void RevertContainer(int blockIndex);
+
+        bool GetCanOpenTemplate() const;
+
+        bool GetCanCloseTemplate() const;
+
+        string_view GetBreakFilter() const;
+
+        bool TryFinalizeParse();
     };
 }
