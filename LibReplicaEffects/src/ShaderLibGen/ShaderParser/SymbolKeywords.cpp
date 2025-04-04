@@ -25,6 +25,10 @@ namespace Replica::Effects
         { "struct", TokenTypes::StructDecl },
         { "static", TokenTypes::Static },
         { "const", TokenTypes::Const },
+        { "in", TokenTypes::TypeModifier },
+        { "inout", TokenTypes::TypeModifier },
+        { "out", TokenTypes::TypeModifier },
+        { "uniform", TokenTypes::TypeModifier },
         { "groupshared", TokenTypes::GroupShared }
     };
 
