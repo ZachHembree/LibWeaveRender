@@ -21,6 +21,7 @@ static bool isHeaderLib = false;
 static string featureLevel;
 static string inputPath;
 static string outputPath;
+static string name;
 
 // Option configuration
 static void SetHeaderLib(const IDynamicArray<string_view>& args, int& pos) { isHeaderLib = true; }
@@ -72,6 +73,21 @@ static void SetOutput(const IDynamicArray<string_view>& args, int& pos)
         PARSE_ERR_FMT("Expected output path after {}", args[pos - 1]);
 }
 
+static void SetName(const IDynamicArray<string_view>& args, int& pos)
+{
+    pos++;
+
+    if (pos < args.GetLength() && args[pos][0] != '-')
+    {
+        if (name.empty())
+            name = args[pos];
+        else
+            LOG_ERROR() << "Name specified twice";
+    }
+    else
+        PARSE_ERR_FMT("Expected name after {}", args[pos - 1]);
+}
+
 typedef void (*OptionHandlerFunc)(const IDynamicArray<string_view>& args, int& pos);
 
 static const std::unordered_map<string_view, OptionHandlerFunc> s_OptionMap 
@@ -85,7 +101,9 @@ static const std::unordered_map<string_view, OptionHandlerFunc> s_OptionMap
     { "-i", SetInput },
     { "--input", SetInput },
     { "-o", SetOutput },
-    { "--output", SetOutput }
+    { "--output", SetOutput },
+    { "-n", SetName },
+    { "--name", SetName }
 };
 
 static std::ostream& WriteCharHex(char value, std::ostream& ss)
@@ -188,6 +206,9 @@ static void CreateLibrary()
     else
         output = fs::path(outputPath);
 
+    if (name.empty())
+        name = input.stem().string();
+
     if (featureLevel.empty())
         featureLevel = "5_0";
 
@@ -198,7 +219,7 @@ static void CreateLibrary()
     GetInput(input, inputPath, streamBuf);
 
     // Parse source and generate library
-    ShaderLibDef def = libGen.GetLibrary(inputPath, streamBuf.view());
+    ShaderLibDef def = libGen.GetLibrary(name, inputPath, streamBuf.view());
     streamBuf.clear();
     streamBuf.str({});
 
@@ -206,9 +227,11 @@ static void CreateLibrary()
     Serializer writeTest(streamBuf);
     writeTest(def);
 
+    name = "s_FX_" + name;
+
     // Convert output to hex string header
     if (isHeaderLib)
-        ConvertBinaryToHeader("LibName", strBuf, streamBuf);
+        ConvertBinaryToHeader(name, strBuf, streamBuf);
 
     WriteBinary(output, outputPath, streamBuf);
 

@@ -343,6 +343,16 @@ namespace Replica::Effects
 	struct ShaderLibDef
 	{
 		/// <summary>
+		/// Name of the library
+		/// </summary>
+		string name;
+
+		/// <summary>
+		/// File the library was compiled from
+		/// </summary>
+		string srcPath;
+
+		/// <summary>
 		/// Describes the platform targeted during compilation
 		/// </summary>
 		PlatformDef platform;

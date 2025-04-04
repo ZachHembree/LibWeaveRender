@@ -11,7 +11,7 @@ using namespace Replica::D3D11;
 
 static ShaderLibDef DeserializeLibData()
 {
-	const string_view libData((char*)&LibName[0], std::size(LibName));
+	const string_view libData((char*)&s_FX_DefaultShaders[0], std::size(s_FX_DefaultShaders));
 	std::stringstream bufStream;
 	ShaderLibDef lib;
 

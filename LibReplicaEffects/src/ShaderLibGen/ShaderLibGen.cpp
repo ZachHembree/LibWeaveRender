@@ -22,11 +22,13 @@ ShaderLibGen::ShaderLibGen() :
 
 ShaderLibGen::~ShaderLibGen() = default;
 
-ShaderLibDef ShaderLibGen::GetLibrary(string_view libPath, string_view libSrc)
+ShaderLibDef ShaderLibGen::GetLibrary(string_view name, string_view libPath, string_view libSrc)
 {
 	Clear();
 
 	ShaderLibDef lib;
+	lib.name = name;
+	lib.srcPath = libPath;
 	pVariantGen->SetSrc(libPath, libSrc);
 
 	for (int vID = 0; vID < pVariantGen->GetVariantCount(); vID++)

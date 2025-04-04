@@ -28,7 +28,7 @@ namespace Replica::Effects
 
 		~ShaderLibGen();
 
-		ShaderLibDef GetLibrary(string_view libPath, string_view libSrc);
+		ShaderLibDef GetLibrary(string_view name, string_view libPath, string_view libSrc);
 
 		void SetTarget(PlatformTargets target);
 
