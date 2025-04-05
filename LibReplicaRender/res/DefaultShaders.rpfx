@@ -183,30 +183,30 @@ pixel PS_Textured
 
 effect Default
 {
-	Vertex = VS_Default
-	Pixel = PS_Default
+	Vertex = VS_Default;
+	Pixel = PS_Default;
 }
 
 effect PosTextured2D
 {
-	Vertex = VS_PosTextured
-	Pixel = PS_Textured
+	Vertex = VS_PosTextured;
+	Pixel = PS_Textured;
 }
 
 effect Textured2D
 {
-	Vertex = VS_Textured2D
-	Pixel = PS_Textured
+	Vertex = VS_Textured2D;
+	Pixel = PS_Textured;
 }
 
 effect DebugFlat3D
 {
-	Vertex = VS_3D
-	Pixel = PS_Flat3D
+	Vertex = VS_3D;
+	Pixel = PS_Flat3D;
 }
 
 effect Textured3D
 {
-	Vertex = VS_Textured3D
-	Pixel = PS_Textured
+	Vertex = VS_Textured3D;
+	Pixel = PS_Textured;
 }

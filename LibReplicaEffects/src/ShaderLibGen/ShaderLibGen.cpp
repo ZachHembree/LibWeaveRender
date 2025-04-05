@@ -213,7 +213,7 @@ void ShaderLibGen::GetEffects()
 			ScopeHandle effectScope = *symbol.GetScope();
 			EffectBlock& effect = effectBlocks.emplace_back();
 			effect.nameID = pShaderRegistry->GetOrAddStringID(symbol.GetName());
-			effect.passStart = (uint)effectPasses.GetLength();
+			effect.passStart = 0;
 			effect.passCount = 0; 
 			bool isPassDefaulted = false;
 
@@ -229,6 +229,9 @@ void ShaderLibGen::GetEffects()
 					PARSE_ASSERT_MSG(!isPassDefaulted, 
 						"Defaulted passes and explicit passes cannot be used in the same effect.")
 
+					if (effect.passStart == 0)
+						(uint)effectPasses.GetLength();
+
 					effect.passCount++;
 				}
 			}
@@ -236,6 +239,7 @@ void ShaderLibGen::GetEffects()
 			if (isPassDefaulted)
 			{
 				AddPass(effectScope, "DefaultedPass");
+				effect.passCount = 1;
 			}
 			else
 			{

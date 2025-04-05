@@ -224,8 +224,8 @@ static void CreateLibrary()
     streamBuf.str({});
 
     // Write serialized library binary to ss
-    Serializer writeTest(streamBuf);
-    writeTest(def);
+    Serializer libWriter(streamBuf);
+    libWriter(def);
 
     name = "s_FX_" + name;
 
