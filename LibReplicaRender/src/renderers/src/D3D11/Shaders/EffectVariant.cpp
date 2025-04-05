@@ -59,12 +59,18 @@ uint EffectVariant::GetShaderCount(const int pass) const { return (uint)def.GetS
 
 void EffectVariant::Setup(Context& ctx, int pass, const ResourceSet& res) const
 {
-	for (int i = 0; i < passes.GetLength(); i++)
-		passes[pass][i]->Bind(ctx, res);
+	for (int i = 0; i < passes[pass].GetLength(); i++)
+	{
+		const ShaderVariantBase& shader = *passes[pass][i];
+		shader.Bind(ctx, res);
+	}
 }
 
 void EffectVariant::Reset(Context& ctx, int pass) const
 {
-	for (int i = 0; i < passes.GetLength(); i++)
-		passes[pass][i]->Unbind(ctx);
+	for (int i = 0; i < passes[pass].GetLength(); i++)
+	{
+		const ShaderVariantBase& shader = *passes[pass][i];
+		shader.Unbind(ctx);
+	}
 }
