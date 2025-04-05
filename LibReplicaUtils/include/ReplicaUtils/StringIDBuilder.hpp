@@ -61,6 +61,7 @@ namespace Replica
         void Clear();
 
     private:
+        std::string textBuf;
         // String storage; ID -> string
         std::deque<std::string> strings;
         // string -> ID map

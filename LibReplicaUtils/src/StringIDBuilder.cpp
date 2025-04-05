@@ -15,6 +15,9 @@ StringIDBuilder& StringIDBuilder::operator=(StringIDBuilder&& other) noexcept = 
 /// </summary>
 uint StringIDBuilder::GetOrAddStringID(std::string&& str) noexcept
 {
+    if (str.back() != '\0')
+        str.push_back('\0');
+
     auto it = idMap.find(str);
 
     if (it != idMap.end())
@@ -37,6 +40,14 @@ uint StringIDBuilder::GetOrAddStringID(std::string&& str) noexcept
 /// </summary>
 uint StringIDBuilder::GetOrAddStringID(std::string_view str)
 {
+    if (str.back() != '\0')
+    {
+        textBuf.clear();
+        textBuf.append(str);
+        textBuf.push_back('\0');
+        str = textBuf;
+    }
+
     auto it = idMap.find(str);
 
     if (it != idMap.end())
@@ -97,7 +108,7 @@ StringIDMapDef StringIDBuilder::ExportDefinition() const
     {
         const uint subLen = (uint)strings[i].size();
         def.substrings[2 * i] = charCount;
-        def.substrings[2 * i + 1] = subLen;
+        def.substrings[2 * i + 1] = subLen - 1; // Exclude null terminator
         charCount += subLen;
     }
 
