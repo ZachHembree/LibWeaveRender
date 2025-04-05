@@ -8,32 +8,36 @@ using namespace Replica;
 using namespace Replica::Effects;
 using namespace Replica::D3D11;
 
-ConstantGroupMap::ConstantGroupMap()
+ConstantGroupMap::ConstantGroupMap() :
+	size(0u)
 { }
 
-ConstantGroupMap::ConstantGroupMap(const ConstBufGroupHandle& layout) :
-	group(layout.GetLength()),
+ConstantGroupMap::ConstantGroupMap(const std::optional<ConstBufGroupHandle>& layout) :
+	group(layout.has_value() ? layout->GetLength() : 0u),
 	size(0u)
 {
-	for (int i = 0; i < group.GetLength(); i++)
+	if (layout.has_value())
 	{
-		const ConstBufDefHandle bufDef = layout[i];
-		ConstantMap& map = group[i];
-		uint offset = 0u;
-		map.index = i;
-		map.size = bufDef.GetSize();
-		map.constMap.reserve(layout.GetLength());
-
-		for (int j = 0; j < bufDef.GetLength(); j++)
+		for (int i = 0; i < group.GetLength(); i++)
 		{
-			const ConstDef& member = bufDef[i];
-			const Constant entry(member.size, offset);
+			const ConstBufDefHandle bufDef = (*layout)[i];
+			ConstantMap& map = group[i];
+			uint offset = 0u;
+			map.index = i;
+			map.size = bufDef.GetSize();
+			map.constMap.reserve(layout->GetLength());
 
-			map.constMap.emplace(member.stringID, entry);
-			offset += member.size;
+			for (int j = 0; j < bufDef.GetLength(); j++)
+			{
+				const ConstDef& member = bufDef[i];
+				const Constant entry(member.size, offset);
+
+				map.constMap.emplace(member.stringID, entry);
+				offset += member.size;
+			}
+
+			size += map.size;
 		}
-
-		size += map.size;
 	}
 }
 

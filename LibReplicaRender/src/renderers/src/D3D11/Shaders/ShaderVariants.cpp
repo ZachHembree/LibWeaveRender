@@ -55,7 +55,9 @@ void ComputeShaderVariant::Unbind(Context& ctx) const
 void ComputeShaderVariant::MapResources(Context& ctx, const ResourceSet& res) const
 {
 	ShaderVariant::MapResources(ctx, res);
-	ctx.SetUAVs(res.GetUAVs(), uavMap);
+
+	if (res.GetUAVs().GetLength() > 0)
+		ctx.SetUAVs(res.GetUAVs(), uavMap);
 }
 
 void ComputeShaderVariant::UnmapResources(Context& ctx) const

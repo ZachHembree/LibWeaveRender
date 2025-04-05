@@ -18,6 +18,7 @@ ShaderVariantBase::ShaderVariantBase() :
 ShaderVariantBase::ShaderVariantBase(Device& dev, const ShaderDefHandle& def) :
 	DeviceChild(dev),
 	def(def),
+	constants(def.GetConstantBuffers()),
 	sampMap(def.GetResources(), ShaderTypes::Sampler),
 	srvMap(def.GetResources(), ShaderTypes::Texture)
 { 
@@ -38,11 +39,18 @@ ShaderVariantBase& ShaderVariantBase::operator=(ShaderVariantBase&& other) noexc
 void ShaderVariantBase::MapResources(Context& ctx, const ResourceSet& res) const
 {
 	const ShadeStages stage = def.GetStage();
-	ctx.SetSamplers(res.GetSamplers(), sampMap, stage);
-	ctx.SetSRVs(res.GetSRVs(), srvMap, stage);
 
-	const IDynamicArray<Span<byte>>& constData = res.GetMappedConstants(constants);
-	ctx.SetConstants(constData, cbufs, stage);
+	if (res.GetSamplers().GetLength() > 0)
+		ctx.SetSamplers(res.GetSamplers(), sampMap, stage);
+
+	if (res.GetSRVs().GetLength() > 0)
+		ctx.SetSRVs(res.GetSRVs(), srvMap, stage);
+
+	if (constants.GetBufferCount() > 0)
+	{
+		const IDynamicArray<Span<byte>>& constData = res.GetMappedConstants(constants);
+		ctx.SetConstants(constData, cbufs, stage);
+	}
 }
 
 void ShaderVariantBase::UnmapResources(Context& ctx) const
@@ -50,5 +58,7 @@ void ShaderVariantBase::UnmapResources(Context& ctx) const
 	const ShadeStages stage = def.GetStage();
 	ctx.ClearSamplers(0, (uint)sampMap.GetCount(), stage);
 	ctx.ClearSRVs(0, (uint)srvMap.GetCount(), stage);
-	ctx.ClearConstants(0, (uint)constants.GetBufferCount(), stage);
+
+	if (constants.GetBufferCount() > 0)
+		ctx.ClearConstants(0, (uint)constants.GetBufferCount(), stage);
 }

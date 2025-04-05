@@ -32,7 +32,7 @@ namespace Replica::D3D11
 		/// The layout defines the total size and the metadata (offset and size)
 		/// for each constant stored in the map.
 		/// </summary>
-		ConstantGroupMap(const ConstBufGroupHandle& layout);
+		ConstantGroupMap(const std::optional<ConstBufGroupHandle>& layout);
 
 		/// <summary>
 		/// Returns true if a member with the given string ID is registered to the map
