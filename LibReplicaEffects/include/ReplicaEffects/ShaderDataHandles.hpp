@@ -1,5 +1,6 @@
 #pragma once
 #include "ReplicaEffects/ShaderData.hpp"
+#include <optional>
 
 namespace Replica::Effects
 {
@@ -173,22 +174,22 @@ namespace Replica::Effects
 		/// <summary>
 		/// Returns the input layout/signature for the shader
 		/// </summary>
-		IOLayoutHandle GetInLayout() const;
+		std::optional <IOLayoutHandle> GetInLayout() const;
 
 		/// <summary>
 		/// Returns the output/return signature for the shader
 		/// </summary>
-		IOLayoutHandle GetOutLayout() const;
+		std::optional <IOLayoutHandle> GetOutLayout() const;
 
 		/// <summary>
 		/// Returns the unique set of resources required by the shader
 		/// </summary>
-		ResourceGroupHandle GetResources() const;
+		std::optional<ResourceGroupHandle> GetResources() const;
 
 		/// <summary>
 		/// Returns the constant buffers used by the shader
 		/// </summary>
-		ConstBufGroupHandle GetConstantBuffers() const;
+		std::optional <ConstBufGroupHandle> GetConstantBuffers() const;
 
 		/// <summary>
 		/// Map for stringID lookup

@@ -21,12 +21,13 @@ ShaderVariantBase::ShaderVariantBase(Device& dev, const ShaderDefHandle& def) :
 	sampMap(def.GetResources(), ShaderTypes::Sampler),
 	srvMap(def.GetResources(), ShaderTypes::Texture)
 { 
-	ConstBufGroupHandle bufData = def.GetConstantBuffers();
-	cbufs = UniqueArray<ConstantBuffer>(bufData.GetLength());
+	std::optional<ConstBufGroupHandle> bufData = def.GetConstantBuffers();
+	if (bufData.has_value())
+	{ 
+		cbufs = UniqueArray<ConstantBuffer>(bufData->GetLength());
 
-	for (int i = 0; i < cbufs.GetLength(); i++)
-	{
-		cbufs[i] = ConstantBuffer(dev, bufData[i].GetSize());
+		for (int i = 0; i < cbufs.GetLength(); i++)
+			cbufs[i] = ConstantBuffer(dev, (*bufData)[i].GetSize());
 	}
 }
 

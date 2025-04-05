@@ -234,6 +234,8 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 
 		def.inLayoutID = builder.GetOrAddIOLayout(std::move(inSignature));
 	}
+	else
+		def.inLayoutID = -1;
 
 	// Output params
 	if (shaderDesc.OutputParameters > 0)
@@ -249,6 +251,8 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 
 		def.outLayoutID = builder.GetOrAddIOLayout(std::move(retSignature));
 	}
+	else
+		def.outLayoutID = -1;
 }
 
 /// <summary>
@@ -292,6 +296,8 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 
 		def.cbufGroupID = builder.GetOrAddCBufGroup(std::move(cbufGroup));
 	}
+	else
+		def.cbufGroupID = -1;
 }
 
 /// <summary>
@@ -327,6 +333,8 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 
 		def.resLayoutID = builder.GetOrAddResGroup(std::move(resources));
 	}
+	else
+		def.resLayoutID = -1;
 }
 
 /// <summary>

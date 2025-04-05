@@ -25,16 +25,19 @@ namespace Replica::D3D11
 		ResourceMap& operator=(const ResourceMap& other) = default;
 		ResourceMap& operator=(ResourceMap&& other) = default;
 
-		ResourceMap(const ResourceGroupHandle& resources, ShaderTypes type)
+		ResourceMap(const std::optional<ResourceGroupHandle>& resources, ShaderTypes type)
 		{
-			uint count = 0;
+			if (resources.has_value())
+			{ 
+				uint count = 0;
 
-			for (int i = 0; i < resources.GetLength(); i++)
-			{
-				if (resources[i].GetHasFlags(type))
+				for (int i = 0; i < resources->GetLength(); i++)
 				{
-					resourceMap.emplace(resources[i].stringID, count);
-					count++;
+					if ((*resources)[i].GetHasFlags(type))
+					{
+						resourceMap.emplace((*resources)[i].stringID, count);
+						count++;
+					}
 				}
 			}
 		}

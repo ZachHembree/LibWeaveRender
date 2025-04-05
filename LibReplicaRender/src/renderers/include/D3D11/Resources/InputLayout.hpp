@@ -23,7 +23,7 @@ namespace Replica::D3D11
 			Device& dev,
 			const byte* pVS,
 			size_t srcSize,
-			IOLayoutHandle layout
+			std::optional<IOLayoutHandle> layout
 		);
 
 		/// <summary>

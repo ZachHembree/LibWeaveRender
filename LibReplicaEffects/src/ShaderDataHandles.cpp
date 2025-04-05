@@ -44,13 +44,37 @@ ShadeStages ShaderDefHandle::GetStage() const { return pDef->stage; }
 
 tvec3<uint> ShaderDefHandle::GetThreadGroupSize() const { return pDef->threadGroupSize; }
 
-IOLayoutHandle ShaderDefHandle::GetInLayout() const { return IOLayoutHandle(*pMap, pDef->inLayoutID); }
+std::optional <IOLayoutHandle> ShaderDefHandle::GetInLayout() const
+{ 
+	if (pDef->inLayoutID != -1)
+		return IOLayoutHandle(*pMap, pDef->inLayoutID);
+	else
+		return std::nullopt;
+}
 
-IOLayoutHandle ShaderDefHandle::GetOutLayout() const { return IOLayoutHandle(*pMap, pDef->outLayoutID); }
+std::optional <IOLayoutHandle> ShaderDefHandle::GetOutLayout() const 
+{ 
+	if (pDef->outLayoutID != -1)
+		return IOLayoutHandle(*pMap, pDef->outLayoutID);
+	else
+		return std::nullopt;
+}
 
-ResourceGroupHandle ShaderDefHandle::GetResources() const { return ResourceGroupHandle(*pMap, pDef->resLayoutID); }
+std::optional<ResourceGroupHandle> ShaderDefHandle::GetResources() const
+{ 
+	if (pDef->resLayoutID != -1)
+		return ResourceGroupHandle(*pMap, pDef->resLayoutID);
+	else
+		return std::nullopt;
+}
 
-ConstBufGroupHandle ShaderDefHandle::GetConstantBuffers() const { return ConstBufGroupHandle(*pMap, pDef->cbufGroupID); }
+std::optional <ConstBufGroupHandle> ShaderDefHandle::GetConstantBuffers() const
+{ 
+	if (pDef->cbufGroupID != -1)
+		return ConstBufGroupHandle(*pMap, pDef->cbufGroupID);
+	else
+		return std::nullopt;
+}
 
 const StringIDMap& ShaderDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
 

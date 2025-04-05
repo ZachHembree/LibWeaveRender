@@ -51,31 +51,34 @@ InputLayout::InputLayout(
 	Device& dev,
 	const byte* pVS,
 	size_t srcSize,
-	IOLayoutHandle desc
+	std::optional<IOLayoutHandle> desc
 ) : DeviceChild(dev)
 {
-	GFX_ASSERT(desc.GetLength() <= 15, "Vertex input layout size limit exceeded")
-	D3D11_INPUT_ELEMENT_DESC descBuf[15];
-
-	for (int i = 0; i < desc.GetLength(); i++)
+	if (desc.has_value())
 	{
-		descBuf[i].Format = GetFormat(desc[i]);
-		descBuf[i].SemanticIndex = desc[i].semanticIndex;
-		descBuf[i].SemanticName = desc.GetStringMap().GetString(desc[i].semanticID).data();
+		GFX_ASSERT(desc->GetLength() <= 15, "Vertex input layout size limit exceeded")
+			D3D11_INPUT_ELEMENT_DESC descBuf[15];
 
-		descBuf[i].InputSlot = 0u;
-		descBuf[i].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		descBuf[i].InstanceDataStepRate = 0u;
-		descBuf[i].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		for (int i = 0; i < desc->GetLength(); i++)
+		{
+			descBuf[i].Format = GetFormat((*desc)[i]);
+			descBuf[i].SemanticIndex = (*desc)[i].semanticIndex;
+			descBuf[i].SemanticName = desc->GetStringMap().GetString((*desc)[i].semanticID).data();
+
+			descBuf[i].InputSlot = 0u;
+			descBuf[i].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+			descBuf[i].InstanceDataStepRate = 0u;
+			descBuf[i].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		}
+
+		GFX_THROW_FAILED(dev->CreateInputLayout(
+			reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(&descBuf),
+			(uint)desc->GetLength(),
+			pVS,
+			(uint)srcSize,
+			&pLayout
+		));
 	}
-
-	GFX_THROW_FAILED(dev->CreateInputLayout(
-		reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(&descBuf),
-		(uint)desc.GetLength(),
-		pVS,
-		(uint)srcSize,
-		&pLayout
-	));
 }
 
 ID3D11InputLayout* InputLayout::Get() const { return pLayout.Get(); };
