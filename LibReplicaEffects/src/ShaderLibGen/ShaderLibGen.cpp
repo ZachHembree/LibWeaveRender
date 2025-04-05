@@ -46,13 +46,13 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view name, string_view libPath, str
 				InitLibrary(lib);
 
 			LOG_INFO() << "Generating variant: " << vID;
+			// Shaders
 			GetEntryPoints();
-			GetEffects();
-
 			lib.variants[vID].shaders = DynamicArray<ShaderVariantDef>(entrypoints.GetLength());
-			lib.variants[vID].effects = DynamicArray<EffectVariantDef>(effectBlocks.GetLength());
-
 			GetShaderDefs(libPath, lib.variants[vID].shaders, vID);
+			// Effects
+			GetEffects();
+			lib.variants[vID].effects = DynamicArray<EffectVariantDef>(effectBlocks.GetLength());
 			GetEffectDefs(lib.variants[vID].effects, vID);
 		}
 		else
