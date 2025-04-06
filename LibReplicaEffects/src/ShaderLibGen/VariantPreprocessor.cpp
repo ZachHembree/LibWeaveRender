@@ -3,6 +3,21 @@
 
 namespace Replica::Effects
 { 
+	static StringSpan AddStringSpan(string_view substr, Vector<StringSpan>& spanBuf, string& textBuf)
+	{
+		const uint bufStart = (uint)textBuf.length();
+		uint subLen = (uint)substr.length();
+		textBuf.append(substr);
+
+		if (substr.back() != '\0')
+		{
+			textBuf.push_back('\0');
+			subLen++;
+		}
+
+		return spanBuf.emplace_back(textBuf, bufStart, subLen);
+	}
+
 	VariantPreprocessor::VariantPreprocessor() : 
 		isInitialized(false), 
 		pEntrypoints(nullptr)
@@ -17,11 +32,11 @@ namespace Replica::Effects
 
 	bool VariantPreprocessor::GetIsInitialized() const { return isInitialized; }
 
-	void VariantPreprocessor::AddMacro(std::string_view macro) { macroBuf.emplace_back(macro); }
+	void VariantPreprocessor::AddMacro(std::string_view macro) { AddStringSpan(macro, macroStarts, textBuf); }
 
-	void VariantPreprocessor::AddSystemIncludePath(std::string_view path) { sysIncludeBuf.emplace_back(path); }
+	void VariantPreprocessor::AddSystemIncludePath(std::string_view path) { AddStringSpan(path, sysIncludeStarts, textBuf); }
 
-	void VariantPreprocessor::AddIncludePath(std::string_view path) { includeBuf.emplace_back(path); }
+	void VariantPreprocessor::AddIncludePath(std::string_view path) { AddStringSpan(path, includeStarts, textBuf); }
 
 	void VariantPreprocessor::Clear()
 	{
@@ -29,12 +44,12 @@ namespace Replica::Effects
 		filePath = std::string_view();
 		isInitialized = false;
 
-		macroBuf.clear();
-		sysIncludeBuf.clear();
-		includeBuf.clear();
+		textBuf.clear();
+		macroStarts.clear();
+		sysIncludeStarts.clear();
+		includeStarts.clear();
 
 		variantDefineSet.clear();
-		variantDefineBuf.clear();
 
 		variantModes.clear();
 		variantFlags.clear();
@@ -45,9 +60,9 @@ namespace Replica::Effects
 
 	std::string VariantPreprocessor::GetWaveVerString() { return WaveContext::get_version_string(); }
 
-	void VariantPreprocessor::GetVariant(const int variantID, string& dst, Vector<ShaderEntrypoint>& entrypoints)
+	void VariantPreprocessor::GetVariant(const uint variantID, string& dst, Vector<ShaderEntrypoint>& entrypoints)
 	{
-		PARSE_ASSERT_MSG(variantID >= 0 && variantID < std::max<size_t>(1, GetVariantCount()), "Invalid variant ID");
+		PARSE_ASSERT_MSG(variantID != -1 && variantID < std::max<uint>(1u, GetVariantCount()), "Invalid variant ID");
 		pEntrypoints = &entrypoints;
 
 		// Initialize context to source
@@ -56,14 +71,14 @@ namespace Replica::Effects
 		ctx.set_language(VarProcLangFlags);
 
 		// Configure include paths
-		for (const string& sysInclude : sysIncludeBuf)
-			ctx.add_sysinclude_path(sysInclude.data());
+		for (const StringSpan& sysInclude : sysIncludeStarts)
+			ctx.add_sysinclude_path(sysInclude.GetFirst());
 
-		for (const string& include : includeBuf)
-			ctx.add_include_path(include.data());
+		for (const StringSpan& include : includeStarts)
+			ctx.add_include_path(include.GetFirst());
 
 		// Configure external macros
-		for (const string& macro : macroBuf)
+		for (const StringSpan& macro : macroStarts)
 			ctx.add_macro_definition(macro);
 
 		// Convert ID into bit flags and set defines
@@ -74,14 +89,14 @@ namespace Replica::Effects
 			const int id = 1 << i;
 
 			if ((id & flagID) > 0)
-				ctx.add_macro_definition(variantFlags[i].data());
+				ctx.add_macro_definition(variantFlags[i]);
 		}
 
 		// Set mode define
-		const int enumID = variantID / GetFlagVariantCount();
+		const uint enumID = variantID / GetFlagVariantCount();
 
 		if (enumID > 0)
-			ctx.add_macro_definition(variantModes[enumID].data());
+			ctx.add_macro_definition(variantModes[enumID]);
 
 		// Process directives
 		for (const WaveLexToken& token : ctx)
@@ -94,22 +109,22 @@ namespace Replica::Effects
 		pEntrypoints = nullptr;
 	}
 
-	int VariantPreprocessor::GetFlagVariantCount() const { return 1 << (variantFlags.GetLength()); }
+	uint VariantPreprocessor::GetFlagVariantCount() const { return 1u << (variantFlags.GetLength()); }
 
-	int VariantPreprocessor::GetShaderModeCount() const { return (int)variantModes.GetLength(); }
+	uint VariantPreprocessor::GetShaderModeCount() const { return (uint)variantModes.GetLength(); }
 
-	int VariantPreprocessor::GetVariantCount() const { return GetFlagVariantCount() * std::max(1, GetShaderModeCount()); }
+	uint VariantPreprocessor::GetVariantCount() const { return GetFlagVariantCount() * std::max(1u, GetShaderModeCount()); }
 
 	void VariantPreprocessor::AddVariantFlag(string_view flag) 
 	{
 		if (!isInitialized)
 		{
-			if (!variantDefineSet.contains(flag))
-			{ 
-				PARSE_ASSERT_MSG(variantFlags.GetLength() < VariantFlagLimit, "Flag pragma limit exceeded")
+			const StringSpan& span = AddStringSpan(flag, variantFlags, textBuf);
 
-				string& flagCpy = variantDefineBuf.emplace_back(flag);
-				variantDefineSet.emplace(variantFlags.emplace_back(flagCpy));
+			if (!variantDefineSet.contains(span))
+			{ 
+				PARSE_ASSERT_MSG(variantFlags.GetLength() < g_VariantFlagLimit, "Flag pragma limit exceeded")
+				variantDefineSet.emplace(span);
 			}
 			else
 				PARSE_ERR("Attempted to redefine pragma flag or mode")
@@ -120,12 +135,12 @@ namespace Replica::Effects
 	{
 		if (!isInitialized)
 		{
-			if (!variantDefineSet.contains(modeName))
+			const StringSpan& span = AddStringSpan(modeName, variantModes, textBuf);
+
+			if (!variantDefineSet.contains(span))
 			{ 
-				PARSE_ASSERT_MSG(variantModes.GetLength() < VariantModeLimit, "Mode pragma limit exceeded")
-			
-				string& flagCpy = variantDefineBuf.emplace_back(modeName);
-				variantDefineSet.emplace(variantModes.emplace_back(flagCpy));
+				PARSE_ASSERT_MSG(variantModes.GetLength() < g_VariantModeLimit, "Mode pragma limit exceeded")		
+				variantDefineSet.emplace(span);
 			}
 			else
 				PARSE_ERR("Attempted to redefine pragma flag or mode")
@@ -137,9 +152,9 @@ namespace Replica::Effects
 		pEntrypoints->emplace_back(string(shaderName), stage);
 	}
 
-	const IDynamicArray<string_view>& VariantPreprocessor::GetVariantFlags() const { return variantFlags; }
+	const IDynamicArray<StringSpan>& VariantPreprocessor::GetVariantFlags() const { return variantFlags; }
 
-	const IDynamicArray<string_view>& VariantPreprocessor::GetVariantModes() const { return variantModes; }
+	const IDynamicArray<StringSpan>& VariantPreprocessor::GetVariantModes() const { return variantModes; }
 
 	WaveContextPolicy::WaveContextPolicy() : pMain(nullptr)
 	{ }
@@ -162,7 +177,7 @@ namespace Replica::Effects
 		const string_view optName(optString.begin(), optString.end());
 		ShadeStages stage;
 
-		if (optName == VariantFlagsKeyword)
+		if (optName == g_VariantFlagsKeyword)
 		{
 			for (const WaveLexToken& lexToken : values)
 			{
@@ -175,7 +190,7 @@ namespace Replica::Effects
 
 			return true;
 		}
-		else if (optName == VariantModesKeyword)
+		else if (optName == g_VariantModesKeyword)
 		{
 			for (const WaveLexToken& lexToken : values)
 			{

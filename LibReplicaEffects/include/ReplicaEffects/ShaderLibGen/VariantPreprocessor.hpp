@@ -2,16 +2,19 @@
 #include <unordered_set>
 #include <list>
 #include "ReplicaUtils/Utils.hpp"
+#include "ReplicaUtils/StringSpan.hpp"
 #include "boost/wave/cpp_exceptions.hpp"
 #include "ShaderEntrypoint.hpp"
 
 namespace Replica::Effects
 {
-	constexpr string_view VariantFlagsKeyword = "flags";
-	constexpr uint VariantFlagLimit = 8;
+	constexpr string_view g_VariantFlagsKeyword = "flags";
+	constexpr uint g_VariantFlagLimit = 8u;
 
-	constexpr string_view VariantModesKeyword = "modes";
-	constexpr uint VariantModeLimit = 256;
+	constexpr string_view g_VariantModesKeyword = "modes";
+	constexpr uint g_VariantModeLimit = 256u;
+
+	constexpr uint g_VariantGroupMask = 0xFFFFu;
 
 	/// <summary>
 	/// Base class for exceptions thrown by Wave
@@ -57,23 +60,23 @@ namespace Replica::Effects
 		/// Generates variant with flags corresponding to the given index and returns 
 		/// reference to temporary buffer
 		/// </summary>
-		void GetVariant(const int variantID, string& dst, Vector<ShaderEntrypoint>& entrypoints);
+		void GetVariant(const uint variantID, string& dst, Vector<ShaderEntrypoint>& entrypoints);
 
 		/// <summary>
 		/// Returns the total number of compile flag combos
 		/// </summary>
-		int GetFlagVariantCount() const;
+		uint GetFlagVariantCount() const;
 
 		/// <summary>
 		/// Returns the number of shader modes
 		/// </summary>
-		int GetShaderModeCount() const;
+		uint GetShaderModeCount() const;
 
 		/// <summary>
 		/// Returns the number of unique shader variants. Only valid after variant 0 is
 		/// generated.
 		/// </summary>
-		int GetVariantCount() const;
+		uint GetVariantCount() const;
 
 		/// <summary>
 		/// Add external variant flag
@@ -93,12 +96,12 @@ namespace Replica::Effects
 		/// <summary>
 		/// Returns the current list of variant flags
 		/// </summary>
-		const IDynamicArray<string_view>& GetVariantFlags() const;
+		const IDynamicArray<StringSpan>& GetVariantFlags() const;
 
 		/// <summary>
 		/// Returns the current list of variant modes
 		/// </summary>
-		const IDynamicArray<string_view>& GetVariantModes() const;
+		const IDynamicArray<StringSpan>& GetVariantModes() const;
 
 		/// <summary>
 		/// Resets the preprocessor and clears internal state
@@ -115,15 +118,15 @@ namespace Replica::Effects
 		string_view filePath;
 		bool isInitialized;
 
-		UniqueVector<string> macroBuf;
-		UniqueVector<string> sysIncludeBuf;
-		UniqueVector<string> includeBuf;
+		string textBuf;
+		UniqueVector<StringSpan> macroStarts;
+		UniqueVector<StringSpan> sysIncludeStarts;
+		UniqueVector<StringSpan> includeStarts;
+		UniqueVector<StringSpan> variantModes;
+		UniqueVector<StringSpan> variantFlags;
 
-		UniqueVector<string_view> variantModes;
-		UniqueVector<string_view> variantFlags;
 		Vector<ShaderEntrypoint>* pEntrypoints;
 
-		std::unordered_set<string_view> variantDefineSet;
-		std::list<string> variantDefineBuf;
+		std::unordered_set<StringSpan> variantDefineSet;
 	};
 }
