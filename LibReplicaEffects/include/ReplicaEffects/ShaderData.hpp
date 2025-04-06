@@ -340,10 +340,10 @@ namespace Replica::Effects
 	/// Serializable collection of effect and shader variants compiled from the same
 	/// effect file.
 	/// </summary>
-	struct ShaderLibDef
+	struct VariantRepoDef
 	{
 		/// <summary>
-		/// Name of the library
+		/// Name of the repo
 		/// </summary>
 		string name;
 
@@ -351,11 +351,6 @@ namespace Replica::Effects
 		/// File the library was compiled from
 		/// </summary>
 		string srcPath;
-
-		/// <summary>
-		/// Describes the platform targeted during compilation
-		/// </summary>
-		PlatformDef platform;
 
 		/// <summary>
 		/// Flag names used for static shader variant generation
@@ -371,23 +366,28 @@ namespace Replica::Effects
 		/// Array of shaders and effects for each variant
 		/// </summary>
 		DynamicArray<VariantDef> variants;
-
-		/// <summary>
-		/// Stores a serializable collection of all unique effects, shaders and requisite metadata
-		/// required by the library definition.
-		/// </summary>
-		ShaderRegistryDef regData;
 	};
 
 	/// <summary>
-	/// Serializable collection of shader libraries compiled for a given platform
+	/// Serializable collection of shaders and their variants from one or more source files
 	/// </summary>
-	struct ShaderRepoDef
+	struct ShaderLibDef
 	{
+		/// <summary>
+		/// Describes the platform targeted during compilation
+		/// </summary>
+		PlatformDef platform;
+
 		/// <summary>
 		/// A collection of independent shader libraries from at least one effect file
 		/// </summary>
-		DynamicArray<ShaderLibDef> libraries;
+		DynamicArray<VariantRepoDef> repos;
+
+		/// <summary>
+		/// Stores a serializable collection of all unique effects, shaders and requisite metadata
+		/// required by library definitions
+		/// </summary>
+		ShaderRegistryDef regData;
 	};
 }
 

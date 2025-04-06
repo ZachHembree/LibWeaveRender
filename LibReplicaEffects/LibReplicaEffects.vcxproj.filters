@@ -54,7 +54,7 @@
     <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibMap.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderRepoMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ReplicaEffects\ShaderLibGen\SymbolHandles.hpp">
@@ -85,6 +85,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ReplicaEffects\ShaderDataHandles.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ReplicaEffects\ShaderLibMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -122,13 +125,13 @@
     <ClCompile Include="src\ShaderLibGen\ShaderGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibMap.cpp">
+    <ClCompile Include="src\ShaderRepoMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderLibGen\VariantPreprocessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderLibGen.cpp">
+    <ClCompile Include="src\ShaderLibGen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderLibGen\ShaderRegistryBuilder.cpp">
@@ -141,6 +144,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderLibMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

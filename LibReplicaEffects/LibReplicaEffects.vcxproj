@@ -29,6 +29,7 @@
     <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderEntrypoint.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderGenerator.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibMap.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderRepoMap.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\BlockAnalyzer.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\ScopeBuilder.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderData.hpp" />
@@ -49,12 +50,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderLibGen.cpp" />
+    <ClCompile Include="src\ShaderLibGen.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderRegistryBuilder.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderCompilerD3D11.cpp" />
     <ClCompile Include="src\ShaderDataHandles.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderGenerator.cpp" />
     <ClCompile Include="src\ShaderLibMap.cpp" />
+    <ClCompile Include="src\ShaderRepoMap.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderParser\BlockAnalyzer.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderParser\MatchingPatterns.cpp" />
     <ClCompile Include="src\ShaderLibGen\ShaderParser\ScopeBuilder.cpp" />

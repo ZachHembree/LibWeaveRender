@@ -219,13 +219,13 @@ static void CreateLibrary()
     GetInput(input, inputPath, streamBuf);
 
     // Parse source and generate library
-    ShaderLibDef def = libGen.GetLibrary(name, inputPath, streamBuf.view());
+    ShaderLibDef shaderLib = libGen.GetLibrary(name, inputPath, streamBuf.view());
     streamBuf.clear();
     streamBuf.str({});
 
     // Write serialized library binary to ss
     Serializer libWriter(streamBuf);
-    libWriter(def);
+    libWriter(shaderLib);
 
     name = "s_FX_" + name;
 
@@ -236,12 +236,10 @@ static void CreateLibrary()
     WriteBinary(output, outputPath, streamBuf);
 
     LOG_INFO() << "Wrote library to " << outputPath;
-    LOG_INFO() << "Library Stats: "
-        << "Variants: " << def.variants.GetLength()
-        << " | Shaders: " << def.regData.shaders.GetLength()
-        << " | Effects: " << def.regData.effects.GetLength()
-        << " | Constants: " << def.regData.constants.GetLength()
-        << " | Resources: " << def.regData.resources.GetLength();
+    LOG_INFO() << "Library Stats: Shaders: " << shaderLib.regData.shaders.GetLength()
+        << " | Effects: " << shaderLib.regData.effects.GetLength()
+        << " | Constants: " << shaderLib.regData.constants.GetLength()
+        << " | Resources: " << shaderLib.regData.resources.GetLength();
 }
 
 /// <summary>

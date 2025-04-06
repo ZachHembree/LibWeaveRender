@@ -11,10 +11,6 @@ using namespace Replica::D3D11;
 
 ShaderLibrary::ShaderLibrary() = default;
 
-ShaderLibrary::ShaderLibrary(Renderer& renderer, const ShaderLibDef& def) :
-	pManager(new ShaderVariantManager(renderer.GetDevice(), std::move(def)))
-{ }
-
 ShaderLibrary::ShaderLibrary(Renderer& renderer, ShaderLibDef&& def) :
 	pManager(new ShaderVariantManager(renderer.GetDevice(), std::move(def)))
 { }

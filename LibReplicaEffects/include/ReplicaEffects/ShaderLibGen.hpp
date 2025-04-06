@@ -80,7 +80,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Initializes the library variants and corresponding flags
 		/// </summary>
-		void InitLibrary(ShaderLibDef& lib);
+		void InitLibrary(VariantRepoDef& lib);
 
 		/// <summary>
 		/// Identifies shaders in the source and buffers their entrypoint symbols
@@ -100,7 +100,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Generates shader definitions for every shader in a variant
 		/// </summary>
-		void GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& shaders, const int vID);
+		void GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& variants, const int vID);
 
 		/// <summary>
 		/// Generates effect definitions for every effect in a variant

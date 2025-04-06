@@ -17,8 +17,6 @@ namespace Replica::D3D11
 
 		ShaderLibrary();
 
-		ShaderLibrary(Renderer& renderer, const ShaderLibDef& def);
-
 		ShaderLibrary(Renderer& renderer, ShaderLibDef&& def);
 
 		~ShaderLibrary();
