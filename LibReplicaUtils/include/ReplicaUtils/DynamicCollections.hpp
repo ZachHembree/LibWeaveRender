@@ -210,6 +210,22 @@ namespace Replica
 			return std::equal(left.begin(), left.end(), right.begin());
 	}
 
+	template<typename T, typename IndexT>
+	requires std::is_integral<IndexT>::value
+	T& GetArrayAtIndex(T* pStart, IndexT index, IndexT length)
+	{
+#if _CONTAINER_DEBUG_LEVEL > 0
+		if (index >= length)
+		{
+			char buffer[100];
+			sprintf_s(buffer, 100, "Array index out of range. Index: %tu, Length %tu", index, length);
+
+			throw std::exception(buffer);
+		}
+#endif
+		return pStart[index];
+	}
+
 	/// <summary>
 	/// Returns true if the contents of the arrays are equal
 	/// </summary>
@@ -425,38 +441,12 @@ namespace Replica
 		/// <summary>
 		/// Provides indexed access to array member references.
 		/// </summary>
-		T& operator[](size_t index) override
-		{
-#if _CONTAINER_DEBUG_LEVEL > 0
-			if (index >= length)
-			{
-				char buffer[100];
-				sprintf_s(buffer, 100, "Array index out of range. Index: %tu, Length %tu", index, length);
-
-				throw std::exception(buffer);
-			}
-#endif
-
-			return data[index];
-		}
+		T& operator[](size_t index) override { return GetArrayAtIndex(data, index, length); }
 
 		/// <summary>
 		/// Provides indexed access to array members using constant references.
 		/// </summary>
-		const T& operator[](size_t index) const override
-		{
-#if _CONTAINER_DEBUG_LEVEL > 0
-			if (index >= length)
-			{
-				char buffer[100];
-				sprintf_s(buffer, 100, "Array index out of range. Index: %tu, Length %tu", index, length);
-
-				throw std::exception(buffer);
-			}
-#endif
-
-			return data[index];
-		}
+		const T& operator[](size_t index) const override { return GetArrayAtIndex(data, index, length); }
 
 		/// <summary>
 		/// Returns a copy of the pointer to the backing the array.
@@ -749,38 +739,12 @@ namespace Replica
 		/// <summary>
 		/// Provides indexed access to vector member references.
 		/// </summary>
-		T& operator[](size_t index) override 
-		{ 
-#if _CONTAINER_DEBUG_LEVEL > 0
-			if (index >= this->size())
-			{
-				char buffer[100];
-				sprintf_s(buffer, 100, "Vector index out of range. Index: %tu, Length %tu", index, this->size());
-
-				throw std::exception(buffer);
-			}
-#endif
-
-			return this->at(index); 
-		}
+		T& operator[](size_t index) override { return GetArrayAtIndex(this->data(), index, this->size()); }
 
 		/// <summary>
 		/// Provides indexed access to vector members using constant references.
 		/// </summary>
-		const T& operator[](size_t index) const override 
-		{ 
-#if _CONTAINER_DEBUG_LEVEL > 0
-			if (index >= this->size())
-			{
-				char buffer[100];
-				sprintf_s(buffer, 100, "Vector index out of range. Index: %tu, Length %tu", index, this->size());
-
-				throw std::exception(buffer);
-			}
-#endif
-
-			return this->at(index); 
-		}
+		const T& operator[](size_t index) const override { return GetArrayAtIndex(this->data(), index, this->size()); }
 
 		/// <summary>
 		/// Returns a new copy of the unique vector.

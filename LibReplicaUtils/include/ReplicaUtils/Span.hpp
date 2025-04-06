@@ -14,7 +14,7 @@
 namespace Replica
 { 
 	/// <summary>
-	/// Represents a contiguous section of an array
+	/// Represents a contiguous section of a fixed length array
 	/// </summary>
 	template<typename T>
 	class Span : public IDynamicArray<T>
@@ -146,5 +146,14 @@ namespace Replica
 		protected:
 			T* pStart;
 			size_t length;
+	};
+}
+
+namespace std
+{
+	template<typename T>
+	struct hash<Replica::Span<T>>
+	{
+		size_t operator()(const Replica::Span<T>& arr) const noexcept { return arr.GetHash(); }
 	};
 }

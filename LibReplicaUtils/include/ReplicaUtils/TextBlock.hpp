@@ -39,18 +39,12 @@ namespace Replica
         /// <summary>
         /// Returns true if the given substring is present at or after the given start.
         /// </summary>
-        bool Contains(const string_view& substr, const char* pStart = nullptr) const
-        {
-            return Find(substr, pStart) != nullptr;
-        }
+        bool Contains(const string_view& substr, const char* pStart = nullptr) const;
 
         /// <summary>
         /// Returns true if the given substring is present at or after the given start.
         /// </summary>
-        bool Contains(const char* substr, int subLen, const char* pStart = nullptr) const
-        {
-            return Find(substr, subLen, pStart) != nullptr;
-        }
+        bool Contains(const char* substr, int subLen, const char* pStart = nullptr) const;
 
         /// <summary>
         /// Returns the total number of the given character in the text block, starting
@@ -62,28 +56,19 @@ namespace Replica
         /// Finds position of the first character of the first matching occurence of 
         /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
         /// </summary>
-        const char* Find(const string_view& substr, const char* pStart = nullptr) const
-        {
-            return Find(&substr[0], (int)substr.length(), pStart);
-        }
+        const char* Find(const string_view& substr, const char* pStart = nullptr) const;
 
         //// <summary>
         /// Finds position of the first character of the first matching occurence of 
         /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
         /// </summary>
-        const char* Find(const TextBlock& substr, const char* pStart = nullptr) const
-        {
-            return Find(substr.pStart, (int)substr.length, pStart);
-        }
+        const char* Find(const TextBlock& substr, const char* pStart = nullptr) const;
 
         /// <summary>
         /// Finds position of the first character of the first matching occurence of 
         /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
         /// </summary>
-        const char* Find(const char ch, const char* pStart = nullptr) const
-        {
-            return Find(&ch, 1, pStart);
-        }
+        const char* Find(const char ch, const char* pStart = nullptr) const;
 
         /// <summary>
         /// Finds position of the first character of the first matching occurence of 
@@ -95,42 +80,23 @@ namespace Replica
         /// Returns pointer to first character in a word found in the text after the 
         /// given start, with the given bounding characters.
         /// </summary>
-        const char* FindWord(const char* pStart, const string_view& breakFilter = "") const
-        {
-            return FindStart(pStart, breakFilter, '!', '~');
-        }
+        const char* FindWord(const char* pStart, const string_view& breakFilter = "") const;
 
         /// <summary>
         /// Returns pointer to last character in a word found in the text after the 
         /// given start, with the given bounding characters.
         /// </summary>
-        const char* FindWordEnd(const char* pStart, const string_view& breakFilter = "") const
-        {
-            return FindEnd(pStart, breakFilter, '!', '~');
-        }
+        const char* FindWordEnd(const char* pStart, const string_view& breakFilter = "") const;
 
         /// <summary>
         /// Returns pointer to first character in a word found in the text before the 
         /// given start, with the given bounding characters.
         /// </summary>
-        const char* FindLastWord(const char* pStart, const string_view& breakFilter = "") const
-        {
-            return FindLastStart(pStart, breakFilter, '!', '~');
-        }
+        const char* FindLastWord(const char* pStart, const string_view& breakFilter = "") const;
 
-        TextBlock GetWord(const char* pStart, const string_view& breakFilter = "", char min = '!', char max = '~') const
-        {
-            pStart = FindStart(pStart, breakFilter, min, max);
-            const char* pEnd = FindEnd(pStart, breakFilter, min, max);
-            return TextBlock(pStart, pEnd);
-        }
+        TextBlock GetWord(const char* pStart, const string_view& breakFilter = "", char min = '!', char max = '~') const;
 
-        TextBlock GetLastWord(const char* pStart, const string_view& breakFilter = "", char min = '!', char max = '~') const
-        {
-            pStart = FindLastStart(pStart, breakFilter, min, max);
-            const char* pEnd = FindEnd(pStart, breakFilter, min, max);
-            return TextBlock(pStart, pEnd);
-        }
+        TextBlock GetLastWord(const char* pStart, const string_view& breakFilter = "", char min = '!', char max = '~') const;
 
         /// <summary>
         /// Finds position of the first character of the first matching occurence of 
@@ -166,10 +132,7 @@ namespace Replica
         /// Finds position of the first character of the first matching occurence of 
         /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
         /// </summary>
-        const char* Find(const char ch, const char* pStart = nullptr)
-        {
-            return Find(&ch, 1, pStart);
-        }
+        const char* Find(const char ch, const char* pStart = nullptr);
 
         /// <summary>
         /// Writes a null-terminated copy of the text span's contents to the given buffer.
@@ -190,19 +153,12 @@ namespace Replica
         /// <summary>
         /// Returns a copy of the range as a new string
         /// </summary>
-        string ToString()
-        {
-            return string(pStart, length);
-        }
+        string ToString();
 
         /// <summary>
         /// Returns a copy of the range as a new string
         /// </summary>
-        static string ToString(const char* pStart, const char* pEnd)
-        {
-            size_t len = UnsignedDelta(pEnd, pStart);
-            return string(pStart, len);
-        }
+        static string ToString(const char* pStart, const char* pEnd);
 
         /// <summary>
         /// Returns true if the given character falls inside the given range and isn't in the given string filter.

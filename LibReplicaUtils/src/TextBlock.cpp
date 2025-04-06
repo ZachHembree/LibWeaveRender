@@ -39,6 +39,22 @@ TextBlock::TextBlock(Span<char>& span) : Span(span.GetFirst(), span.GetLength())
 { }
 
 /// <summary>
+/// Returns true if the given substring is present at or after the given start.
+/// </summary>
+bool TextBlock::Contains(const string_view & substr, const char* pStart) const
+{
+    return Find(substr, pStart) != nullptr;
+}
+
+/// <summary>
+/// Returns true if the given substring is present at or after the given start.
+/// </summary>
+bool TextBlock::Contains(const char* substr, int subLen, const char* pStart) const
+{
+    return Find(substr, subLen, pStart) != nullptr;
+}
+
+/// <summary>
 /// Returns the total number of the given character in the text block, starting
 /// from the given point.
 /// </summary>
@@ -63,6 +79,33 @@ int TextBlock::FindCount(const char ch, const char* pStart) const
     }
 
     return count;
+}
+
+/// <summary>
+/// Finds position of the first character of the first matching occurence of 
+/// the given substring, starting from the given pointer. Doesn't stop on '\0'.
+/// </summary>
+const char* TextBlock::Find(const string_view& substr, const char* pStart) const
+{
+    return Find(&substr[0], (int)substr.length(), pStart);
+}
+
+//// <summary>
+/// Finds position of the first character of the first matching occurence of 
+/// the given substring, starting from the given pointer. Doesn't stop on '\0'.
+/// </summary>
+const char* TextBlock::Find(const TextBlock& substr, const char* pStart) const
+{
+    return Find(substr.pStart, (int)substr.length, pStart);
+}
+
+/// <summary>
+/// Finds position of the first character of the first matching occurence of 
+/// the given substring, starting from the given pointer. Doesn't stop on '\0'.
+/// </summary>
+const char* TextBlock::Find(const char ch, const char* pStart) const
+{
+    return Find(&ch, 1, pStart);
 }
 
 /// <summary>
@@ -111,6 +154,47 @@ const char* TextBlock::Find(const char* substr, int subLen, const char* pStart) 
     }
 
     return nullptr;
+}
+
+/// <summary>
+/// Returns pointer to first character in a word found in the text after the 
+/// given start, with the given bounding characters.
+/// </summary>
+const char* TextBlock::FindWord(const char* pStart, const string_view& breakFilter) const
+{
+    return FindStart(pStart, breakFilter, '!', '~');
+}
+
+/// <summary>
+/// Returns pointer to last character in a word found in the text after the 
+/// given start, with the given bounding characters.
+/// </summary>
+const char* TextBlock::FindWordEnd(const char* pStart, const string_view& breakFilter) const
+{
+    return FindEnd(pStart, breakFilter, '!', '~');
+}
+
+/// <summary>
+/// Returns pointer to first character in a word found in the text before the 
+/// given start, with the given bounding characters.
+/// </summary>
+const char* TextBlock::FindLastWord(const char* pStart, const string_view& breakFilter) const
+{
+    return FindLastStart(pStart, breakFilter, '!', '~');
+}
+
+TextBlock TextBlock::GetWord(const char* pStart, const string_view& breakFilter, char min, char max) const
+{
+    pStart = FindStart(pStart, breakFilter, min, max);
+    const char* pEnd = FindEnd(pStart, breakFilter, min, max);
+    return TextBlock(pStart, pEnd);
+}
+
+TextBlock TextBlock::GetLastWord(const char* pStart, const string_view& breakFilter, char min, char max) const
+{
+    pStart = FindLastStart(pStart, breakFilter, min, max);
+    const char* pEnd = FindEnd(pStart, breakFilter, min, max);
+    return TextBlock(pStart, pEnd);
 }
 
 const char* TextBlock::Find(const char* substr, int subLen, const char* pStart)
@@ -200,6 +284,15 @@ const char* TextBlock::FindLastStart(const char* pStart, const string_view& brea
 }
 
 /// <summary>
+/// Finds position of the first character of the first matching occurence of 
+/// the given substring, starting from the given pointer. Doesn't stop on '\0'.
+/// </summary>
+const char* TextBlock::Find(const char ch, const char* pStart)
+{
+    return Find(&ch, 1, pStart);
+}
+
+/// <summary>
 /// Writes a null-terminated copy of the text span's contents to the given buffer.
 /// </summary>
 void TextBlock::CopyTo(char* dst, size_t maxLength) const
@@ -209,6 +302,23 @@ void TextBlock::CopyTo(char* dst, size_t maxLength) const
 
     memcpy(dst, pStart, len);
     dst[end] = '\0';
+}
+
+/// <summary>
+/// Returns a copy of the range as a new string
+/// </summary>
+string TextBlock::ToString()
+{
+    return string(pStart, length);
+}
+
+/// <summary>
+/// Returns a copy of the range as a new string
+/// </summary>
+string TextBlock::ToString(const char* pStart, const char* pEnd)
+{
+    size_t len = UnsignedDelta(pEnd, pStart);
+    return string(pStart, len);
 }
 
 /// <summary>

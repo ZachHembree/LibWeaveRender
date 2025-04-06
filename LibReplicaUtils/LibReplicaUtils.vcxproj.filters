@@ -90,6 +90,12 @@
     <ClInclude Include="include\ReplicaUtils\GlobalUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ReplicaUtils\VectorSpan.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ReplicaUtils\StringSpan.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\internal\DeltaUtils.cpp">

@@ -23,6 +23,8 @@
     <ClInclude Include="include\ReplicaUtils\ObjectPool.hpp" />
     <ClInclude Include="include\ReplicaUtils\GlobalUtils.hpp" />
     <ClInclude Include="include\ReplicaUtils\StringIDBuilder.hpp" />
+    <ClInclude Include="include\ReplicaUtils\StringSpan.hpp" />
+    <ClInclude Include="include\ReplicaUtils\VectorSpan.hpp" />
     <ClInclude Include="src\pch.hpp" />
     <ClInclude Include="include\ReplicaUtils\Serialization.hpp" />
     <ClInclude Include="include\internal\DynCollectionSerializers.hpp" />
