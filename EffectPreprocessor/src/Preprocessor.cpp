@@ -219,7 +219,13 @@ static void CreateLibrary()
     GetInput(input, inputPath, streamBuf);
 
     // Parse source and generate library
+    Stopwatch timer;
+    timer.Start();
     ShaderLibDef shaderLib = libGen.GetLibrary(name, inputPath, streamBuf.view());
+
+    LOG_INFO() << "Compiler: " << shaderLib.platform.compilerVersion;
+    LOG_INFO() << "Shader Model: " << shaderLib.platform.featureLevel;
+
     streamBuf.clear();
     streamBuf.str({});
 
@@ -234,12 +240,14 @@ static void CreateLibrary()
         ConvertBinaryToHeader(name, strBuf, streamBuf);
 
     WriteBinary(output, outputPath, streamBuf);
+    timer.Stop();
 
     LOG_INFO() << "Wrote library to " << outputPath;
     LOG_INFO() << "Library Stats: Shaders: " << shaderLib.regData.shaders.GetLength()
         << " | Effects: " << shaderLib.regData.effects.GetLength()
         << " | Constants: " << shaderLib.regData.constants.GetLength()
         << " | Resources: " << shaderLib.regData.resources.GetLength();
+    LOG_INFO() << "Time: " << timer.GetElapsedMS() << "ms";
 }
 
 /// <summary>

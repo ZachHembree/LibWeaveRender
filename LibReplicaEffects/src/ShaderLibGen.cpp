@@ -35,9 +35,6 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view name, string_view libPath, str
 		.target = target
 	};
 
-	LOG_INFO() << "Compiler: " << repo.platform.compilerVersion;
-	LOG_INFO() << "Shader Model: " << repo.platform.featureLevel;
-
 	VariantRepoDef& lib = repo.repos[0];
 	lib.name = name;
 	lib.srcPath = libPath;
@@ -45,19 +42,33 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view name, string_view libPath, str
 
 	for (uint vID = 0; vID < pVariantGen->GetVariantCount(); vID++)
 	{
-		// Preprocess and parse
-		pVariantGen->GetVariant(vID, libTextBuf, entrypoints);
-		const bool isDuplicate = libTextBuf == libTextLast;
+		VariantSrcBuf* pBuf = &libBufs[libBufIndex];
+		pBuf->libText.clear();
+		pBuf->vID = vID;
 
-		if (!isDuplicate)
+		// Generate variant
+		pVariantGen->GetVariant(vID, pBuf->libText, entrypoints);
+		bool isDuplicate = false;
+
+		for (int i = 0; i < std::size(libBufs); i++)
 		{
-			pAnalyzer->AnalyzeSource(libTextBuf);
+			if (libBufIndex != i && pBuf->libText == libBufs[i].libText)
+			{
+				isDuplicate = true;
+				pBuf = &libBufs[i];
+				break;
+			}
+		}
+
+		if (!isDuplicate) // Parse and precompile variants
+		{
+			const uint resCount = pShaderRegistry->GetUniqueResCount();
+
+			pAnalyzer->AnalyzeSource(pBuf->libText);
 			pTable->ParseBlocks(pAnalyzer->GetBlocks());
 
 			if (vID == 0)
 				InitLibrary(lib);
-
-			LOG_INFO() << "Generating variant: " << vID;
 
 			// Shaders
 			GetEntryPoints();
@@ -67,19 +78,25 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view name, string_view libPath, str
 			GetEffects();
 			lib.variants[vID].effects = DynamicArray<EffectVariantDef>(effectBlocks.GetLength());
 			GetEffectDefs(lib.variants[vID].effects, vID);
-		}
-		else
-		{
-			LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Skipping...";
 
+			if (resCount == pShaderRegistry->GetUniqueResCount())
+				LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Not skipped.";
+
+			libBufIndex++;
+			libBufIndex %= std::size(libBufs);
+		}
+		else // Skip processing
+		{
 			// Copy variant mappings and update ID
-			lib.variants[vID] = lib.variants[vID - 1];
+			lib.variants[vID] = lib.variants[pBuf->vID];
 
 			for (ShaderVariantDef& shader : lib.variants[vID].shaders)
 				shader.variantID = vID;
 
 			for (EffectVariantDef& effect : lib.variants[vID].effects)
 				effect.variantID = vID;
+
+			LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Skipped.";
 		}
 
 		ClearVariant();
@@ -92,14 +109,6 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view name, string_view libPath, str
 void ShaderLibGen::SetTarget(PlatformTargets target) { this->target = target; }
 
 void ShaderLibGen::SetFeatureLevel(string_view featureLevel) { this->featureLevel = featureLevel; }
-
-void ShaderLibGen::Clear()
-{
-	ClearVariant();
-	libTextLast.clear();
-	pVariantGen->Clear();
-	pShaderRegistry->Clear();
-}
 
 void ShaderLibGen::InitLibrary(VariantRepoDef& lib)
 {
@@ -280,7 +289,7 @@ void ShaderLibGen::AddPass(const ScopeHandle& passScope, string_view name)
 	pass.shaderCount = (uint)effectShaders.GetLength() - pass.shaderStart;
 }
 
-void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& variants, const int vID)
+void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& variants, const uint vID)
 {
 	for (int i = 0; i < entrypoints.GetLength(); i++)
 	{
@@ -299,7 +308,7 @@ void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariant
 	}
 }
 
-void ShaderLibGen::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const int vID)
+void ShaderLibGen::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const uint vID)
 {
 	// Effects
 	for (uint i = 0; i < (uint)effectBlocks.GetLength(); i++)
@@ -332,6 +341,21 @@ void ShaderLibGen::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const 
 	}
 }
 
+void ShaderLibGen::Clear()
+{
+	ClearVariant();
+	libBufIndex = 0;
+
+	for (int i = 0; i < std::size(libBufs); i++)
+	{
+		libBufs[i].libText.clear();
+		libBufs[i].vID = 0;
+	}
+
+	pVariantGen->Clear();
+	pShaderRegistry->Clear();
+}
+
 void ShaderLibGen::ClearVariant()
 {
 	pTable->Clear();
@@ -345,7 +369,5 @@ void ShaderLibGen::ClearVariant()
 	effectPasses.clear();
 	effectShaders.clear();
 
-	std::swap(libTextBuf, libTextLast);
-	libTextBuf.clear();
 	hlslBuf.clear();
 }

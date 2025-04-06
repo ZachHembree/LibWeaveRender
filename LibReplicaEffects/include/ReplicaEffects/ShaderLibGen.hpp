@@ -51,6 +51,12 @@ namespace Replica::Effects
 			uint passCount;
 		};
 
+		struct VariantSrcBuf
+		{
+			string libText;
+			uint vID;
+		};
+
 		// Config
 		string_view featureLevel;
 		PlatformTargets target;
@@ -63,8 +69,8 @@ namespace Replica::Effects
 		unique_ptr<ShaderGenerator> pShaderGen;
 
 		// Variant buffers
-		string libTextBuf;
-		string libTextLast;
+		VariantSrcBuf libBufs[4];
+		uint libBufIndex;
 		string hlslBuf;
 
 		// Shader mains
@@ -100,12 +106,12 @@ namespace Replica::Effects
 		/// <summary>
 		/// Generates shader definitions for every shader in a variant
 		/// </summary>
-		void GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& variants, const int vID);
+		void GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& variants, const uint vID);
 
 		/// <summary>
 		/// Generates effect definitions for every effect in a variant
 		/// </summary>
-		void GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const int vID);
+		void GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const uint vID);
 
 		/// <summary>
 		/// Resets tables for next variant
