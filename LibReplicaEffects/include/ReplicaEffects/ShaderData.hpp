@@ -1,12 +1,15 @@
 #pragma once
 #include "ReplicaUtils/Math.hpp"
 #include "ReplicaEffects/ParseExcept.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderParser/SymbolEnums.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderParser/ShaderTypeInfo.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderParser/SymbolEnums.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderParser/ShaderTypeInfo.hpp"
 #include "ReplicaUtils/StringIDMap.hpp"
 
 namespace Replica::Effects
 {
+	constexpr uint g_VariantMask = 0xFFFFu;
+	constexpr uint g_VariantGroupOffset = 16u;
+
 	/// <summary>
 	/// Defines a shader constant's name, size and position within a cbuf
 	/// </summary>
@@ -336,11 +339,7 @@ namespace Replica::Effects
 		PlatformTargets target;
 	};
 
-	/// <summary>
-	/// Serializable collection of effect and shader variants compiled from the same
-	/// effect file.
-	/// </summary>
-	struct VariantRepoDef
+	struct VariantRepoSrc
 	{
 		/// <summary>
 		/// Name of the repo
@@ -350,7 +349,19 @@ namespace Replica::Effects
 		/// <summary>
 		/// File the library was compiled from
 		/// </summary>
-		string srcPath;
+		string path;
+	};
+
+	/// <summary>
+	/// Serializable collection of effect and shader variants compiled from the same
+	/// effect file.
+	/// </summary>
+	struct VariantRepoDef
+	{
+		/// <summary>
+		/// Source file and name used to create the repo
+		/// </summary>
+		VariantRepoSrc src;
 
 		/// <summary>
 		/// Flag names used for static shader variant generation
@@ -366,6 +377,14 @@ namespace Replica::Effects
 		/// Array of shaders and effects for each variant
 		/// </summary>
 		DynamicArray<VariantDef> variants;
+	};
+
+	/// <summary>
+	/// A collection of independent shader libraries from at least one effect file
+	/// </summary>
+	struct ShaderLibSrc
+	{
+		DynamicArray<VariantRepoSrc> srcFiles;
 	};
 
 	/// <summary>
@@ -391,4 +410,4 @@ namespace Replica::Effects
 	};
 }
 
-#include "ReplicaEffects/ShaderLibGen/ShaderDataHashes.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderDataHashes.hpp"

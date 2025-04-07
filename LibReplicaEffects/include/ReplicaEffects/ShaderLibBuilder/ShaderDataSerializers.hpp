@@ -124,12 +124,24 @@ namespace Replica::Effects
 	template <class Archive>
 	void serialize(Archive& ar, VariantRepoDef& def)
 	{
-		ar(def.name, def.srcPath, def.flagIDs, def.modeIDs, def.variants);
+		ar(def.src, def.flagIDs, def.modeIDs, def.variants);
 	}
 
 	template <class Archive>
 	void serialize(Archive& ar, ShaderLibDef& def)
 	{
 		ar(def.platform, def.repos, def.regData);
+	}
+
+	template <class Archive>
+	void serialize(Archive& ar, VariantRepoSrc& def)
+	{
+		ar(def.name, def.path);
+	}
+
+	template <class Archive>
+	void serialize(Archive& ar, ShaderLibSrc& def)
+	{
+		ar(def.srcFiles);
 	}
 }

@@ -1,43 +1,37 @@
 #pragma once
 #include "pch.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderParser/BlockAnalyzer.hpp"
-#include "ReplicaEffects/ShaderLibGen/SymbolTable.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderGenerator.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderCompiler.hpp"
-#include "ReplicaEffects/ShaderLibGen/VariantPreprocessor.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderRegistryBuilder.hpp"
-#include "ReplicaEffects/ShaderLibGen.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderParser/BlockAnalyzer.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/SymbolTable.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderGenerator.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderCompiler.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/VariantPreprocessor.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderRegistryBuilder.hpp"
+#include "ReplicaEffects/ShaderLibBuilder.hpp"
 
 using namespace Replica::Effects;
 
-ShaderLibGen::ShaderLibGen() :
+ShaderLibBuilder::ShaderLibBuilder() :
 	pVariantGen(new VariantPreprocessor()),
 	pAnalyzer(new BlockAnalyzer()),
 	pTable(new SymbolTable()),
 	pShaderGen(new ShaderGenerator()),
-	pShaderRegistry(new ShaderRegistryBuilder()),
-	featureLevel("5_0"),
-	target(PlatformTargets::DirectX11)
-{ }
-
-ShaderLibGen::~ShaderLibGen() = default;
-
-ShaderLibDef ShaderLibGen::GetLibrary(string_view name, string_view libPath, string_view libSrc)
+	pShaderRegistry(new ShaderRegistryBuilder())
 {
-	Clear();
-
-	ShaderLibDef repo = {};
-	repo.repos = DynamicArray<VariantRepoDef>(1);
-	repo.platform =
+	platform = PlatformDef
 	{
 		.compilerVersion = string(GetCompilerVersionD3D11()),
-		.featureLevel = string(featureLevel),
-		.target = target
+		.featureLevel = string("5_0"),
+		.target = PlatformTargets::DirectX11
 	};
+}
 
-	VariantRepoDef& lib = repo.repos[0];
-	lib.name = name;
-	lib.srcPath = libPath;
+ShaderLibBuilder::~ShaderLibBuilder() = default;
+
+void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_view libSrc)
+{
+	VariantRepoDef& lib = repos.emplace_back();
+	lib.src.name = name;
+	lib.src.path = libPath;
 	pVariantGen->SetSrc(libPath, libSrc);
 
 	for (uint vID = 0; vID < pVariantGen->GetVariantCount(); vID++)
@@ -68,7 +62,7 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view name, string_view libPath, str
 			pTable->ParseBlocks(pAnalyzer->GetBlocks());
 
 			if (vID == 0)
-				InitLibrary(lib);
+				InitVariants(lib);
 
 			// Shaders
 			GetEntryPoints();
@@ -101,16 +95,27 @@ ShaderLibDef ShaderLibGen::GetLibrary(string_view name, string_view libPath, str
 
 		ClearVariant();
 	}
-
-	repo.regData = pShaderRegistry->ExportDefinition();
-	return repo;
 }
 
-void ShaderLibGen::SetTarget(PlatformTargets target) { this->target = target; }
+ShaderLibDef ShaderLibBuilder::ExportLibrary() 
+{
+	ShaderLibDef lib;
+	lib.platform = platform;
+	lib.regData = pShaderRegistry->ExportDefinition();
+	lib.repos = DynamicArray<VariantRepoDef>(repos.GetLength());
+	
+	for (int i = 0; i < repos.GetLength(); i++)
+		lib.repos[i] = std::move(repos[i]);
 
-void ShaderLibGen::SetFeatureLevel(string_view featureLevel) { this->featureLevel = featureLevel; }
+	repos.clear();
+	return lib;
+}
 
-void ShaderLibGen::InitLibrary(VariantRepoDef& lib)
+void ShaderLibBuilder::SetTarget(PlatformTargets target) { platform.target = target; }
+
+void ShaderLibBuilder::SetFeatureLevel(string_view featureLevel) { platform.featureLevel = featureLevel; }
+
+void ShaderLibBuilder::InitVariants(VariantRepoDef& lib)
 {
 	const IDynamicArray<StringSpan>& flags = pVariantGen->GetVariantFlags();
 	lib.flagIDs = DynamicArray<uint>(flags.GetLength());
@@ -129,7 +134,7 @@ void ShaderLibGen::InitLibrary(VariantRepoDef& lib)
 	LOG_INFO() << "Variants declared: " << lib.variants.GetLength();
 }
 
-void ShaderLibGen::GetEntryPoints()
+void ShaderLibBuilder::GetEntryPoints()
 {
 	// Attribute tags
 	for (int i = 0; i < pTable->GetSymbolCount(); i++)
@@ -213,7 +218,7 @@ void ShaderLibGen::GetEntryPoints()
 	}
 }
 
-void ShaderLibGen::GetEffects()
+void ShaderLibBuilder::GetEffects()
 {
 	for (int i = 0; i < pTable->GetSymbolCount(); i++)
 	{
@@ -267,7 +272,7 @@ void ShaderLibGen::GetEffects()
 	}
 }
 
-void ShaderLibGen::AddPass(const ScopeHandle& passScope, string_view name)
+void ShaderLibBuilder::AddPass(const ScopeHandle& passScope, string_view name)
 {
 	PassBlock& pass = effectPasses.emplace_back();
 	pass.nameID = pShaderRegistry->GetOrAddStringID(name);
@@ -289,7 +294,7 @@ void ShaderLibGen::AddPass(const ScopeHandle& passScope, string_view name)
 	pass.shaderCount = (uint)effectShaders.GetLength() - pass.shaderStart;
 }
 
-void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& variants, const uint vID)
+void ShaderLibBuilder::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& variants, const uint vID)
 {
 	for (int i = 0; i < entrypoints.GetLength(); i++)
 	{
@@ -298,7 +303,7 @@ void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariant
 		const ShaderEntrypoint& ep = entrypoints[i];
 		pShaderGen->GetShaderSource(*pTable, pAnalyzer->GetBlocks(), ep, entrypoints, hlslBuf);
 
-		const uint shaderID = GetShaderDefD3D11(libPath, hlslBuf, featureLevel, ep.stage, ep.name, *pShaderRegistry);
+		const uint shaderID = GetShaderDefD3D11(libPath, hlslBuf, platform.featureLevel, ep.stage, ep.name, *pShaderRegistry);
 		const uint nameID = pShaderRegistry->GetShader(shaderID).nameID;
 
 		variants[i].shaderID = shaderID;
@@ -308,7 +313,7 @@ void ShaderLibGen::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariant
 	}
 }
 
-void ShaderLibGen::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const uint vID)
+void ShaderLibBuilder::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const uint vID)
 {
 	// Effects
 	for (uint i = 0; i < (uint)effectBlocks.GetLength(); i++)
@@ -341,7 +346,7 @@ void ShaderLibGen::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const 
 	}
 }
 
-void ShaderLibGen::Clear()
+void ShaderLibBuilder::Clear()
 {
 	ClearVariant();
 	libBufIndex = 0;
@@ -356,7 +361,7 @@ void ShaderLibGen::Clear()
 	pShaderRegistry->Clear();
 }
 
-void ShaderLibGen::ClearVariant()
+void ShaderLibBuilder::ClearVariant()
 {
 	pTable->Clear();
 	pAnalyzer->Clear();

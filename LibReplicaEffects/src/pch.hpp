@@ -9,6 +9,6 @@
 
 #include "ReplicaUtils/Utils.hpp"
 #include "ReplicaUtils/Math.hpp"
-#include "ReplicaEffects/ShaderLibGen/WaveConfig.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/WaveConfig.hpp"
 #include "ReplicaEffects/ParseExcept.hpp"
 #include "ReplicaUtils/Logger.hpp"

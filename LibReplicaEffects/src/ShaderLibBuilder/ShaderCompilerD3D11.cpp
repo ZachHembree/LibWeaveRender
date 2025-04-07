@@ -5,7 +5,7 @@
 #include <thread>
 #include "ReplicaUtils/WinUtils.hpp"
 #include "ReplicaEffects/ParseExcept.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderCompiler.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderCompiler.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "d3dcompiler.lib")

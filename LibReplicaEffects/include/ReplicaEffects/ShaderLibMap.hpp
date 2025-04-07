@@ -1,5 +1,5 @@
 #pragma once
-#include "ShaderRepoMap.hpp"
+#include "VariantRepoMap.hpp"
 
 namespace Replica::Effects
 {
@@ -29,7 +29,7 @@ namespace Replica::Effects
 		/// </summary>
 		EffectDefHandle GetEffect(uint effectID) const;
 
-		const ShaderRepoMap& GetVariantMap(int mapID) const;
+		const VariantRepoMap& GetVariantMap(int mapID) const;
 
 		uint GetVariantMapCount() const;
 
@@ -44,6 +44,6 @@ namespace Replica::Effects
 		/// </summary>
 		std::unique_ptr<ShaderRegistryMap> pRegMap;
 
-		UniqueArray<ShaderRepoMap> repoMaps;
+		UniqueArray<VariantRepoMap> repoMaps;
 	};
 }

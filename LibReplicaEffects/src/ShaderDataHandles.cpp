@@ -1,6 +1,6 @@
 #include "pch.hpp"
 #include "ReplicaEffects/ShaderDataHandles.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderRegistryMap.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderRegistryMap.hpp"
 #include "ReplicaUtils/StringIDMap.hpp"
 
 using namespace Replica;

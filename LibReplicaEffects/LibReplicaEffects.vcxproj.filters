@@ -15,58 +15,58 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\BlockAnalyzer.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderParser\BlockAnalyzer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\ScopeBuilder.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderParser\ScopeBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ReplicaEffects\ShaderData.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\ShaderTypeInfo.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\SymbolData.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderParser\SymbolData.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\SymbolEnums.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderParser\SymbolEnums.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\SymbolParser.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderParser\SymbolParser.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderParser\SymbolPatterns.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderParser\SymbolPatterns.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderCompiler.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderCompiler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderDataSerializers.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderDataSerializers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderEntrypoint.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderEntrypoint.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderGenerator.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderRepoMap.hpp">
+    <ClInclude Include="include\ReplicaEffects\VariantRepoMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\SymbolHandles.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\SymbolHandles.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\SymbolTable.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\SymbolTable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\VariantPreprocessor.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\VariantPreprocessor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\WaveConfig.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\WaveConfig.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ReplicaEffects\ParseExcept.hpp">
@@ -75,13 +75,13 @@
     <ClInclude Include="src\pch.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderRegistryBuilder.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderRegistryBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderDataHashes.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderDataHashes.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibGen\ShaderRegistryMap.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderRegistryMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ReplicaEffects\ShaderDataHandles.hpp">
@@ -92,55 +92,55 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ShaderLibGen\ShaderParser\BlockAnalyzer.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\BlockAnalyzer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderParser\MatchingPatterns.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\MatchingPatterns.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderParser\ScopeBuilder.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\ScopeBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderParser\ShaderTypeInfo.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderParser\SymbolHandles.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\SymbolHandles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderParser\SymbolKeywords.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\SymbolKeywords.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderParser\SymbolParser.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\SymbolParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderParser\SymbolPatterns.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\SymbolPatterns.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderParser\SymbolTable.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\SymbolTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderCompilerD3D11.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderCompilerD3D11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderGenerator.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderRepoMap.cpp">
+    <ClCompile Include="src\VariantRepoMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\VariantPreprocessor.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\VariantPreprocessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen.cpp">
+    <ClCompile Include="src\ShaderLibBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderRegistryBuilder.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderRegistryBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderDataHandles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderLibGen\ShaderRegistryMap.cpp">
+    <ClCompile Include="src\ShaderLibBuilder\ShaderRegistryMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\pch.cpp">

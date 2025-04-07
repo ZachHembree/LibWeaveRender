@@ -1,6 +1,6 @@
 #include "pch.hpp"
 #include "ReplicaEffects/ShaderLibMap.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderRegistryMap.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderRegistryMap.hpp"
 
 using namespace Replica;
 using namespace Replica::Effects;
@@ -35,6 +35,6 @@ EffectDefHandle ShaderLibMap::GetEffect(uint effectID) const
 	return EffectDefHandle(*pRegMap, effectID);
 }
 
-const ShaderRepoMap& ShaderLibMap::GetVariantMap(int mapID) const { return repoMaps[mapID]; }
+const VariantRepoMap& ShaderLibMap::GetVariantMap(int mapID) const { return repoMaps[mapID]; }
 
-uint ShaderLibMap::GetVariantMapCount() const { return repoMaps.GetLength(); }
+uint ShaderLibMap::GetVariantMapCount() const { return (uint)repoMaps.GetLength(); }

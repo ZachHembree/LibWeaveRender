@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderParser/SymbolPatterns.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderParser/SymbolPatterns.hpp"
 
 using namespace Replica;
 using namespace Replica::Effects;

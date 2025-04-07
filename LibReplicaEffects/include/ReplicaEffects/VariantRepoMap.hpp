@@ -8,18 +8,18 @@ namespace Replica::Effects
 	/// <summary>
 	/// Faciltates retrieval of preprocessed shaders and effects
 	/// </summary>
-	class ShaderRepoMap
+	class VariantRepoMap
 	{
 	public:
-		MAKE_NO_COPY(ShaderRepoMap)
+		MAKE_NO_COPY(VariantRepoMap)
 
-		ShaderRepoMap();
+		VariantRepoMap();
 
-		ShaderRepoMap(const VariantRepoDef& repo, const ShaderRegistryMap& reg);
+		VariantRepoMap(const VariantRepoDef& repo, const ShaderRegistryMap& reg);
 
-		ShaderRepoMap(VariantRepoDef&& repo, const ShaderRegistryMap& reg) noexcept;
+		VariantRepoMap(VariantRepoDef&& repo, const ShaderRegistryMap& reg) noexcept;
 
-		~ShaderRepoMap();
+		~VariantRepoMap();
 		
 		/// <summary>
 		/// Returns string ID lookup map
@@ -29,17 +29,17 @@ namespace Replica::Effects
 		/// <summary>
 		/// Returns the shaderID by name ID and variantID, -1 on fail
 		/// </summary>
-		uint TryGetShaderID(uint nameID, int vID) const;
+		uint TryGetShaderID(uint nameID, uint vID) const;
 
 		/// <summary>
 		/// Returns the effectID with the given name ID and variantID, -1 on fail
 		/// </summary>
-		uint TryGetEffectID(uint nameID, int vID) const;
+		uint TryGetEffectID(uint nameID, uint vID) const;
 
 		/// <summary>
 		/// Finds the shader variant modeID corresponding to the given mode name
 		/// </summary>
-		int TryGetMode(uint nameID) const;
+		uint TryGetMode(uint nameID) const;
 
 		/// <summary>
 		/// Gets bit flag configuration using the given flag name(s)
@@ -47,7 +47,7 @@ namespace Replica::Effects
 		template<typename Iterator>
 		requires std::forward_iterator<Iterator>&&
 			std::convertible_to<typename std::iterator_traits<Iterator>::value_type, std::string_view>
-		int TryGetFlags(const Iterator begin, const Iterator end) const
+		uint TryGetFlags(const Iterator begin, const Iterator end) const
 		{
 			uint flags = 0;
 
@@ -72,7 +72,7 @@ namespace Replica::Effects
 					return -1;
 			}
 
-			return (int)flags;
+			return flags;
 		}
 
 		/// <summary>
@@ -81,7 +81,7 @@ namespace Replica::Effects
 		template<typename Iterator>	
 		requires std::forward_iterator<Iterator>&&
 			std::is_integral_v<typename std::iterator_traits<Iterator>::value_type>
-		int TryGetFlags(const Iterator begin, const Iterator end) const
+		uint TryGetFlags(const Iterator begin, const Iterator end) const
 		{
 			uint flags = 0;
 
@@ -98,102 +98,102 @@ namespace Replica::Effects
 					return -1;
 			}
 
-			return (int)flags;
+			return flags;
 		}
 
 		/// <summary>
 		/// Gets bit flag configuration using the given flag name(s)
 		/// </summary>
-		int TryGetFlags(const std::initializer_list<string_view>& defines) const;
+		uint TryGetFlags(const std::initializer_list<string_view>& defines) const;
 
 		/// <summary>
 		/// Gets bit flag configuration using the given flag name(s)
 		/// </summary>
-		int TryGetFlags(const IDynamicArray<string_view>& defines) const;
+		uint TryGetFlags(const IDynamicArray<string_view>& defines) const;
 
 		/// <summary>
 		/// Gets bit flag configuration using the given flag name(s)
 		/// </summary>
 		template <typename... T>
 		requires std::convertible_to<T..., string_view>
-		int TryGetFlags(const T&... args) const { return TryGetFlags(std::initializer_list<string_view>{ args... }); }
+		uint TryGetFlags(const T&... args) const { return TryGetFlags(std::initializer_list<string_view>{ args... }); }
 
 		/// <summary>
 		/// Gets bit flag configuration using the given flag name IDs
 		/// </summary>
-		int TryGetFlags(const std::initializer_list<uint>& defines) const;
+		uint TryGetFlags(const std::initializer_list<uint>& defines) const;
 
 		/// <summary>
 		/// Gets bit flag configuration using the given flag name IDs
 		/// </summary>
-		int TryGetFlags(const IDynamicArray<uint>& defines) const;
+		uint TryGetFlags(const IDynamicArray<uint>& defines) const;
 
 		/// <summary>
 		/// Gets bit flag configuration using the given flag name(s)
 		/// </summary>
 		template <typename... T>
 		requires std::convertible_to<T..., uint>
-		int TryGetFlags(const T&... args) const { return TryGetFlags(std::initializer_list<uint>{ args... }); }
+		uint TryGetFlags(const T&... args) const { return TryGetFlags(std::initializer_list<uint>{ args... }); }
 
 		/// <summary>
 		/// Calculates the bit flag configuration used from a given variant ID
 		/// </summary>
-		uint GetFlagID(const int variantID) const;
+		uint GetFlagID(uint variantID) const;
 
 		/// <summary>
 		/// Calculates the modeID from a given variant ID
 		/// </summary>
-		uint GetModeID(const int variantID) const;
+		uint GetModeID(uint variantID) const;
 
 		/// <summary>
 		/// Calculates variantID from the given flag and mode configuration. Required for variant lookup.
 		/// </summary>
-		int GetVariantID(const uint flagID, const uint modeID) const;
+		uint GetVariantID(uint flagID, uint modeID) const;
 
 		/// <summary>
 		/// Returns true if the given flag or mode is set for the given vID
 		/// </summary>
-		bool GetIsDefined(uint nameID, const int vID) const;
+		bool GetIsDefined(uint nameID, uint vID) const;
 
 		/// <summary>
 		/// Returns true if the given mode or flag name is set for the given variant
 		/// </summary>
-		bool GetIsDefined(string_view name, const int vID) const;
+		bool GetIsDefined(string_view name, uint vID) const;
 
 		/// <summary>
 		/// Returns all mode and flag names set for the given variant
 		/// </summary>
-		void GetDefines(const int vID, Vector<uint>& defines) const;
+		void GetDefines(const uint vID, Vector<uint>& defines) const;
 
 		/// <summary>
 		/// Returns all mode and flag names set for the given variant
 		/// </summary>
-		void GetDefines(const int vID, Vector<string_view>& defines) const;
+		void GetDefines(const uint vID, Vector<string_view>& defines) const;
 
 		/// <summary>
 		/// Returns variantID with the given flag set to the given value.
 		/// </summary>
-		int SetFlag(uint nameID, bool value, int vID) const;
+		uint SetFlag(uint nameID, bool value, uint vID) const;
 
 		/// <summary>
 		/// Returns variantID with the given flag set to the given value.
 		/// </summary>
-		int SetFlag(string_view name, bool value, int vID) const;
+		uint SetFlag(string_view name, bool value, uint vID) const;
 
 		/// <summary>
 		/// Returns variantID with the given mode
 		/// </summary>
-		int SetMode(uint nameID, int vID) const;
+		uint SetMode(uint nameID, uint vID) const;
 
 		/// <summary>
 		/// Resets variant mode to default
 		/// </summary>
-		int ResetMode(int vID) const;
+		uint ResetMode(uint vID) const;
 
 		/// <summary>
 		/// Returns variantID with the given mode
 		/// </summary>
-		int SetMode(string_view name, int vID) const;
+		uint SetMode(string_view name, uint vID) const;
 
 		/// <summary>
 		/// Returns an immutable reference to library variant definitions
@@ -203,27 +203,27 @@ namespace Replica::Effects
 		/// <summary>
 		/// Returns the total number of flag combinations used for variant generation
 		/// </summary>
-		size_t GetFlagVariantCount() const;
+		uint GetFlagVariantCount() const;
 
 		/// <summary>
 		/// Returns the total number of modes used for variant generation
 		/// </summary>
-		size_t GetModeCount() const;
+		uint GetModeCount() const;
 
 		/// <summary>
 		/// Returns the total number of variants generated, including all flag and mode combinations
 		/// </summary>
-		size_t GetVariantCount() const;
+		uint GetVariantCount() const;
 
 		/// <summary>
 		/// Returns the number of shaders in a given variant
 		/// </summary>
-		size_t GetShaderCount(int vID) const;
+		uint GetShaderCount(uint vID) const;
 
 		/// <summary>
 		/// Returns the number of effects in a given variant
 		/// </summary>
-		size_t GetEffectCount(int vID) const;
+		uint GetEffectCount(uint vID) const;
 
 	private:
 		using NameIndexMap = std::unordered_map<uint, uint>;
@@ -268,6 +268,6 @@ namespace Replica::Effects
 
 		void InitMap();
 
-		const VariantDef& GetVariant(const int vID) const;
+		const VariantDef& GetVariant(const uint vID) const;
 	};
 }

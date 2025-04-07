@@ -1,7 +1,7 @@
 #include "pch.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderParser/ScopeBuilder.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderParser/SymbolParser.hpp"
-#include "ReplicaEffects/ShaderLibGen/SymbolTable.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderParser/ScopeBuilder.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderParser/SymbolParser.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/SymbolTable.hpp"
 
 namespace Replica::Effects
 {

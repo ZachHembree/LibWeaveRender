@@ -1,8 +1,8 @@
 #pragma once
 #include <unordered_map>
 #include <memory>
-#include "ReplicaEffects/ShaderLibGen/ShaderEntrypoint.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderDataSerializers.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderEntrypoint.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderDataSerializers.hpp"
 
 namespace Replica::Effects
 {
@@ -19,20 +19,22 @@ namespace Replica::Effects
 	/// Generates preprocessed and precompiled shader and effect variants with corresponding
 	/// metadata from source
 	/// </summary>
-	class ShaderLibGen
+	class ShaderLibBuilder
 	{
 	public:
-		MAKE_MOVE_ONLY(ShaderLibGen)
+		MAKE_MOVE_ONLY(ShaderLibBuilder)
 
-		ShaderLibGen();
+		ShaderLibBuilder();
 
-		~ShaderLibGen();
+		~ShaderLibBuilder();
 
-		ShaderLibDef GetLibrary(string_view name, string_view libPath, string_view libSrc);
+		void AddRepo(string_view name, string_view libPath, string_view libSrc);
 
 		void SetTarget(PlatformTargets target);
 
 		void SetFeatureLevel(string_view featureLevel);
+
+		ShaderLibDef ExportLibrary();
 
 		void Clear();
 
@@ -57,9 +59,8 @@ namespace Replica::Effects
 			uint vID;
 		};
 
-		// Config
-		string_view featureLevel;
-		PlatformTargets target;
+		PlatformDef platform;
+		UniqueVector<VariantRepoDef> repos;
 
 		// Parsing, code gen and reflection
 		unique_ptr<ShaderRegistryBuilder> pShaderRegistry;
@@ -86,7 +87,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Initializes the library variants and corresponding flags
 		/// </summary>
-		void InitLibrary(VariantRepoDef& lib);
+		void InitVariants(VariantRepoDef& lib);
 
 		/// <summary>
 		/// Identifies shaders in the source and buffers their entrypoint symbols

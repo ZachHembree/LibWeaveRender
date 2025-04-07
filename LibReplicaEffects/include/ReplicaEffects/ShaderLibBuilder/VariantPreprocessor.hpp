@@ -14,8 +14,6 @@ namespace Replica::Effects
 	constexpr string_view g_VariantModesKeyword = "modes";
 	constexpr uint g_VariantModeLimit = 256u;
 
-	constexpr uint g_VariantGroupMask = 0xFFFFu;
-
 	/// <summary>
 	/// Base class for exceptions thrown by Wave
 	/// </summary>

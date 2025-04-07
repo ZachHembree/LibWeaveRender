@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "ReplicaEffects/ShaderLibGen/VariantPreprocessor.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/VariantPreprocessor.hpp"
 
 namespace Replica::Effects
 { 
@@ -82,11 +82,11 @@ namespace Replica::Effects
 			ctx.add_macro_definition(macro);
 
 		// Convert ID into bit flags and set defines
-		const int flagID = variantID % GetFlagVariantCount();
+		const uint flagID = variantID % GetFlagVariantCount();
 
 		for (int i = 0; i < variantFlags.GetLength(); i++)
 		{
-			const int id = 1 << i;
+			const uint id = 1u << i;
 
 			if ((id & flagID) > 0)
 				ctx.add_macro_definition(variantFlags[i]);

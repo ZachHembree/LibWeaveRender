@@ -1,6 +1,6 @@
 #include "pch.hpp"
-#include "ReplicaEffects/ShaderRepoMap.hpp"
-#include "ReplicaEffects/ShaderLibGen/ShaderRegistryMap.hpp"
+#include "ReplicaEffects/VariantRepoMap.hpp"
+#include "ReplicaEffects/ShaderLibBuilder/ShaderRegistryMap.hpp"
 
 /* Variant ID generation
 
@@ -26,26 +26,26 @@
 
 namespace Replica::Effects
 {
-	ShaderRepoMap::ShaderRepoMap() : pRegMap(nullptr)
+	VariantRepoMap::VariantRepoMap() : pRegMap(nullptr)
 	{ }
 
-	ShaderRepoMap::ShaderRepoMap(const VariantRepoDef& def, const ShaderRegistryMap& reg) :
+	VariantRepoMap::VariantRepoMap(const VariantRepoDef& def, const ShaderRegistryMap& reg) :
 		pRegMap(&reg),
 		repoData(def)
 	{
 		InitMap();
 	}
 
-	ShaderRepoMap::ShaderRepoMap(VariantRepoDef&& def, const ShaderRegistryMap& reg) noexcept :
+	VariantRepoMap::VariantRepoMap(VariantRepoDef&& def, const ShaderRegistryMap& reg) noexcept :
 		pRegMap(&reg),
 		repoData(std::move(def))
 	{
 		InitMap();
 	}
 
-	ShaderRepoMap::~ShaderRepoMap() = default;
+	VariantRepoMap::~VariantRepoMap() = default;
 
-	void ShaderRepoMap::InitMap()
+	void VariantRepoMap::InitMap()
 	{
 		// Initialize tables
 		// Compile flags
@@ -89,9 +89,9 @@ namespace Replica::Effects
 		}
 	}
 
-	const StringIDMap& ShaderRepoMap::GetStringMap() const { return pRegMap->GetStringMap(); }
+	const StringIDMap& VariantRepoMap::GetStringMap() const { return pRegMap->GetStringMap(); }
 
-	uint ShaderRepoMap::TryGetShaderID(uint nameID, int vID) const
+	uint VariantRepoMap::TryGetShaderID(uint nameID, uint vID) const
 	{
 		const NameIndexMap& nameMap = variantMaps[vID].nameShaderMap;
 		const auto& it = nameMap.find(nameID);
@@ -106,7 +106,7 @@ namespace Replica::Effects
 			return -1;
 	}
 
-	uint ShaderRepoMap::TryGetEffectID(uint nameID, int vID) const
+	uint VariantRepoMap::TryGetEffectID(uint nameID, uint vID) const
 	{
 		const NameIndexMap& nameMap = variantMaps[vID].effectNameMap;
 		const auto& it = nameMap.find(nameID);
@@ -121,60 +121,60 @@ namespace Replica::Effects
 			return -1;
 	}
 
-	int ShaderRepoMap::TryGetMode(uint nameID) const
+	uint VariantRepoMap::TryGetMode(uint nameID) const
 	{
 		const auto& result = modeNameMap.find(nameID);
 
 		if (result != modeNameMap.end())
-			return (int)(result->second);
+			return result->second;
 
 		return -1;
 	}
 
-	size_t ShaderRepoMap::GetFlagVariantCount() const { return (1ull << repoData.flagIDs.GetLength()); }
+	uint VariantRepoMap::GetFlagVariantCount() const { return (1u << (uint)repoData.flagIDs.GetLength()); }
 
-	size_t ShaderRepoMap::GetModeCount() const { return repoData.modeIDs.GetLength(); }
+	uint VariantRepoMap::GetModeCount() const { return (uint)repoData.modeIDs.GetLength(); }
 
-	size_t ShaderRepoMap::GetVariantCount() const { return repoData.modeIDs.GetLength() * GetFlagVariantCount(); }
+	uint VariantRepoMap::GetVariantCount() const { return (uint)repoData.modeIDs.GetLength() * GetFlagVariantCount(); }
 
-	size_t ShaderRepoMap::GetShaderCount(int vID) const { return GetVariant(vID).shaders.GetLength(); }
+	uint VariantRepoMap::GetShaderCount(uint vID) const { return (uint)GetVariant(vID).shaders.GetLength(); }
 
-	size_t ShaderRepoMap::GetEffectCount(int vID) const { return GetVariant(vID).effects.GetLength(); }
+	uint VariantRepoMap::GetEffectCount(uint vID) const { return (uint)GetVariant(vID).effects.GetLength(); }
 
-	uint ShaderRepoMap::GetFlagID(const int variantID) const
+	uint VariantRepoMap::GetFlagID(uint variantID) const
 	{
-		PARSE_ASSERT_MSG(variantID >= 0, "Invalid variant ID");
-		return (uint)variantID % (uint)GetFlagVariantCount();
+		PARSE_ASSERT_MSG(variantID != -1, "Invalid variant ID");
+		return variantID % GetFlagVariantCount();
 	}
 
-	uint ShaderRepoMap::GetModeID(const int variantID) const
+	uint VariantRepoMap::GetModeID(uint variantID) const
 	{
-		PARSE_ASSERT_MSG(variantID >= 0, "Invalid variant ID");
-		return (uint)variantID / (uint)GetFlagVariantCount();
+		PARSE_ASSERT_MSG(variantID != -1, "Invalid variant ID");
+		return variantID / GetFlagVariantCount();
 	}
 
-	int ShaderRepoMap::GetVariantID(const uint flagID, const uint modeID) const
+	uint VariantRepoMap::GetVariantID(uint flagID, uint modeID) const
 	{
-		PARSE_ASSERT_MSG(flagID >= 0 && modeID >= 0, "Invalid flag or mode ID");
-		return (int)flagID + ((int)modeID * (int)GetFlagVariantCount());
+		PARSE_ASSERT_MSG(flagID != -1 && modeID != -1, "Invalid flag or mode ID");
+		return flagID + (modeID * GetFlagVariantCount());
 	}
 
-	bool ShaderRepoMap::GetIsDefined(uint nameID, const int vID) const
+	bool VariantRepoMap::GetIsDefined(uint nameID, uint vID) const
 	{
-		const auto flagIt = flagNameMap.find(nameID);
+		const auto& flagIt = flagNameMap.find(nameID);
 
 		if (flagIt != flagNameMap.end())
 		{
-			const int flags = GetFlagID(vID);	
+			const uint flags = GetFlagID(vID);
 			return (flags & (1 << flagIt->second)) > 0;
 		}
 		else
 		{
-			const auto modeIt = modeNameMap.find(nameID);
+			const auto& modeIt = modeNameMap.find(nameID);
 
 			if (modeIt != modeNameMap.end())
 			{
-				const int mode = GetModeID(vID);
+				const uint mode = GetModeID(vID);
 				return mode == modeIt->second;
 			}
 			else
@@ -182,7 +182,7 @@ namespace Replica::Effects
 		}
 	}
 
-	bool ShaderRepoMap::GetIsDefined(string_view name, const int vID) const
+	bool VariantRepoMap::GetIsDefined(string_view name, uint vID) const
 	{
 		uint id = -1;
 
@@ -192,23 +192,23 @@ namespace Replica::Effects
 			return false;
 	}
 
-	const IDynamicArray<VariantDef>& ShaderRepoMap::GetVariants() const { return repoData.variants; }
+	const IDynamicArray<VariantDef>& VariantRepoMap::GetVariants() const { return repoData.variants; }
 
-	const VariantDef& ShaderRepoMap::GetVariant(const int vID) const
+	const VariantDef& VariantRepoMap::GetVariant(uint vID) const
 	{
-		REP_ASSERT_MSG(vID >= 0 && vID < repoData.variants.GetLength(), "Variant ID invalid");
+		REP_ASSERT_MSG(vID != -1 && vID < repoData.variants.GetLength(), "Variant ID invalid");
 		return repoData.variants[vID];
 	}
 
-	int ShaderRepoMap::TryGetFlags(const std::initializer_list<string_view>& defines) const { return TryGetFlags(defines.begin(), defines.end()); }
+	uint VariantRepoMap::TryGetFlags(const std::initializer_list<string_view>& defines) const { return TryGetFlags(defines.begin(), defines.end()); }
 
-	int ShaderRepoMap::TryGetFlags(const IDynamicArray<string_view>& defines) const { return TryGetFlags(defines.begin(), defines.end()); }
+	uint VariantRepoMap::TryGetFlags(const IDynamicArray<string_view>& defines) const { return TryGetFlags(defines.begin(), defines.end()); }
 
-	int ShaderRepoMap::TryGetFlags(const std::initializer_list<uint>& defines) const { return TryGetFlags(defines.begin(), defines.end()); }
+	uint VariantRepoMap::TryGetFlags(const std::initializer_list<uint>& defines) const { return TryGetFlags(defines.begin(), defines.end()); }
 
-	int ShaderRepoMap::TryGetFlags(const IDynamicArray<uint>& defines) const { return TryGetFlags(defines.begin(), defines.end()); }
+	uint VariantRepoMap::TryGetFlags(const IDynamicArray<uint>& defines) const { return TryGetFlags(defines.begin(), defines.end()); }
 
-	void ShaderRepoMap::GetDefines(const int vID, Vector<uint>& defines) const
+	void VariantRepoMap::GetDefines(uint vID, Vector<uint>& defines) const
 	{
 		const uint flags = GetFlagID(vID);
 		const uint mode = GetModeID(vID);
@@ -225,7 +225,7 @@ namespace Replica::Effects
 		}
 	}
 
-	void ShaderRepoMap::GetDefines(const int vID, Vector<string_view>& defines) const
+	void VariantRepoMap::GetDefines(uint vID, Vector<string_view>& defines) const
 	{
 		const uint flags = GetFlagID(vID);
 		const uint mode = GetModeID(vID);
@@ -242,7 +242,7 @@ namespace Replica::Effects
 		}
 	}
 
-	int ShaderRepoMap::SetFlag(uint nameID, bool value, int vID) const
+	uint VariantRepoMap::SetFlag(uint nameID, bool value, uint vID) const
 	{
 		const auto& flagIt = flagNameMap.find(nameID);
 
@@ -263,7 +263,7 @@ namespace Replica::Effects
 			return -1;
 	}
 
-	int ShaderRepoMap::SetFlag(string_view name, bool value, int vID) const
+	uint VariantRepoMap::SetFlag(string_view name, bool value, uint vID) const
 	{
 		uint id = -1;
 
@@ -273,7 +273,7 @@ namespace Replica::Effects
 			return -1;
 	}
 
-	int ShaderRepoMap::SetMode(uint nameID, int vID) const
+	uint VariantRepoMap::SetMode(uint nameID, uint vID) const
 	{
 		const auto modeIt = modeNameMap.find(nameID);
 
@@ -287,13 +287,13 @@ namespace Replica::Effects
 			return -1;
 	}
 
-	int ShaderRepoMap::ResetMode(int vID) const
+	uint VariantRepoMap::ResetMode(uint vID) const
 	{
 		const uint flags = GetFlagID(vID);
 		return GetVariantID(flags, 0u);
 	}
 
-	int ShaderRepoMap::SetMode(string_view name, int vID) const
+	uint VariantRepoMap::SetMode(string_view name, uint vID) const
 	{
 		uint id = -1;
 

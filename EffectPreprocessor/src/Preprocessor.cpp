@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include "ReplicaEffects/ParseExcept.hpp"
 #include "ReplicaUtils/Logger.hpp"
-#include "ReplicaEffects/ShaderLibGen.hpp"
+#include "ReplicaEffects/ShaderLibBuilder.hpp"
 
 using std::cout;
 using std::cin;
@@ -180,11 +180,11 @@ static void WriteBinary(fs::path output, string_view binPath, const std::strings
 /// </summary>
 static void CreateLibrary()
 {
-    static ShaderLibGen libGen;
+    static ShaderLibBuilder libBuilder;
     static std::stringstream streamBuf;
     static string strBuf;
 
-    libGen.Clear();
+    libBuilder.Clear();
     streamBuf.clear();
     streamBuf.str({});
     strBuf.clear();
@@ -221,7 +221,8 @@ static void CreateLibrary()
     // Parse source and generate library
     Stopwatch timer;
     timer.Start();
-    ShaderLibDef shaderLib = libGen.GetLibrary(name, inputPath, streamBuf.view());
+    libBuilder.AddRepo(name, inputPath, streamBuf.view());
+    ShaderLibDef shaderLib = libBuilder.ExportLibrary();
 
     LOG_INFO() << "Compiler: " << shaderLib.platform.compilerVersion;
     LOG_INFO() << "Shader Model: " << shaderLib.platform.featureLevel;
