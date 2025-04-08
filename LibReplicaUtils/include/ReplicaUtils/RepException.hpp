@@ -4,8 +4,8 @@
 
 #define REP_THROW() { throw RepException(__LINE__, __FILE__); }
 #define REP_THROW_MSG(msg) { throw RepMsgException(__LINE__, __FILE__, msg); }
-#define REP_ASSERT(x) if (!(x)) { throw RepException(__LINE__, __FILE__); }
-#define REP_ASSERT_MSG(x, msg) if (!(x)) { throw RepMsgException(__LINE__, __FILE__, msg); }
+#define REP_ASSERT(x) {if (!(x)) { throw RepException(__LINE__, __FILE__); }}
+#define REP_ASSERT_MSG(x, msg) {if (!(x)) { throw RepMsgException(__LINE__, __FILE__, msg); }}
 
 namespace Replica
 {

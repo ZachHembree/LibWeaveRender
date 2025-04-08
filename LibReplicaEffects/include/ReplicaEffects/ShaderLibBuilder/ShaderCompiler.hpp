@@ -13,7 +13,8 @@ namespace Replica::Effects
 		string_view featureLevel,
 		ShadeStages stage, 
 		string_view mainName, 
-		ShaderRegistryBuilder& builder
+		ShaderRegistryBuilder& builder, 
+		bool isDebugging = false
 	);
 
 	/// <summary>

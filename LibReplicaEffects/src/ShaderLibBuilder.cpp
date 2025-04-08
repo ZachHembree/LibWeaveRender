@@ -15,7 +15,8 @@ ShaderLibBuilder::ShaderLibBuilder() :
 	pAnalyzer(new BlockAnalyzer()),
 	pTable(new SymbolTable()),
 	pShaderGen(new ShaderGenerator()),
-	pShaderRegistry(new ShaderRegistryBuilder())
+	pShaderRegistry(new ShaderRegistryBuilder()),
+	isDebugging(false)
 {
 	platform = PlatformDef
 	{
@@ -117,6 +118,8 @@ ShaderLibDef ShaderLibBuilder::ExportLibrary()
 void ShaderLibBuilder::SetTarget(PlatformTargets target) { platform.target = target; }
 
 void ShaderLibBuilder::SetFeatureLevel(string_view featureLevel) { platform.featureLevel = featureLevel; }
+
+void ShaderLibBuilder::SetDebug(bool isDebugging) { this->isDebugging = isDebugging; }
 
 void ShaderLibBuilder::InitVariants(VariantRepoDef& lib)
 {
@@ -306,7 +309,8 @@ void ShaderLibBuilder::GetShaderDefs(string_view libPath, DynamicArray<ShaderVar
 		const ShaderEntrypoint& ep = entrypoints[i];
 		pShaderGen->GetShaderSource(*pTable, pAnalyzer->GetBlocks(), ep, entrypoints, hlslBuf);
 
-		const uint shaderID = GetShaderDefD3D11(libPath, hlslBuf, platform.featureLevel, ep.stage, ep.name, *pShaderRegistry);
+		const uint shaderID = GetShaderDefD3D11(libPath, hlslBuf, platform.featureLevel, ep.stage, 
+			ep.name, *pShaderRegistry, isDebugging);
 		const uint nameID = pShaderRegistry->GetShader(shaderID).nameID;
 
 		variants[i].shaderID = shaderID;

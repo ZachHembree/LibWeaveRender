@@ -172,8 +172,8 @@
       <ObjectFileOutput>$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <PreBuildEvent>
-      <Command>$(SolutionDir)EffectPreprocessor\Build\x64\$(Configuration)\bin\rpfx.exe --header^
-    --input "$(ProjectDir)res\DefaultShaders.rpfx"^
+      <Command>$(SolutionDir)EffectPreprocessor\Build\x64\$(Configuration)\bin\rpfx.exe -hm^
+    --input "$(ProjectDir)res\*.rpfx"^
     --output "$(ProjectDir)src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -208,8 +208,8 @@
       <ObjectFileOutput>$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <PreBuildEvent>
-      <Command>$(SolutionDir)EffectPreprocessor\Build\x64\$(Configuration)\bin\rpfx.exe --header^
-    --input "$(ProjectDir)res\DefaultShaders.rpfx"^
+      <Command>$(SolutionDir)EffectPreprocessor\Build\x64\$(Configuration)\bin\rpfx.exe -hm^
+    --input "$(ProjectDir)res\*.rpfx"^
     --output "$(ProjectDir)src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>

@@ -34,6 +34,8 @@ namespace Replica::Effects
 
 		void SetFeatureLevel(string_view featureLevel);
 
+		void SetDebug(bool isDebugging);
+
 		ShaderLibDef ExportLibrary();
 
 		void Clear();
@@ -61,6 +63,7 @@ namespace Replica::Effects
 
 		PlatformDef platform;
 		UniqueVector<VariantRepoDef> repos;
+		bool isDebugging;
 
 		// Parsing, code gen and reflection
 		unique_ptr<ShaderRegistryBuilder> pShaderRegistry;

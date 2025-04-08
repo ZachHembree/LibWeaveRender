@@ -138,8 +138,15 @@ static ShaderTypes GetResourceType(const D3D11_SHADER_INPUT_BIND_DESC& resDesc)
 /// <summary>
 /// Returns precompiled shader bytecode for D3D11 with the shading stage specified, targeting SM 5.0
 /// </summary>
-static void GetPrecompShaderD3D11(string_view srcFile, string_view srcText, ShadeStages stage, string_view mainName, 
-	ShaderDef& def, ShaderRegistryBuilder& builder)
+static void GetPrecompShaderD3D11(
+	string_view srcFile, 
+	string_view srcText, 
+	ShadeStages stage, 
+	string_view mainName, 
+	ShaderDef& def, 
+	ShaderRegistryBuilder& builder,
+	bool isDebugging
+)
 {
 	REP_ASSERT_MSG((int)stage > 0 && (int)stage < CompilerState::GetTargetCount(), "Invalid stage specified")
 
@@ -152,7 +159,12 @@ static void GetPrecompShaderD3D11(string_view srcFile, string_view srcText, Shad
 	tmpMain.append(mainName);
 
 	// Disallow deprecated features
-	uint compileFlags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3;
+	uint compileFlags = D3DCOMPILE_ENABLE_STRICTNESS;
+
+	if (!isDebugging)
+		compileFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
+	else
+		compileFlags |= D3DCOMPILE_DEBUG;
 	
 	// Compile
 	ComPtr<ID3DBlob> binSrc, errors;
@@ -370,14 +382,15 @@ uint Replica::Effects::GetShaderDefD3D11(
 	string_view featureLevel, 
 	ShadeStages stage,
 	string_view mainName, 
-	ShaderRegistryBuilder& builder
+	ShaderRegistryBuilder& builder,
+	bool isDebugging
 )
 {
 	ShaderDef def;
 	s_State.SetFeatureLevel(featureLevel);
 
 	// Precompile
-	GetPrecompShaderD3D11(srcFile, srcText, stage, mainName, def, builder);
+	GetPrecompShaderD3D11(srcFile, srcText, stage, mainName, def, builder, isDebugging);
 	// Reflect binary
 	GetReflectedMetadata(def, builder);
 
