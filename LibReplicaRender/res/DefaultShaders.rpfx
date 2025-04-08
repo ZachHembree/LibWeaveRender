@@ -1,6 +1,5 @@
 // Built-in scaling and blit utilities
-
-compute CS_TexCopy2D
+compute TexCopy2D
 {
 	int2 SrcOffset;
 	int2 DstOffset;
@@ -9,13 +8,13 @@ compute CS_TexCopy2D
 	RWTexture2D<float4> DstTex;
 
 	[numthreads(1, 1, 1)]
-	void CS_TexCopy2D(uint3 id : SV_DispatchThreadID)
+	void TexCopy2D(uint3 id : SV_DispatchThreadID)
 	{
 		DstTex[id.xy + DstOffset] = SrcTex[id.xy + SrcOffset];
 	}
 }
 
-compute CS_TexCopySamp2D
+compute TexCopySamp2D
 {
 	float4 DstTexelSize;
 
@@ -24,14 +23,14 @@ compute CS_TexCopySamp2D
 	SamplerState Samp;
 
 	[numthreads(1, 1, 1)]
-	void CS_TexCopySamp2D( uint3 id : SV_DispatchThreadID )
+	void TexCopySamp2D( uint3 id : SV_DispatchThreadID )
 	{
 		const float2 uv = ((id.xy) + 0.5f) * DstTexelSize.xy;
 		DstTex[id.xy] = SrcTex.SampleLevel(Samp, uv , 0);
 	}
 }
 
-compute CS_TexCopyScaledSamp2D
+compute TexCopyScaledSamp2D
 {
 	float4 DstTexelSize;
 	float2 Scale;
@@ -42,7 +41,7 @@ compute CS_TexCopyScaledSamp2D
 	SamplerState Samp;
 
 	[numthreads(1, 1, 1)]
-	void CS_TexCopyScaledSamp2D(uint3 id : SV_DispatchThreadID)
+	void TexCopyScaledSamp2D(uint3 id : SV_DispatchThreadID)
 	{
 		const float2 uv = Scale * (id.xy + 0.5f) * DstTexelSize.xy;
 		DstTex[id.xy] = SrcTex.SampleLevel(Samp, Offset + uv, 0);
