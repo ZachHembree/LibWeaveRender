@@ -60,9 +60,9 @@ namespace Replica::Effects
 
 	std::string VariantPreprocessor::GetWaveVerString() { return WaveContext::get_version_string(); }
 
-	void VariantPreprocessor::GetVariant(const uint variantID, string& dst, Vector<ShaderEntrypoint>& entrypoints)
+	void VariantPreprocessor::GetVariant(const uint configID, string& dst, Vector<ShaderEntrypoint>& entrypoints)
 	{
-		PARSE_ASSERT_MSG(variantID != -1 && variantID < std::max<uint>(1u, GetVariantCount()), "Invalid variant ID");
+		PARSE_ASSERT_MSG(configID != -1 && configID < std::max<uint>(1u, GetVariantCount()), "Invalid variant ID");
 		pEntrypoints = &entrypoints;
 
 		// Initialize context to source
@@ -82,7 +82,7 @@ namespace Replica::Effects
 			ctx.add_macro_definition(macro);
 
 		// Convert ID into bit flags and set defines
-		const uint flagID = variantID % GetFlagVariantCount();
+		const uint flagID = configID % GetFlagVariantCount();
 
 		for (int i = 0; i < variantFlags.GetLength(); i++)
 		{
@@ -93,7 +93,7 @@ namespace Replica::Effects
 		}
 
 		// Set mode define
-		const uint enumID = variantID / GetFlagVariantCount();
+		const uint enumID = configID / GetFlagVariantCount();
 
 		if (enumID > 0)
 			ctx.add_macro_definition(variantModes[enumID]);

@@ -58,7 +58,7 @@ namespace Replica::Effects
 		/// Generates variant with flags corresponding to the given index and returns 
 		/// reference to temporary buffer
 		/// </summary>
-		void GetVariant(const uint variantID, string& dst, Vector<ShaderEntrypoint>& entrypoints);
+		void GetVariant(const uint configID, string& dst, Vector<ShaderEntrypoint>& entrypoints);
 
 		/// <summary>
 		/// Returns the total number of compile flag combos

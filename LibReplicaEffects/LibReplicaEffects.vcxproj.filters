@@ -54,9 +54,6 @@
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\VariantRepoMap.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\SymbolHandles.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -123,9 +120,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderLibBuilder\ShaderGenerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VariantRepoMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderLibBuilder\VariantPreprocessor.cpp">

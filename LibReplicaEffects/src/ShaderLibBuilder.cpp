@@ -29,19 +29,21 @@ ShaderLibBuilder::~ShaderLibBuilder() = default;
 
 void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_view libSrc)
 {
+	const uint repoID = (uint)repos.GetLength() << g_VariantGroupOffset;
 	VariantRepoDef& lib = repos.emplace_back();
 	lib.src.name = name;
 	lib.src.path = libPath;
 	pVariantGen->SetSrc(libPath, libSrc);
 
-	for (uint vID = 0; vID < pVariantGen->GetVariantCount(); vID++)
+	for (uint configID = 0; configID < pVariantGen->GetVariantCount(); configID++)
 	{
+		const uint vID = repoID | configID;
 		VariantSrcBuf* pBuf = &libBufs[libBufIndex];
 		pBuf->libText.clear();
-		pBuf->vID = vID;
+		pBuf->vID = configID;
 
 		// Generate variant
-		pVariantGen->GetVariant(vID, pBuf->libText, entrypoints);
+		pVariantGen->GetVariant(configID, pBuf->libText, entrypoints);
 		bool isDuplicate = false;
 
 		for (int i = 0; i < std::size(libBufs); i++)
@@ -61,17 +63,18 @@ void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_vie
 			pAnalyzer->AnalyzeSource(pBuf->libText);
 			pTable->ParseBlocks(pAnalyzer->GetBlocks());
 
-			if (vID == 0)
+			if (configID == 0)
 				InitVariants(lib);
 
 			// Shaders
 			GetEntryPoints();
-			lib.variants[vID].shaders = DynamicArray<ShaderVariantDef>(entrypoints.GetLength());
-			GetShaderDefs(libPath, lib.variants[vID].shaders, vID);
+			lib.variants[configID].shaders = DynamicArray<ShaderVariantDef>(entrypoints.GetLength());
+			GetShaderDefs(libPath, lib.variants[configID].shaders, vID);
+
 			// Effects
 			GetEffects();
-			lib.variants[vID].effects = DynamicArray<EffectVariantDef>(effectBlocks.GetLength());
-			GetEffectDefs(lib.variants[vID].effects, vID);
+			lib.variants[configID].effects = DynamicArray<EffectVariantDef>(effectBlocks.GetLength());
+			GetEffectDefs(lib.variants[configID].effects, vID);
 
 			if (resCount == pShaderRegistry->GetUniqueResCount())
 				LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Not skipped.";
@@ -82,13 +85,13 @@ void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_vie
 		else // Skip processing
 		{
 			// Copy variant mappings and update ID
-			lib.variants[vID] = lib.variants[pBuf->vID];
+			lib.variants[configID] = lib.variants[pBuf->vID];
 
-			for (ShaderVariantDef& shader : lib.variants[vID].shaders)
-				shader.variantID = vID;
+			for (ShaderVariantDef& shader : lib.variants[configID].shaders)
+				shader.variantID = configID;
 
-			for (EffectVariantDef& effect : lib.variants[vID].effects)
-				effect.variantID = vID;
+			for (EffectVariantDef& effect : lib.variants[configID].effects)
+				effect.variantID = configID;
 
 			LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Skipped.";
 		}
@@ -294,7 +297,7 @@ void ShaderLibBuilder::AddPass(const ScopeHandle& passScope, string_view name)
 	pass.shaderCount = (uint)effectShaders.GetLength() - pass.shaderStart;
 }
 
-void ShaderLibBuilder::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& variants, const uint vID)
+void ShaderLibBuilder::GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& variants, uint vID)
 {
 	for (int i = 0; i < entrypoints.GetLength(); i++)
 	{
@@ -313,7 +316,7 @@ void ShaderLibBuilder::GetShaderDefs(string_view libPath, DynamicArray<ShaderVar
 	}
 }
 
-void ShaderLibBuilder::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const uint vID)
+void ShaderLibBuilder::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, uint vID)
 {
 	// Effects
 	for (uint i = 0; i < (uint)effectBlocks.GetLength(); i++)
@@ -341,7 +344,7 @@ void ShaderLibBuilder::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, co
 		effects[i] = EffectVariantDef 
 		{
 			.effectID = pShaderRegistry->GetOrAddEffect(std::move(effect)),
-			.variantID = (uint)vID
+			.variantID = vID
 		};
 	}
 }

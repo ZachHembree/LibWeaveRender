@@ -107,12 +107,12 @@ namespace Replica::Effects
 		/// <summary>
 		/// Generates shader definitions for every shader in a variant
 		/// </summary>
-		void GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& variants, const uint vID);
+		void GetShaderDefs(string_view libPath, DynamicArray<ShaderVariantDef>& variants, uint resID);
 
 		/// <summary>
 		/// Generates effect definitions for every effect in a variant
 		/// </summary>
-		void GetEffectDefs(DynamicArray<EffectVariantDef>& effects, const uint vID);
+		void GetEffectDefs(DynamicArray<EffectVariantDef>& effects, uint resID);
 
 		/// <summary>
 		/// Resets tables for next variant

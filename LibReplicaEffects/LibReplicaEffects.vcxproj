@@ -29,7 +29,6 @@
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderEntrypoint.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderGenerator.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibMap.hpp" />
-    <ClInclude Include="include\ReplicaEffects\VariantRepoMap.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderParser\BlockAnalyzer.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderParser\ScopeBuilder.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderData.hpp" />
@@ -56,7 +55,6 @@
     <ClCompile Include="src\ShaderDataHandles.cpp" />
     <ClCompile Include="src\ShaderLibBuilder\ShaderGenerator.cpp" />
     <ClCompile Include="src\ShaderLibMap.cpp" />
-    <ClCompile Include="src\VariantRepoMap.cpp" />
     <ClCompile Include="src\ShaderLibBuilder\ShaderParser\BlockAnalyzer.cpp" />
     <ClCompile Include="src\ShaderLibBuilder\ShaderParser\MatchingPatterns.cpp" />
     <ClCompile Include="src\ShaderLibBuilder\ShaderParser\ScopeBuilder.cpp" />

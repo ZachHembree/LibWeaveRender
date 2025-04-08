@@ -106,7 +106,7 @@ namespace Replica
         {
         case Level::Info: return "INFO";
         case Level::Error: return "ERROR";
-        case Level::Warning: return "WARNING";
+        case Level::Warning: return "WARN";
         case Level::Debug: return "DEBUG";
         default: return "UNKNOWN";
         }
