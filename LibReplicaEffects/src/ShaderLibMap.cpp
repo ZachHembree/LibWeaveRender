@@ -50,6 +50,17 @@ ShaderLibMap::~ShaderLibMap() = default;
 
 const StringIDMap& ShaderLibMap::GetStringMap() const { return pRegMap->GetStringMap(); }
 
+ShaderLibMap::ShaderLibMap(const ShaderLibDef& def) :
+	platform(def.platform),
+	variantShaderMaps(def.repos.GetLength()),
+	variantFlagMaps(def.repos.GetLength()),
+	variantModeMaps(def.repos.GetLength()),
+	variantRepos(def.repos),
+	pRegMap(new ShaderRegistryMap(def.regData))
+{
+	InitMaps();
+}
+
 ShaderLibMap::ShaderLibMap(ShaderLibDef&& def) :
 	platform(std::move(def.platform)),
 	variantShaderMaps(def.repos.GetLength()),
@@ -143,24 +154,24 @@ EffectDefHandle ShaderLibMap::GetEffect(uint effectID) const
 	return EffectDefHandle(*pRegMap, effectID);
 }
 
-uint ShaderLibMap::TryGetShaderID(uint nameID) const 
+uint ShaderLibMap::TryGetDefaultShaderVariant(uint nameID) const
 {
 	REP_ASSERT_MSG(nameID != -1, "Name ID invalid");
 	const auto& it = sharedVariantMap.shaders.find(nameID);
 
 	if (it != sharedVariantMap.shaders.end())
-		return TryGetShaderID(nameID, it->second);
+		return it->second;
 	else
 		return -1;
 }
 
-uint ShaderLibMap::TryGetEffectID(uint nameID) const 
+uint ShaderLibMap::TryGetDefaultEffectVariant(uint nameID) const
 {
 	REP_ASSERT_MSG(nameID != -1, "Name ID invalid");
 	const auto& it = sharedVariantMap.effects.find(nameID);
 
 	if (it != sharedVariantMap.effects.end())
-		return TryGetEffectID(nameID, it->second);
+		return it->second;
 	else
 		return -1;
 }
@@ -354,6 +365,12 @@ uint ShaderLibMap::SetFlag(string_view name, bool value, uint vID) const
 		return -1;
 }
 
+uint ShaderLibMap::ResetVariant(uint vID) const 
+{
+	const uint repoIndex = GetRepoIndex(vID);
+	return PackVariantID(repoIndex, 0);
+}
+
 uint ShaderLibMap::SetMode(uint modeID, uint vID) const 
 {
 	const uint repoIndex = GetRepoIndex(vID);
@@ -399,27 +416,6 @@ uint ShaderLibMap::GetModeCount(uint repoIndex) const
 {
 	const uint modeCount = (uint)variantRepos[repoIndex].modeIDs.GetLength();
 	return modeCount;
-}
-
-uint ShaderLibMap::GetModeName(uint repoIndex, uint modeID) const
-{
-	return variantRepos[repoIndex].modeIDs[modeID];
-}
-
-uint ShaderLibMap::GetFlagName(uint repoIndex, uint flagID) const
-{
-	uint flagIndex = 0u;
-
-	while (flagID > 0u)
-	{
-		if ((flagID & 1u) == 1u)
-			return variantRepos[repoIndex].flagIDs[flagIndex];
-
-		flagIndex++;
-		flagID >>= 1u;
-	}
-
-	return -1;
 }
 
 uint ShaderLibMap::GetFlags(uint repoIndex, uint configIndex) const

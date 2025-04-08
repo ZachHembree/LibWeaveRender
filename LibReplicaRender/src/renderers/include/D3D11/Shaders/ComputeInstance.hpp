@@ -14,7 +14,7 @@ namespace Replica::D3D11
 
 		ComputeInstance();
 
-		ComputeInstance(ShaderVariantManager& lib, uint nameID, int vID);
+		ComputeInstance(ShaderVariantManager& lib, uint nameID, uint vID);
 
 		ComputeInstance(ComputeInstance&&) noexcept;
 
@@ -31,6 +31,6 @@ namespace Replica::D3D11
 
 		const ComputeShaderVariant& GetShader() const;
 
-		void SetVariantID(int vID) override;
+		void SetVariantID(uint vID) override;
 	};
 }

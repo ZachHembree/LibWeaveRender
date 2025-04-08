@@ -11,8 +11,8 @@ ShaderInstanceBase::ShaderInstanceBase() :
 
 ShaderInstanceBase::~ShaderInstanceBase() = default;
 
-ShaderInstanceBase::ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, int vID) :
-	pLib(&lib), vID(0), nameID(nameID), pRes(new ResourceSet())
+ShaderInstanceBase::ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, uint vID) :
+	pLib(&lib), vID(vID), nameID(nameID), pRes(new ResourceSet())
 { }
 
 ShaderInstanceBase::ShaderInstanceBase(ShaderInstanceBase&&) noexcept = default;
@@ -23,7 +23,7 @@ uint ShaderInstanceBase::GetNameID() const { return nameID; }
 
 string_view ShaderInstanceBase::GetName() const { return pLib->GetStringMap().GetString(nameID); }
 
-int ShaderInstanceBase::GetVariantID() const { return vID; }
+uint ShaderInstanceBase::GetVariantID() const { return vID; }
 
 void ShaderInstanceBase::SetConstant(uint nameID, const byte* pSrc, const size_t size) { pRes->SetConstant(nameID, pSrc, (uint)size); }
 
@@ -65,16 +65,26 @@ bool ShaderInstanceBase::GetIsDefined(uint nameID) const { return pLib->GetLibMa
 
 bool ShaderInstanceBase::GetIsDefined(string_view name) const { return pLib->GetLibMap().GetIsDefined(name, vID); }
 
-void ShaderInstanceBase::SetFlag(uint nameID, bool value) { SetVariantID(pLib->GetLibMap().SetFlag(nameID, value, vID)); }
+void ShaderInstanceBase::SetFlag(uint nameID, bool value) 
+{
+	const ShaderLibMap& map = pLib->GetLibMap();
+	const uint flag = map.TryGetFlag(nameID, vID);
+	SetVariantID(map.SetFlags(flag, value, vID));
+}
 
 void ShaderInstanceBase::SetFlag(string_view name, bool value) { SetVariantID(pLib->GetLibMap().SetFlag(name, value, vID)); }
 
-void ShaderInstanceBase::SetMode(uint nameID) { SetVariantID(pLib->GetLibMap().SetMode(nameID, vID)); }
+void ShaderInstanceBase::SetMode(uint nameID) 
+{ 
+	const ShaderLibMap& map = pLib->GetLibMap();
+	const uint mode = map.TryGetModeID(nameID, vID);
+	SetVariantID(pLib->GetLibMap().SetMode(mode, vID)); 
+}
 
 void ShaderInstanceBase::SetMode(string_view name) { SetVariantID(pLib->GetLibMap().SetMode(name, vID)); }
 
 void ShaderInstanceBase::ResetMode() { SetVariantID(pLib->GetLibMap().ResetMode(vID)); }
 
-void ShaderInstanceBase::ResetDefines() { SetVariantID(0); }
+void ShaderInstanceBase::ResetDefines() { SetVariantID(pLib->GetLibMap().ResetVariant(0)); }
 
 void ShaderInstanceBase::GetDefines(Vector<uint>& nameIDs) const { pLib->GetLibMap().GetDefines(vID, nameIDs); }

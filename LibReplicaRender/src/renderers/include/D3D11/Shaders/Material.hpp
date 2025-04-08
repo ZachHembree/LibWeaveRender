@@ -14,7 +14,7 @@ namespace Replica::D3D11
 
 		Material();
 
-		Material(ShaderVariantManager& lib, uint nameID, int vID);
+		Material(ShaderVariantManager& lib, uint nameID, uint vID);
 
 		Material(Material&&) noexcept;
 
@@ -45,6 +45,6 @@ namespace Replica::D3D11
 
 		const EffectVariant& GetEffect() const;
 
-		void SetVariantID(int vID) override;
+		void SetVariantID(uint vID) override;
 	};
 }

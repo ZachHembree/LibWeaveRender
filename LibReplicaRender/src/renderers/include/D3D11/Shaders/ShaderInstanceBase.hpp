@@ -192,20 +192,20 @@ namespace Replica::D3D11
 		std::unique_ptr<ResourceSet> pRes;
 		ShaderVariantManager* pLib;
 		uint nameID;
-		int vID;
+		uint vID;
 
 		ShaderInstanceBase();
 
 		~ShaderInstanceBase();
 
-		ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, int vID);
+		ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, uint vID);
 
 		ShaderInstanceBase(ShaderInstanceBase&&) noexcept;
 
 		ShaderInstanceBase& operator=(ShaderInstanceBase&&) noexcept;
 
-		int GetVariantID() const;
+		uint GetVariantID() const;
 
-		virtual void SetVariantID(int vID) = 0;
+		virtual void SetVariantID(uint vID) = 0;
 	};
 }

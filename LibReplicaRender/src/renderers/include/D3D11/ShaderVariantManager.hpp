@@ -17,6 +17,8 @@ namespace Replica::D3D11
 
 		ShaderVariantManager();
 
+		ShaderVariantManager(Device& device, const ShaderLibDef& def);
+
 		ShaderVariantManager(Device& device, ShaderLibDef&& def);
 
 		/// <summary>

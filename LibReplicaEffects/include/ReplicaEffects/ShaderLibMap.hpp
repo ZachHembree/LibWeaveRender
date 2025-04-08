@@ -5,12 +5,17 @@
 
 namespace Replica::Effects
 {
+	/// <summary>
+	/// Provides a runtime interface to precompiled shader and effect variants.
+	/// </summary>
 	class ShaderLibMap
 	{
 	public:
 		MAKE_NO_COPY(ShaderLibMap)
 
 		ShaderLibMap();
+
+		ShaderLibMap(const ShaderLibDef& def);
 
 		ShaderLibMap(ShaderLibDef&& def);
 
@@ -32,14 +37,14 @@ namespace Replica::Effects
 		EffectDefHandle GetEffect(uint effectID) const;
 
 		/// <summary>
-		/// Returns the shaderID by name ID, -1 on fail
+		/// Returns the default variant ID for the shader with the given name, -1 on fail
 		/// </summary>
-		uint TryGetShaderID(uint nameID) const;
+		uint TryGetDefaultShaderVariant(uint nameID) const;
 
 		/// <summary>
-		/// Returns the effectID with the given name ID, -1 on fail
+		/// Returns the default variant ID for the effect with the given name, -1 on fail
 		/// </summary>
-		uint TryGetEffectID(uint nameID) const;
+		uint TryGetDefaultEffectVariant(uint nameID) const;
 
 		/// <summary>
 		/// Returns the shaderID by name ID and variantID, -1 on fail
@@ -183,6 +188,11 @@ namespace Replica::Effects
 		uint SetFlag(string_view name, bool value, uint vID) const;
 
 		/// <summary>
+		/// Returns default variant based on the given ID
+		/// </summary>
+		uint ResetVariant(uint vID) const;
+
+		/// <summary>
 		/// Resets variant mode to default
 		/// </summary>
 		uint ResetMode(uint vID) const;
@@ -279,9 +289,5 @@ namespace Replica::Effects
 		/// Returns the total number of modes used for variant generation
 		/// </summary>
 		uint GetModeCount(uint vID) const;
-
-		uint GetModeName(uint repoIndex, uint modeID) const;
-
-		uint GetFlagName(uint repoIndex, uint flagID) const;
 	};
 }

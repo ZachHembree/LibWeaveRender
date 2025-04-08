@@ -8,6 +8,11 @@ ShaderVariantManager::ShaderVariantManager() :
 	pDev(nullptr)
 { }
 
+ShaderVariantManager::ShaderVariantManager(Device& device, const ShaderLibDef& def) :
+	pDev(&device),
+	libMap(def)
+{ }
+
 ShaderVariantManager::ShaderVariantManager(Device& device, ShaderLibDef&& def) :
 	pDev(&device),
 	libMap(std::move(def))

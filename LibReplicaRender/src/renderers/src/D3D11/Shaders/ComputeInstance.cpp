@@ -9,10 +9,10 @@ using namespace Replica::D3D11;
 
 ComputeInstance::ComputeInstance() = default;
 
-ComputeInstance::ComputeInstance(ShaderVariantManager& lib, uint nameID, int vID)  : 
+ComputeInstance::ComputeInstance(ShaderVariantManager& lib, uint nameID, uint vID)  : 
 	ShaderInstanceBase(lib, nameID, vID), pCS(nullptr)
 { 
-	SetVariantID(0);
+	SetVariantID(vID);
 }
 
 ComputeInstance::ComputeInstance(ComputeInstance&&) noexcept = default;
@@ -38,7 +38,7 @@ const ComputeShaderVariant& ComputeInstance::GetShader() const
 	return *pCS; 
 }
 
-void ComputeInstance::SetVariantID(int vID)
+void ComputeInstance::SetVariantID(uint vID)
 {
 	if (pCS != nullptr && vID != this->vID)
 	{ 
