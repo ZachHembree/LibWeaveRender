@@ -45,7 +45,7 @@
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderCompiler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderDataSerializers.hpp">
+    <ClInclude Include="include\ReplicaEffects\ShaderDataSerialization.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderEntrypoint.hpp">
@@ -141,6 +141,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderLibMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderDataSerialization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

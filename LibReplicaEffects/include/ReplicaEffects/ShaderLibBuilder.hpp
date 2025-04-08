@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <memory>
 #include "ReplicaEffects/ShaderLibBuilder/ShaderEntrypoint.hpp"
-#include "ReplicaEffects/ShaderLibBuilder/ShaderDataSerializers.hpp"
+#include "ReplicaEffects/ShaderDataSerialization.hpp"
 
 namespace Replica::Effects
 {

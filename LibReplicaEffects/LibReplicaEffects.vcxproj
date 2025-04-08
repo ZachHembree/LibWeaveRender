@@ -25,7 +25,7 @@
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderDataHashes.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderCompiler.hpp" />
-    <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderDataSerializers.hpp" />
+    <ClInclude Include="include\ReplicaEffects\ShaderDataSerialization.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderEntrypoint.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderGenerator.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibMap.hpp" />
@@ -49,6 +49,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\ShaderDataSerialization.cpp" />
     <ClCompile Include="src\ShaderLibBuilder.cpp" />
     <ClCompile Include="src\ShaderLibBuilder\ShaderRegistryBuilder.cpp" />
     <ClCompile Include="src\ShaderLibBuilder\ShaderCompilerD3D11.cpp" />
