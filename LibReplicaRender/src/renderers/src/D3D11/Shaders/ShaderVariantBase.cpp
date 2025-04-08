@@ -40,10 +40,10 @@ void ShaderVariantBase::MapResources(Context& ctx, const ResourceSet& res) const
 {
 	const ShadeStages stage = def.GetStage();
 
-	if (res.GetSamplers().GetLength() > 0)
+	if (sampMap.GetCount() > 0)
 		ctx.SetSamplers(res.GetSamplers(), sampMap, stage);
 
-	if (res.GetSRVs().GetLength() > 0)
+	if (srvMap.GetCount() > 0)
 		ctx.SetSRVs(res.GetSRVs(), srvMap, stage);
 
 	if (constants.GetBufferCount() > 0)
@@ -56,8 +56,12 @@ void ShaderVariantBase::MapResources(Context& ctx, const ResourceSet& res) const
 void ShaderVariantBase::UnmapResources(Context& ctx) const
 {
 	const ShadeStages stage = def.GetStage();
-	ctx.ClearSamplers(0, (uint)sampMap.GetCount(), stage);
-	ctx.ClearSRVs(0, (uint)srvMap.GetCount(), stage);
+
+	if (sampMap.GetCount() > 0)
+		ctx.ClearSamplers(0, (uint)sampMap.GetCount(), stage);
+
+	if (srvMap.GetCount() > 0)
+		ctx.ClearSRVs(0, (uint)srvMap.GetCount(), stage);
 
 	if (constants.GetBufferCount() > 0)
 		ctx.ClearConstants(0, (uint)constants.GetBufferCount(), stage);

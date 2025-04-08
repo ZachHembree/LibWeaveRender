@@ -63,7 +63,9 @@ void ComputeShaderVariant::MapResources(Context& ctx, const ResourceSet& res) co
 void ComputeShaderVariant::UnmapResources(Context& ctx) const
 {
 	ShaderVariant::UnmapResources(ctx);
-	ctx.ClearUAVs(0, (uint)uavMap.GetCount());
+
+	if (uavMap.GetCount() > 0)
+		ctx.ClearUAVs(0, (uint)uavMap.GetCount());
 }
 
 void PixelShaderVariant::Bind(Context& ctx, const ResourceSet& res) const

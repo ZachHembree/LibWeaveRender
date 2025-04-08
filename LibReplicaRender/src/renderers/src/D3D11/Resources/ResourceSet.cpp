@@ -41,10 +41,11 @@ void ResourceSet::ConstantGroup::SetValue(uint stringID, const byte* pValue, uin
 	}
 	else // Add new value
 	{
-		const uint newOffset = (uint)constants.GetLength();
-		constants.emplace_back(stringID, size, newOffset);
-		stringConstMap.emplace(stringID, newOffset);
-		data.reserve(data.GetLength() + size);
+		const uint index = (uint)constants.GetLength();
+		const uint offset = (uint)data.GetLength();
+		constants.emplace_back(stringID, size, offset);
+		stringConstMap.emplace(stringID, index);
+		data.reserve(offset + size);
 
 		for (size_t i = 0; i < size; i++)
 			data.emplace_back(pValue[i]);
