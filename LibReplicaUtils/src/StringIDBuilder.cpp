@@ -15,25 +15,19 @@ StringIDBuilder& StringIDBuilder::operator=(StringIDBuilder&& other) noexcept = 
 /// </summary>
 uint StringIDBuilder::GetOrAddStringID(std::string_view str)
 {
-    if (str.back() != '\0')
-    {
-        textBuf.clear();
-        textBuf.append(str);
-        textBuf.push_back('\0');
-        str = textBuf;
-    }
-
-    auto it = idMap.find(str);
+    StringSpan ss = GetTmpStringSpan(str, stringData);
+    auto it = idMap.find(ss);
 
     if (it != idMap.end())
     {
+        RemoveTmpStringSpan(ss, stringData);
         return it->second;
     }
     else
     {
-        const uint id = static_cast<uint>(strings.size());
-        const std::string& storedStr = strings.emplace_back(string(str));
-        idMap.emplace(std::string_view(storedStr), id);
+        const uint id = static_cast<uint>(strings.GetLength());
+        strings.emplace_back(ss);
+        idMap.emplace(ss, id);
 
         return id;
     }
@@ -44,7 +38,9 @@ uint StringIDBuilder::GetOrAddStringID(std::string_view str)
 /// </summary>
 bool StringIDBuilder::TryGetStringID(std::string_view str, uint& id) const
 {
-    auto it = idMap.find(str);
+    StringSpan ss = GetTmpStringSpan(str, textBuf);
+    auto it = idMap.find(ss);
+    RemoveTmpStringSpan(ss, textBuf);
 
     if (it != idMap.end())
     {
@@ -65,7 +61,7 @@ std::string_view StringIDBuilder::GetString(uint id) const { return strings[id];
 /// Returns the total number of strings mapped
 /// </summary>
 /// <returns></returns>
-uint StringIDBuilder::GetStringCount() const { return static_cast<uint>(strings.size()); }
+uint StringIDBuilder::GetStringCount() const { return static_cast<uint>(strings.GetLength()); }
 
 /// <summary>
 /// Returns a copy of the ID generator's current state in a compact, serializable format
@@ -81,7 +77,7 @@ StringIDMapDef StringIDBuilder::ExportDefinition() const
 
     for (uint i = 0; i < count; i++)
     {
-        const uint subLen = (uint)strings[i].size();
+        const uint subLen = (uint)strings[i].GetLength();
         def.substrings[2 * i] = charCount;
         def.substrings[2 * i + 1] = subLen - 1; // Exclude null terminator
         charCount += subLen;
@@ -90,14 +86,7 @@ StringIDMapDef StringIDBuilder::ExportDefinition() const
     // Copy strings into concatenated buffer
     def.stringData = DynamicArray<char>(charCount);
     uint charStart = 0;
-
-    for (uint i = 0; i < count; i++)
-    {
-        const uint remLen = (uint)def.stringData.GetLength() - charStart;
-        const string& substring = strings[i];
-        memcpy_s(&def.stringData[charStart], remLen, substring.data(), substring.size());
-        charStart += static_cast<uint>(substring.size());
-    }
+    memcpy(def.stringData.GetPtr(), stringData.data(), charCount);
 
     return def;
 }
@@ -106,4 +95,32 @@ void StringIDBuilder::Clear()
 {
     strings.clear();
     idMap.clear();
+    textBuf.clear();
+    stringData.clear();
+}
+
+/// <summary>
+/// Copies a temporary string into the text buffer, but not the lookup tables
+/// </summary>
+StringSpan StringIDBuilder::GetTmpStringSpan(string_view str, string& buf)
+{
+    const size_t bufStart = buf.length();
+    size_t len = str.length();
+    buf.append(str);
+
+    if (str.back() != '\0')
+    {
+        buf.push_back('\0');
+        len++;
+    }
+
+    return StringSpan(buf, bufStart, len);
+}
+
+/// <summary>
+/// Erases a temporary string from the end of the text buffer
+/// </summary>
+void StringIDBuilder::RemoveTmpStringSpan(const StringSpan& ss, string& buf)
+{
+    buf.erase(buf.length() - ss.GetLength());
 }

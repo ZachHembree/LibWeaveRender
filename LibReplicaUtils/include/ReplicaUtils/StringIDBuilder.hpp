@@ -1,8 +1,8 @@
 #pragma once
-#include "ReplicaUtils/Utils.hpp"
 #include <unordered_map>
-#include <deque>
+#include "ReplicaUtils/Utils.hpp"
 #include "ReplicaUtils/StringIDMap.hpp"
+#include "ReplicaUtils/StringSpan.hpp"
 
 namespace Replica 
 {
@@ -26,17 +26,17 @@ namespace Replica
         /// Returns the ID corresponding to the given string. Adds a copy of
         /// the string to the map if it hasn't been added previously.
         /// </summary>
-        uint GetOrAddStringID(std::string_view str);
+        uint GetOrAddStringID(string_view str);
 
         /// <summary>
         /// Returns true if the string exists in the map and retrieves its ID
         /// </summary>
-        bool TryGetStringID(std::string_view str, uint& id) const;
+        bool TryGetStringID(string_view str, uint& id) const;
 
         /// <summary>
         /// Returns the string corresponding to the given ID
         /// </summary>
-        std::string_view GetString(uint id) const;
+        string_view GetString(uint id) const;
 
         /// <summary>
         /// Returns the total number of strings mapped
@@ -55,10 +55,15 @@ namespace Replica
         void Clear();
 
     private:
-        std::string textBuf;
+        mutable string textBuf;
+        string stringData;
         // String storage; ID -> string
-        std::deque<std::string> strings;
+        UniqueVector<StringSpan> strings;
         // string -> ID map
-        std::unordered_map<std::string_view, uint> idMap;
+        std::unordered_map<StringSpan, uint> idMap;
+
+        static StringSpan GetTmpStringSpan(string_view str, string& buf);
+
+        static void RemoveTmpStringSpan(const StringSpan& str, string& buf);
     };
 }
