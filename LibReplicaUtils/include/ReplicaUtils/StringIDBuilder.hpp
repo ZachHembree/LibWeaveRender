@@ -23,12 +23,6 @@ namespace Replica
         StringIDBuilder& operator=(StringIDBuilder&& other) noexcept;
 
         /// <summary>
-        /// Returns the ID corresponding to the given string. Moves
-        /// the string to the map if it hasn't been added previously.
-        /// </summary>
-        uint GetOrAddStringID(std::string&& str) noexcept;
-
-        /// <summary>
         /// Returns the ID corresponding to the given string. Adds a copy of
         /// the string to the map if it hasn't been added previously.
         /// </summary>

@@ -69,6 +69,8 @@ namespace Replica
 		DynIterator operator+(difference_type offset) const { return DynIterator(pData + offset); }
 		DynIterator operator-(difference_type offset) const { return DynIterator(pData - offset); }
 
+		friend DynIterator operator+(difference_type offset, const DynIterator& it) { return DynIterator(it.pData + offset); }
+
 		DynIterator& operator+=(difference_type offset) { pData += offset; return *this; }
 		DynIterator& operator-=(difference_type offset) { pData -= offset; return *this; }
 

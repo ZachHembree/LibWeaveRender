@@ -12,6 +12,7 @@ ShaderRegistryBuilder::ShaderRegistryBuilder() :
 void ShaderRegistryBuilder::Clear()
 {
 	stringIDs.Clear();
+	idBuffer.clear();
 	resourceSet.clear();
 	constants.clear();
 	cbufDefs.clear();
@@ -22,8 +23,8 @@ void ShaderRegistryBuilder::Clear()
 	resGroups.clear();
 	shaders.clear();
 	effects.clear();
-
 	resCount = 0;
+
 	uniqueResCount = 0;
 }
 
@@ -31,30 +32,26 @@ int ShaderRegistryBuilder::GetResourceCount() const { return resCount; }
 
 int ShaderRegistryBuilder::GetUniqueResCount() const { return uniqueResCount; }
 
-uint ShaderRegistryBuilder::GetOrAddStringID(const char* str) { return GetOrAddStringID(string_view(str)); }
-
-uint ShaderRegistryBuilder::GetOrAddStringID(string&& str) { return stringIDs.GetOrAddStringID(std::move(str)); }
-
 uint ShaderRegistryBuilder::GetOrAddStringID(string_view str) { return stringIDs.GetOrAddStringID(str); }
 
 // Add helpers
 uint ShaderRegistryBuilder::GetOrAddConstant(const ConstDef& constDef) { return GetOrAddValue(ConstDef(constDef), constants); }
 
-uint ShaderRegistryBuilder::GetOrAddConstantBuffer(ConstBufDef&& cbufDef) { return GetOrAddValue(std::move(cbufDef), cbufDefs); }
+uint ShaderRegistryBuilder::GetOrAddConstantBuffer(const ConstBufDef& cbufDef) { return GetOrAddValue(cbufDef, cbufDefs); }
 
 uint ShaderRegistryBuilder::GetOrAddIOElement(const IOElementDef& ioDef) { return GetOrAddValue(IOElementDef(ioDef), ioElements); }
 
 uint ShaderRegistryBuilder::GetOrAddResource(const ResourceDef& resDef) { return GetOrAddValue(ResourceDef(resDef), resources); }
 
-uint ShaderRegistryBuilder::GetOrAddCBufGroup(DynamicArray<uint>&& bufGroup) { return GetOrAddValue(std::move(bufGroup), cbufGroups); }
+uint ShaderRegistryBuilder::GetOrAddCBufGroup(const IDynamicArray<uint>& bufGroup) { return GetOrAddValue(bufGroup, cbufGroups); }
 
-uint ShaderRegistryBuilder::GetOrAddIOLayout(DynamicArray<uint>&& signature) { return GetOrAddValue(std::move(signature), ioSignatures); }
+uint ShaderRegistryBuilder::GetOrAddIOLayout(const IDynamicArray<uint>& signature) { return GetOrAddValue(signature, ioSignatures); }
 
-uint ShaderRegistryBuilder::GetOrAddResGroup(DynamicArray<uint>&& resGroup) { return GetOrAddValue(std::move(resGroup), resGroups); }
+uint ShaderRegistryBuilder::GetOrAddResGroup(const IDynamicArray<uint>& resGroup) { return GetOrAddValue(resGroup, resGroups); }
 
-uint ShaderRegistryBuilder::GetOrAddShader(ShaderDef&& shader) { return GetOrAddValue(std::move(shader), shaders); }
+uint ShaderRegistryBuilder::GetOrAddShader(const ShaderDef& shader) { return GetOrAddValue(shader, shaders); }
 
-uint ShaderRegistryBuilder::GetOrAddEffect(EffectDef&& effect) { return GetOrAddValue(std::move(effect), effects); }
+uint ShaderRegistryBuilder::GetOrAddEffect(const EffectDef& effect) { return GetOrAddValue(effect, effects); }
 
 // Getter helpers
 const ConstDef& ShaderRegistryBuilder::GetConstant(const uint id) const { return constants.GetValue(id); }
@@ -83,11 +80,23 @@ ShaderRegistryDef ShaderRegistryBuilder::ExportDefinition() const
 	def.cbufDefs = DynamicArray(cbufDefs);
 	def.ioElements = DynamicArray(ioElements);
 	def.resources = DynamicArray(resources);
-	def.cbufGroups = DynamicArray(cbufGroups);
-	def.ioSignatures = DynamicArray(ioSignatures);
-	def.resGroups = DynamicArray(resGroups);
 	def.shaders = DynamicArray(shaders);
 	def.effects = DynamicArray(effects);
+
+	def.cbufGroups = DynamicArray<DynamicArray<uint>>(cbufGroups.GetLength());
+
+	for (uint i = 0; i < cbufGroups.GetLength(); i++)
+		def.cbufGroups[i] = DynamicArray<uint>(cbufGroups[i]);
+
+	def.ioSignatures = DynamicArray<DynamicArray<uint>>(ioSignatures.GetLength());
+
+	for (uint i = 0; i < ioSignatures.GetLength(); i++)
+		def.ioSignatures[i] = DynamicArray<uint>(ioSignatures[i]);
+
+	def.resGroups = DynamicArray<DynamicArray<uint>>(resGroups.GetLength());
+
+	for (uint i = 0; i < resGroups.GetLength(); i++)
+		def.resGroups[i] = DynamicArray<uint>(resGroups[i]);
 
 	return def;
 }

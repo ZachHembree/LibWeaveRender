@@ -1,8 +1,9 @@
 #pragma once
-#include "ReplicaEffects/ShaderData.hpp"
-#include "ReplicaUtils/StringIDBuilder.hpp"
 #include <unordered_set>
 #include <functional>
+#include "ReplicaEffects/ShaderData.hpp"
+#include "ReplicaUtils/StringIDBuilder.hpp"
+#include "ReplicaUtils/VectorSpan.hpp"
 
 namespace Replica::Effects
 {
@@ -104,29 +105,25 @@ namespace Replica::Effects
 		* 
 		* StringIDs are separate from shader definition types. */
 
-		uint GetOrAddStringID(const char* str);
-
-		uint GetOrAddStringID(string&& str);
-
 		uint GetOrAddStringID(string_view str);
 
 		uint GetOrAddConstant(const ConstDef& constDef);
 
-		uint GetOrAddConstantBuffer(ConstBufDef&& cbufDef);
+		uint GetOrAddConstantBuffer(const ConstBufDef& cbufDef);
 
 		uint GetOrAddIOElement(const IOElementDef& ioDef);
 
 		uint GetOrAddResource(const ResourceDef& resDef);
 
-		uint GetOrAddCBufGroup(DynamicArray<uint>&& bufGroup);
+		uint GetOrAddCBufGroup(const IDynamicArray<uint>& bufGroup);
 
-		uint GetOrAddIOLayout(DynamicArray<uint>&& signature);
+		uint GetOrAddIOLayout(const IDynamicArray<uint>& signature);
 
-		uint GetOrAddResGroup(DynamicArray<uint>&& resGroup);
+		uint GetOrAddResGroup(const IDynamicArray<uint>& resGroup);
 
-		uint GetOrAddShader(ShaderDef&& shader);
+		uint GetOrAddShader(const ShaderDef& shader);
 
-		uint GetOrAddEffect(EffectDef&& effect);
+		uint GetOrAddEffect(const EffectDef& effect);
 
 		/* Get(Member) returns an immutable reference to the object corresponding to the given ID. */
 
@@ -166,6 +163,8 @@ namespace Replica::Effects
 		 static uint GetIndex(uint id);
 
 	private:
+		using LayoutSpan = VectorSpan<UniqueVector<uint>, uint>;
+
 		/// <summary>
 		/// Vector template that allows hashing members with HashHandles
 		/// </summary>
@@ -204,17 +203,19 @@ namespace Replica::Effects
 			IsEqFunc GetIsMemberEq;
 		};
 
+
 		StringIDBuilder stringIDs;
 		std::unordered_set<HashHandle> resourceSet;
+		UniqueVector<uint> idBuffer;
 
 		HashableVector<ConstDef, ResourceType::Constant> constants;
 		HashableVector<ConstBufDef, ResourceType::ConstantBuffer> cbufDefs;
 		HashableVector<IOElementDef, ResourceType::IOElement> ioElements;
 		HashableVector<ResourceDef, ResourceType::Resource> resources;
 
-		HashableVector<DynamicArray<uint>, ResourceType::CBufGroup> cbufGroups;
-		HashableVector<DynamicArray<uint>, ResourceType::IOLayout> ioSignatures;
-		HashableVector<DynamicArray<uint>, ResourceType::ResGroup> resGroups;
+		HashableVector<LayoutSpan, ResourceType::CBufGroup> cbufGroups;
+		HashableVector<LayoutSpan, ResourceType::IOLayout> ioSignatures;
+		HashableVector<LayoutSpan, ResourceType::ResGroup> resGroups;
 
 		HashableVector<ShaderDef, ResourceType::Shader> shaders;
 		HashableVector<EffectDef, ResourceType::Effect> effects;
@@ -223,13 +224,13 @@ namespace Replica::Effects
 		int uniqueResCount;
 
 		template<typename T, ResourceType type>
-		uint GetOrAddValue(T&& newValue, HashableVector<T, type>& values)
+		uint GetOrAddValue(const T& newValue, HashableVector<T, type>& values)
 		{
 			const uint index = (uint)values.GetLength();
 			const uint newID = SetResourceType(index, type);
 
 			// Temporarily store new value in vector to ensure valid handle
-			values.emplace_back(std::move(newValue));
+			values.emplace_back(newValue);
 			// Create handle and search set
 			HashHandle handle(newID, values.GetHashFunc(), values.GetEqFunc());
 			const auto& it = resourceSet.find(handle);
@@ -249,5 +250,39 @@ namespace Replica::Effects
 				return handle.GetID();
 			}
 		}
+
+		
+		template<ResourceType type>
+		uint GetOrAddValue(const IDynamicArray<uint>& ids, HashableVector<LayoutSpan, type>& values)
+		{
+			const uint index = (uint)values.GetLength();
+			const uint newID = SetResourceType(index, type);
+			const uint spanStart = (uint)idBuffer.GetLength();
+
+			// Temporarily store new value in vector to ensure valid handle
+			idBuffer.AddRange(ids);
+			const LayoutSpan& layout = values.emplace_back(idBuffer, spanStart, ids.GetLength());
+	
+			// Create handle and search set
+			HashHandle handle(newID, values.GetHashFunc(), values.GetEqFunc());
+			const auto& it = resourceSet.find(handle);
+
+			resCount++;
+
+			if (it != resourceSet.end())
+			{
+				// Value already existed, remove from vector and return existing ID
+				idBuffer.RemoveRange(spanStart, layout.GetLength());
+				values.pop_back();
+				return it->GetID();
+			}
+			else
+			{
+				uniqueResCount++;
+				resourceSet.emplace(handle);
+				return handle.GetID();
+			}
+		}
+
 	};
 }

@@ -10,31 +10,6 @@ StringIDBuilder::StringIDBuilder(StringIDBuilder&& other) noexcept = default;
 StringIDBuilder& StringIDBuilder::operator=(StringIDBuilder&& other) noexcept = default;
 
 /// <summary>
-/// Returns the ID corresponding to the given string. Moves
-/// the string to the map if it hasn't been added previously.
-/// </summary>
-uint StringIDBuilder::GetOrAddStringID(std::string&& str) noexcept
-{
-    if (str.back() != '\0')
-        str.push_back('\0');
-
-    auto it = idMap.find(str);
-
-    if (it != idMap.end())
-    {
-        return it->second;
-    }
-    else
-    {
-        const uint id = static_cast<uint>(strings.size());
-        const std::string& storedStr = strings.emplace_back(std::move(str));
-        idMap.emplace(std::string_view(storedStr), id);
-
-        return id;
-    }
-}
-
-/// <summary>
 /// Returns the ID corresponding to the given string. Adds a copy of
 /// the string to the map if it hasn't been added previously.
 /// </summary>
