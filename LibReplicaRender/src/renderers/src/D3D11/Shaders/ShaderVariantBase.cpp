@@ -23,6 +23,7 @@ ShaderVariantBase::ShaderVariantBase(Device& dev, const ShaderDefHandle& def) :
 	srvMap(def.GetResources(), ShaderTypes::Texture)
 { 
 	std::optional<ConstBufGroupHandle> bufData = def.GetConstantBuffers();
+
 	if (bufData.has_value())
 	{ 
 		cbufs = UniqueArray<ConstantBuffer>(bufData->GetLength());

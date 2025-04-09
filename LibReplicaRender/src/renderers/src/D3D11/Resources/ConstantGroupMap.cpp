@@ -9,79 +9,73 @@ using namespace Replica::Effects;
 using namespace Replica::D3D11;
 
 ConstantGroupMap::ConstantGroupMap() :
-	size(0u)
+	totalSize(0u)
 { }
 
 ConstantGroupMap::ConstantGroupMap(const std::optional<ConstBufGroupHandle>& layout) :
-	group(layout.has_value() ? layout->GetLength() : 0u),
-	size(0u)
+	cbufMaps(layout.has_value() ? layout->GetLength() : 0u),
+	totalSize(0u)
 {
 	if (layout.has_value())
 	{
-		for (int i = 0; i < group.GetLength(); i++)
+		const uint cbufCount = (uint)cbufMaps.GetLength();
+
+		// Copy constant layout for each buffer
+		for (uint i = 0; i < cbufCount; i++)
 		{
 			const ConstBufDefHandle bufDef = (*layout)[i];
-			ConstantMap& map = group[i];
-			uint offset = 0u;
-			map.index = i;
-			map.size = bufDef.GetSize();
-			map.constMap.reserve(layout->GetLength());
+			const uint bufLen = (uint)bufDef.GetLength();
+			cbufMaps[i] = UniqueArray<ConstDef>(bufLen);
 
-			for (int j = 0; j < bufDef.GetLength(); j++)
-			{
-				const ConstDef& member = bufDef[i];
-				const Constant entry(member.size, offset);
+			for (uint j = 0; j < bufLen; j++)
+				cbufMaps[i][j] = bufDef[j];
 
-				map.constMap.emplace(member.stringID, entry);
-				offset += member.size;
-			}
-
-			size += map.size;
+			totalSize += bufDef.GetSize();
 		}
-	}
-}
 
-bool ConstantGroupMap::GetMemberExists(uint nameID, sint buffer) const
-{
-	const auto& pair = group[buffer].constMap.find(nameID);
-	return pair != group[buffer].constMap.end();
-}
+		// Create data buffers
+		cbufData = UniqueArray<byte>(totalSize);
+		cbufSpans = UniqueArray<Span<byte>>(cbufCount);
+		uint bufOffset = 0u;
 
-void ConstantGroupMap::SetData(const GroupData& src, IDynamicArray<Span<byte>>& dstBufs) const
-{
-	for (const ConstantData& srcConst : src.constants)
-	{
-		for (const ConstantMap& map : group)
+		for (uint i = 0; i < cbufCount; i++)
 		{
-			const auto& it = map.constMap.find(srcConst.stringID);
-
-			if (it != map.constMap.end())
-			{
-				IDynamicArray<byte>& subBuf = dstBufs[map.index];
-				const Constant& dstConst = it->second;
-				const byte* pSrcStart = &src.data[srcConst.offset];
-				byte* pDstStart = &subBuf[dstConst.offset];
-
-				GFX_ASSERT(dstConst.size >= srcConst.size, "Constant data cannot be larger than constant destination")
-				memcpy(pDstStart, pSrcStart, dstConst.size);
-
-				break;
-			}
+			const ConstBufDefHandle bufDef = (*layout)[i];
+			const uint bufSize = bufDef.GetSize();
+			cbufSpans[i] = Span<byte>(&cbufData[bufOffset], bufSize);
+			bufOffset += bufSize;
 		}
 	}
 }
 
-uint ConstantGroupMap::GetTotalSize() const { return size; }
+const IDynamicArray<Span<byte>>& ConstantGroupMap::GetData(const GroupData& src) const
+{
+	for (uint cbuf = 0; cbuf < (uint)cbufMaps.GetLength(); cbuf++)
+	{
+		Span<byte>& bufSpan = cbufSpans[cbuf];
 
-uint ConstantGroupMap::GetBufferSize(sint buffer) const { return group[buffer].size; }
+		for (const ConstDef& dstConst : cbufMaps[cbuf])
+		{
+			// Look up constant in source data using dst constant names
+			const auto& it = src.stringConstMap.find(dstConst.stringID);
 
-uint ConstantGroupMap::GetBufferCount() const { return (uint)group.GetLength(); }
+			if (it != src.stringConstMap.end()) // Src assigned this cbuf member
+			{
+				const ConstantData& srcConst = src.constants[it->second];
+				const byte* pSrcStart = &src.data[srcConst.offset];
+				byte* pDstStart = &bufSpan[dstConst.offset];
+				
+				GFX_ASSERT(srcConst.size <= dstConst.size, "Constant data source cannot be larger than constant destination");
+				memcpy(pDstStart, pSrcStart, srcConst.size);
+			}
+		}
+	}
 
-ConstantGroupMap::Constant::Constant() : 
-	size(0), offset(0)
-{ }
+	return cbufSpans;
+}
 
-ConstantGroupMap::Constant::Constant(const uint size, const uint offset) :
-	size(size),
-	offset(offset)
-{ }
+uint ConstantGroupMap::GetTotalSize() const { return totalSize; }
+
+uint ConstantGroupMap::GetBufferSize(sint buffer) const { return (uint)cbufSpans[buffer].GetLength(); }
+
+uint ConstantGroupMap::GetBufferCount() const { return (uint)cbufMaps.GetLength(); }

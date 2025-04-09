@@ -7,6 +7,7 @@
 namespace Replica::D3D11
 {
 	using Effects::ConstBufDefHandle;
+	using Effects::ConstDef;
 
 	class Context;
 	class ConstantBuffer;
@@ -28,18 +29,17 @@ namespace Replica::D3D11
 		ConstantGroupMap();
 
 		/// <summary>
-		/// Constructs a ConstantMap using the provided constant buffer layout.
+		/// Constructs a constant map using the provided constant buffer layout.
 		/// The layout defines the total size and the metadata (offset and size)
-		/// for each constant stored in the map.
+		/// for each constant buffer and constant stored in the map.
 		/// </summary>
 		ConstantGroupMap(const std::optional<ConstBufGroupHandle>& layout);
 
 		/// <summary>
-		/// Returns true if a member with the given string ID is registered to the map
+		/// Reads unordered constants from ResourceSet into internal fixed layout 
+		/// buffers and returns a reference.
 		/// </summary>
-		bool GetMemberExists(uint nameID, sint buffer) const;
-
-		void SetData(const GroupData& src, IDynamicArray<Span<byte>>& dstBufs) const;
+		const IDynamicArray<Span<byte>>& GetData(const GroupData& src) const;
 		
 		/// <summary>
 		/// Returns the combined size, in bytes, of all CBs in the group
@@ -57,27 +57,14 @@ namespace Replica::D3D11
 		uint GetBufferCount() const;
 
 	private:
-		struct Constant
-		{
-			MAKE_DEF_MOVE_COPY(Constant)
+		using ConstantMap = UniqueArray<ConstDef>;
 
-			const uint size;
-			const uint offset;
+		// Shared contiguous buffer
+		UniqueArray<byte> cbufData;
+		// Parallel cbuf data - arr[x] -> buffer data/const desc
+		mutable UniqueArray<Span<byte>> cbufSpans;
+		UniqueArray<ConstantMap> cbufMaps;
 
-			Constant();
-
-			Constant(const uint size, const uint offset);
-		};
-
-		struct ConstantMap
-		{ 
-			uint index;
-			uint size;
-			// stringID -> Constant
-			std::unordered_map<uint, Constant> constMap;
-		};
-
-		UniqueArray<ConstantMap> group;
-		uint size;
+		uint totalSize;
 	};
 }

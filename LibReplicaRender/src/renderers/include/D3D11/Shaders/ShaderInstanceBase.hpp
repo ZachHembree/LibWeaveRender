@@ -42,14 +42,14 @@ namespace Replica::D3D11
 		/// Sets the value corresponding to the given name to the
 		/// given value.
 		/// </summary>
-		void SetConstant(uint nameID, const byte* pSrc, const size_t size);
+		void SetConstant(uint nameID, const Span<byte>& newValue);
 
 		/// <summary>
 		/// Sets the value corresponding to the given name to the
 		/// given value.
 		/// </summary>
 		template<typename T>
-		void SetConstant(uint nameID, const T& value) { SetConstant(nameID, (byte*)&value, sizeof(T)); }
+		void SetConstant(uint nameID, const T& value) { SetConstant(nameID, {(byte*)&value, sizeof(T)}); }
 
 		/// <summary>
 		/// Sets the value corresponding to the given name to the
@@ -59,7 +59,7 @@ namespace Replica::D3D11
 		void SetConstant<mat4>(uint nameID, const mat4& value)
 		{
 			const mat4 x = transpose(value);
-			SetConstant(nameID, (byte*)&x, sizeof(mat4));
+			SetConstant(nameID, {(byte*)&x, sizeof(mat4)});
 		}
 
 		/// <summary>
@@ -70,21 +70,21 @@ namespace Replica::D3D11
 		void SetConstant<mat3>(uint nameID, const mat3& value)
 		{
 			const mat3 x = transpose(value);
-			SetConstant(nameID, (byte*)&x, sizeof(mat3));
+			SetConstant(nameID, {(byte*)&x, sizeof(mat3)});
 		}
 
 		/// <summary>
 		/// Sets the value corresponding to the given name to the
 		/// given value.
 		/// </summary>
-		void SetConstant(string_view name, const byte* pSrc, const size_t size);
+		void SetConstant(string_view name, const Span<byte>& newValue);
 
 		/// <summary>
 		/// Sets the value corresponding to the given name to the
 		/// given value.
 		/// </summary>
 		template<typename T>
-		void SetConstant(string_view name, const T& value) { SetConstant(name, (byte*)&value, sizeof(T)); }
+		void SetConstant(string_view name, const T& value) { SetConstant(name, {(byte*)&value, sizeof(T)}); }
 
 		/// <summary>
 		/// Sets the value corresponding to the given name to the
@@ -94,7 +94,7 @@ namespace Replica::D3D11
 		void SetConstant<mat4>(string_view name, const mat4& value)
 		{
 			const mat4 x = transpose(value);
-			SetConstant(name, (byte*)&x, sizeof(mat4));
+			SetConstant(name, {(byte*)&x, sizeof(mat4)});
 		}
 
 		/// <summary>
@@ -105,7 +105,7 @@ namespace Replica::D3D11
 		void SetConstant<mat3>(string_view name, const mat3& value)
 		{
 			const mat3 x = transpose(value);
-			SetConstant(name, (byte*)&x, sizeof(mat3));
+			SetConstant(name, {(byte*)&x, sizeof(mat3)});
 		}
 
 		/// <summary>

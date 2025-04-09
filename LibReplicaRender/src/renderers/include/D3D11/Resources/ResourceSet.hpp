@@ -1,4 +1,5 @@
 #pragma once
+#include "ReplicaUtils/Span.hpp"
 #include "ResourceBase.hpp"
 #include <unordered_map>
 
@@ -78,7 +79,7 @@ namespace Replica::D3D11
 			// stringID -> const Index
 			std::unordered_map<uint, uint> stringConstMap;
 
-			void SetValue(uint stringID, const byte* pValue, uint size);
+			void SetValue(uint stringID, const Span<byte>& newValue);
 
 			void Clear();
 		};
@@ -95,10 +96,10 @@ namespace Replica::D3D11
 
 		void SetUAV(uint stringID, const ComPtr<ID3D11UnorderedAccessView>& pUAV);
 
-		void SetConstant(uint stringID, const byte* pSrc, const uint size);
+		void SetConstant(uint stringID, const Span<byte>& newValue);
 
 		template<typename T>
-		void SetConstant(uint stringID, const T& value) { constants.SetValue(stringID, (byte*)(&value), (uint)sizeof(T)); }
+		void SetConstant(uint stringID, const T& value) { constants.SetValue(stringID, {(byte*)(&value), sizeof(T)}); }
 
 		const IDynamicArray<ResView<ID3D11SamplerState>>& GetSamplers() const;
 
@@ -121,8 +122,5 @@ namespace Replica::D3D11
 		ViewMap<ID3D11SamplerState> sampMap;
 		ViewMap<ID3D11ShaderResourceView> textures;
 		ViewMap<ID3D11UnorderedAccessView> rwTextures;
-
-		mutable UniqueArray<byte> cbufData;
-		mutable UniqueVector<Span<byte>> bufferSpans;
 	};
 }
