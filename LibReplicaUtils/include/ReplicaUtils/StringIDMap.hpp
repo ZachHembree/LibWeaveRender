@@ -24,12 +24,14 @@ namespace Replica
         /// <summary>
         /// Alternating starting indices + string length. ID == index / 2
         /// </summary>
-        DynamicArray<uint> substrings;
+        Vector<uint> substrings;
 
         /// <summary>
         /// Concatenated strings stored in the order they were created
         /// </summary>
-        DynamicArray<char> stringData;
+        string stringData;
+
+        void Clear();
     };
 
     template<class Archive>
@@ -69,7 +71,7 @@ namespace Replica
 
     private:
         // Concatenated text buffer
-        UniqueArray<char> stringBuf;
+        string stringBuf;
         // Substrings pointing to text buffer and ID -> String map
         UniqueArray<std::string_view> substrings;
         // String -> ID map

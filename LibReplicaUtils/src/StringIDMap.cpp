@@ -9,6 +9,12 @@ StringIDMapDef::StringIDMapDef(StringIDMapDef&& other) noexcept = default;
 
 StringIDMapDef& StringIDMapDef::operator=(StringIDMapDef&& other) noexcept = default;
 
+void StringIDMapDef::Clear()
+{
+    substrings.clear();
+    stringData.clear();
+}
+
 StringIDMap::StringIDMap(StringIDMapDef&& def) noexcept :
     stringBuf(std::move(def.stringData))
 {
@@ -16,7 +22,7 @@ StringIDMap::StringIDMap(StringIDMapDef&& def) noexcept :
 }
 
 StringIDMap::StringIDMap(const StringIDMapDef& def) :
-    stringBuf(def.stringData.GetCopy())
+    stringBuf(def.stringData)
 {
     InitMapData(def);
 }

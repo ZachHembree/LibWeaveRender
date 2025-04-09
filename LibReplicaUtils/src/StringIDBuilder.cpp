@@ -63,32 +63,24 @@ std::string_view StringIDBuilder::GetString(uint id) const { return strings[id];
 /// <returns></returns>
 uint StringIDBuilder::GetStringCount() const { return static_cast<uint>(strings.GetLength()); }
 
-/// <summary>
-/// Returns a copy of the ID generator's current state in a compact, serializable format
-/// </summary>
-StringIDMapDef StringIDBuilder::ExportDefinition() const
+void StringIDBuilder::WriteDefinition(StringIDMapDef& def) const
 {
     const uint count = GetStringCount();
     uint charCount = 0;
 
     // Calculate concatenated string buffer size and substring layout
-    StringIDMapDef def = {};
-    def.substrings = DynamicArray<uint>(2 * count);
+    def.substrings.reserve(2 * count);
 
     for (uint i = 0; i < count; i++)
     {
         const uint subLen = (uint)strings[i].GetLength();
-        def.substrings[2 * i] = charCount;
-        def.substrings[2 * i + 1] = subLen - 1; // Exclude null terminator
+        def.substrings.push_back(charCount);
+        def.substrings.push_back(subLen - 1); // Exclude null terminator
         charCount += subLen;
     }
 
-    // Copy strings into concatenated buffer
-    def.stringData = DynamicArray<char>(charCount);
-    uint charStart = 0;
-    memcpy(def.stringData.GetPtr(), stringData.data(), charCount);
-
-    return def;
+    // Copy concatenated string buffer
+    def.stringData.append(stringData);
 }
 
 void StringIDBuilder::Clear()

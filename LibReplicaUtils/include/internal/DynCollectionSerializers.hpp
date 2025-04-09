@@ -128,6 +128,24 @@ namespace Replica
 		}
 	}
 
+	// Non-boolean raw binary read
+	template <class Archive, typename T, typename ArrT>
+	requires IsBinaryDeserializableArrNB<Archive, T>&& std::derived_from<ArrT, Vector<T>>
+	inline void load(Archive& ar, ArrT& dst)
+	{
+		// Get array size
+		cereal::size_type length;
+		ar(cereal::make_size_tag(length));
+
+		// Allocate destination
+		dst = ArrT();
+		dst.reserve(length);
+
+		// Write deserialized data
+		for (size_t i = 0; i < length; i++)
+			ar(dst.emplace_back());
+	}
+
 	// Interface templates used by Cereal
 	template <class Archive, typename T>
 	inline void load(Archive& ar, DynamicArray<T>& dst) { load<Archive, T, DynamicArray<T>>(ar, dst); }

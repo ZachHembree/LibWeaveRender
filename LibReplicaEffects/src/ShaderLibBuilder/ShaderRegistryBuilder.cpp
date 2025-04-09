@@ -93,7 +93,8 @@ const EffectDef& ShaderRegistryBuilder::GetEffect(const uint id) const { return 
 ShaderRegistryDef ShaderRegistryBuilder::ExportDefinition() const
 {
 	ShaderRegistryDef def;
-	def.stringIDs = stringIDs.ExportDefinition();
+	stringIDs.WriteDefinition(def.stringIDs);
+
 	def.constants = DynamicArray(constants);
 	def.cbufDefs = DynamicArray(cbufDefs);
 	def.ioElements = DynamicArray(ioElements);

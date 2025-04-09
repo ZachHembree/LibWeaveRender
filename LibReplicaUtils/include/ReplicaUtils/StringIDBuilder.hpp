@@ -45,9 +45,9 @@ namespace Replica
         uint GetStringCount() const;
 
         /// <summary>
-        /// Returns a copy of the ID generator's current state in a compact, serializable format
+        /// Writes the contents of the builder to a compact and reusable serializable format
         /// </summary>
-        StringIDMapDef ExportDefinition() const;
+        void WriteDefinition(StringIDMapDef& def) const;
 
         /// <summary>
         /// Clears all strings from the builder
@@ -55,10 +55,11 @@ namespace Replica
         void Clear();
 
     private:
-        mutable string textBuf;
         string stringData;
         // String storage; ID -> string
         UniqueVector<StringSpan> strings;
+
+        mutable string textBuf;
         // string -> ID map
         std::unordered_map<StringSpan, uint> idMap;
 
