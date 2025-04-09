@@ -407,11 +407,11 @@ int main(int argc, char* argv[])
     LOG_INFO() << "RPFX Preprocessor";
     LOG_INFO() << "Working Dir: " << argv[0];
 
-#ifndef _DEBUG
+#ifndef _DEBUG_VS
     try
 #endif
     {
-#ifndef _DEBUG
+#ifndef _DEBUG_VS
         DynamicArray<string_view> args(argc);
 
         for (int i = 0; i < argc; i++)
@@ -441,7 +441,7 @@ int main(int argc, char* argv[])
         HandleOptions(args);
         CreateLibrary();
     }
-#ifndef _DEBUG
+#ifndef _DEBUG_VS
     catch (const RepException& err)
     {
         LOG_ERROR() << "[" << err.GetType() << "] " << err.what();
