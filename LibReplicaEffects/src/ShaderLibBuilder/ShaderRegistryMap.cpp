@@ -12,9 +12,12 @@ ShaderRegistryMap::ShaderRegistryMap(ShaderRegistryDef&& def) :
 	cbufDefs(std::move(def.cbufDefs)),
 	ioElements(std::move(def.ioElements)),
 	resources(std::move(def.resources)),
+	cbufLayouts(std::move(def.cbufLayouts)),
 	cbufGroups(std::move(def.cbufGroups)),
 	ioSignatures(std::move(def.ioSignatures)),
 	resGroups(std::move(def.resGroups)),
+	effectPasses(std::move(def.effectPasses)),
+	binaries(std::move(def.binaries)),
 	shaders(std::move(def.shaders)),
 	effects(std::move(def.effects))
 { }
@@ -25,9 +28,12 @@ ShaderRegistryMap::ShaderRegistryMap(const ShaderRegistryDef& def) :
 	cbufDefs(def.cbufDefs),
 	ioElements(def.ioElements),
 	resources(def.resources),
+	cbufLayouts(def.cbufLayouts),
 	cbufGroups(def.cbufGroups),
 	ioSignatures(def.ioSignatures),
 	resGroups(def.resGroups),
+	effectPasses(def.effectPasses),
+	binaries(def.binaries),
 	shaders(def.shaders),
 	effects(def.effects)
 { }
@@ -46,6 +52,12 @@ uint ShaderRegistryMap::GetStringCount() const { return stringMap.GetStringCount
 const EffectDef& ShaderRegistryMap::GetEffect(uint effectID) const { return effects[ShaderRegistryBuilder::GetIndex(effectID)]; }
 
 const ShaderDef& ShaderRegistryMap::GetShader(uint shaderID) const { return shaders[ShaderRegistryBuilder::GetIndex(shaderID)]; }
+
+const IDynamicArray<byte>& ShaderRegistryMap::GetByteCode(uint byteCodeID) const { return binaries[ShaderRegistryBuilder::GetIndex(byteCodeID)]; }
+
+const IDynamicArray<uint>& ShaderRegistryMap::GetEffectPass(uint passID) const { return effectPasses[ShaderRegistryBuilder::GetIndex(passID)]; }
+
+const IDynamicArray<uint>& ShaderRegistryMap::GetCBufLayout(uint layoutID) const { return cbufLayouts[ShaderRegistryBuilder::GetIndex(layoutID)]; }
 
 const IDynamicArray<uint>& ShaderRegistryMap::GetResourceGroup(uint groupID) const { return resGroups[ShaderRegistryBuilder::GetIndex(groupID)]; }
 

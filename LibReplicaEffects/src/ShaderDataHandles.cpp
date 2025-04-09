@@ -19,9 +19,17 @@ uint ConstBufDefHandle::GetNameID() const { return pDef->stringID; }
 
 uint ConstBufDefHandle::GetSize() const { return pDef->size; }
 
-const ConstDef& ConstBufDefHandle::operator[](ptrdiff_t index) const { return pMap->GetConstant(pDef->members[index]); }
+const ConstDef& ConstBufDefHandle::operator[](ptrdiff_t index) const 
+{ 
+	const IDynamicArray<uint>& members = pMap->GetCBufLayout(pDef->layoutID);
+	return pMap->GetConstant(members[index]);
+}
 
-size_t ConstBufDefHandle::GetLength() const { return pDef->members.GetLength(); }
+size_t ConstBufDefHandle::GetLength() const 
+{ 
+	const IDynamicArray<uint>& members = pMap->GetCBufLayout(pDef->layoutID);
+	return members.GetLength();
+}
 
 const StringIDMap& ConstBufDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
 
@@ -38,7 +46,7 @@ uint ShaderDefHandle::GetFilePathID() const { return pDef->fileStringID; }
 
 uint ShaderDefHandle::GetNameID() const { return pDef->nameID; }
 
-const IDynamicArray<byte>& ShaderDefHandle::GetBinSrc() const { return pDef->binSrc; }
+const IDynamicArray<byte>& ShaderDefHandle::GetBinSrc() const { return pMap->GetByteCode(pDef->byteCodeID); }
 
 ShadeStages ShaderDefHandle::GetStage() const { return pDef->stage; }
 
@@ -91,13 +99,20 @@ uint EffectDefHandle::GetNameID() const { return pDef->nameID; }
 
 ShaderDefHandle EffectDefHandle::GetShader(int pass, int shader) const
 {
-	const IDynamicArray<uint>& shaders = pDef->passes[pass].shaderIDs;
+	const IDynamicArray<uint>& shaders = pMap->GetEffectPass(pDef->passes[pass]);
 	return ShaderDefHandle(*pMap, shaders[shader]);
 }
 
-const EffectPass& EffectDefHandle::GetPass(int pass) const { return pDef->passes[pass]; }
+const IDynamicArray<uint>& EffectDefHandle::GetPass(int pass) const 
+{ 
+	return pMap->GetEffectPass(pDef->passes[pass]); 
+}
 
-uint EffectDefHandle::GetShaderCount(int pass) const { return (uint)pDef->passes[pass].shaderIDs.GetLength(); }
+uint EffectDefHandle::GetShaderCount(int pass) const 
+{ 
+	const IDynamicArray<uint>& shaders = pMap->GetEffectPass(pDef->passes[pass]);
+	return (uint)shaders.GetLength();
+}
 
 uint EffectDefHandle::GetPassCount() const { return (uint)pDef->passes.GetLength(); }
 

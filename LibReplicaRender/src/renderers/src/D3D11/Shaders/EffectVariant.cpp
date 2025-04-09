@@ -15,13 +15,13 @@ EffectVariant::EffectVariant(ShaderVariantManager& lib, EffectDefHandle effectDe
 { 
 	for (uint i = 0; i < def.GetPassCount(); i++)
 	{
-		const EffectPass& pass = def.GetPass(i);
-		passes[i] = PassHandle(pass.shaderIDs.GetLength());
+		const IDynamicArray<uint>& pass = def.GetPass(i);
+		passes[i] = PassHandle(pass.GetLength());
 
-		for (int j = 0; j < pass.shaderIDs.GetLength(); j++)
+		for (int j = 0; j < pass.GetLength(); j++)
 		{
 			const ShaderDefHandle shaderDef = effectDef.GetShader(i, j);
-			const uint shaderID = pass.shaderIDs[j];
+			const uint shaderID = pass[j];
 
 			switch (shaderDef.GetStage())
 			{

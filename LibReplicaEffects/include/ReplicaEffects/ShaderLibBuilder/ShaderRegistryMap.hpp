@@ -41,6 +41,12 @@ namespace Replica::Effects
 
 		const ShaderDef& GetShader(uint shaderID) const;
 
+		const IDynamicArray<byte>& GetByteCode(uint byteCodeID) const;
+
+		const IDynamicArray<uint>& GetEffectPass(uint passID) const;
+
+		const IDynamicArray<uint>& GetCBufLayout(uint layoutID) const;
+
 		const IDynamicArray<uint>& GetResourceGroup(uint groupID) const;
 
 		const IDynamicArray<uint>& GetIOLayout(uint layoutID) const;
@@ -63,10 +69,13 @@ namespace Replica::Effects
 		UniqueArray<IOElementDef> ioElements;
 		UniqueArray<ResourceDef> resources;
 
+		UniqueArray<DynamicArray<uint>> cbufLayouts;
 		UniqueArray<DynamicArray<uint>> cbufGroups;
 		UniqueArray<DynamicArray<uint>> ioSignatures;
 		UniqueArray<DynamicArray<uint>> resGroups;
+		UniqueArray<DynamicArray<uint>> effectPasses;
 
+		UniqueArray<DynamicArray<byte>> binaries;
 		UniqueArray<ShaderDef> shaders;
 		UniqueArray<EffectDef> effects;
 	};

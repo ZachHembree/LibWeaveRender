@@ -44,7 +44,7 @@ namespace Replica::Effects
 
 		uint stringID;
 		uint size;
-		DynamicArray<uint> members;
+		uint layoutID;
 	};
 
 	/// <summary>
@@ -143,9 +143,9 @@ namespace Replica::Effects
 		uint fileStringID;
 
 		/// <summary>
-		/// Precompiled source binary
+		/// Precompiled source binary ID
 		/// </summary>
-		DynamicArray<byte> binSrc;
+		uint byteCodeID;
 
 		/// <summary>
 		/// StringID corresponding to shader name
@@ -184,17 +184,6 @@ namespace Replica::Effects
 
 	};
 
-	struct EffectPass
-	{
-		USE_DEFAULT_CMP(EffectPass)
-
-		/// <summary>
-		/// Shaders used in the pass, in the order they are executed. ShaderStage determined
-		/// by ShaderDef referenced by ID.
-		/// </summary>
-		DynamicArray<uint> shaderIDs;
-	};
-
 	struct EffectDef
 	{
 		USE_DEFAULT_CMP(EffectDef)
@@ -207,7 +196,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Effect passes in execution order
 		/// </summary>
-		DynamicArray<EffectPass> passes;
+		DynamicArray<uint> passes;
 	};
 
 	struct ShaderVariantDef
@@ -268,6 +257,11 @@ namespace Replica::Effects
 		DynamicArray<ConstDef> constants;
 
 		/// <summary>
+		/// Unique constant buffer layout combinations
+		/// </summary>
+		DynamicArray<DynamicArray<uint>> cbufLayouts;
+
+		/// <summary>
 		/// Unique constant buffers
 		/// </summary>
 		DynamicArray<ConstBufDef> cbufDefs;
@@ -296,6 +290,16 @@ namespace Replica::Effects
 		/// Unique groups of textures, buffers and samplers used in a shader
 		/// </summary>
 		DynamicArray<DynamicArray<uint>> resGroups;
+
+		/// <summary>
+		/// Unique IDs representing shaders in an effect pass
+		/// </summary>
+		DynamicArray<DynamicArray<uint>> effectPasses;
+
+		/// <summary>
+		/// Shader bytecode buffers
+		/// </summary>
+		DynamicArray<DynamicArray<byte>> binaries;
 
 		/// <summary>
 		/// Unique shaders and associated resources

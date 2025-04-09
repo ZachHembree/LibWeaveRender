@@ -224,7 +224,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Returns shaders for the given pass
 		/// </summary>
-		const EffectPass& GetPass(int pass) const;
+		const IDynamicArray<uint>& GetPass(int pass) const;
 
 		/// <summary>
 		/// Returns the number of shaders used by the given pass

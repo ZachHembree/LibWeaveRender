@@ -6,7 +6,6 @@
 namespace Replica::D3D11
 {
 	using Effects::EffectDef;
-	using Effects::EffectPass;
 
 	class Sampler;
 	class ShaderVariantManager;

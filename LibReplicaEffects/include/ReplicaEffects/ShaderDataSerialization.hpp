@@ -28,7 +28,7 @@ namespace Replica::Effects
 	template <class Archive>
 	void serialize(Archive& ar, ConstBufDef& def)
 	{
-		ar(def.stringID, def.size, def.members);
+		ar(def.stringID, def.size, def.layoutID);
 	}
 
 	template <class Archive>
@@ -44,54 +44,13 @@ namespace Replica::Effects
 	}
 
 	template <class Archive>
-	requires (!cereal::traits::is_text_archive<Archive>::value)
 	void serialize(Archive& ar, ShaderDef& def)
 	{
 		ar(
-			def.fileStringID, def.binSrc, def.nameID, def.stage,
+			def.fileStringID, def.byteCodeID, def.nameID, def.stage,
 			def.threadGroupSize.x, def.threadGroupSize.y, def.threadGroupSize.z,
 			def.inLayoutID, def.outLayoutID, def.resLayoutID, def.cbufGroupID
 		);
-	}
-
-	template <class Archive>
-	requires cereal::traits::is_text_archive<Archive>::value
-	void save(Archive& ar, const ShaderDef& def)
-	{
-		ar(
-			def.fileStringID, def.nameID, def.stage,
-			def.threadGroupSize.x, def.threadGroupSize.y, def.threadGroupSize.z,
-			def.inLayoutID, def.outLayoutID, def.resLayoutID, def.cbufGroupID
-		);
-
-		// Manual size tag
-		ar(static_cast<cereal::size_type>(GetArrSize(def.binSrc)));
-		// Write as base64 string
-		ar.saveBinaryValue(def.binSrc.GetPtr(), GetArrSize(def.binSrc));
-	}
-
-	template <class Archive>
-	requires cereal::traits::is_text_archive<Archive>::value
-	void load(Archive& ar, ShaderDef& def)
-	{
-		ar(
-			def.fileStringID, def.nameID, def.stage,
-			def.threadGroupSize.x, def.threadGroupSize.y, def.threadGroupSize.z,
-			def.inLayoutID, def.outLayoutID, def.resLayoutID, def.cbufGroupID
-		);
-
-		// Get array size
-		cereal::size_type size = 0;
-		ar(size);
-		// Allocate and read
-		def.binSrc = UniqueArray<byte>(size);
-		ar.loadBinaryValue(def.binSrc.GetPtr(), size);
-	}
-
-	template <class Archive>
-	void serialize(Archive& ar, EffectPass& def)
-	{
-		ar(def.shaderIDs);
 	}
 
 	template <class Archive>
@@ -123,8 +82,10 @@ namespace Replica::Effects
 	{
 		ar(
 			def.stringIDs, 
-			def.constants, def.cbufDefs, def.ioElements, def.resources,
+			def.constants, def.cbufLayouts, def.cbufDefs, 
+			def.ioElements, def.resources,
 			def.cbufGroups, def.ioSignatures, def.resGroups,
+			def.effectPasses, def.binaries, 
 			def.shaders, def.effects
 		);
 	}

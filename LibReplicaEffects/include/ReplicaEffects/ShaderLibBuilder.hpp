@@ -86,6 +86,7 @@ namespace Replica::Effects
 		UniqueVector<EffectBlock> effectBlocks;
 		UniqueVector<PassBlock> effectPasses;
 		UniqueVector<uint> effectShaders;
+		UniqueVector<uint> idBuffer;
 
 		/// <summary>
 		/// Initializes the library variants and corresponding flags

@@ -18,7 +18,7 @@ struct std::hash<ConstBufDef>
 {
 	size_t operator()(const ConstBufDef& def) const noexcept
 	{
-		return GetCombinedHash(def.stringID, def.members, def.size);
+		return GetCombinedHash(def.stringID, def.layoutID, def.size);
 	}
 };
 
@@ -54,16 +54,7 @@ struct std::hash<ShaderDef>
 {
 	size_t operator()(const ShaderDef& def) const noexcept
 	{
-		return GetCombinedHash(def.fileStringID, def.binSrc, def.nameID, def.stage, def.threadGroupSize);
-	}
-};
-
-template<>
-struct std::hash<EffectPass>
-{
-	size_t operator()(const EffectPass& def) const noexcept
-	{
-		return GetCombinedHash(def.shaderIDs);
+		return GetCombinedHash(def.fileStringID, def.byteCodeID, def.nameID, def.stage, def.threadGroupSize);
 	}
 };
 

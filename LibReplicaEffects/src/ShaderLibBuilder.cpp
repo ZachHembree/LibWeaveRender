@@ -16,7 +16,8 @@ ShaderLibBuilder::ShaderLibBuilder() :
 	pTable(new SymbolTable()),
 	pShaderGen(new ShaderGenerator()),
 	pShaderRegistry(new ShaderRegistryBuilder()),
-	isDebugging(false)
+	isDebugging(false),
+	libBufIndex(0)
 {
 	platform = PlatformDef
 	{
@@ -328,26 +329,27 @@ void ShaderLibBuilder::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, ui
 		const EffectBlock& block = effectBlocks[i];
 		EffectDef effect;
 		effect.nameID = block.nameID;
-		effect.passes = DynamicArray<EffectPass>(block.passCount);
+		effect.passes = DynamicArray<uint>(block.passCount);
 
 		// Passes
 		for (uint j = 0; j < block.passCount; j++)
 		{
 			PassBlock& pass = effectPasses[block.passStart + j];
-			DynamicArray<uint>& shaderIDs = effect.passes[j].shaderIDs;
-			shaderIDs = DynamicArray<uint>(pass.shaderCount);
+			idBuffer.clear();
 
 			// Shaders
 			for (uint k = 0; k < pass.shaderCount; k++)
 			{
 				const uint shaderIndex = pass.shaderStart + k;
-				shaderIDs[k] = effectShaders[shaderIndex];
+				idBuffer.emplace_back(effectShaders[shaderIndex]);
 			}
+
+			effect.passes[j] = pShaderRegistry->GetOrAddEffectPass(idBuffer);
 		}
 
 		effects[i] = EffectVariantDef 
 		{
-			.effectID = pShaderRegistry->GetOrAddEffect(std::move(effect)),
+			.effectID = pShaderRegistry->GetOrAddEffect(effect),
 			.variantID = vID
 		};
 	}

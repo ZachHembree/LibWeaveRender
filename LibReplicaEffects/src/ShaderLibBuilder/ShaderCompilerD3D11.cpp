@@ -19,7 +19,13 @@ using namespace Replica::Effects;
 class CompilerState
 {
 public:
-	CompilerState() { SetFeatureLevel("5_0"); }
+	CompilerState() : 
+		isDebugging(false)
+	{ SetFeatureLevel("5_0"); }
+
+	void SetDebugging(bool isDebugging) { this->isDebugging = isDebugging; }
+
+	bool GetIsDebugging() const { return isDebugging; }
 
 	/// <summary>
 	/// Updates feature level and per-stage version strings
@@ -70,6 +76,8 @@ private:
 
 	static constexpr size_t TargetCount = std::size(TargetPrefixesD3D11);
 
+	bool isDebugging;
+
 	// Feature level postfix, e.g. 5_0, 4_0, 4_0_level_9_1
 	string_view featureLevel;
 	string targets[TargetCount];
@@ -79,6 +87,10 @@ private:
 /// Compiler state for the current thread
 /// </summary>
 static thread_local CompilerState s_State;
+
+static thread_local UniqueVector<uint> s_IDbuf;
+static thread_local UniqueVector<uint> s_IDbuf2;
+static thread_local UniqueVector<byte> s_ByteBuf;
 
 /// <summary>
 /// Converts resource description into portable enum
@@ -144,8 +156,7 @@ static void GetPrecompShaderD3D11(
 	ShadeStages stage, 
 	string_view mainName, 
 	ShaderDef& def, 
-	ShaderRegistryBuilder& builder,
-	bool isDebugging
+	ShaderRegistryBuilder& builder
 )
 {
 	REP_ASSERT_MSG((int)stage > 0 && (int)stage < CompilerState::GetTargetCount(), "Invalid stage specified")
@@ -161,7 +172,7 @@ static void GetPrecompShaderD3D11(
 	// Disallow deprecated features
 	uint compileFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 
-	if (!isDebugging)
+	if (!s_State.GetIsDebugging())
 		compileFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
 	else
 		compileFlags |= D3DCOMPILE_DEBUG;
@@ -192,8 +203,12 @@ static void GetPrecompShaderD3D11(
 	def.fileStringID = builder.GetOrAddStringID(srcFile);
 	def.nameID = builder.GetOrAddStringID(mainName);
 	def.stage = stage;
-	// Copy binary to definition
-	def.binSrc = DynamicArray<byte>(static_cast<const byte*>(binSrc->GetBufferPointer()), binSrc->GetBufferSize());
+
+	const Span<byte> binSpan(static_cast<byte*>(binSrc->GetBufferPointer()), binSrc->GetBufferSize());
+	s_ByteBuf.clear();
+	s_ByteBuf.AddRange(binSpan);
+
+	def.byteCodeID = builder.GetOrAddShaderBin(s_ByteBuf);
 }
 
 /// <summary>
@@ -235,16 +250,16 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 	// Input params
 	if (shaderDesc.InputParameters > 0)
 	{
-		DynamicArray<uint> inSignature(shaderDesc.InputParameters);
+		s_IDbuf.clear();
 
 		for (uint i = 0; i < shaderDesc.InputParameters; i++)
 		{
 			D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
 			WIN_THROW_HR(pReflect->GetInputParameterDesc(i, &paramDesc));
-			inSignature[i] = GetIOElementDef(paramDesc, builder);
+			s_IDbuf.emplace_back(GetIOElementDef(paramDesc, builder));
 		}
 
-		def.inLayoutID = builder.GetOrAddIOLayout(std::move(inSignature));
+		def.inLayoutID = builder.GetOrAddIOLayout(s_IDbuf);
 	}
 	else
 		def.inLayoutID = -1;
@@ -252,16 +267,16 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 	// Output params
 	if (shaderDesc.OutputParameters > 0)
 	{
-		DynamicArray<uint> retSignature(shaderDesc.OutputParameters);
+		s_IDbuf.clear();
 
 		for (uint i = 0; i < shaderDesc.OutputParameters; i++)
 		{
 			D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
 			WIN_THROW_HR(pReflect->GetOutputParameterDesc(i, &paramDesc));
-			retSignature[i] = GetIOElementDef(paramDesc, builder);
+			s_IDbuf.emplace_back(GetIOElementDef(paramDesc, builder));
 		}
 
-		def.outLayoutID = builder.GetOrAddIOLayout(std::move(retSignature));
+		def.outLayoutID = builder.GetOrAddIOLayout(s_IDbuf);
 	}
 	else
 		def.outLayoutID = -1;
@@ -276,7 +291,7 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 	// Constant buffers
 	if (shaderDesc.ConstantBuffers > 0)
 	{
-		DynamicArray<uint> cbufGroup(shaderDesc.ConstantBuffers);
+		s_IDbuf.clear();
 
 		for (uint i = 0; i < shaderDesc.ConstantBuffers; i++)
 		{
@@ -287,7 +302,8 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 			ConstBufDef constants;
 			constants.stringID = builder.GetOrAddStringID(string_view(cbufDesc.Name));
 			constants.size = cbufDesc.Size;
-			constants.members = DynamicArray<uint>(cbufDesc.Variables);
+			
+			s_IDbuf2.clear();
 
 			for (uint j = 0; j < cbufDesc.Variables; j++)
 			{
@@ -300,13 +316,14 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 				varDef.offset = varDesc.StartOffset;
 				varDef.size = varDesc.Size;
 
-				constants.members[j] = builder.GetOrAddConstant(varDef);
+				s_IDbuf2.emplace_back(builder.GetOrAddConstant(varDef));
 			}
 
-			cbufGroup[i] = builder.GetOrAddConstantBuffer(std::move(constants));
+			constants.layoutID = builder.GetOrAddConstantLayout(s_IDbuf2);
+			s_IDbuf.emplace_back(builder.GetOrAddConstantBuffer(constants));
 		}
 
-		def.cbufGroupID = builder.GetOrAddCBufGroup(std::move(cbufGroup));
+		def.cbufGroupID = builder.GetOrAddCBufGroup(s_IDbuf);
 	}
 	else
 		def.cbufGroupID = -1;
@@ -323,7 +340,7 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 	// Resources
 	if (resourceCount > 0)
 	{
-		DynamicArray<uint> resources(resourceCount);
+		s_IDbuf.clear();
 		uint resIndex = 0;
 
 		for (uint i = 0; i < shaderDesc.BoundResources; i++)
@@ -338,12 +355,12 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 				res.type = GetResourceType(resDesc);
 				res.slot = resDesc.BindPoint;
 
-				resources[resIndex] = builder.GetOrAddResource(res);
+				s_IDbuf.emplace_back(builder.GetOrAddResource(res));
 				resIndex++;
 			}
 		}
 
-		def.resLayoutID = builder.GetOrAddResGroup(std::move(resources));
+		def.resLayoutID = builder.GetOrAddResGroup(s_IDbuf);
 	}
 	else
 		def.resLayoutID = -1;
@@ -355,9 +372,11 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 static void GetReflectedMetadata(ShaderDef& def, ShaderRegistryBuilder& builder)
 {
 	// Reflect
+	const IDynamicArray<byte>& binSrc = builder.GetShaderBin(def.byteCodeID);
+
 	ComPtr<ID3D11ShaderReflection> pReflect;
 	WIN_THROW_HR(D3DReflect(
-		def.binSrc.GetPtr(), GetArrSize(def.binSrc),
+		binSrc.GetPtr(), GetArrSize(binSrc),
 		__uuidof(ID3D11ShaderReflection),
 		&pReflect
 	));
@@ -388,13 +407,14 @@ uint Replica::Effects::GetShaderDefD3D11(
 {
 	ShaderDef def;
 	s_State.SetFeatureLevel(featureLevel);
+	s_State.SetDebugging(isDebugging);
 
 	// Precompile
-	GetPrecompShaderD3D11(srcFile, srcText, stage, mainName, def, builder, isDebugging);
+	GetPrecompShaderD3D11(srcFile, srcText, stage, mainName, def, builder);
 	// Reflect binary
 	GetReflectedMetadata(def, builder);
 
-	return builder.GetOrAddShader(std::move(def));
+	return builder.GetOrAddShader(def);
 }
 
 string_view Replica::Effects::GetCompilerVersionD3D11() { return D3DCOMPILER_DLL_A; }
