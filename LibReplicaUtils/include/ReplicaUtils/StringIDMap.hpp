@@ -1,6 +1,5 @@
 #pragma once
 #include "ReplicaUtils/Utils.hpp"
-#include "ReplicaUtils/Serialization.hpp"
 #include <unordered_map>
 #include <limits>
 
@@ -33,12 +32,6 @@ namespace Replica
 
         void Clear();
     };
-
-    template<class Archive>
-    void serialize(Archive& ar, StringIDMapDef& def)
-    {
-        ar(def.substrings, def.stringData);
-    }
 
     /// <summary>
     /// Read-only interface for string ID lookup

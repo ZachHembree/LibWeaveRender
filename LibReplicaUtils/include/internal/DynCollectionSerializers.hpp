@@ -2,9 +2,16 @@
 #include <concepts>
 #include <cereal/cereal.hpp>
 #include "ReplicaUtils/Utils.hpp"
+#include "ReplicaUtils/StringIDMap.hpp"
 
 namespace Replica
 {
+	template<class Archive>
+	void serialize(Archive& ar, StringIDMapDef& def)
+	{
+		ar(def.substrings, def.stringData);
+	}
+
 	// Constraints
 	// Non-boolean arithmetic values that can be written as raw binary to the archive
 	template <class Archive, typename T>

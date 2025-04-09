@@ -5,20 +5,6 @@
 
 namespace Replica::Effects
 {
-	/// <summary>
-	/// Deserializes a byte array into a ShaderLibDef
-	/// </summary>
-	ShaderLibDef GetDeserializedLibDef(string_view libData);
-
-	/// <summary>
-	/// Deserializes a byte array into a ShaderLibDef
-	/// </summary>
-	template <std::size_t N>
-	constexpr ShaderLibDef GetDeserializedLibDef(const byte(&arr)[N]) noexcept
-	{
-		return GetDeserializedLibDef(string_view(reinterpret_cast<const char*>(&arr[0]), N));
-	}
-
 	template <class Archive>
 	void serialize(Archive& ar, ConstDef& def)
 	{

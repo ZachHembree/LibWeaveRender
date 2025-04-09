@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "ReplicaEffects/ShaderData.hpp"
 #include "ReplicaEffects/ShaderDataSerialization.hpp"
 
 using namespace Replica;
