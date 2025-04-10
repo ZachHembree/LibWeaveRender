@@ -6,36 +6,14 @@
 using namespace Replica;
 using namespace Replica::Effects;
 
-ShaderRegistryMap::ShaderRegistryMap(ShaderRegistryDef&& def) :
-	stringMap(std::move(def.stringIDs)),
-	constants(std::move(def.constants)),
-	cbufDefs(std::move(def.cbufDefs)),
-	ioElements(std::move(def.ioElements)),
-	resources(std::move(def.resources)),
-	cbufLayouts(std::move(def.cbufLayouts)),
-	cbufGroups(std::move(def.cbufGroups)),
-	ioSignatures(std::move(def.ioSignatures)),
-	resGroups(std::move(def.resGroups)),
-	effectPasses(std::move(def.effectPasses)),
-	binaries(std::move(def.binaries)),
-	shaders(std::move(def.shaders)),
-	effects(std::move(def.effects))
+ShaderRegistryMap::ShaderRegistryMap(const StringIDMapDef& strDef, const ShaderRegistryDef& def) :
+	pRegDef(new ShaderRegistryDef(def)),
+	stringMap(strDef)
 { }
 
-ShaderRegistryMap::ShaderRegistryMap(const ShaderRegistryDef& def) :
-	stringMap(def.stringIDs),
-	constants(def.constants),
-	cbufDefs(def.cbufDefs),
-	ioElements(def.ioElements),
-	resources(def.resources),
-	cbufLayouts(def.cbufLayouts),
-	cbufGroups(def.cbufGroups),
-	ioSignatures(def.ioSignatures),
-	resGroups(def.resGroups),
-	effectPasses(def.effectPasses),
-	binaries(def.binaries),
-	shaders(def.shaders),
-	effects(def.effects)
+ShaderRegistryMap::ShaderRegistryMap(StringIDMapDef&& strDef, ShaderRegistryDef&& def) :
+	pRegDef(std::move(&def)),
+	stringMap(std::move(strDef))
 { }
 
 const StringIDMap& ShaderRegistryMap::GetStringMap() const { return stringMap; }
@@ -49,26 +27,26 @@ string_view ShaderRegistryMap::GetString(uint id) const { return stringMap.GetSt
 
 uint ShaderRegistryMap::GetStringCount() const { return stringMap.GetStringCount(); }
 
-const EffectDef& ShaderRegistryMap::GetEffect(uint effectID) const { return effects[ShaderRegistryBuilder::GetIndex(effectID)]; }
+const EffectDef& ShaderRegistryMap::GetEffect(uint effectID) const 
+{ return pRegDef->effects[ShaderRegistryBuilder::GetIndex(effectID)]; }
 
-const ShaderDef& ShaderRegistryMap::GetShader(uint shaderID) const { return shaders[ShaderRegistryBuilder::GetIndex(shaderID)]; }
+const ShaderDef& ShaderRegistryMap::GetShader(uint shaderID) const 
+{ return pRegDef->shaders[ShaderRegistryBuilder::GetIndex(shaderID)]; }
 
-const IDynamicArray<byte>& ShaderRegistryMap::GetByteCode(uint byteCodeID) const { return binaries[ShaderRegistryBuilder::GetIndex(byteCodeID)]; }
+ByteSpan ShaderRegistryMap::GetByteCode(uint byteCodeID) const
+{ return pRegDef->binSpans[ShaderRegistryBuilder::GetIndex(byteCodeID)]; }
 
-const IDynamicArray<uint>& ShaderRegistryMap::GetEffectPass(uint passID) const { return effectPasses[ShaderRegistryBuilder::GetIndex(passID)]; }
+IDSpan ShaderRegistryMap::GetIDGroup(uint groupID) const
+{ return pRegDef->idGroups[ShaderRegistryBuilder::GetIndex(groupID)]; }
 
-const IDynamicArray<uint>& ShaderRegistryMap::GetCBufLayout(uint layoutID) const { return cbufLayouts[ShaderRegistryBuilder::GetIndex(layoutID)]; }
+const ResourceDef& ShaderRegistryMap::GetResource(const uint resID) const 
+{ return pRegDef->resources[ShaderRegistryBuilder::GetIndex(resID)]; }
 
-const IDynamicArray<uint>& ShaderRegistryMap::GetResourceGroup(uint groupID) const { return resGroups[ShaderRegistryBuilder::GetIndex(groupID)]; }
+const IOElementDef& ShaderRegistryMap::GetIOElement(const uint id) const 
+{ return pRegDef->ioElements[ShaderRegistryBuilder::GetIndex(id)]; }
 
-const IDynamicArray<uint>& ShaderRegistryMap::GetIOLayout(uint layoutID) const { return ioSignatures[ShaderRegistryBuilder::GetIndex(layoutID)]; }
+const ConstBufDef& ShaderRegistryMap::GetConstBuf(const uint cbufID) const 
+{ return pRegDef->cbufDefs[ShaderRegistryBuilder::GetIndex(cbufID)]; }
 
-const IDynamicArray<uint>& ShaderRegistryMap::GetCBufGroup(uint groupID) const { return cbufGroups[ShaderRegistryBuilder::GetIndex(groupID)]; }
-
-const ResourceDef& ShaderRegistryMap::GetResource(const uint resID) const { return resources[ShaderRegistryBuilder::GetIndex(resID)]; }
-
-const IOElementDef& ShaderRegistryMap::GetIOElement(const uint id) const { return ioElements[ShaderRegistryBuilder::GetIndex(id)]; }
-
-const ConstBufDef& ShaderRegistryMap::GetConstBuf(const uint cbufID) const { return cbufDefs[ShaderRegistryBuilder::GetIndex(cbufID)]; }
-
-const ConstDef& ShaderRegistryMap::GetConstant(const uint constID) const { return constants[ShaderRegistryBuilder::GetIndex(constID)]; }
+const ConstDef& ShaderRegistryMap::GetConstant(const uint constID) const 
+{ return pRegDef->constants[ShaderRegistryBuilder::GetIndex(constID)]; }

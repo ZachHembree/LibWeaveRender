@@ -1,14 +1,127 @@
 #pragma once
 #include "ReplicaUtils/Math.hpp"
 #include "ReplicaEffects/ParseExcept.hpp"
+#include "ReplicaUtils/StringIDMap.hpp"
+#include "ReplicaUtils/VectorSpan.hpp"
 #include "ReplicaEffects/ShaderLibBuilder/ShaderParser/SymbolEnums.hpp"
 #include "ReplicaEffects/ShaderLibBuilder/ShaderParser/ShaderTypeInfo.hpp"
-#include "ReplicaUtils/StringIDMap.hpp"
 
 namespace Replica::Effects
 {
 	constexpr uint g_VariantMask = 0xFFFFu;
 	constexpr uint g_VariantGroupOffset = 16u;
+
+	/// <summary>
+	/// Non-owning span of raw bytes
+	/// </summary>
+	using ByteSpan = const VectorSpan<Vector<byte>>;
+
+	/// <summary>
+	/// Non-owning span of uint IDs
+	/// </summary>
+	using IDSpan = const VectorSpan<Vector<uint>>;
+
+	template <typename T>
+	class SpanVector
+	{
+	public:
+		using value_type = VectorSpan<Vector<T>>;
+		using const_value_type = const VectorSpan<Vector<T>>;
+		using reference = value_type;
+		using const_reference = const_value_type;
+
+		Vector<T> data;
+		Vector<uint> spans;
+
+		void SetData(const SpanVector& data)
+		{
+			Clear();
+			this->data.AddRange(data.data);
+			this->spans.AddRange(data.spans);
+		}
+
+		void SetData(const IDynamicArray<T>& data, const IDynamicArray<uint>& spans)
+		{
+			Clear();
+			this->data.AddRange(data);
+			this->spans.AddRange(spans);
+		}
+
+		/// <summary>
+		/// Copies a new span into the vector
+		/// </summary>
+		void Add(const IDynamicArray<T>& arr)
+		{
+			uint index = (uint)data.GetLength();
+			uint length = (uint)arr.GetLength();
+			REP_ASSERT_MSG(length > 0, "Cannot add empty array");
+			spans.Add(index);
+			spans.Add(length);
+			data.AddRange(arr);
+		}
+
+		void RemoveBack()
+		{
+			REP_ASSERT_MSG(spans.GetLength() >= 2, "No spans to remove");
+			uint index = (uint)spans[spans.GetLength() - 2];
+			uint length = (uint)spans.GetBack();
+			data.RemoveRange(index, length);
+			spans.RemoveBack();
+			spans.RemoveBack();
+		}
+
+		bool IsEmpty() const { return spans.GetLength() == 0; }
+
+		/// <summary>
+		/// Clears the contents of the vector
+		/// </summary>
+		void Clear()
+		{
+			data.Clear();
+			spans.Clear();
+		}
+
+		/// <summary>
+		/// Returns the number of spans in the vector
+		/// </summary>
+		size_t GetLength() const { return spans.GetLength() / 2; }
+
+		/// <summary>
+		/// Returns the span at the given index
+		/// </summary>
+		value_type at(size_t index)
+		{
+			REP_ASSERT_MSG((index * 2 + 1) < spans.GetLength(), "Span index out of range");
+			return value_type(data, spans[index * 2], spans[index * 2 + 1]);
+		}
+
+		/// <summary>
+		/// Returns the span at the given index
+		/// </summary>
+		const_value_type at(size_t index) const
+		{
+			REP_ASSERT_MSG((index * 2 + 1) < spans.GetLength(), "Span index out of range");
+			return const_value_type(*const_cast<Vector<T>*>(&data), spans[index * 2], spans[index * 2 + 1]);
+		}
+
+		/// <summary>
+		/// Returns the span at the given index
+		/// </summary>
+		value_type operator[](size_t index)
+		{
+			REP_ASSERT_MSG((index * 2 + 1) < spans.GetLength(), "Span index out of range");
+			return value_type(data, spans[index * 2], spans[index * 2 + 1]);
+		}
+
+		/// <summary>
+		/// Returns the span at the given index
+		/// </summary>
+		const_value_type operator[](size_t index) const
+		{
+			REP_ASSERT_MSG((index * 2 + 1) < spans.GetLength(), "Span index out of range");
+			return const_value_type(*const_cast<Vector<T>*>(&data), spans[index * 2], spans[index * 2 + 1]);
+		}
+	};
 
 	/// <summary>
 	/// Defines a shader constant's name, size and position within a cbuf
@@ -25,13 +138,15 @@ namespace Replica::Effects
 			offset(0),
 			size(0),
 			stringID(0)
-		{ }
+		{
+		}
 
 		ConstDef(uint stringID, uint offset, uint size) :
 			stringID(stringID),
 			offset(offset),
 			size(size)
-		{ }
+		{
+		}
 	};
 
 	/// <summary>
@@ -85,7 +200,8 @@ namespace Replica::Effects
 			size(0),
 			dataType(0),
 			componentCount(0)
-		{ }
+		{
+		}
 
 		IOElementDef(uint semantic, uint semanticIndex, uint dataType, uint componentCount, uint size) :
 			semanticID(semantic),
@@ -93,7 +209,8 @@ namespace Replica::Effects
 			dataType(dataType),
 			componentCount(componentCount),
 			size(size)
-		{ }
+		{
+		}
 	};
 
 	/// <summary>
@@ -103,10 +220,10 @@ namespace Replica::Effects
 	{
 		USE_DEFAULT_CMP(ResourceDef)
 
-		/// <summary>
-		/// StringID of the resource declared in the source
-		/// </summary>
-		uint stringID;
+			/// <summary>
+			/// StringID of the resource declared in the source
+			/// </summary>
+			uint stringID;
 
 		/// <summary>
 		/// Type of resource
@@ -119,13 +236,15 @@ namespace Replica::Effects
 			type(ShaderTypes::Void),
 			slot(-1),
 			stringID(-1)
-		{ }
+		{
+		}
 
 		ResourceDef(uint stringID, ShaderTypes type, uint slot = -1) :
 			stringID(stringID),
 			type(type),
 			slot(slot)
-		{ }
+		{
+		}
 
 		bool GetHasFlags(ShaderTypes flags) const { return (type & flags) == flags; }
 	};
@@ -137,10 +256,10 @@ namespace Replica::Effects
 	{
 		USE_DEFAULT_CMP(ShaderDef)
 
-		/// <summary>
-		/// StringID for the path of the original source
-		/// </summary>
-		uint fileStringID;
+			/// <summary>
+			/// StringID for the path of the original source
+			/// </summary>
+			uint fileStringID;
 
 		/// <summary>
 		/// Precompiled source binary ID
@@ -196,7 +315,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Effect passes in execution order
 		/// </summary>
-		DynamicArray<uint> passes;
+		uint passGroupID;
 	};
 
 	struct ShaderVariantDef
@@ -247,69 +366,56 @@ namespace Replica::Effects
 	struct ShaderRegistryDef
 	{
 		/// <summary>
-		/// Unique strings
-		/// </summary>
-		StringIDMapDef stringIDs;
-
-		/// <summary>
 		/// Unique constant buffer members
 		/// </summary>
-		DynamicArray<ConstDef> constants;
-
-		/// <summary>
-		/// Unique constant buffer layout combinations
-		/// </summary>
-		DynamicArray<DynamicArray<uint>> cbufLayouts;
+		Vector<ConstDef> constants;
 
 		/// <summary>
 		/// Unique constant buffers
 		/// </summary>
-		DynamicArray<ConstBufDef> cbufDefs;
+		Vector<ConstBufDef> cbufDefs;
 
 		/// <summary>
 		/// Unique individual input/output members for a stage
 		/// </summary>
-		DynamicArray<IOElementDef> ioElements;
+		Vector<IOElementDef> ioElements;
 
 		/// <summary>
 		/// Unique textures, buffers and samplers
 		/// </summary>
-		DynamicArray<ResourceDef> resources;
-
-		/// <summary>
-		/// Unique groups of constant buffers used in a shader
-		/// </summary>
-		DynamicArray<DynamicArray<uint>> cbufGroups;
-
-		/// <summary>
-		/// Unique stage input/output signatures for a shader
-		/// </summary>
-		DynamicArray<DynamicArray<uint>> ioSignatures;
-
-		/// <summary>
-		/// Unique groups of textures, buffers and samplers used in a shader
-		/// </summary>
-		DynamicArray<DynamicArray<uint>> resGroups;
-
-		/// <summary>
-		/// Unique IDs representing shaders in an effect pass
-		/// </summary>
-		DynamicArray<DynamicArray<uint>> effectPasses;
-
-		/// <summary>
-		/// Shader bytecode buffers
-		/// </summary>
-		DynamicArray<DynamicArray<byte>> binaries;
+		Vector<ResourceDef> resources;
 
 		/// <summary>
 		/// Unique shaders and associated resources
 		/// </summary>
-		DynamicArray<ShaderDef> shaders;
+		Vector<ShaderDef> shaders;
 
 		/// <summary>
 		/// Unique effects and associated resources
 		/// </summary>
-		DynamicArray<EffectDef> effects;
+		Vector<EffectDef> effects;
+
+		/// <summary>
+		/// Groups of unique uint resources identifiers
+		/// </summary>
+		SpanVector<uint> idGroups;
+
+		/// <summary>
+		/// Unique shader binaries
+		/// </summary>
+		SpanVector<byte> binSpans;
+
+		void Clear()
+		{
+			constants.Clear();
+			cbufDefs.Clear();
+			ioElements.Clear();
+			resources.Clear();
+			shaders.Clear();
+			effects.Clear();
+			idGroups.Clear();
+			binSpans.Clear();
+		}
 	};
 
 	/// <summary>
@@ -411,6 +517,11 @@ namespace Replica::Effects
 		/// required by library definitions
 		/// </summary>
 		ShaderRegistryDef regData;
+
+		/// <summary>
+		/// Unique strings
+		/// </summary>
+		StringIDMapDef stringIDs;
 	};
 
 	/// <summary>

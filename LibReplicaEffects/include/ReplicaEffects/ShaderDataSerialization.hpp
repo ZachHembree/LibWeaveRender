@@ -6,31 +6,31 @@
 namespace Replica::Effects
 {
 	template <class Archive>
-	void serialize(Archive& ar, ConstDef& def)
+	inline void serialize(Archive& ar, ConstDef& def)
 	{
 		ar(def.stringID, def.offset, def.size);
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, ConstBufDef& def)
+	inline void serialize(Archive& ar, ConstBufDef& def)
 	{
 		ar(def.stringID, def.size, def.layoutID);
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, IOElementDef& def)
+	inline void serialize(Archive& ar, IOElementDef& def)
 	{
 		ar(def.semanticID, def.semanticIndex, def.dataType, def.componentCount, def.size);
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, ResourceDef& def)
+	inline void serialize(Archive& ar, ResourceDef& def)
 	{
 		ar(def.stringID, def.type, def.slot);
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, ShaderDef& def)
+	inline void serialize(Archive& ar, ShaderDef& def)
 	{
 		ar(
 			def.fileStringID, def.byteCodeID, def.nameID, def.stage,
@@ -40,68 +40,71 @@ namespace Replica::Effects
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, EffectDef& def)
+	inline void serialize(Archive& ar, EffectDef& def)
 	{
-		ar(def.nameID, def.passes);
+		ar(def.nameID, def.passGroupID);
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, ShaderVariantDef& def)
+	inline void serialize(Archive& ar, ShaderVariantDef& def)
 	{
 		ar(def.shaderID, def.variantID);
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, EffectVariantDef& def)
+	inline void serialize(Archive& ar, EffectVariantDef& def)
 	{
 		ar(def.effectID, def.variantID);
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, VariantDef& def)
+	inline void serialize(Archive& ar, VariantDef& def)
 	{
 		ar(def.effects, def.shaders);
 	}
 
+	template<class Archive, typename T>
+	inline void serialize(Archive& ar, SpanVector<T>& vec)
+	{
+		ar(vec.spans, vec.data);
+	}
+
 	template <class Archive>
-	void serialize(Archive& ar, ShaderRegistryDef& def)
+	inline void serialize(Archive& ar, ShaderRegistryDef& def)
 	{
 		ar(
-			def.stringIDs, 
-			def.constants, def.cbufLayouts, def.cbufDefs, 
-			def.ioElements, def.resources,
-			def.cbufGroups, def.ioSignatures, def.resGroups,
-			def.effectPasses, def.binaries, 
-			def.shaders, def.effects
+			def.constants, def.cbufDefs, def.ioElements,
+			def.resources, def.shaders, def.effects,
+			def.idGroups, def.binSpans
 		);
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, PlatformDef& def)
+	inline void serialize(Archive& ar, PlatformDef& def)
 	{
 		ar(def.compilerVersion, def.featureLevel, def.target);
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, VariantRepoDef& def)
+	inline void serialize(Archive& ar, VariantRepoDef& def)
 	{
 		ar(def.src, def.flagIDs, def.modeIDs, def.variants);
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, ShaderLibDef& def)
+	inline void serialize(Archive& ar, ShaderLibDef& def)
 	{
-		ar(def.platform, def.repos, def.regData);
+		ar(def.platform, def.repos, def.regData, def.stringIDs);
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, VariantRepoSrc& def)
+	inline void serialize(Archive& ar, VariantRepoSrc& def)
 	{
 		ar(def.name, def.path);
 	}
 
 	template <class Archive>
-	void serialize(Archive& ar, ShaderLibSrc& def)
+	inline void serialize(Archive& ar, ShaderLibSrc& def)
 	{
 		ar(def.srcFiles);
 	}

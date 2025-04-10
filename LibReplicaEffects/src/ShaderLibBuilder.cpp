@@ -106,7 +106,6 @@ ShaderLibDef ShaderLibBuilder::ExportLibrary()
 {
 	ShaderLibDef lib;
 	lib.platform = platform;
-	lib.regData = pShaderRegistry->ExportDefinition();
 	lib.repos = DynamicArray<VariantRepoDef>(repos.GetLength());
 	
 	for (int i = 0; i < repos.GetLength(); i++)
@@ -331,7 +330,7 @@ void ShaderLibBuilder::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, ui
 		const EffectBlock& block = effectBlocks[i];
 		EffectDef effect;
 		effect.nameID = block.nameID;
-		effect.passes = DynamicArray<uint>(block.passCount);
+		Vector<uint> passBuf = pShaderRegistry->GetTmpIDBuffer();
 
 		// Passes
 		for (uint j = 0; j < block.passCount; j++)
@@ -346,9 +345,12 @@ void ShaderLibBuilder::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, ui
 				idBuf.EmplaceBack(effectShaders[shaderIndex]);
 			}
 
-			passBuf.EmplaceBack(pShaderRegistry->GetOrAddEffectPass(idBuf));
+			passBuf.EmplaceBack(pShaderRegistry->GetOrAddIDGroup(idBuf));
 			pShaderRegistry->ReturnTmpIDBuffer(std::move(idBuf));
 		}
+
+		effect.passGroupID = pShaderRegistry->GetOrAddIDGroup(passBuf);
+		pShaderRegistry->ReturnTmpIDBuffer(std::move(passBuf));
 
 		effects[i] = EffectVariantDef 
 		{

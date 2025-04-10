@@ -411,7 +411,7 @@ int main(int argc, char* argv[])
     try
 #endif
     {
-#ifndef _DEBUG_VS
+#ifndef _DEBUG
         DynamicArray<string_view> args(argc);
 
         for (int i = 0; i < argc; i++)

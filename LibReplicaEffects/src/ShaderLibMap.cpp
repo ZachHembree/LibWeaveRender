@@ -56,7 +56,7 @@ ShaderLibMap::ShaderLibMap(const ShaderLibDef& def) :
 	variantFlagMaps(def.repos.GetLength()),
 	variantModeMaps(def.repos.GetLength()),
 	variantRepos(def.repos),
-	pRegMap(new ShaderRegistryMap(def.regData))
+	pRegMap(new ShaderRegistryMap(def.stringIDs, def.regData))
 {
 	InitMaps();
 }
@@ -67,7 +67,7 @@ ShaderLibMap::ShaderLibMap(ShaderLibDef&& def) :
 	variantFlagMaps(def.repos.GetLength()),
 	variantModeMaps(def.repos.GetLength()),
 	variantRepos(std::move(def.repos)),
-	pRegMap(new ShaderRegistryMap(std::move(def.regData)))
+	pRegMap(new ShaderRegistryMap(std::move(def.stringIDs), std::move(def.regData)))
 {
 	InitMaps();
 }

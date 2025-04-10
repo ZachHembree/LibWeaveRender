@@ -256,7 +256,7 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 			idBuf.EmplaceBack(GetIOElementDef(paramDesc, builder));
 		}
 
-		def.inLayoutID = builder.GetOrAddIOLayout(idBuf);
+		def.inLayoutID = builder.GetOrAddIDGroup(idBuf);
 		builder.ReturnTmpIDBuffer(std::move(idBuf));
 	}
 	else
@@ -274,7 +274,7 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 			idBuf.EmplaceBack(GetIOElementDef(paramDesc, builder));
 		}
 
-		def.outLayoutID = builder.GetOrAddIOLayout(idBuf);
+		def.outLayoutID = builder.GetOrAddIDGroup(idBuf);
 		builder.ReturnTmpIDBuffer(std::move(idBuf));
 	}
 	else
@@ -317,12 +317,12 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 				constIDbuf.EmplaceBack(builder.GetOrAddConstant(varDef));
 			}
 
-			constants.layoutID = builder.GetOrAddConstantLayout(constIDbuf);
+			constants.layoutID = builder.GetOrAddIDGroup(constIDbuf);
 			groupIDbuf.EmplaceBack(builder.GetOrAddConstantBuffer(constants));
 			builder.ReturnTmpIDBuffer(std::move(constIDbuf));
 		}
 
-		def.cbufGroupID = builder.GetOrAddCBufGroup(groupIDbuf);
+		def.cbufGroupID = builder.GetOrAddIDGroup(groupIDbuf);
 		builder.ReturnTmpIDBuffer(std::move(groupIDbuf));
 	}
 	else
@@ -360,7 +360,7 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 			}
 		}
 
-		def.resLayoutID = builder.GetOrAddResGroup(idBuf);
+		def.resLayoutID = builder.GetOrAddIDGroup(idBuf);
 		builder.ReturnTmpIDBuffer(std::move(idBuf));
 	}
 	else

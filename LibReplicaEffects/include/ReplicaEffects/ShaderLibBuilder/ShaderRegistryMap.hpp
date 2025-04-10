@@ -13,9 +13,9 @@ namespace Replica::Effects
 	public:
 		MAKE_NO_COPY(ShaderRegistryMap)
 
-		ShaderRegistryMap(ShaderRegistryDef&& def);
+		ShaderRegistryMap(const StringIDMapDef& strDef, const ShaderRegistryDef& def);
 
-		ShaderRegistryMap(const ShaderRegistryDef& def);
+		ShaderRegistryMap(StringIDMapDef&& strDef, ShaderRegistryDef&& def);
 
 		/// <summary>
 		/// Returns string ID lookup map
@@ -41,17 +41,9 @@ namespace Replica::Effects
 
 		const ShaderDef& GetShader(uint shaderID) const;
 
-		const IDynamicArray<byte>& GetByteCode(uint byteCodeID) const;
+		ByteSpan GetByteCode(uint byteCodeID) const;
 
-		const IDynamicArray<uint>& GetEffectPass(uint passID) const;
-
-		const IDynamicArray<uint>& GetCBufLayout(uint layoutID) const;
-
-		const IDynamicArray<uint>& GetResourceGroup(uint groupID) const;
-
-		const IDynamicArray<uint>& GetIOLayout(uint layoutID) const;
-
-		const IDynamicArray<uint>& GetCBufGroup(uint groupID) const;
+		IDSpan GetIDGroup(uint groupID) const;
 
 		const ResourceDef& GetResource(const uint resID) const;
 
@@ -62,21 +54,8 @@ namespace Replica::Effects
 		const ConstDef& GetConstant(const uint constID) const;
 
 	private:
+		std::unique_ptr<ShaderRegistryDef> pRegDef;
 		StringIDMap stringMap;
-		
-		UniqueArray<ConstDef> constants;
-		UniqueArray<ConstBufDef> cbufDefs;
-		UniqueArray<IOElementDef> ioElements;
-		UniqueArray<ResourceDef> resources;
 
-		UniqueArray<DynamicArray<uint>> cbufLayouts;
-		UniqueArray<DynamicArray<uint>> cbufGroups;
-		UniqueArray<DynamicArray<uint>> ioSignatures;
-		UniqueArray<DynamicArray<uint>> resGroups;
-		UniqueArray<DynamicArray<uint>> effectPasses;
-
-		UniqueArray<DynamicArray<byte>> binaries;
-		UniqueArray<ShaderDef> shaders;
-		UniqueArray<EffectDef> effects;
 	};
 }

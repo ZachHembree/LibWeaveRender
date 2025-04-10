@@ -21,13 +21,13 @@ uint ConstBufDefHandle::GetSize() const { return pDef->size; }
 
 const ConstDef& ConstBufDefHandle::operator[](ptrdiff_t index) const 
 { 
-	const IDynamicArray<uint>& members = pMap->GetCBufLayout(pDef->layoutID);
+	IDSpan members = pMap->GetIDGroup(pDef->layoutID);
 	return pMap->GetConstant(members[index]);
 }
 
 size_t ConstBufDefHandle::GetLength() const 
 { 
-	const IDynamicArray<uint>& members = pMap->GetCBufLayout(pDef->layoutID);
+	IDSpan members = pMap->GetIDGroup(pDef->layoutID);
 	return members.GetLength();
 }
 
@@ -46,7 +46,7 @@ uint ShaderDefHandle::GetFilePathID() const { return pDef->fileStringID; }
 
 uint ShaderDefHandle::GetNameID() const { return pDef->nameID; }
 
-const IDynamicArray<byte>& ShaderDefHandle::GetBinSrc() const { return pMap->GetByteCode(pDef->byteCodeID); }
+ByteSpan ShaderDefHandle::GetBinSrc() const { return pMap->GetByteCode(pDef->byteCodeID); }
 
 ShadeStages ShaderDefHandle::GetStage() const { return pDef->stage; }
 
@@ -88,80 +88,83 @@ const StringIDMap& ShaderDefHandle::GetStringMap() const { return pMap->GetStrin
 
 // EffectDef
 EffectDefHandle::EffectDefHandle() :
-	pMap(nullptr), pDef(nullptr)
+	pMap(nullptr), def({})
 {}
 
 EffectDefHandle::EffectDefHandle(const ShaderRegistryMap& map, uint effectID) :
-	pMap(&map), pDef(&map.GetEffect(effectID))
+	pMap(&map), def(map.GetEffect(effectID)), passes(map.GetIDGroup(def.passGroupID))
 {}
 
-uint EffectDefHandle::GetNameID() const { return pDef->nameID; }
+uint EffectDefHandle::GetNameID() const { return def.nameID; }
 
 ShaderDefHandle EffectDefHandle::GetShader(int pass, int shader) const
 {
-	const IDynamicArray<uint>& shaders = pMap->GetEffectPass(pDef->passes[pass]);
+	IDSpan shaders = pMap->GetIDGroup(passes[pass]);
 	return ShaderDefHandle(*pMap, shaders[shader]);
 }
 
-const IDynamicArray<uint>& EffectDefHandle::GetPass(int pass) const 
+IDSpan EffectDefHandle::GetPass(int pass) const
 { 
-	return pMap->GetEffectPass(pDef->passes[pass]); 
+	return pMap->GetIDGroup(passes[pass]);
 }
 
 uint EffectDefHandle::GetShaderCount(int pass) const 
 { 
-	const IDynamicArray<uint>& shaders = pMap->GetEffectPass(pDef->passes[pass]);
+	IDSpan shaders = pMap->GetIDGroup(passes[pass]);
 	return (uint)shaders.GetLength();
 }
 
-uint EffectDefHandle::GetPassCount() const { return (uint)pDef->passes.GetLength(); }
+uint EffectDefHandle::GetPassCount() const 
+{
+	return (uint)passes.GetLength();
+}
 
 const StringIDMap& EffectDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
 
 // IO layout
 IOLayoutHandle::IOLayoutHandle() :
-	pMap(nullptr), pLayout(nullptr)
+	pMap(nullptr), layout()
 { }
 
 IOLayoutHandle::IOLayoutHandle(const ShaderRegistryMap& map, uint layoutID) :
-	pMap(&map), pLayout(&map.GetIOLayout(layoutID))
+	pMap(&map), layout(map.GetIDGroup(layoutID))
 { }
 
-const IOElementDef& IOLayoutHandle::operator[](const ptrdiff_t index) const { return pMap->GetIOElement(pLayout->operator[](index)); }
+const IOElementDef& IOLayoutHandle::operator[](const ptrdiff_t index) const { return pMap->GetIOElement(layout[index]); }
 
-size_t IOLayoutHandle::GetLength() const { return pLayout->GetLength(); }
+size_t IOLayoutHandle::GetLength() const { return layout.GetLength(); }
 
 const StringIDMap& IOLayoutHandle::GetStringMap() const { return pMap->GetStringMap(); }
 
 // Resource layout
 ResourceGroupHandle::ResourceGroupHandle() :
-	pMap(nullptr), pLayout(nullptr)
+	pMap(nullptr)
 { }
 
 ResourceGroupHandle::ResourceGroupHandle(const ShaderRegistryMap& map, uint layoutID) :
-	pMap(&map), pLayout(&map.GetResourceGroup(layoutID))
+	pMap(&map), layout(map.GetIDGroup(layoutID))
 { }
 
-const ResourceDef& ResourceGroupHandle::operator[](const ptrdiff_t index) const { return pMap->GetResource(pLayout->operator[](index)); }
+const ResourceDef& ResourceGroupHandle::operator[](const ptrdiff_t index) const { return pMap->GetResource(layout[index]); }
 
-size_t ResourceGroupHandle::GetLength() const { return pLayout->GetLength(); }
+size_t ResourceGroupHandle::GetLength() const { return layout.GetLength(); }
 
 const StringIDMap& ResourceGroupHandle::GetStringMap() const { return pMap->GetStringMap(); }
 
 // Cbuf group
 ConstBufGroupHandle::ConstBufGroupHandle() :
-	pMap(nullptr), pLayout(nullptr)
+	pMap(nullptr)
 { }
 
 ConstBufGroupHandle::ConstBufGroupHandle(const ShaderRegistryMap& map, uint groupID) :
-	pMap(&map), pLayout(&map.GetCBufGroup(groupID))
+	pMap(&map), layout(map.GetIDGroup(groupID))
 {}
 
-ConstBufDefHandle ConstBufGroupHandle::operator[](const ptrdiff_t index) const { return ConstBufDefHandle(*pMap, pLayout->operator[](index)); }
+ConstBufDefHandle ConstBufGroupHandle::operator[](const ptrdiff_t index) const { return ConstBufDefHandle(*pMap, layout[index]); }
 
 /// <summary>
 /// Returns the total number of buffers in the group
 /// </summary>
-size_t ConstBufGroupHandle::GetLength() const { return pLayout->GetLength(); }
+size_t ConstBufGroupHandle::GetLength() const { return layout.GetLength(); }
 
 const StringIDMap& ConstBufGroupHandle::GetStringMap() const { return pMap->GetStringMap(); }

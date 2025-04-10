@@ -63,6 +63,6 @@ struct std::hash<EffectDef>
 {
 	size_t operator()(const EffectDef& def) const noexcept
 	{
-		return GetCombinedHash(def.nameID, def.passes);
+		return GetCombinedHash(def.nameID, def.passGroupID);
 	}
 };

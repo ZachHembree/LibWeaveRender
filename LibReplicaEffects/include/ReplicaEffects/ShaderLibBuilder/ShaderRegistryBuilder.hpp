@@ -4,6 +4,7 @@
 #include "ReplicaEffects/ShaderData.hpp"
 #include "ReplicaUtils/StringIDBuilder.hpp"
 #include "ReplicaUtils/VectorSpan.hpp"
+#include "ReplicaUtils/ObjectPool.hpp"
 
 namespace Replica::Effects
 {
@@ -15,19 +16,15 @@ namespace Replica::Effects
 		Undefined = 0,
 
 		Constant = 1,
-		ConstLayout = 2,
-		ConstantBuffer = 3,
-		IOElement = 4,
-		Resource = 5,
+		ConstantBuffer = 2,
+		IOElement = 3,
+		Resource = 4,
 
-		CBufGroup = 6,
-		IOLayout = 7,
-		ResGroup = 8,
+		Shader = 5,
+		Effect = 6,
 
-		ByteCode = 9,
-		Shader = 10,
-		EffectPass = 11,
-		Effect = 12,
+		ByteCode = 7,
+		IDGroups = 8,
 	};
 
 	/// <summary>
@@ -105,8 +102,8 @@ namespace Replica::Effects
 		int GetUniqueResCount() const;
 
 		/* GetOrAdd(Member) functions return an integer ID that uniquely corresponds to the given definition.
-		* If a definition has not been seen before, it will be added and a new ID will be generated. 
-		* 
+		* If a definition has not been seen before, it will be added and a new ID will be generated.
+		*
 		* StringIDs are separate from shader definition types. */
 
 		uint GetOrAddStringID(string_view str);
@@ -119,21 +116,13 @@ namespace Replica::Effects
 
 		uint GetOrAddResource(const ResourceDef& resDef);
 
-		uint GetOrAddConstantLayout(const IDynamicArray<uint>& layout);
-
-		uint GetOrAddCBufGroup(const IDynamicArray<uint>& bufGroup);
-
-		uint GetOrAddIOLayout(const IDynamicArray<uint>& signature);
-
-		uint GetOrAddResGroup(const IDynamicArray<uint>& resGroup);
-
-		uint GetOrAddEffectPass(const IDynamicArray<uint>& pass);
-
-		uint GetOrAddShaderBin(const IDynamicArray<byte>& byteCode);
-
 		uint GetOrAddShader(const ShaderDef& shader);
 
 		uint GetOrAddEffect(const EffectDef& effect);
+
+		uint GetOrAddIDGroup(const IDynamicArray<uint>& idGroup);
+
+		uint GetOrAddShaderBin(const IDynamicArray<byte>& byteCode);
 
 		/* Get(Member) returns an immutable reference to the object corresponding to the given ID. */
 
@@ -145,23 +134,13 @@ namespace Replica::Effects
 
 		const ResourceDef& GetResource(const uint id) const;
 
-		const IDynamicArray<uint>& GetConstantLayout(const uint id) const;
-
-		const IDynamicArray<uint>& GetCBufGroup(const uint id) const;
-
-		const IDynamicArray<uint>& GetIOLayout(const uint id) const;
-
-		const IDynamicArray<uint>& GetResGroup(const uint id) const;
-
-		const IDynamicArray<uint>& GetEffectPass(const uint id) const;
-
-		const IDynamicArray<byte>& GetShaderBin(const uint id) const;
-
 		const ShaderDef& GetShader(const uint id) const;
 
 		const EffectDef& GetEffect(const uint id) const;
 
-		ShaderRegistryDef ExportDefinition() const;
+		IDSpan GetIDGroup(const uint id) const;
+
+		ByteSpan GetShaderBin(const uint id) const;
 
 		/// <summary>
 		/// Returns a temporary buffer for building a collection of unique IDs. Must be returned
@@ -185,6 +164,8 @@ namespace Replica::Effects
 		/// </summary>
 		void ReturnTmpByteBuffer(Vector<byte>&& buf);
 
+		void WriteDefinition(StringIDMapDef& strData, ShaderRegistryDef& def) const;
+
 		/// <summary>
 		/// Returns index and resource enum combined into an ID
 		/// </summary>
@@ -198,19 +179,18 @@ namespace Replica::Effects
 		/// <summary>
 		/// Returns index from ID
 		/// </summary>
-		 static uint GetIndex(uint id);
+		static uint GetIndex(uint id);
 
 	private:
-		template<typename T>
-		using RegSpan = VectorSpan<UniqueVector<T>, T>;
-
 		/// <summary>
 		/// Vector template that allows hashing members with HashHandles
 		/// </summary>
-		template<typename T, ResourceType typeEnum>
-		class HashableVector : public UniqueVector<T>
+		template<typename VecT, ResourceType typeEnum>
+		class HashableVector : public VecT
 		{
-		public:			
+		public:
+			using value_type = typename VecT::value_type;
+			using const_reference = typename VecT::const_reference;
 			static constexpr ResourceType ResType = typeEnum;
 
 			HashableVector()
@@ -221,7 +201,7 @@ namespace Replica::Effects
 				};
 				GetMemberHash = [this](const HashHandle& handle) -> size_t
 				{
-					return std::hash<T>{}(this->at(handle.GetIndex()) );
+					return std::hash<value_type>{}(this->at(handle.GetIndex()));
 				};
 			}
 
@@ -229,7 +209,7 @@ namespace Replica::Effects
 
 			const IsEqFunc& GetEqFunc() const { return GetIsMemberEq; }
 
-			const T& GetValue(const uint id) const 
+			const_reference GetValue(const uint id) const
 			{
 				if (GetResourceType(id) == typeEnum)
 					return this->at(GetIndex(id));
@@ -247,39 +227,35 @@ namespace Replica::Effects
 
 		StringIDBuilder stringIDs;
 		std::unordered_set<HashHandle> resourceSet;
+
 		UniqueVector<uint> idBuffer;
 		UniqueVector<byte> byteBuffer;
 
-		HashableVector<ConstDef, ResourceType::Constant> constants;
-		HashableVector<ConstBufDef, ResourceType::ConstantBuffer> cbufDefs;
-		HashableVector<IOElementDef, ResourceType::IOElement> ioElements;
-		HashableVector<ResourceDef, ResourceType::Resource> resources;
+		HashableVector<UniqueVector<ConstDef>, ResourceType::Constant> constants;
+		HashableVector<UniqueVector<ConstBufDef>, ResourceType::ConstantBuffer> cbufDefs;
+		HashableVector<UniqueVector<IOElementDef>, ResourceType::IOElement> ioElements;
+		HashableVector< UniqueVector<ResourceDef>, ResourceType::Resource> resources;
 
-		HashableVector<RegSpan<uint>, ResourceType::ConstLayout> cbufLayouts;
-		HashableVector<RegSpan<uint>, ResourceType::CBufGroup> cbufGroups;
-		HashableVector<RegSpan<uint>, ResourceType::IOLayout> ioSignatures;
-		HashableVector<RegSpan<uint>, ResourceType::ResGroup> resGroups;
-		HashableVector<RegSpan<uint>, ResourceType::EffectPass> effectPasses;
+		HashableVector<UniqueVector<ShaderDef>, ResourceType::Shader> shaders;
+		HashableVector<UniqueVector<EffectDef>, ResourceType::Effect> effects;
 
-		HashableVector<RegSpan<byte>, ResourceType::ByteCode> binaries;
-		HashableVector<ShaderDef, ResourceType::Shader> shaders;
-		HashableVector<EffectDef, ResourceType::Effect> effects;
+		HashableVector<SpanVector<uint>, ResourceType::IDGroups> idGroups;
+		HashableVector<SpanVector<byte>, ResourceType::ByteCode> binSpans;
 
 		int resCount;
 		int uniqueResCount;
 
-		template<typename T, ResourceType type>
-		uint GetOrAddValue(const T& newValue, HashableVector<T, type>& values)
+		template<typename T, typename VecT, ResourceType type>
+		uint GetOrAddValue(const T& newValue, HashableVector<VecT, type>& values)
 		{
 			const uint index = (uint)values.GetLength();
 			const uint newID = SetResourceType(index, type);
 
 			// Temporarily store new value in vector to ensure valid handle
-			values.EmplaceBack(newValue);
+			values.Add(newValue);
 			// Create handle and search set
 			HashHandle handle(newID, values.GetHashFunc(), values.GetEqFunc());
 			const auto& it = resourceSet.find(handle);
-
 			resCount++;
 
 			if (it != resourceSet.end())
@@ -295,38 +271,5 @@ namespace Replica::Effects
 				return handle.GetID();
 			}
 		}
-		
-		template<typename T, ResourceType type>
-		uint GetOrAddValue(const IDynamicArray<T>& ids, HashableVector<RegSpan<T>, type>& values, UniqueVector<T>& buffer)
-		{
-			const uint index = (uint)values.GetLength();
-			const uint newID = SetResourceType(index, type);
-			const uint spanStart = (uint)buffer.GetLength();
-
-			// Temporarily store new value in vector to ensure valid handle
-			buffer.AddRange(ids);
-			const DynSpan<T>& layout = values.EmplaceBack(buffer, spanStart, ids.GetLength());
-	
-			// Create handle and search set
-			HashHandle handle(newID, values.GetHashFunc(), values.GetEqFunc());
-			const auto& it = resourceSet.find(handle);
-
-			resCount++;
-
-			if (it != resourceSet.end())
-			{
-				// Value already existed, remove from vector and return existing ID
-				buffer.RemoveRange(spanStart, layout.GetLength());
-				values.RemoveBack();
-				return it->GetID();
-			}
-			else
-			{
-				uniqueResCount++;
-				resourceSet.emplace(handle);
-				return handle.GetID();
-			}
-		}
-
 	};
 }

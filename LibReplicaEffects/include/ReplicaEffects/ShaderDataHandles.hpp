@@ -73,7 +73,7 @@ namespace Replica::Effects
 
 	private:
 		const ShaderRegistryMap* pMap;
-		const IDynamicArray<uint>* pLayout;
+		IDSpan layout;
 	};
 
 	/// <summary>
@@ -103,7 +103,7 @@ namespace Replica::Effects
 
 	private:
 		const ShaderRegistryMap* pMap;
-		const IDynamicArray<uint>* pLayout;
+		IDSpan layout;
 	};
 
 	/// <summary>
@@ -133,7 +133,7 @@ namespace Replica::Effects
 
 	private:
 		const ShaderRegistryMap* pMap;
-		const IDynamicArray<uint>* pLayout;
+		IDSpan layout;
 	};
 
 	/// <summary>
@@ -159,7 +159,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Returns precompiled platform-specific bytecode
 		/// </summary>
-		const IDynamicArray<byte>& GetBinSrc() const;
+		ByteSpan GetBinSrc() const;
 
 		/// <summary>
 		/// Identifies the shading stage defined by the shader
@@ -224,7 +224,7 @@ namespace Replica::Effects
 		/// <summary>
 		/// Returns shaders for the given pass
 		/// </summary>
-		const IDynamicArray<uint>& GetPass(int pass) const;
+		IDSpan GetPass(int pass) const;
 
 		/// <summary>
 		/// Returns the number of shaders used by the given pass
@@ -242,7 +242,8 @@ namespace Replica::Effects
 		const StringIDMap& GetStringMap() const;
 
 	private:
+		EffectDef def;
 		const ShaderRegistryMap* pMap;
-		const EffectDef* pDef;
+		IDSpan passes;
 	};
 }

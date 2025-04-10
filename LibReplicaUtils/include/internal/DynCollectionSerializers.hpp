@@ -135,9 +135,8 @@ namespace Replica
 		}
 	}
 
-	// Non-boolean raw binary read
 	template <class Archive, typename T, typename ArrT>
-	requires IsBinaryDeserializableArrNB<Archive, T>&& std::derived_from<ArrT, Vector<T>>
+	requires std::derived_from<ArrT, Vector<T>>
 	inline void load(Archive& ar, ArrT& dst)
 	{
 		// Get array size

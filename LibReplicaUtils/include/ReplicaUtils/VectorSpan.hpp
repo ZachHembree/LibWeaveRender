@@ -10,8 +10,8 @@ namespace Replica
 		requires std::is_integral_v<IndexT>;
 		requires std::contiguous_iterator<std::ranges::iterator_t<const ContainerT>>;
 
-	// Immutable const indexer
-	{ ct[i] } -> std::same_as<const ReturnT&>;
+		// Immutable const indexer
+		{ ct[i] } -> std::same_as<const ReturnT&>;
 	};
 
 	/// <summary>
