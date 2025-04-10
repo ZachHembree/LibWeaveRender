@@ -3,33 +3,24 @@
 
 using namespace Replica;
 
-StringIDMapDef::StringIDMapDef() = default;
-
-StringIDMapDef::StringIDMapDef(StringIDMapDef&& other) noexcept = default;
-
-StringIDMapDef& StringIDMapDef::operator=(StringIDMapDef&& other) noexcept = default;
-
 void StringIDMapDef::Clear()
 {
     substrings.clear();
     stringData.clear();
 }
 
-StringIDMap::StringIDMap(StringIDMapDef&& def) noexcept :
-    stringBuf(std::move(def.stringData))
-{
-    InitMapData(def);
-}
-
 StringIDMap::StringIDMap(const StringIDMapDef& def) :
-    stringBuf(def.stringData)
+    pDef(new StringIDMapDef(def))
 {
-    InitMapData(def);
+    InitMapData();
 }
 
-/// <summary>
-/// Returns true if the string exists in the map and retrieves its ID
-/// </summary>
+StringIDMap::StringIDMap(StringIDMapDef&& def) :
+    pDef(std::move(&def))
+{
+    InitMapData();
+}
+
 bool StringIDMap::TryGetStringID(std::string_view str, uint& id) const
 {
     auto it = idMap.find(str);
@@ -44,31 +35,22 @@ bool StringIDMap::TryGetStringID(std::string_view str, uint& id) const
     return false;
 }
 
-/// <summary>
-/// Returns the string_view corresponding to the given ID
-/// </summary>
-std::string_view StringIDMap::GetString(uint id) const { return substrings[id]; }
+std::string_view StringIDMap::GetString(uint id) const 
+{ 
+    size_t start = pDef->substrings[id * 2];
+    size_t length = pDef->substrings[id * 2 + 1];
+    return string_view(&pDef->stringData[start], length); 
+}
 
-/// <summary>
-/// Returns the number of unique strings in the map
-/// </summary>
-uint StringIDMap::GetStringCount() const { return static_cast<uint>(substrings.GetLength()); }
+uint StringIDMap::GetStringCount() const { return (uint)(pDef->substrings.GetLength() / 2); }
 
-void StringIDMap::InitMapData(const StringIDMapDef& def)
+void StringIDMap::InitMapData()
 {
-    substrings = UniqueArray<string_view>(def.substrings.GetLength() / 2);
-    idMap.reserve(substrings.GetLength());
+    const uint strCount = (uint)(pDef->substrings.GetLength() / 2);
+    idMap.reserve(strCount);
 
-    for (size_t i = 0; i < def.substrings.GetLength(); i += 2)
+    for (uint i = 0; i < strCount; i++)
     {
-        const uint startIndex = def.substrings[i];
-        const uint subLen = def.substrings[i + 1];
-        const char* pStart = &stringBuf[startIndex];
-        substrings[i / 2] = string_view(pStart, subLen);
-    }
-
-    for (size_t i = 0; i < substrings.GetLength(); i++)
-    {
-        idMap.emplace(substrings[i], static_cast<uint>(i));
+        idMap.emplace(GetString(i), i);
     }
 }

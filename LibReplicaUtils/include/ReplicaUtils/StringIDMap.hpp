@@ -12,13 +12,9 @@ namespace Replica
     {
         static constexpr uint INVALID_ID = -1;
 
-        MAKE_NO_COPY(StringIDMapDef)
+        MAKE_DEF_MOVE_COPY(StringIDMapDef)
 
-        StringIDMapDef();
-
-        StringIDMapDef(StringIDMapDef&& other) noexcept;
-
-        StringIDMapDef& operator=(StringIDMapDef&& other) noexcept;
+        StringIDMapDef() = default;
 
         /// <summary>
         /// Alternating starting indices + string length. ID == index / 2
@@ -43,9 +39,9 @@ namespace Replica
 
         static constexpr uint INVALID_ID = StringIDMapDef::INVALID_ID;
 
-        StringIDMap(StringIDMapDef&& def) noexcept;
-
         explicit StringIDMap(const StringIDMapDef& def);
+
+        explicit StringIDMap(StringIDMapDef&& def);
 
         /// <summary>
         /// Returns true if the string exists in the map and retrieves its ID
@@ -63,14 +59,11 @@ namespace Replica
         uint GetStringCount() const;
 
     private:
-        // Concatenated text buffer
-        string stringBuf;
-        // Substrings pointing to text buffer and ID -> String map
-        UniqueArray<std::string_view> substrings;
+        std::unique_ptr<StringIDMapDef> pDef;
         // String -> ID map
         std::unordered_map<std::string_view, uint> idMap;
 
-        void InitMapData(const StringIDMapDef& def);
+        void InitMapData();
     };
 
 }
