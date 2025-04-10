@@ -164,6 +164,28 @@ namespace Replica::Effects
 		ShaderRegistryDef ExportDefinition() const;
 
 		/// <summary>
+		/// Returns a temporary buffer for building a collection of unique IDs. Must be returned
+		/// before clearing or exporting the registry.
+		/// </summary>
+		Vector<uint> GetTmpIDBuffer();
+
+		/// <summary>
+		/// Returns an ID buffer to the pool for reuse.
+		/// </summary>
+		void ReturnTmpIDBuffer(Vector<uint>&& buf);
+
+		/// <summary>
+		/// Returns a raw byte vector for temporarily storing shader bytecode. Must be returned
+		/// before clearing or exporting the registry.
+		/// </summary>
+		Vector<byte> GetTmpByteBuffer();
+
+		/// <summary>
+		/// Returns the bytecode vector to the pool for reuse.
+		/// </summary>
+		void ReturnTmpByteBuffer(Vector<byte>&& buf);
+
+		/// <summary>
 		/// Returns index and resource enum combined into an ID
 		/// </summary>
 		static uint SetResourceType(uint index, ResourceType type);
@@ -219,6 +241,9 @@ namespace Replica::Effects
 			HashFunc GetMemberHash;
 			IsEqFunc GetIsMemberEq;
 		};
+
+		ObjectPool<Vector<uint>> idBufPool;
+		ObjectPool<Vector<byte>> byteCodePool;
 
 		StringIDBuilder stringIDs;
 		std::unordered_set<HashHandle> resourceSet;

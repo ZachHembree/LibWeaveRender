@@ -335,16 +335,17 @@ void ShaderLibBuilder::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, ui
 		for (uint j = 0; j < block.passCount; j++)
 		{
 			PassBlock& pass = effectPasses[block.passStart + j];
-			idBuffer.clear();
+			Vector<uint> idBuf = pShaderRegistry->GetTmpIDBuffer();
 
 			// Shaders
 			for (uint k = 0; k < pass.shaderCount; k++)
 			{
 				const uint shaderIndex = pass.shaderStart + k;
-				idBuffer.emplace_back(effectShaders[shaderIndex]);
+				idBuf.emplace_back(effectShaders[shaderIndex]);
 			}
 
-			effect.passes[j] = pShaderRegistry->GetOrAddEffectPass(idBuffer);
+			effect.passes[j] = pShaderRegistry->GetOrAddEffectPass(idBuf);
+			pShaderRegistry->ReturnTmpIDBuffer(std::move(idBuf));
 		}
 
 		effects[i] = EffectVariantDef 

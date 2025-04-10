@@ -88,10 +88,6 @@ private:
 /// </summary>
 static thread_local CompilerState s_State;
 
-static thread_local UniqueVector<uint> s_IDbuf;
-static thread_local UniqueVector<uint> s_IDbuf2;
-static thread_local UniqueVector<byte> s_ByteBuf;
-
 /// <summary>
 /// Converts resource description into portable enum
 /// </summary>
@@ -205,10 +201,11 @@ static void GetPrecompShaderD3D11(
 	def.stage = stage;
 
 	const Span<byte> binSpan(static_cast<byte*>(binSrc->GetBufferPointer()), binSrc->GetBufferSize());
-	s_ByteBuf.clear();
-	s_ByteBuf.AddRange(binSpan);
+	Vector<byte> byteBuf = builder.GetTmpByteBuffer();
+	byteBuf.AddRange(binSpan);
 
-	def.byteCodeID = builder.GetOrAddShaderBin(s_ByteBuf);
+	def.byteCodeID = builder.GetOrAddShaderBin(byteBuf);
+	builder.ReturnTmpByteBuffer(std::move(byteBuf));
 }
 
 /// <summary>
@@ -250,16 +247,17 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 	// Input params
 	if (shaderDesc.InputParameters > 0)
 	{
-		s_IDbuf.clear();
+		Vector<uint> idBuf = builder.GetTmpIDBuffer();
 
 		for (uint i = 0; i < shaderDesc.InputParameters; i++)
 		{
 			D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
 			WIN_THROW_HR(pReflect->GetInputParameterDesc(i, &paramDesc));
-			s_IDbuf.emplace_back(GetIOElementDef(paramDesc, builder));
+			idBuf.emplace_back(GetIOElementDef(paramDesc, builder));
 		}
 
-		def.inLayoutID = builder.GetOrAddIOLayout(s_IDbuf);
+		def.inLayoutID = builder.GetOrAddIOLayout(idBuf);
+		builder.ReturnTmpIDBuffer(std::move(idBuf));
 	}
 	else
 		def.inLayoutID = -1;
@@ -267,16 +265,17 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 	// Output params
 	if (shaderDesc.OutputParameters > 0)
 	{
-		s_IDbuf.clear();
+		Vector<uint> idBuf = builder.GetTmpIDBuffer();
 
 		for (uint i = 0; i < shaderDesc.OutputParameters; i++)
 		{
 			D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
 			WIN_THROW_HR(pReflect->GetOutputParameterDesc(i, &paramDesc));
-			s_IDbuf.emplace_back(GetIOElementDef(paramDesc, builder));
+			idBuf.emplace_back(GetIOElementDef(paramDesc, builder));
 		}
 
-		def.outLayoutID = builder.GetOrAddIOLayout(s_IDbuf);
+		def.outLayoutID = builder.GetOrAddIOLayout(idBuf);
+		builder.ReturnTmpIDBuffer(std::move(idBuf));
 	}
 	else
 		def.outLayoutID = -1;
@@ -291,7 +290,7 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 	// Constant buffers
 	if (shaderDesc.ConstantBuffers > 0)
 	{
-		s_IDbuf.clear();
+		Vector<uint> groupIDbuf = builder.GetTmpIDBuffer();
 
 		for (uint i = 0; i < shaderDesc.ConstantBuffers; i++)
 		{
@@ -299,12 +298,11 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 			D3D11_SHADER_BUFFER_DESC cbufDesc;
 			WIN_THROW_HR(cbuf.GetDesc(&cbufDesc));
 
+			Vector<uint> constIDbuf = builder.GetTmpIDBuffer();
 			ConstBufDef constants;
 			constants.stringID = builder.GetOrAddStringID(string_view(cbufDesc.Name));
 			constants.size = cbufDesc.Size;
 			
-			s_IDbuf2.clear();
-
 			for (uint j = 0; j < cbufDesc.Variables; j++)
 			{
 				ID3D11ShaderReflectionVariable& var = *cbuf.GetVariableByIndex(j);
@@ -316,14 +314,16 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 				varDef.offset = varDesc.StartOffset;
 				varDef.size = varDesc.Size;
 
-				s_IDbuf2.emplace_back(builder.GetOrAddConstant(varDef));
+				constIDbuf.emplace_back(builder.GetOrAddConstant(varDef));
 			}
 
-			constants.layoutID = builder.GetOrAddConstantLayout(s_IDbuf2);
-			s_IDbuf.emplace_back(builder.GetOrAddConstantBuffer(constants));
+			constants.layoutID = builder.GetOrAddConstantLayout(constIDbuf);
+			groupIDbuf.emplace_back(builder.GetOrAddConstantBuffer(constants));
+			builder.ReturnTmpIDBuffer(std::move(constIDbuf));
 		}
 
-		def.cbufGroupID = builder.GetOrAddCBufGroup(s_IDbuf);
+		def.cbufGroupID = builder.GetOrAddCBufGroup(groupIDbuf);
+		builder.ReturnTmpIDBuffer(std::move(groupIDbuf));
 	}
 	else
 		def.cbufGroupID = -1;
@@ -340,7 +340,7 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 	// Resources
 	if (resourceCount > 0)
 	{
-		s_IDbuf.clear();
+		Vector<uint> idBuf = builder.GetTmpIDBuffer();
 		uint resIndex = 0;
 
 		for (uint i = 0; i < shaderDesc.BoundResources; i++)
@@ -355,12 +355,13 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 				res.type = GetResourceType(resDesc);
 				res.slot = resDesc.BindPoint;
 
-				s_IDbuf.emplace_back(builder.GetOrAddResource(res));
+				idBuf.emplace_back(builder.GetOrAddResource(res));
 				resIndex++;
 			}
 		}
 
-		def.resLayoutID = builder.GetOrAddResGroup(s_IDbuf);
+		def.resLayoutID = builder.GetOrAddResGroup(idBuf);
+		builder.ReturnTmpIDBuffer(std::move(idBuf));
 	}
 	else
 		def.resLayoutID = -1;

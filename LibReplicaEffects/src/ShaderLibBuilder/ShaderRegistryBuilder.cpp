@@ -11,6 +11,9 @@ ShaderRegistryBuilder::ShaderRegistryBuilder() :
 
 void ShaderRegistryBuilder::Clear()
 {
+	PARSE_ASSERT_MSG((idBufPool.GetObjectsOutstanding() + byteCodePool.GetObjectsOutstanding()) == 0,
+		"Temporary buffers must be returned before finalizing or exporting shader regsitry.");
+
 	stringIDs.Clear();
 	resourceSet.clear();
 	idBuffer.clear();
@@ -90,8 +93,19 @@ const ShaderDef& ShaderRegistryBuilder::GetShader(const uint id) const { return 
 
 const EffectDef& ShaderRegistryBuilder::GetEffect(const uint id) const { return effects.GetValue(id); }
 
+Vector<uint> ShaderRegistryBuilder::GetTmpIDBuffer() { return idBufPool.Get(); }
+
+Vector<byte> ShaderRegistryBuilder::GetTmpByteBuffer() { return byteCodePool.Get(); }
+
+void ShaderRegistryBuilder::ReturnTmpByteBuffer(Vector<byte>&& buf) { buf.clear(); byteCodePool.Return(std::move(buf)); }
+
+void ShaderRegistryBuilder::ReturnTmpIDBuffer(Vector<uint>&& buf) { buf.clear(); idBufPool.Return(std::move(buf)); }
+
 ShaderRegistryDef ShaderRegistryBuilder::ExportDefinition() const
 {
+	PARSE_ASSERT_MSG((idBufPool.GetObjectsOutstanding() + byteCodePool.GetObjectsOutstanding()) == 0,
+		"Temporary buffers must be returned before finalizing or exporting shader regsitry.");
+
 	ShaderRegistryDef def;
 	stringIDs.WriteDefinition(def.stringIDs);
 

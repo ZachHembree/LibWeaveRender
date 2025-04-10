@@ -50,6 +50,11 @@ namespace Replica
 		~VectorSpan() = default;
 
 		/// <summary>
+		/// Returns the index of the first element in the parent vector
+		/// </summary>
+		size_t GetIndex() const { return start; }
+
+		/// <summary>
 		/// Returns the length of the span
 		/// </summary>
 		size_t GetLength() const override { return length; }
