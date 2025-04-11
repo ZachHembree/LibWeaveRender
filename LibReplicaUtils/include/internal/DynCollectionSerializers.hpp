@@ -7,9 +7,15 @@
 namespace Replica
 {
 	template<class Archive>
-	void serialize(Archive& ar, StringIDMapDef& def)
+	void load(Archive& ar, StringIDMapDef& def)
 	{
 		ar(def.substrings, def.stringData);
+	}
+
+	template<class Archive>
+	void save(Archive& ar, const StringIDMapDef::Handle def)
+	{
+		ar(*def.pSubstrings, *def.pStringData);
 	}
 
 	// Constraints

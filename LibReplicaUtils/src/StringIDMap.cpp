@@ -16,7 +16,7 @@ StringIDMap::StringIDMap(const StringIDMapDef& def) :
 }
 
 StringIDMap::StringIDMap(StringIDMapDef&& def) :
-    pDef(std::move(&def))
+    pDef(new StringIDMapDef(std::move(def)))
 {
     InitMapData();
 }

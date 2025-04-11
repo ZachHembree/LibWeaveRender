@@ -220,10 +220,10 @@ namespace Replica::Effects
 	{
 		USE_DEFAULT_CMP(ResourceDef)
 
-			/// <summary>
-			/// StringID of the resource declared in the source
-			/// </summary>
-			uint stringID;
+		/// <summary>
+		/// StringID of the resource declared in the source
+		/// </summary>
+		uint stringID;
 
 		/// <summary>
 		/// Type of resource
@@ -256,10 +256,10 @@ namespace Replica::Effects
 	{
 		USE_DEFAULT_CMP(ShaderDef)
 
-			/// <summary>
-			/// StringID for the path of the original source
-			/// </summary>
-			uint fileStringID;
+		/// <summary>
+		/// StringID for the path of the original source
+		/// </summary>
+		uint fileStringID;
 
 		/// <summary>
 		/// Precompiled source binary ID
@@ -405,6 +405,33 @@ namespace Replica::Effects
 		/// </summary>
 		SpanVector<byte> binSpans;
 
+		struct Handle
+		{
+			const IDynamicArray<ConstDef>* pConstants;
+			const IDynamicArray<ConstBufDef>* pCBufDefs;
+			const IDynamicArray<IOElementDef>* pIOElements;
+			const IDynamicArray<ResourceDef>* pResources;
+			const IDynamicArray<ShaderDef>* pShaders;
+			const IDynamicArray<EffectDef>* pEffects;
+			const SpanVector<uint>* pIDGroups;
+			const SpanVector<byte>* pBinSpans;
+		};
+
+		Handle GetHandle() const
+		{
+			return
+			{
+				.pConstants = &constants,
+				.pCBufDefs = &cbufDefs,
+				.pIOElements = &ioElements,
+				.pResources = &resources,
+				.pShaders = &shaders,
+				.pEffects = &effects,
+				.pIDGroups = &idGroups,
+				.pBinSpans = &binSpans
+			};
+		}
+
 		void Clear()
 		{
 			constants.Clear();
@@ -522,6 +549,25 @@ namespace Replica::Effects
 		/// Unique strings
 		/// </summary>
 		StringIDMapDef stringIDs;
+
+		struct Handle
+		{
+			const PlatformDef* pPlatform;
+			const IDynamicArray<VariantRepoDef>* pRepos;
+			const ShaderRegistryDef::Handle regHandle;
+			const StringIDMapDef::Handle strMapHandle;
+		};
+
+		Handle GetHandle() const
+		{
+			return 
+			{
+				.pPlatform = &platform,
+				.pRepos = &repos,
+				.regHandle = regData.GetHandle(),
+				.strMapHandle = stringIDs.GetHandle()
+			};
+		}
 	};
 
 	/// <summary>

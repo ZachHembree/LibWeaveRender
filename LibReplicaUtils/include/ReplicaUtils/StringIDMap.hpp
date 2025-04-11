@@ -26,6 +26,21 @@ namespace Replica
         /// </summary>
         string stringData;
 
+        struct Handle
+        {
+            const Vector<uint>* pSubstrings;
+            const string* pStringData;
+        };
+
+        Handle GetHandle() const
+        {
+            return 
+            {
+                .pSubstrings = &substrings,
+                .pStringData = &stringData
+            };
+        }
+
         void Clear();
     };
 

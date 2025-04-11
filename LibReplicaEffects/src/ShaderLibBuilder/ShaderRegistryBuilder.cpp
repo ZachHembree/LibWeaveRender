@@ -81,24 +81,26 @@ Vector<byte> ShaderRegistryBuilder::GetTmpByteBuffer() { return byteCodePool.Get
 
 void ShaderRegistryBuilder::ReturnTmpByteBuffer(Vector<byte>&& buf) { buf.Clear(); byteCodePool.Return(std::move(buf)); }
 
+const StringIDBuilder& ShaderRegistryBuilder::GetStringIDBuilder() const { return stringIDs; }
+
 void ShaderRegistryBuilder::ReturnTmpIDBuffer(Vector<uint>&& buf) { buf.Clear(); idBufPool.Return(std::move(buf)); }
 
-void ShaderRegistryBuilder::WriteDefinition(StringIDMapDef& strData, ShaderRegistryDef& def) const
+ShaderRegistryDef::Handle ShaderRegistryBuilder::GetDefinition() const
 {
 	PARSE_ASSERT_MSG((idBufPool.GetObjectsOutstanding() + byteCodePool.GetObjectsOutstanding()) == 0,
 		"Temporary buffers must be returned before finalizing or exporting shader regsitry.");
 
-	stringIDs.WriteDefinition(strData);
-
-	def.constants.AddRange(constants);
-	def.cbufDefs.AddRange(cbufDefs);
-	def.ioElements.AddRange(ioElements);
-	def.resources.AddRange(resources);
-	def.shaders.AddRange(shaders);
-	def.effects.AddRange(effects);
-
-	def.idGroups.SetData(idGroups);
-	def.binSpans.SetData(binSpans);
+	return
+	{
+		.pConstants = &constants,
+		.pCBufDefs = &cbufDefs,
+		.pIOElements = &ioElements,
+		.pResources = &resources,
+		.pShaders = &shaders,
+		.pEffects = &effects,
+		.pIDGroups = &idGroups,
+		.pBinSpans = &binSpans
+	};
 }
 
 uint ShaderRegistryBuilder::SetResourceType(uint index, ResourceType type) { return ((index & 0x00FFFFFFu) | ((uint)type << 24u)); }

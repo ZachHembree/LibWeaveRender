@@ -102,17 +102,15 @@ void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_vie
 	}
 }
 
-ShaderLibDef ShaderLibBuilder::ExportLibrary() 
+ShaderLibDef::Handle ShaderLibBuilder::GetDefinition() const
 {
-	ShaderLibDef lib;
-	lib.platform = platform;
-	lib.repos = DynamicArray<VariantRepoDef>(repos.GetLength());
-	
-	for (int i = 0; i < repos.GetLength(); i++)
-		lib.repos[i] = std::move(repos[i]);
-
-	repos.Clear();
-	pShaderRegistry->WriteDefinition(lib.stringIDs, lib.regData);
+	ShaderLibDef::Handle lib = 
+	{
+		.pPlatform = &platform,
+		.pRepos = &repos,
+		.regHandle = pShaderRegistry->GetDefinition(),
+		.strMapHandle = pShaderRegistry->GetStringIDBuilder().GetDefinition()
+	};
 
 	return lib;
 }
@@ -371,6 +369,7 @@ void ShaderLibBuilder::Clear()
 		libBufs[i].vID = 0;
 	}
 
+	repos.Clear();
 	pVariantGen->Clear();
 	pShaderRegistry->Clear();
 }

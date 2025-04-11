@@ -26,5 +26,5 @@ namespace Replica::Effects
 		vec2 uv;
 	};
 
-	const ShaderLibDef& GetBuiltInShaders();
+	ShaderLibDef GetBuiltInShaders();
 }

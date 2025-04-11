@@ -41,13 +41,12 @@ namespace Replica
         /// <summary>
         /// Returns the total number of strings mapped
         /// </summary>
-        /// <returns></returns>
         uint GetStringCount() const;
 
         /// <summary>
-        /// Writes the contents of the builder to a compact and reusable serializable format
+        /// Returns serializable handle to string ID map data
         /// </summary>
-        void WriteDefinition(StringIDMapDef& def) const;
+        StringIDMapDef::Handle GetDefinition() const;
 
         /// <summary>
         /// Clears all strings from the builder
@@ -57,7 +56,7 @@ namespace Replica
     private:
         string stringData;
         // String storage; ID -> string
-        UniqueVector<StringSpan> strings;
+        UniqueVector<uint> substrings;
 
         mutable string textBuf;
         // string -> ID map

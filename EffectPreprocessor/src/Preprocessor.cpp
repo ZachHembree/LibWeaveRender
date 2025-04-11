@@ -227,7 +227,7 @@ static void WriteBinary(const fs::path& output, const std::stringstream& ss)
 
 static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::stringstream& streamBuf, const fs::path& output)
 {
-    ShaderLibDef shaderLib = libBuilder.ExportLibrary();
+    ShaderLibDef::Handle shaderLib = libBuilder.GetDefinition();
 
     streamBuf.clear();
     streamBuf.str({});
@@ -247,12 +247,14 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
     WriteBinary(output, streamBuf);
 
     LOG_INFO() << "Wrote library to " << output;
-    LOG_INFO() << "Library Stats: Shaders: " << shaderLib.regData.shaders.GetLength()
-        << " | Effects: " << shaderLib.regData.effects.GetLength()
-        << " | Constants: " << shaderLib.regData.constants.GetLength()
-        << " | Resources: " << shaderLib.regData.resources.GetLength();
-    LOG_INFO() << "Compiler: " << shaderLib.platform.compilerVersion;
-    LOG_INFO() << "Shader Model: " << shaderLib.platform.featureLevel;
+    LOG_INFO() << "Library Stats: Shaders: " << shaderLib.regHandle.pShaders->GetLength()
+        << " | Effects: " << shaderLib.regHandle.pEffects->GetLength()
+        << " | Constants: " << shaderLib.regHandle.pConstants->GetLength()
+        << " | Resources: " << shaderLib.regHandle.pResources->GetLength();
+    LOG_INFO() << "Compiler: " << shaderLib.pPlatform->compilerVersion;
+    LOG_INFO() << "Shader Model: " << shaderLib.pPlatform->featureLevel;
+
+    libBuilder.Clear();
 }
 
 /// <summary>
@@ -326,7 +328,6 @@ static void CreateLibrary()
             LOG_INFO() << "Output path: " << outFile;
 
             WriteLibrary(name, libBuilder, streamBuf, outFile);
-            libBuilder.Clear();
         }
     }
 

@@ -5,9 +5,7 @@
 using namespace Replica;
 using namespace Replica::Effects;
 
-static const ShaderLibDef s_DefaultLibDef = GetDeserializedLibDef(s_FX_DefaultShaders);
-
-const ShaderLibDef& Replica::Effects::GetBuiltInShaders()
+ShaderLibDef Replica::Effects::GetBuiltInShaders()
 {
-	return s_DefaultLibDef;
+	return GetDeserializedLibDef(s_FX_DefaultShaders);
 }

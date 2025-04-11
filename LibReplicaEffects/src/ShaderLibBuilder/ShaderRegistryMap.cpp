@@ -12,7 +12,7 @@ ShaderRegistryMap::ShaderRegistryMap(const StringIDMapDef& strDef, const ShaderR
 { }
 
 ShaderRegistryMap::ShaderRegistryMap(StringIDMapDef&& strDef, ShaderRegistryDef&& def) :
-	pRegDef(std::move(&def)),
+	pRegDef(new ShaderRegistryDef(std::move(def))),
 	stringMap(std::move(strDef))
 { }
 

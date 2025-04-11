@@ -36,7 +36,7 @@ namespace Replica::Effects
 
 		void SetDebug(bool isDebugging);
 
-		ShaderLibDef ExportLibrary();
+		ShaderLibDef::Handle GetDefinition() const;
 
 		void Clear();
 
@@ -68,6 +68,7 @@ namespace Replica::Effects
 		// Parsing, code gen and reflection
 		unique_ptr<ShaderRegistryBuilder> pShaderRegistry;
 		unique_ptr<VariantPreprocessor> pVariantGen;
+
 		unique_ptr<BlockAnalyzer> pAnalyzer;
 		unique_ptr<SymbolTable> pTable;
 		unique_ptr<ShaderGenerator> pShaderGen;

@@ -25,8 +25,9 @@ uint StringIDBuilder::GetOrAddStringID(std::string_view str)
     }
     else
     {
-        const uint id = static_cast<uint>(strings.GetLength());
-        strings.EmplaceBack(ss);
+        const uint id = static_cast<uint>(substrings.GetLength() / 2);
+        substrings.Add((uint)ss.GetIndex());
+        substrings.Add((uint)ss.GetLength() - 1); // Exclude null-terminator
         idMap.emplace(ss, id);
 
         return id;
@@ -55,37 +56,31 @@ bool StringIDBuilder::TryGetStringID(std::string_view str, uint& id) const
 /// <summary>
 /// Returns the string corresponding to the given ID
 /// </summary>
-std::string_view StringIDBuilder::GetString(uint id) const { return strings[id]; }
+string_view StringIDBuilder::GetString(uint id) const 
+{ 
+    const uint start = substrings[id * 2],
+        length = substrings[id * 2 + 1];
+
+    return string_view(&stringData[start], length);
+}
 
 /// <summary>
 /// Returns the total number of strings mapped
 /// </summary>
-/// <returns></returns>
-uint StringIDBuilder::GetStringCount() const { return static_cast<uint>(strings.GetLength()); }
+uint StringIDBuilder::GetStringCount() const { return (uint)(substrings.GetLength() / 2); }
 
-void StringIDBuilder::WriteDefinition(StringIDMapDef& def) const
+StringIDMapDef::Handle StringIDBuilder::GetDefinition() const
 {
-    const uint count = GetStringCount();
-    uint charCount = 0;
-
-    // Calculate concatenated string buffer size and substring layout
-    def.substrings.Reserve(2 * count);
-
-    for (uint i = 0; i < count; i++)
+    return 
     {
-        const uint subLen = (uint)strings[i].GetLength();
-        def.substrings.Add(charCount);
-        def.substrings.Add(subLen - 1); // Exclude null terminator
-        charCount += subLen;
-    }
-
-    // Copy concatenated string buffer
-    def.stringData.append(stringData);
+        .pSubstrings = &substrings,
+        .pStringData = &stringData
+    };
 }
 
 void StringIDBuilder::Clear()
 {
-    strings.Clear();
+    substrings.Clear();
     idMap.clear();
     textBuf.clear();
     stringData.clear();

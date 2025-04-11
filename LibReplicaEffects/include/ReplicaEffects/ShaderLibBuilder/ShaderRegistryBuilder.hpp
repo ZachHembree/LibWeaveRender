@@ -164,7 +164,15 @@ namespace Replica::Effects
 		/// </summary>
 		void ReturnTmpByteBuffer(Vector<byte>&& buf);
 
-		void WriteDefinition(StringIDMapDef& strData, ShaderRegistryDef& def) const;
+		/// <summary>
+		/// Returns reference to string ID map
+		/// </summary>
+		const StringIDBuilder& GetStringIDBuilder() const;
+
+		/// <summary>
+		/// Returns serializable handles to registry definitions
+		/// </summary>
+		ShaderRegistryDef::Handle GetDefinition() const;
 
 		/// <summary>
 		/// Returns index and resource enum combined into an ID

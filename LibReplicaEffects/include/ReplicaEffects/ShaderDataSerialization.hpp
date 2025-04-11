@@ -70,16 +70,6 @@ namespace Replica::Effects
 	}
 
 	template <class Archive>
-	inline void serialize(Archive& ar, ShaderRegistryDef& def)
-	{
-		ar(
-			def.constants, def.cbufDefs, def.ioElements,
-			def.resources, def.shaders, def.effects,
-			def.idGroups, def.binSpans
-		);
-	}
-
-	template <class Archive>
 	inline void serialize(Archive& ar, PlatformDef& def)
 	{
 		ar(def.compilerVersion, def.featureLevel, def.target);
@@ -92,12 +82,6 @@ namespace Replica::Effects
 	}
 
 	template <class Archive>
-	inline void serialize(Archive& ar, ShaderLibDef& def)
-	{
-		ar(def.platform, def.repos, def.regData, def.stringIDs);
-	}
-
-	template <class Archive>
 	inline void serialize(Archive& ar, VariantRepoSrc& def)
 	{
 		ar(def.name, def.path);
@@ -107,5 +91,37 @@ namespace Replica::Effects
 	inline void serialize(Archive& ar, ShaderLibSrc& def)
 	{
 		ar(def.srcFiles);
+	}
+
+	template <class Archive>
+	inline void save(Archive& ar, const ShaderLibDef::Handle& def)
+	{
+		ar(*def.pPlatform, *def.pRepos, def.regHandle, def.strMapHandle);
+	}
+
+	template <class Archive>
+	inline void save(Archive& ar, const ShaderRegistryDef::Handle& def)
+	{
+		ar(
+			*def.pConstants, *def.pCBufDefs, *def.pIOElements,
+			*def.pResources, *def.pShaders, *def.pEffects,
+			*def.pIDGroups, *def.pBinSpans
+		);
+	}
+
+	template <class Archive>
+	inline void load(Archive& ar, ShaderLibDef& def)
+	{
+		ar(def.platform, def.repos, def.regData, def.stringIDs);
+	}
+
+	template <class Archive>
+	inline void load(Archive& ar, ShaderRegistryDef& def)
+	{
+		ar(
+			def.constants, def.cbufDefs, def.ioElements,
+			def.resources, def.shaders, def.effects,
+			def.idGroups, def.binSpans
+		);
 	}
 }
