@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include <charconv>
 #include "ReplicaEffects/ParseExcept.hpp"
 #include "ReplicaEffects/ShaderLibBuilder/ShaderParser/BlockAnalyzer.hpp"
 
@@ -69,6 +70,7 @@ namespace Replica::Effects
 
     void BlockAnalyzer::Clear()
     {
+        files.Clear();
         containers.Clear();
         blocks.Clear();
         depth = 0;
@@ -77,11 +79,12 @@ namespace Replica::Effects
         pPosOld = nullptr;
     }
 
-    void BlockAnalyzer::AnalyzeSource(TextBlock src)
+    void BlockAnalyzer::AnalyzeSource(string_view path, TextBlock src)
     {
         Clear();
         this->src = src;
         pPos = src.GetData();
+        files.EmplaceBack(path, line);
 
         while (true)
         {            
@@ -138,6 +141,8 @@ namespace Replica::Effects
         }
     }
 
+    const IDynamicArray<LexFile>& BlockAnalyzer::GetSourceFiles() const { return files; }
+
     const IDynamicArray<LexBlock>& BlockAnalyzer::GetBlocks() const { return blocks; }
 
     void BlockAnalyzer::AddBlock(const TextBlock& start)
@@ -193,6 +198,7 @@ namespace Replica::Effects
         block.src = TextBlock(start.GetData(), pNext);
         block.startLine = line;
         block.lineCount = block.src.FindCount('\n');
+        block.file = GetFileIndex();
 
         line += block.lineCount;
         pPos = &block.src.GetBack();
@@ -223,6 +229,9 @@ namespace Replica::Effects
 
             while (!containers.IsEmpty() && containers.GetBack() > blockIndex)
                 containers.RemoveBack();
+
+            while (block.file > GetFileIndex())
+                files.RemoveBack();
 
             blocks.RemoveRange(blockIndex + 1, (int)blocks.GetLength() - blockIndex - 1);
         }
@@ -265,7 +274,7 @@ namespace Replica::Effects
 
         // Start new container to be later finalized in LIFO order as closing braces are encountered
         containers.Add((int)blocks.GetLength());
-        blocks.EmplaceBack(depth, delimType, pPos, line);
+        blocks.EmplaceBack(depth, delimType, pPos, line, GetFileIndex());
         depth++;
     }
 
@@ -320,15 +329,17 @@ namespace Replica::Effects
     /// </summary>
     void BlockAnalyzer::AddDirective()
     {
-        LexBlock name, body;
+        LexBlock& name = blocks.EmplaceBack();
         bool hasMoreLines;
 
         name.depth = depth;
         name.type = LexBlockTypes::DirectiveName;
         name.src = TextBlock(pPos, src.FindWordEnd(pPos) + 1);
         name.startLine = line;
+        name.file = GetFileIndex();
 
         pPos = src.FindWord(&name.src.GetBack() + 1);
+
         const char* pLast = pPos;
         int lineCount = 0;
 
@@ -343,17 +354,55 @@ namespace Replica::Effects
 
         } while (hasMoreLines);
 
+        bool isLineDirective = false;
+
+        if (name.src.StartsWith("#line"))
+            isLineDirective = true;
+
+        LexBlock& body = blocks.EmplaceBack();
         body.depth = depth;
         body.type = LexBlockTypes::DirectiveBody;
         body.src = TextBlock(pPos, pLast);
         body.startLine = line;
         body.lineCount = lineCount;
+        body.file = GetFileIndex();
 
         line += lineCount;
-        blocks.EmplaceBack(name);
-        blocks.EmplaceBack(body);
-
         pPos = &body.src.GetBack();
+
+        if (isLineDirective)
+            ProcessLineDirective(body);
+    }
+
+    void BlockAnalyzer::ProcessLineDirective(const LexBlock& body) 
+    {
+        // New line number
+        const char* pFirstDigit = body.src.FindStart(body.src.GetData(), "", '0', '9');
+        const char* pLastDigit = body.src.FindEnd(pFirstDigit, "", '0', '9');
+        TextBlock numString(pFirstDigit, pLastDigit);
+
+        PARSE_ASSERT_FMT(*pFirstDigit >= '0' && *pFirstDigit <= '9',
+            "Expected a line number after #line directive on line {}", line);
+
+        int newLine = -1;
+        string_view newPath;
+        std::from_chars(&numString.GetFront(), &numString.GetBack() + 1, newLine);
+
+        PARSE_ASSERT_FMT(newLine >= 0,
+            "Expected a line number after #line directive on line {}", line);
+
+        // New file path
+        if (pLastDigit < &body.src.GetBack())
+        {
+            const char* pFileStart = body.src.Find('"', pLastDigit + 1);
+            const char* pFileEnd = body.src.FindEnd(pFileStart + 1, """");
+            newPath = TextBlock(pFileStart, pFileEnd);
+        }
+        else
+            newPath = files.GetBack().filePath;
+
+        files.EmplaceBack(newPath, newLine);
+        line = newLine;
     }
     
     /// <summary>
@@ -388,4 +437,6 @@ namespace Replica::Effects
         PARSE_ASSERT_MSG(depth == 0, "Internal container parsing error.")
         return true;
     }
+
+    int BlockAnalyzer::GetFileIndex() const { return (int)files.GetLength() - 1; }
 }

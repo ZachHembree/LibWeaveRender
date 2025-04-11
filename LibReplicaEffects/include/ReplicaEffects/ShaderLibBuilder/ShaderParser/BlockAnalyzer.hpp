@@ -65,7 +65,16 @@ namespace Replica::Effects
         CloseAngleBrackets = AngleBrackets | EndContainer
     };
 
-    BITWISE_ALL(LexBlockTypes, uint)
+    BITWISE_ALL(LexBlockTypes, uint);
+
+    /// <summary>
+    /// Source file associated with LexBlocks
+    /// </summary>
+    struct LexFile
+    {
+        string_view filePath;
+        int startLine;
+    };
 
     /// <summary>
     /// A range of source representing a group of lexemes, bounded by punctuation
@@ -74,16 +83,21 @@ namespace Replica::Effects
     {
         TextBlock src;
         LexBlockTypes type;
-        int depth, startLine, lineCount;
+        int file;
+        int depth;
+        int startLine;
+        int lineCount;
 
         LexBlock() :
+            file(0),
             depth(-1),
             startLine(0),
             lineCount(0),
             type(LexBlockTypes::Unknown)
         { }
 
-        LexBlock(int depth, LexBlockTypes type, char* pStart, int startLine = 0, int lineBreaks = 0) :
+        LexBlock(int depth, LexBlockTypes type, char* pStart, int startLine = 0, int lineBreaks = 0, int file = 0) :
+            file(file),
             depth(depth),
             startLine(startLine),
             lineCount(lineBreaks),
@@ -91,7 +105,8 @@ namespace Replica::Effects
             src(pStart)
         { }
 
-        LexBlock(int depth, LexBlockTypes type, char* pStart, char* pEnd, int startLine = 0, int lineBreaks = 0) :
+        LexBlock(int depth, LexBlockTypes type, char* pStart, char* pEnd, int startLine = 0, int lineBreaks = 0, int file = 0) :
+            file(file),
             depth(depth),
             startLine(startLine),
             lineCount(lineBreaks),
@@ -99,7 +114,8 @@ namespace Replica::Effects
             src(pStart, pEnd)
         { }
 
-        LexBlock(int depth, LexBlockTypes type, TextBlock src, int startLine = 0, int lineBreaks = 0) :
+        LexBlock(int depth, LexBlockTypes type, TextBlock src, int startLine = 0, int lineBreaks = 0, int file = 0) :
+            file(file),
             depth(depth),
             startLine(startLine),
             lineCount(lineBreaks),
@@ -124,12 +140,15 @@ namespace Replica::Effects
 
         void Clear();
 
-        void AnalyzeSource(TextBlock src);
+        void AnalyzeSource(string_view path, TextBlock src);
+
+        const IDynamicArray<LexFile>& GetSourceFiles() const;
 
         const IDynamicArray<LexBlock>& GetBlocks() const;
 
     private:
         TextBlock src;
+        UniqueVector<LexFile> files;
         UniqueVector<LexBlock> blocks;
         UniqueVector<int> containers;
         const char* pPosOld;
@@ -148,6 +167,8 @@ namespace Replica::Effects
 
         void AddDirective();
 
+        void ProcessLineDirective(const LexBlock& body);
+
         void SetState(int blockIndex);
 
         void RevertContainer(int blockIndex);
@@ -159,5 +180,7 @@ namespace Replica::Effects
         string_view GetBreakFilter() const;
 
         bool TryFinalizeParse();
+
+        int GetFileIndex() const;
     };
 }

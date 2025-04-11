@@ -62,8 +62,8 @@ void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_vie
 		{
 			const uint resCount = pShaderRegistry->GetUniqueResCount();
 
-			pAnalyzer->AnalyzeSource(pBuf->libText);
-			pTable->ParseBlocks(pAnalyzer->GetBlocks());
+			pAnalyzer->AnalyzeSource(libPath, pBuf->libText);
+			pTable->ParseBlocks(*pAnalyzer);
 
 			if (configID == 0)
 				InitVariants(lib);
@@ -104,15 +104,13 @@ void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_vie
 
 ShaderLibDef::Handle ShaderLibBuilder::GetDefinition() const
 {
-	ShaderLibDef::Handle lib = 
+	return
 	{
 		.pPlatform = &platform,
 		.pRepos = &repos,
 		.regHandle = pShaderRegistry->GetDefinition(),
 		.strMapHandle = pShaderRegistry->GetStringIDBuilder().GetDefinition()
 	};
-
-	return lib;
 }
 
 void ShaderLibBuilder::SetTarget(PlatformTargets target) { platform.target = target; }

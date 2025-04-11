@@ -41,6 +41,22 @@ TextBlock::TextBlock(Span<char>& span) : Span(span.GetData(), span.GetLength())
 /// <summary>
 /// Returns true if the given substring is present at or after the given start.
 /// </summary>
+bool TextBlock::StartsWith(const string_view & substr) const { return StartsWith(substr.data(), substr.size()); }
+
+/// <summary>
+/// Returns true if the given substring is present at or after the given start.
+/// </summary>
+bool TextBlock::StartsWith(const char* substr, size_t subLen) const 
+{
+    if (subLen <= length)
+        return memcmp(substr, this->pStart, subLen) == 0;
+    else
+        return false;
+}
+
+/// <summary>
+/// Returns true if the given substring is present at or after the given start.
+/// </summary>
 bool TextBlock::Contains(const string_view & substr, const char* pStart) const
 {
     return Find(substr, pStart) != nullptr;
@@ -49,7 +65,7 @@ bool TextBlock::Contains(const string_view & substr, const char* pStart) const
 /// <summary>
 /// Returns true if the given substring is present at or after the given start.
 /// </summary>
-bool TextBlock::Contains(const char* substr, int subLen, const char* pStart) const
+bool TextBlock::Contains(const char* substr, size_t subLen, const char* pStart) const
 {
     return Find(substr, subLen, pStart) != nullptr;
 }
@@ -121,7 +137,7 @@ const char* TextBlock::Find(const string_view& substr, const char* pStart)
 /// Finds position of the first character of the first matching occurence of 
 /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
 /// </summary>
-const char* TextBlock::Find(const char* substr, int subLen, const char* pStart) const
+const char* TextBlock::Find(const char* substr, size_t subLen, const char* pStart) const
 {
     if (pStart == nullptr)
         pStart = this->pStart;
@@ -148,7 +164,7 @@ const char* TextBlock::Find(const char* substr, int subLen, const char* pStart) 
                 }
 
                 if (matchLen == subLen)
-                    return (char*)&pStart[i];
+                    return &pStart[i];
             }
         }
     }
@@ -197,7 +213,7 @@ TextBlock TextBlock::GetLastWord(const char* pStart, const string_view& breakFil
     return TextBlock(pStart, pEnd);
 }
 
-const char* TextBlock::Find(const char* substr, int subLen, const char* pStart)
+const char* TextBlock::Find(const char* substr, size_t subLen, const char* pStart)
 {
     if (pStart == nullptr)
         pStart = this->pStart;
@@ -224,7 +240,7 @@ const char* TextBlock::Find(const char* substr, int subLen, const char* pStart)
                 }
 
                 if (matchLen == subLen)
-                    return (char*)&pStart[i];
+                    return &pStart[i];
             }
         }
     }
@@ -242,7 +258,7 @@ const char* TextBlock::FindStart(const char* pStart, const string_view& breakFil
     while (pStart < &GetBack() && !(*pStart >= min && *pStart <= max) && breakFilter.find(*pStart) == string::npos)
         pStart++;
 
-    return (char*)pStart;
+    return pStart;
 }
 
 /// <summary>
@@ -259,7 +275,7 @@ const char* TextBlock::FindEnd(const char* pStart, const string_view& breakFilte
         pCh++;
     }
 
-    return (char*)pStart;
+    return pStart;
 }
 
 /// <summary>
@@ -280,7 +296,7 @@ const char* TextBlock::FindLastStart(const char* pStart, const string_view& brea
     } 
     while (pCh >= GetData() && GetIsRangeChar(*pCh, breakFilter, min, max));
 
-    return (char*)pStart;
+    return pStart;
 }
 
 /// <summary>

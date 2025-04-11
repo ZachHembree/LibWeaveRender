@@ -37,6 +37,16 @@ namespace Replica
         TextBlock(Span<char>& span);
 
         /// <summary>
+        /// Returns true if the given substring is present at the beginning
+        /// </summary>
+        bool StartsWith(const string_view& substr) const;
+
+        /// <summary>
+        /// Returns true if the given substring is present at the beginning
+        /// </summary>
+        bool StartsWith(const char* substr, size_t subLen) const;
+
+        /// <summary>
         /// Returns true if the given substring is present at or after the given start.
         /// </summary>
         bool Contains(const string_view& substr, const char* pStart = nullptr) const;
@@ -44,7 +54,7 @@ namespace Replica
         /// <summary>
         /// Returns true if the given substring is present at or after the given start.
         /// </summary>
-        bool Contains(const char* substr, int subLen, const char* pStart = nullptr) const;
+        bool Contains(const char* substr, size_t subLen, const char* pStart = nullptr) const;
 
         /// <summary>
         /// Returns the total number of the given character in the text block, starting
@@ -74,7 +84,7 @@ namespace Replica
         /// Finds position of the first character of the first matching occurence of 
         /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
         /// </summary>
-        const char* Find(const char* substr, int subLen, const char* pStart = nullptr) const;
+        const char* Find(const char* substr, size_t subLen, const char* pStart = nullptr) const;
 
         /// <summary>
         /// Returns pointer to first character in a word found in the text after the 
@@ -108,7 +118,7 @@ namespace Replica
         /// Finds position of the first character of the first matching occurence of 
         /// the given substring, starting from the given pointer. Doesn't stop on '\0'.
         /// </summary>
-        const char* Find(const char* substr, int subLen, const char* pStart = nullptr);
+        const char* Find(const char* substr, size_t subLen, const char* pStart = nullptr);
 
         /// <summary>
         /// Returns pointer to first character in a range found in the text after the 

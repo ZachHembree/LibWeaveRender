@@ -24,7 +24,7 @@ namespace Replica::Effects
         /// Resets the parser, sets the source to the given value and parses symbols
         /// from it.
         /// </summary>
-        void ParseBlocks(const IDynamicArray<LexBlock>& src);
+        void ParseBlocks(const BlockAnalyzer& src);
 
         /// <summary>
         /// Resets the parser to its initial state

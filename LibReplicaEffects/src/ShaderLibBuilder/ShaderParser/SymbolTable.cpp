@@ -12,7 +12,7 @@ namespace Replica::Effects
 
     SymbolTable::~SymbolTable() = default;
 
-    void SymbolTable::ParseBlocks(const IDynamicArray<LexBlock>& src)
+    void SymbolTable::ParseBlocks(const BlockAnalyzer& src)
     {
         pSB->Clear();
         pParse->GetSymbols(src, *pSB);

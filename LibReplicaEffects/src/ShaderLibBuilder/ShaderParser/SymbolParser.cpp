@@ -37,16 +37,16 @@ namespace Replica::Effects
 
     SymbolParser::SymbolParser() :
         pSB(nullptr),
-        pSrcBlocks(nullptr)
+        pAnalyzer(nullptr)
     { }
 
     SymbolParser::~SymbolParser() = default;
 
-    void SymbolParser::GetSymbols(const IDynamicArray<LexBlock>& src, ScopeBuilder& dst)
+    void SymbolParser::GetSymbols(const BlockAnalyzer& src, ScopeBuilder& dst)
     {
         Reset();
 
-        pSrcBlocks = &src;
+        pAnalyzer = &src;
         pSB = &dst;
         REP_ASSERT_MSG(pSB != nullptr, "Parse destination not set")
 
@@ -61,15 +61,15 @@ namespace Replica::Effects
         textBuf.clear();
         textBuf.str({});
         
-        pSrcBlocks = nullptr;
+        pAnalyzer = nullptr;
         pSB = nullptr;
     }
 
     void SymbolParser::ParseSource()
     {
-        for (int i = 0; i < pSrcBlocks->GetLength(); i++)
+        for (int i = 0; i < GetBlockCount(); i++)
         {
-            const LexBlock& block = (*pSrcBlocks)[i];
+            const LexBlock& block = GetBlock(i);
 
             if (block.GetHasFlags(LexBlockTypes::Directive))
                 continue;
@@ -95,7 +95,7 @@ namespace Replica::Effects
                         CaptureSymbols();
                         i += length - 1;
 
-                        if ((*pSrcBlocks)[i].GetHasFlags(LexBlockTypes::StartScope))
+                        if (GetBlock(i).GetHasFlags(LexBlockTypes::StartScope))
                             i--;
                     }
                 }
@@ -278,16 +278,16 @@ namespace Replica::Effects
             const bool isWild = pattern.type == LexBlockTypes::Unknown,
                 isOptional = pattern.GetHasFlags(MatchQualifiers::Optional) || (isAlternation && i < last),
                 isUnbounded = pattern.GetHasFlags(MatchQualifiers::OneOrMore);
-            int matchEnd = std::min(matchStart + dir, (int)pSrcBlocks->GetLength());
+            int matchEnd = std::min(matchStart + dir, (int)GetBlockCount());
 
             if (isUnbounded) // Bound greedy match
             {
                 const BlockQualifier& gMatchNext = matchPattern[i + 1];
                 int newEnd = -1;
 
-                for (int j = matchStart; (j >= 0 && j < pSrcBlocks->GetLength()); j += dir)
+                for (int j = matchStart; (j >= 0 && j < GetBlockCount()); j += dir)
                 {
-                    if ((*pSrcBlocks)[j].GetHasFlags(gMatchNext.type))
+                    if (GetBlock(j).GetHasFlags(gMatchNext.type))
                     {
                         newEnd = j;
                         break;
@@ -305,7 +305,7 @@ namespace Replica::Effects
 
             while ((nextStart != matchEnd))
             {
-                const LexBlock& block = (*pSrcBlocks)[nextStart];
+                const LexBlock& block = GetBlock(nextStart);
                 const bool canSkip = isWild || (nextStart != matchStart && block.GetHasFlags(LexBlockTypes::Directive));
 
                 if (pattern.GetHasFlags(block.type) || canSkip)
@@ -381,7 +381,7 @@ namespace Replica::Effects
 
     int SymbolParser::GetDirectiveEnd(int start, const int dir)
     {
-        while (start > 0 && start < pSrcBlocks->GetLength() && (*pSrcBlocks)[start].GetHasFlags(LexBlockTypes::Directive))
+        while (start > 0 && start < GetBlockCount() && GetBlock(start).GetHasFlags(LexBlockTypes::Directive))
             start += dir;
 
         return start;
@@ -469,7 +469,7 @@ namespace Replica::Effects
     {
         const int tokenStart = (int)tokenBuf.GetLength();
         const IDynamicArray<CapturePattern>& patterns = *cap.pPatterns;
-        const LexBlock& block = (*pSrcBlocks)[cap.blockID];
+        const LexBlock& block = GetBlock(cap.blockID);
         const char* pStart = block.src.GetData();
         const char* pLast = nullptr;
 
@@ -540,7 +540,7 @@ namespace Replica::Effects
 
     int SymbolParser::GetNewToken(const TokenNodeDef& nodeDef)
     {
-        const LexBlock& block = (*pSrcBlocks)[nodeDef.blockStart];
+        const LexBlock& block = GetBlock(nodeDef.blockStart);
         const int tokenID = pSB->GetNewToken(nodeDef.identifier.name, nodeDef.identifier.tokenFlags,
             block.depth, nodeDef.blockStart);
         TokenNode& ident = pSB->GetTokenNode(tokenID);
@@ -632,4 +632,12 @@ namespace Replica::Effects
         FunctionData& func = pSB->GetFuncData(ident.subtypeID);
         func.signature = pSB->AddGeneratedText(textBuf.str());
     }
+
+    const LexBlock& SymbolParser::GetBlock(ptrdiff_t index) { return pAnalyzer->GetBlocks()[index]; }
+
+    size_t SymbolParser::GetBlockCount() { return pAnalyzer->GetBlocks().GetLength(); }
+
+    const LexFile& SymbolParser::GetFile(ptrdiff_t index) { return pAnalyzer->GetSourceFiles()[index]; }
+
+    size_t SymbolParser::GetFileCount() { return pAnalyzer->GetSourceFiles().GetLength(); }
 }

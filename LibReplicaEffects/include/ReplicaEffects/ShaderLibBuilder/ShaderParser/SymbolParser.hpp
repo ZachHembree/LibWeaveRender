@@ -31,7 +31,7 @@ namespace Replica::Effects
         /// Resets the parser, sets the source to the given value and writes symbols
         /// parsed to the given destination.
         /// </summary>
-        void GetSymbols(const IDynamicArray<LexBlock>& src, ScopeBuilder& dst);
+        void GetSymbols(const BlockAnalyzer& src, ScopeBuilder& dst);
 
         /// <summary>
         /// Resets the parser to its initial state
@@ -40,7 +40,7 @@ namespace Replica::Effects
 
     private:
         ScopeBuilder* pSB;
-        const IDynamicArray<LexBlock>* pSrcBlocks;
+        const BlockAnalyzer* pAnalyzer;
         UniqueVector<TokenNodeDef> tokenBuf;
         UniqueVector<TokenNodeDef> tokenParentBuf;
 
@@ -122,5 +122,13 @@ namespace Replica::Effects
         /// Generates a function signature for the function with the given identifier
         /// </summary>
         void GetFuncSignature(const TokenNode& ident);
+
+        const LexBlock& GetBlock(ptrdiff_t index);
+
+        size_t GetBlockCount();
+
+        const LexFile& GetFile(ptrdiff_t index);
+
+        size_t GetFileCount();
     };
 }
