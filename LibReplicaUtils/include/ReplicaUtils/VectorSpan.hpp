@@ -1,49 +1,39 @@
 #pragma once
 #include <concepts>
-#include "Span.hpp"
+#include "DynamicCollections.hpp"
 
 namespace Replica
 {
 	template <typename ContainerT, typename ReturnT, typename IndexT = std::size_t>
-	concept IsConstContiguousCollection = requires(const ContainerT ct, IndexT i)
+	concept IsContiguousCollection = requires(const ContainerT ct, IndexT i)
 	{
 		requires std::is_integral_v<IndexT>;
 		requires std::contiguous_iterator<std::ranges::iterator_t<const ContainerT>>;
 
-		// Immutable const indexer
-		{ ct[i] } -> std::same_as<const ReturnT&>;
-	};
-
-	template <typename ContainerT, typename ReturnT, typename IndexT = std::size_t>
-	concept IsContiguousCollection = requires(ContainerT ct, IndexT i)
-	{
-		requires IsConstContiguousCollection<ContainerT, ReturnT, IndexT>;
-		requires std::contiguous_iterator<std::ranges::iterator_t<ContainerT>>;
-
-		// Mutable indexer
-		{ ct[i] } -> std::same_as<ReturnT&>;
+	// Immutable const indexer
+	{ ct[i] } -> std::same_as<const ReturnT&>;
 	};
 
 	/// <summary>
 	/// Reallocation tolerant contiguous span. Non-owning. Previously obtained iterators and pointers 
 	/// may become invalid after reallocation, but span accessors provide updated pointers.
 	/// </summary>
-	template<typename VecT, typename T>
-	requires IsContiguousCollection<VecT, T>
-	class VectorSpan : public IDynamicArray<T>
+	template<typename VecT>
+		requires IsContiguousCollection<VecT, typename VecT::value_type>
+	class VectorSpan : public IDynamicArray<typename VecT::value_type>
 	{
 	public:
-		MAKE_DEF_MOVE_COPY(VectorSpan)
-
-		using Iterator = DynIterator<T>;
+		using T = typename VecT::value_type;
+		MAKE_DEF_MOVE_COPY(VectorSpan);
+		DEF_DYN_ARR_TRAITS(IDynamicArray<typename VecT::value_type>);
 
 		VectorSpan() :
 			pVec(nullptr), start(0), length(0)
 		{ }
 
-		explicit VectorSpan(VecT& vec, size_t start, size_t length) :
+		VectorSpan(VecT& vec, size_t start, size_t length) :
 			pVec(&vec), start(start), length(length)
-		{ 
+		{
 			assert(length > 0 && length != -1 && start != -1);
 		}
 
@@ -82,32 +72,32 @@ namespace Replica
 		/// <summary>
 		/// Returns a copy of the pointer to the backing the array.
 		/// </summary>
-		T* GetPtr() override { assert(pVec != nullptr); return &(*pVec)[start]; }
+		T* GetData() override { assert(pVec != nullptr); return &(*pVec)[start]; }
 
 		/// <summary>
 		/// Returns a const copy of the pointer to the backing the array.
 		/// </summary>
-		const T* GetPtr() const override { assert(pVec != nullptr); return &(*pVec)[start]; }
+		const T* GetData() const override { assert(pVec != nullptr); return &(*pVec)[start]; }
 
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
-		Iterator begin() override { assert(pVec != nullptr); return Iterator(&(*pVec)[start]); }
+		iterator begin() override { assert(pVec != nullptr); return iterator(&(*pVec)[start]); }
 
 		/// <summary>
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
-		Iterator end() override { assert(length > 0); return Iterator(&(*pVec)[start] + length); }
+		iterator end() override { assert(length > 0); return iterator(&(*pVec)[start] + length); }
 
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
-		const Iterator begin() const override { assert(pVec != nullptr); return Iterator(&(*pVec)[start]); }
+		const_iterator begin() const override { assert(pVec != nullptr); return const_iterator(&(*pVec)[start]); }
 
 		/// <summary>
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
-		const Iterator end() const override { assert(length > 0); return Iterator(&(*pVec)[start] + length); }
+		const_iterator end() const override { assert(length > 0); return const_iterator(&(*pVec)[start] + length); }
 
 		/// <summary>
 		/// Provides indexed access to array member references.
@@ -128,9 +118,9 @@ namespace Replica
 
 namespace std
 {
-	template<typename VecT, typename T>
-	struct hash<Replica::VectorSpan<VecT, T>>
+	template<typename VecT>
+	struct hash<Replica::VectorSpan<VecT>>
 	{
-		size_t operator()(const Replica::VectorSpan<VecT, T>& arr) const noexcept { return arr.GetHash(); }
+		size_t operator()(const Replica::VectorSpan<VecT>& arr) const noexcept { return arr.GetHash(); }
 	};
 }

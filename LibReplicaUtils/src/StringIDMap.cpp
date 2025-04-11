@@ -5,7 +5,7 @@ using namespace Replica;
 
 void StringIDMapDef::Clear()
 {
-    substrings.clear();
+    substrings.Clear();
     stringData.clear();
 }
 

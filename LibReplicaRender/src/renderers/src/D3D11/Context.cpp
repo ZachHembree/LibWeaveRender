@@ -51,13 +51,13 @@ void Context::SetSamplers(const SamplerMap::DataSrc& sampMap, const SamplerMap& 
 	switch (stage)
 	{
 	case ShadeStages::Vertex:
-		Get().VSSetSamplers(0, (UINT)arr.GetLength(), arr.GetPtr());
+		Get().VSSetSamplers(0, (UINT)arr.GetLength(), arr.GetData());
 		break;
 	case ShadeStages::Pixel:
-		Get().PSSetSamplers(0, (UINT)arr.GetLength(), arr.GetPtr());
+		Get().PSSetSamplers(0, (UINT)arr.GetLength(), arr.GetData());
 		break;
 	case ShadeStages::Compute:
-		Get().CSSetSamplers(0, (UINT)arr.GetLength(), arr.GetPtr());
+		Get().CSSetSamplers(0, (UINT)arr.GetLength(), arr.GetData());
 		break;
 	}
 }
@@ -67,7 +67,7 @@ void Context::SetUAVs(const UnorderedAccessMap::DataSrc& uavs, const UnorderedAc
 	ALLOCA_SPAN(arr, map.GetCount(), ID3D11UnorderedAccessView*);
 	map.GetResources(uavs, arr);
 
-	Get().CSSetUnorderedAccessViews(0, (UINT)arr.GetLength(), arr.GetPtr(), 0);
+	Get().CSSetUnorderedAccessViews(0, (UINT)arr.GetLength(), arr.GetData(), 0);
 }
 
 void Context::SetSRVs(const ResourceViewMap::DataSrc& srvMap, const ResourceViewMap& map, ShadeStages stage)
@@ -78,13 +78,13 @@ void Context::SetSRVs(const ResourceViewMap::DataSrc& srvMap, const ResourceView
 	switch (stage)
 	{
 	case ShadeStages::Vertex:
-		Get().VSSetShaderResources(0, (UINT)arr.GetLength(), arr.GetPtr());
+		Get().VSSetShaderResources(0, (UINT)arr.GetLength(), arr.GetData());
 		break;
 	case ShadeStages::Pixel:
-		Get().PSSetShaderResources(0, (UINT)arr.GetLength(), arr.GetPtr());
+		Get().PSSetShaderResources(0, (UINT)arr.GetLength(), arr.GetData());
 		break;
 	case ShadeStages::Compute:
-		Get().CSSetShaderResources(0, (UINT)arr.GetLength(), arr.GetPtr());
+		Get().CSSetShaderResources(0, (UINT)arr.GetLength(), arr.GetData());
 		break;
 	}
 }
@@ -92,7 +92,7 @@ void Context::SetSRVs(const ResourceViewMap::DataSrc& srvMap, const ResourceView
 void Context::SetConstants(const IDynamicArray<Span<byte>>& cbufData, IDynamicArray<ConstantBuffer>& cBuffers, ShadeStages stage)
 {
 	for (int i = 0; i < cbufData.GetLength(); i++)
-		cBuffers[i].SetData(*this, cbufData[i].GetPtr());
+		cBuffers[i].SetData(*this, cbufData[i].GetData());
 
 	ALLOCA_ARR(pCBs, cBuffers.GetLength(), ID3D11Buffer*);
 
@@ -265,10 +265,10 @@ void Context::Reset()
 	currentDSV = nullptr;
 	currentDSS = nullptr;
 
-	memset(currentVPs.GetPtr(), 0, GetArrSize(currentVPs));
+	memset(currentVPs.GetData(), 0, GetArrSize(currentVPs));
 	vpCount = 0;
 
-	memset(currentRTVs.GetPtr(), 0, GetArrSize(currentRTVs));
+	memset(currentRTVs.GetData(), 0, GetArrSize(currentRTVs));
 	rtvCount = 0;
 
 	vpSpan = Span<Viewport>();
@@ -334,12 +334,12 @@ void Context::SetViewports(const IDynamicArray<Viewport>& viewports, int offset)
 	GFX_ASSERT((offset + viewports.GetLength()) <= D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
 		"Number of viewports supplied exceeds limit.")
 
-	memcpy(currentVPs.GetPtr() + glm::max(offset, 0), viewports.GetPtr(), GetArrSize(viewports));
+	memcpy(currentVPs.GetData() + glm::max(offset, 0), viewports.GetData(), GetArrSize(viewports));
 
 	vpCount = std::max(vpCount, (uint)(offset + viewports.GetLength()));
-	pContext->RSSetViewports(vpCount, (D3D11_VIEWPORT*)currentVPs.GetPtr());
+	pContext->RSSetViewports(vpCount, (D3D11_VIEWPORT*)currentVPs.GetData());
 
-	vpSpan = Span(currentVPs.GetPtr(), vpCount);
+	vpSpan = Span(currentVPs.GetData(), vpCount);
 }
 
 /// <summary>
@@ -356,7 +356,7 @@ void Context::SetDepthStencilBuffer(IDepthStencil& depthStencil)
 	}
 
 	currentDSV = depthStencil.GetDSV();
-	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
+	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetData(), currentDSV);
 }
 
 /// <summary>
@@ -438,8 +438,8 @@ void Context::SetRenderTargets(IDynamicArray<IRenderTarget>& rtvs, IDepthStencil
 	for (int i = 0; i < (int)rtvCount; i++)
 		currentRTVs[i] = rtvs[i].GetRTV();
 
-	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
-	rtvSpan = Span(currentRTVs.GetPtr(), rtvCount);
+	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetData(), currentDSV);
+	rtvSpan = Span(currentRTVs.GetData(), rtvCount);
 
 	// Update viewports for render textures
 	Viewport viewports[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]({});
@@ -733,7 +733,7 @@ void Context::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 
 	Draw(quad, quadFX);
 
-	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetPtr(), currentDSV);
+	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetData(), currentDSV);
 	SetViewport(0, lastVP);
 }
 

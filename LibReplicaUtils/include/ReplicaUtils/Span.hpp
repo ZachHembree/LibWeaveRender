@@ -20,7 +20,7 @@ namespace Replica
 	class Span : public IDynamicArray<T>
 	{
 	public:
-		using Iterator = DynIterator<T>;
+		DEF_DYN_ARR_TRAITS(IDynamicArray<T>)
 
 		Span() : 
 			pStart(nullptr), length(0)
@@ -60,54 +60,34 @@ namespace Replica
 		size_t GetLength() const override { return length; }
 
 		/// <summary>
-		/// Returns pointer to the first member in the span
-		/// </summary>
-		T* GetFirst() { return pStart; }
-
-		/// <summary>
-		/// Returns pointer to the last member in the span
-		/// </summary>
-		T* GetLast() { return pStart + length - 1; }
-
-		/// <summary>
-		/// Returns pointer to the first member in the span
-		/// </summary>
-		const T* GetFirst() const { return pStart; }
-
-		/// <summary>
-		/// Returns pointer to the last member in the span
-		/// </summary>
-		const T* GetLast() const { return pStart + length - 1; }
-
-		/// <summary>
 		/// Returns a copy of the pointer to the backing the array.
 		/// </summary>
-		T* GetPtr() override { return pStart; }
+		T* GetData() override { return pStart; }
 
 		/// <summary>
 		/// Returns a const copy of the pointer to the backing the array.
 		/// </summary>
-		const T* GetPtr() const override { return pStart; }
+		const T* GetData() const override { return pStart; }
 
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
-		Iterator begin() override { return Iterator(pStart); }
+		iterator begin() override { return iterator(pStart); }
 
 		/// <summary>
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
-		Iterator end() override { return Iterator(pStart + length); }
+		iterator end() override { return iterator(pStart + length); }
 
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
-		const Iterator begin() const override { return Iterator(pStart); }
+		const_iterator begin() const override { return const_iterator(pStart); }
 
 		/// <summary>
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
-		const Iterator end() const override { return Iterator(pStart + length); }
+		const_iterator end() const override { return const_iterator(pStart + length); }
 
 		/// <summary>
 		/// Provides indexed access to array member references.

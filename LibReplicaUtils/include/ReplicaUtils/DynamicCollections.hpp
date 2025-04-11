@@ -8,6 +8,18 @@
 #include <concepts>
 #include "ReplicaUtils/GlobalUtils.hpp"
 
+// Defines type aliases for templated IDynamicArray types
+#define DEF_DYN_ARR_TRAITS(BASE) \
+	using Base = BASE;\
+	using value_type = Base::value_type;\
+	using iterator = Base::iterator;\
+	using const_iterator = Base::const_iterator;\
+	using size_type = Base::size_type;\
+	using reference = Base::reference;\
+	using const_reference = Base::const_reference;\
+	using pointer = Base::pointer;\
+	using const_pointer = Base::const_pointer;
+
 namespace Replica
 {
 	template<typename T> class DynamicArray;
@@ -47,10 +59,10 @@ namespace Replica
 
 		DynIterator() : pData(nullptr) { }
 
-		template <typename T = ValueType, typename = std::enable_if_t<!std::is_const<T>::value>>
-		DynIterator(T* pData) : pData(pData) { }
+		DynIterator(ValueType* pData) : pData(pData) {}
 
-		DynIterator(const ValueType* pData) : pData(const_cast<ValueType*>(pData)) { }
+		template <typename U = ValueType, typename = std::enable_if_t<std::is_const_v<U>>>
+		DynIterator(const DynIterator<std::remove_const_t<U>>& other) : pData(other.pData) {}
 
 		// Dereference operators
 		reference operator*() const { return *pData; }
@@ -95,87 +107,115 @@ namespace Replica
 	class IDynamicArray
 	{
 	public:
-		using Iterator = DynIterator<T>;
-		using RevIterator = std::reverse_iterator<DynIterator<T>>;
+		using iterator = DynIterator<T>;
+		using const_iterator = DynIterator<const T>;
+		using reverse_iterator = std::reverse_iterator<DynIterator<T>>;
+		using const_reverse_iterator = std::reverse_iterator<DynIterator<const T>>;
+		using value_type = T;
+		using const_value_type = const T;
+		using size_type = size_t;
+		using difference_type = ptrdiff_t;
+		using reference = value_type&;
+		using const_reference = const_value_type&;
+		using pointer = T*;
+		using const_pointer = const T*;
 
 		virtual ~IDynamicArray() = default;
 
 		/// <summary>
 		/// Returns the length of the array.
 		/// </summary>
-		virtual size_t GetLength() const = 0;
+		virtual size_type GetLength() const = 0;
 
 		/// <summary>
 		/// Provides indexed access to array member references.
 		/// </summary>
-		virtual T& operator[](size_t index) = 0;
+		virtual reference operator[](size_type index) = 0;
 
 		/// <summary>
 		/// Provides indexed access to array members using constant references.
 		/// </summary>
-		virtual const T& operator[](size_t index) const = 0;
+		virtual const_reference operator[](size_type index) const = 0;
 
 		/// <summary>
-		/// Returns a copy of the pointer to the backing the array.
+		/// Returns a copy of the pointer to the backing array.
 		/// </summary>
-		virtual T* GetPtr() = 0;
+		virtual pointer GetData() = 0;
 
 		/// <summary>
-		/// Returns a const copy of the pointer to the backing the array.
+		/// Returns a const copy of the pointer to the backing array.
 		/// </summary>
-		virtual const T* GetPtr() const = 0;
+		virtual const_pointer GetData() const = 0;
+
+		/// <summary>
+		/// Returns a reference to the first element
+		/// </summary>
+		virtual reference GetFront() { return (*this)[0]; }
+
+		/// <summary>
+		/// Returns a constant reference to the first element
+		/// </summary>
+		virtual const_reference GetFront() const { return (*this)[0]; }
+
+		/// <summary>
+		/// Returns a reference to the last element
+		/// </summary>
+		virtual reference GetBack() { return (*this)[GetLength() - 1]; }
+
+		/// <summary>
+		/// Returns a const reference to the last element
+		/// </summary>
+		virtual const_reference GetBack() const { return (*this)[GetLength() - 1]; }
+
+		/// <summary>
+		/// Returns a reference to the element at the given index
+		/// </summary>
+		virtual reference at(size_t index) { return (*this)[index]; }
+
+		/// <summary>
+		/// Returns a constant reference to the element at the given index
+		/// </summary>
+		virtual const_reference at(size_t index) const { return (*this)[index]; }
 
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
-		virtual Iterator begin() = 0;
+		virtual iterator begin() = 0;
 
 		/// <summary>
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
-		virtual Iterator end() = 0;
+		virtual iterator end() = 0;
 
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
-		virtual const Iterator begin() const = 0;
+		virtual const_iterator begin() const = 0;
 
 		/// <summary>
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
-		virtual const Iterator end() const = 0;
+		virtual const_iterator end() const = 0;
 
 		/// <summary>
-		/// Returns iterator pointing to the start of the collection
+		/// Returns iterator pointing to the start of the collection (in reverse)
 		/// </summary>
-		virtual RevIterator rbegin() { return RevIterator(begin()); }
+		virtual reverse_iterator rbegin() { return reverse_iterator(end()); }
 
 		/// <summary>
-		/// Returns iterator pointing to the end of the collection
+		/// Returns iterator pointing to the end of the collection (in reverse)
 		/// </summary>
-		virtual RevIterator rend() { return RevIterator(end()); }
+		virtual reverse_iterator rend() { return reverse_iterator(begin()); }
 
 		/// <summary>
-		/// Returns iterator pointing to the start of the collection
+		/// Returns iterator pointing to the start of the collection (in reverse)
 		/// </summary>
-		virtual const RevIterator rbegin() const { return RevIterator(begin()); }
+		virtual const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
 
 		/// <summary>
-		/// Returns iterator pointing to the end of the collection
+		/// Returns iterator pointing to the end of the collection (in reverse)
 		/// </summary>
-		virtual const RevIterator rend() const { return RevIterator(end()); }
-
-		virtual T& front() { return (*this)[0]; }
-
-		virtual const T& front() const { return (*this)[0]; }
-
-		virtual T& back() { return (*this)[GetLength() - 1]; }
-
-		virtual const T& back() const { return (*this)[GetLength() - 1]; }
-
-		virtual T& at(size_t index) { return (*this)[index]; }
-
-		virtual const T& at(size_t index) const { return (*this)[index]; }
+		virtual const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
 		/// <summary>
 		/// Calculates a combined hash of the current contents of the array
@@ -183,10 +223,8 @@ namespace Replica
 		size_t GetHash() const
 		{
 			size_t seed = 0;
-
-			for (const T& value : *this)
-				seed ^= std::hash<T>{}(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-
+			for (const_reference value : *this)
+				seed ^= std::hash<T>{}(value)+0x9e3779b9 + (seed << 6) + (seed >> 2);
 			return seed;
 		}
 	};
@@ -207,7 +245,7 @@ namespace Replica
 		if (left.GetLength() != right.GetLength()) return false;
 
 		if constexpr (std::is_trivially_copyable_v<T>)
-			return memcmp(left.GetPtr(), right.GetPtr(), left.GetLength() * sizeof(T)) == 0;
+			return memcmp(left.GetData(), right.GetData(), left.GetLength() * sizeof(T)) == 0;
 		else
 			return std::equal(left.begin(), left.end(), right.begin());
 	}
@@ -253,8 +291,7 @@ namespace Replica
 	class DynamicArray : public IDynamicArray<T>
 	{
 	public:
-		using Iterator = IDynamicArray<T>::Iterator;
-		using RevIterator = IDynamicArray<T>::RevIterator;
+		DEF_DYN_ARR_TRAITS(IDynamicArray<T>)
 
 		/// <summary>
 		/// Initializes an empty array with a null pointer.
@@ -354,7 +391,7 @@ namespace Replica
 		{ }
 
 		/// <summary>
-		/// Deallocates the memory backing the array.
+		/// Deallocates the memory Backing the array.
 		/// </summary>
 		~DynamicArray() { delete[] data; }
 
@@ -398,42 +435,42 @@ namespace Replica
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
-		Iterator begin() override { return Iterator(data); }
+		iterator begin() override { return iterator(data); }
 
 		/// <summary>
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
-		Iterator end() override { return Iterator(data + length); }
+		iterator end() override { return iterator(data + length); }
 
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
-		const Iterator begin() const override { return Iterator(data); }
+		const_iterator begin() const override { return const_iterator(data); }
 
 		/// <summary>
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
-		const Iterator end() const override { return Iterator(data + length); }
+		const_iterator end() const override { return const_iterator(data + length); }
 
 		/// <summary>
 		/// Returns the first element in the vector
 		/// </summary>
-		T& front() override { return data[0]; }
+		T& GetFront() override { return data[0]; }
 
 		/// <summary>
 		/// Returns the first element in the vector
 		/// </summary>
-		const T& front() const override { return data[0]; }
+		const T& GetFront() const override { return data[0]; }
 
 		/// <summary>
 		/// Returns the last element in the vector
 		/// </summary>
-		T& back() override { return data[length - 1]; }
+		T& GetBack() override { return data[length - 1]; }
 
 		/// <summary>
 		/// Returns the last element in the vector
 		/// </summary>
-		const T& back() const override { return data[length - 1]; }
+		const T& GetBack() const override { return data[length - 1]; }
 
 		/// <summary>
 		/// Returns the length of the array.
@@ -451,14 +488,14 @@ namespace Replica
 		const T& operator[](size_t index) const override { return GetArrayAtIndex(data, index, length); }
 
 		/// <summary>
-		/// Returns a copy of the pointer to the backing the array.
+		/// Returns a copy of the pointer to the Backing the array.
 		/// </summary>
-		T* GetPtr() override { return data; }
+		T* GetData() override { return data; }
 
 		/// <summary>
-		/// Returns a const copy of the pointer to the backing the array.
+		/// Returns a const copy of the pointer to the Backing the array.
 		/// </summary>
-		const T* GetPtr() const override { return data; }
+		const T* GetData() const override { return data; }
 
 		void swap(DynamicArray& other) noexcept
 		{
@@ -475,7 +512,7 @@ namespace Replica
 		/// <summary>
 		/// Array length
 		/// </summary>
-		size_t length;
+		size_type length;
 
 		/// <summary>
 		/// Array pointer
@@ -493,8 +530,10 @@ namespace Replica
 		MAKE_DEF_COPY(UniqueArray)
 
 	public:
-		using DynamicArray<T>::DynamicArray;
+		DEF_DYN_ARR_TRAITS(DynamicArray<T>)
 		MAKE_DEF_MOVE(UniqueArray)
+
+		using DynamicArray<T>::DynamicArray;
 
 		/// <summary>
 		/// Initializes a copy of the given dynamic array.
@@ -511,26 +550,17 @@ namespace Replica
 	class Vector : public IDynamicArray<T>, private std::vector<T>
 	{		
 	public:
-		using Iterator = IDynamicArray<T>::Iterator;
-		using RevIterator = IDynamicArray<T>::RevIterator;
-
-		using std::vector<T>::vector;
+		DEF_DYN_ARR_TRAITS(IDynamicArray<T>)
 		MAKE_DEF_MOVE_COPY(Vector)
 
+		using std::vector<T>::vector;
+		using std::vector<T>::swap;
+		using std::vector<T>::at;
 		using std::vector<T>::push_back;
 		using std::vector<T>::emplace_back;
-		using std::vector<T>::pop_back;
-		using std::vector<T>::clear;
-		using std::vector<T>::max_size;
-		using std::vector<T>::resize;
-		using std::vector<T>::capacity;
-		using std::vector<T>::reserve;
-		using std::vector<T>::empty;
-		using std::vector<T>::shrink_to_fit;
-		using std::vector<T>::swap;
 
 		explicit Vector(const IDynamicArray<T>& other) :
-			std::vector<T>(other.GetPtr(), other.GetPtr() + other.GetLength())
+			std::vector<T>(other.GetData(), other.GetData() + other.GetLength())
 		{ }
 
 		/// <summary>
@@ -553,6 +583,17 @@ namespace Replica
 		/// Moves the given value into the end of the vector
 		/// </summary>
 		void Add(T&& value) noexcept { this->push_back(std::move(value)); }
+
+		/// <summary>
+		/// Adds a new element constructed in-place at the end of the vector.
+		/// </summary>
+		template<typename... Args>
+		T& EmplaceBack(Args&&... args) { return this->emplace_back(std::forward<Args>(args)...); }
+
+		/// <summary>
+		/// Removes the last element from the vector.
+		/// </summary>
+		void RemoveBack() { this->pop_back(); }
 
 		/// <summary>
 		/// Inserts a copy of the given value at the given index
@@ -679,64 +720,34 @@ namespace Replica
 		size_t GetLength() const override { return this->size(); }
 
 		/// <summary>
-		/// Returns a copy of the pointer to the backing the vector.
+		/// Returns a copy of the pointer to the Backing the vector.
 		/// </summary>
-		T* GetPtr() override { return this->data(); }
+		T* GetData() override { return this->data(); }
 
 		/// <summary>
-		/// Returns a const copy of the pointer to the backing the vector.
+		/// Returns a const copy of the pointer to the Backing the vector.
 		/// </summary>
-		const T* GetPtr() const override { return this->data(); }
-
-		/// <summary>
-		/// Returns iterator pointing to the start of the collection
-		/// </summary>
-		Iterator begin() override { return Iterator(this->data()); }
-
-		/// <summary>
-		/// Returns iterator pointing to the end of the collection
-		/// </summary>
-		Iterator end() override { return Iterator(this->data() + this->size()); }
-
-		/// <summary>
-		/// Returns iterator pointing to the start of the collection
-		/// </summary>
-		const Iterator begin() const override { return Iterator(this->data()); }
-
-		/// <summary>
-		/// Returns iterator pointing to the end of the collection
-		/// </summary>
-		const Iterator end() const override { return Iterator(this->data() + this->size()); }
+		const T* GetData() const override { return this->data(); }
 
 		/// <summary>
 		/// Returns the first element in the vector
 		/// </summary>
-		T& front() override { return std::vector<T>::front(); }
+		T& GetFront() override { return std::vector<T>::front(); }
 
 		/// <summary>
 		/// Returns the first element in the vector
 		/// </summary>
-		const T& front() const override { return std::vector<T>::front(); }
+		const T& GetFront() const override { return std::vector<T>::front(); }
 
 		/// <summary>
 		/// Returns the last element in the vector
 		/// </summary>
-		T& back() override { return std::vector<T>::back(); }
+		T& GetBack() override { return std::vector<T>::back(); }
 
 		/// <summary>
 		/// Returns the last element in the vector
 		/// </summary>
-		const T& back() const override { return std::vector<T>::back(); }
-
-		/// <summary>
-		/// Returns the element at the given index
-		/// </summary>
-		T& at(size_t index) override { return std::vector<T>::at(index); }
-
-		/// <summary>
-		/// Returns the element at the given index
-		/// </summary>
-		const T& at(size_t index) const override { return std::vector<T>::at(index); }
+		const T& GetBack() const override { return std::vector<T>::back(); }
 
 		/// <summary>
 		/// Provides indexed access to vector member references.
@@ -749,9 +760,59 @@ namespace Replica
 		const T& operator[](size_t index) const override { return GetArrayAtIndex(this->data(), index, this->size()); }
 
 		/// <summary>
+	   /// Clears all elements from the vector.
+	   /// </summary>
+		void Clear() { this->clear(); }
+
+		/// <summary>
+		/// Reserves space for the specified capacity.
+		/// </summary>
+		void Reserve(size_type capacity) { this->reserve(capacity); }
+
+		/// <summary>
+		/// Resizes the vector to the specified size.
+		/// </summary>
+		void Resize(size_type newSize) { this->resize(newSize); }
+
+		/// <summary>
+		/// Returns true if the vector is empty.
+		/// </summary>
+		[[nodiscard]] bool IsEmpty() const { return this->empty(); }
+
+		/// <summary>
+		/// Returns the current capacity of the vector.
+		/// </summary>
+		[[nodiscard]] size_type GetCapacity() const { return this->capacity(); }
+
+		/// <summary>
+		/// Shrinks the capacity to fit the current size.
+		/// </summary>
+		void ShrinkToFit() { this->shrink_to_fit(); }
+
+		/// <summary>
 		/// Returns a new copy of the unique vector.
 		/// </summary>
 		Vector GetCopy() const { return Vector(*this); }
+
+		/// <summary>
+		/// Returns iterator pointing to the start of the collection
+		/// </summary>
+		iterator begin() override { return iterator(this->data()); }
+
+		/// <summary>
+		/// Returns iterator pointing to the end of the collection
+		/// </summary>
+		iterator end() override { return iterator(this->data() + this->size()); }
+
+		/// <summary>
+		/// Returns iterator pointing to the start of the collection
+		/// </summary>
+		const_iterator begin() const override { return const_iterator(this->data()); }
+
+		/// <summary>
+		/// Returns iterator pointing to the end of the collection
+		/// </summary>
+		const_iterator end() const override { return const_iterator(this->data() + this->size()); }
 	};
 
 	/// <summary>
@@ -764,8 +825,10 @@ namespace Replica
 		MAKE_DEF_COPY(UniqueVector)
 
 	public:
-		using Vector<T>::Vector;
+		DEF_DYN_ARR_TRAITS(Vector<T>)
 		MAKE_DEF_MOVE(UniqueVector)
+
+		using Vector<T>::Vector;
 
 		/// <summary>
 		/// Initializes a new unique vector by moving the contents the given Vector into itself.

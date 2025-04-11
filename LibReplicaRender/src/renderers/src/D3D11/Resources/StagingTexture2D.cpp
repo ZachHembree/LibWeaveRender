@@ -150,7 +150,7 @@ void StagingTexture2D::WriteToFileWIC(Context& ctx, wstring_view path)
 		desc.Format,
 		buffer.GetRowPitch(),
 		buffer.GetByteSize(),
-		buffer.GetPtr()
+		buffer.GetData()
 	};
 
 	GFX_THROW_FAILED(SaveToWICFile(

@@ -13,7 +13,7 @@ namespace Replica::D3D11
 			ResourceUsages usage = ResourceUsages::Default, 
 			ResourceAccessFlags cpuAccess = ResourceAccessFlags::None
 		) :
-			VertexBuffer(device, data.GetPtr(), data.GetLength(), sizeof(T), usage, cpuAccess)
+			VertexBuffer(device, data.GetData(), data.GetLength(), sizeof(T), usage, cpuAccess)
 		{ }
 
 		VertexBuffer(

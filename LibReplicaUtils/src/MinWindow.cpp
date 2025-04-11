@@ -204,7 +204,7 @@ void MinWindow::RegisterComponent(WindowComponentBase& component)
 {
 	if (!component.isRegistered && component.pParent == this)
 	{
-		components.push_back(&component);
+		components.Add(&component);
 		component.isRegistered = true;
 	}
 }

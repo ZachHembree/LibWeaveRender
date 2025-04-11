@@ -15,7 +15,7 @@ namespace Replica::Effects
 			subLen++;
 		}
 
-		return spanBuf.emplace_back(textBuf, bufStart, subLen);
+		return spanBuf.EmplaceBack(textBuf, bufStart, subLen);
 	}
 
 	VariantPreprocessor::VariantPreprocessor() : 
@@ -45,14 +45,14 @@ namespace Replica::Effects
 		isInitialized = false;
 
 		textBuf.clear();
-		macroStarts.clear();
-		sysIncludeStarts.clear();
-		includeStarts.clear();
+		macroStarts.Clear();
+		sysIncludeStarts.Clear();
+		includeStarts.Clear();
 
 		variantDefineSet.clear();
 
-		variantModes.clear();
-		variantFlags.clear();
+		variantModes.Clear();
+		variantFlags.Clear();
 		pEntrypoints = nullptr;
 
 		AddVariantMode("__DEFAULT_SHADER_MODE__");
@@ -149,7 +149,7 @@ namespace Replica::Effects
 
 	void VariantPreprocessor::AddEntrypoint(string_view shaderName, ShadeStages stage)
 	{
-		pEntrypoints->emplace_back(string(shaderName), stage);
+		pEntrypoints->EmplaceBack(string(shaderName), stage);
 	}
 
 	const IDynamicArray<StringSpan>& VariantPreprocessor::GetVariantFlags() const { return variantFlags; }

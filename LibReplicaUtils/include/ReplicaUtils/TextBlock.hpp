@@ -18,7 +18,7 @@ namespace Replica
     public:
         using Span<const char>::GetLength;
         using Span<const char>::operator[];
-        using Span<const char>::GetPtr;
+        using Span<const char>::GetData;
         using Span<const char>::begin;
         using Span<const char>::end;
 

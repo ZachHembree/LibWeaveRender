@@ -16,22 +16,22 @@ void ShaderRegistryBuilder::Clear()
 
 	stringIDs.Clear();
 	resourceSet.clear();
-	idBuffer.clear();
-	byteBuffer.clear();
+	idBuffer.Clear();
+	byteBuffer.Clear();
 
-	constants.clear();
-	cbufDefs.clear();
-	ioElements.clear();
-	resources.clear();
+	constants.Clear();
+	cbufDefs.Clear();
+	ioElements.Clear();
+	resources.Clear();
 
-	cbufLayouts.clear();
-	cbufGroups.clear();
-	ioSignatures.clear();
-	resGroups.clear();
+	cbufLayouts.Clear();
+	cbufGroups.Clear();
+	ioSignatures.Clear();
+	resGroups.Clear();
 
-	binaries.clear();
-	shaders.clear();
-	effects.clear();
+	binaries.Clear();
+	shaders.Clear();
+	effects.Clear();
 
 	resCount = 0;
 	uniqueResCount = 0;
@@ -97,9 +97,9 @@ Vector<uint> ShaderRegistryBuilder::GetTmpIDBuffer() { return idBufPool.Get(); }
 
 Vector<byte> ShaderRegistryBuilder::GetTmpByteBuffer() { return byteCodePool.Get(); }
 
-void ShaderRegistryBuilder::ReturnTmpByteBuffer(Vector<byte>&& buf) { buf.clear(); byteCodePool.Return(std::move(buf)); }
+void ShaderRegistryBuilder::ReturnTmpByteBuffer(Vector<byte>&& buf) { buf.Clear(); byteCodePool.Return(std::move(buf)); }
 
-void ShaderRegistryBuilder::ReturnTmpIDBuffer(Vector<uint>&& buf) { buf.clear(); idBufPool.Return(std::move(buf)); }
+void ShaderRegistryBuilder::ReturnTmpIDBuffer(Vector<uint>&& buf) { buf.Clear(); idBufPool.Return(std::move(buf)); }
 
 ShaderRegistryDef ShaderRegistryBuilder::ExportDefinition() const
 {

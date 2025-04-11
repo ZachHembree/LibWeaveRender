@@ -55,7 +55,7 @@ namespace Replica::Effects
     /// <summary>
     /// Returns true if a template instantiation is pending completion and '>' should be considered.
     /// </summary>
-    bool BlockAnalyzer::GetCanCloseTemplate() const { return !containers.empty() && blocks[containers.back()].GetHasFlags(LexBlockTypes::OpenAngleBrackets); }
+    bool BlockAnalyzer::GetCanCloseTemplate() const { return !containers.IsEmpty() && blocks[containers.GetBack()].GetHasFlags(LexBlockTypes::OpenAngleBrackets); }
 
     static bool GetHasFlags(const LexBlockTypes value, const LexBlockTypes flags) { return (value & flags) == flags; }
 
@@ -69,8 +69,8 @@ namespace Replica::Effects
 
     void BlockAnalyzer::Clear()
     {
-        containers.clear();
-        blocks.clear();
+        containers.Clear();
+        blocks.Clear();
         depth = 0;
         line = 1;
         pPos = nullptr;
@@ -81,12 +81,12 @@ namespace Replica::Effects
     {
         Clear();
         this->src = src;
-        pPos = src.GetFirst();
+        pPos = src.GetData();
 
         while (true)
         {            
             // Parse
-            if (pPos <= src.GetLast())
+            if (pPos <= &src.GetBack())
             { 
                 if (*pPos <= ' ') // Skip whitespace
                 {
@@ -125,7 +125,7 @@ namespace Replica::Effects
                         }
                         [[fallthrough]];
                     default:
-                        AddBlock({ pPos, src.GetLast() });
+                        AddBlock({ pPos, &src.GetBack() });
                         break;
                     }
                 }
@@ -143,16 +143,16 @@ namespace Replica::Effects
     void BlockAnalyzer::AddBlock(const TextBlock& start)
     {
         const string_view filter = GetBreakFilter();
-        const char* pNext = start.GetFirst() - 1;
+        const char* pNext = start.GetData() - 1;
 
         do
         {
             pNext = start.FindEnd(pNext + 1, filter);
         } 
-        while (pNext < start.GetLast() && TextBlock::GetIsRangeChar(*pNext, filter));
+        while (pNext < &start.GetBack() && TextBlock::GetIsRangeChar(*pNext, filter));
 
         // Create new non-container block
-        LexBlock& block = blocks.emplace_back();
+        LexBlock& block = blocks.EmplaceBack();
         
         switch (*pNext)
         {
@@ -190,15 +190,15 @@ namespace Replica::Effects
             pNext--;
 
         block.depth = depth;
-        block.src = TextBlock(start.GetFirst(), pNext);
+        block.src = TextBlock(start.GetData(), pNext);
         block.startLine = line;
         block.lineCount = block.src.FindCount('\n');
 
         line += block.lineCount;
-        pPos = block.src.GetLast();
+        pPos = &block.src.GetBack();
     }
 
-    LexBlock* BlockAnalyzer::GetTopContainer() { return !containers.empty() ? &blocks[containers.back()] : nullptr; }
+    LexBlock* BlockAnalyzer::GetTopContainer() { return !containers.IsEmpty() ? &blocks[containers.GetBack()] : nullptr; }
 
     void BlockAnalyzer::SetState(int blockIndex)
     {
@@ -216,13 +216,13 @@ namespace Replica::Effects
             PARSE_ASSERT_MSG(blockIndex >= 0 && blockIndex < (int)blocks.GetLength(), "Block index out of range")
 
             LexBlock& block = blocks[blockIndex];
-            pPos = block.src.GetLast();
+            pPos = &block.src.GetBack();
             // Depth is normally incremented after a container is added
             depth = block.depth + (int)block.GetHasFlags(LexBlockTypes::StartContainer);
             line = block.startLine + block.lineCount;
 
-            while (!containers.empty() && containers.back() > blockIndex)
-                containers.pop_back();
+            while (!containers.IsEmpty() && containers.GetBack() > blockIndex)
+                containers.RemoveBack();
 
             blocks.RemoveRange(blockIndex + 1, (int)blocks.GetLength() - blockIndex - 1);
         }
@@ -258,14 +258,14 @@ namespace Replica::Effects
 
             if (top != nullptr && top->GetHasFlags(LexBlockTypes::OpenAngleBrackets))
             {
-                RevertContainer(containers.back());
+                RevertContainer(containers.GetBack());
                 return;
             }
         }
 
         // Start new container to be later finalized in LIFO order as closing braces are encountered
-        containers.push_back((int)blocks.GetLength());
-        blocks.emplace_back(depth, delimType, pPos, line);
+        containers.Add((int)blocks.GetLength());
+        blocks.EmplaceBack(depth, delimType, pPos, line);
         depth++;
     }
 
@@ -278,7 +278,7 @@ namespace Replica::Effects
         // before it was ready. It will need to be reverted and reclassified.
         if (pCont->GetHasFlags(LexBlockTypes::OpenAngleBrackets) && (*pPos != '>'))
         {
-            RevertContainer(containers.back());
+            RevertContainer(containers.GetBack());
         }
         // Normal bounding {}, [], () or <> containers, closed in last-in, first-out order.
         else
@@ -305,12 +305,12 @@ namespace Replica::Effects
             PARSE_ASSERT_FMT(depth >= 0, "Unexpected closing '{}' on line: {}", *pPos, line)
 
             // Finalize source range and line count in container opening
-            containers.pop_back();
-            pCont->src = TextBlock(pCont->src.GetFirst(), pPos);
+            containers.RemoveBack();
+            pCont->src = TextBlock(pCont->src.GetData(), pPos);
             pCont->lineCount = line - pCont->startLine;
 
             // Add duplicate ending marker with appropriate delim flags
-            LexBlock& endContainer = blocks.emplace_back(*pCont);
+            LexBlock& endContainer = blocks.EmplaceBack(*pCont);
             endContainer.type = delimType;
         }
     }
@@ -328,7 +328,7 @@ namespace Replica::Effects
         name.src = TextBlock(pPos, src.FindWordEnd(pPos) + 1);
         name.startLine = line;
 
-        pPos = src.FindWord(name.src.GetLast() + 1);
+        pPos = src.FindWord(&name.src.GetBack() + 1);
         const char* pLast = pPos;
         int lineCount = 0;
 
@@ -350,10 +350,10 @@ namespace Replica::Effects
         body.lineCount = lineCount;
 
         line += lineCount;
-        blocks.emplace_back(name);
-        blocks.emplace_back(body);
+        blocks.EmplaceBack(name);
+        blocks.EmplaceBack(body);
 
-        pPos = body.src.GetLast();
+        pPos = &body.src.GetBack();
     }
     
     /// <summary>
@@ -362,7 +362,7 @@ namespace Replica::Effects
     /// </summary>
     bool BlockAnalyzer::TryFinalizeParse()
     {
-        if (!containers.empty())
+        if (!containers.IsEmpty())
         {
             LexBlock& top = *GetTopContainer();
 
@@ -380,7 +380,7 @@ namespace Replica::Effects
             }
             else if (top.GetHasFlags(LexBlockTypes::OpenAngleBrackets))
             {
-                RevertContainer(containers.back());
+                RevertContainer(containers.GetBack());
                 return false;
             }
         }

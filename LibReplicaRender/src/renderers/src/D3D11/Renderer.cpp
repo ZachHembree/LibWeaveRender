@@ -200,7 +200,7 @@ bool Renderer::RegisterComponent(RenderComponentBase& component)
 	{
 		component.pRenderer = this;
 		component.isRegistered = true;
-		pComponents.push_back(&component);
+		pComponents.Add(&component);
 		return true;
 	}
 	else

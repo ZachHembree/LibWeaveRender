@@ -57,7 +57,7 @@ namespace Replica::Effects
     {
         ClearMatchBuffers();
 
-        tokenBuf.clear();
+        tokenBuf.Clear();
         textBuf.clear();
         textBuf.str({});
         
@@ -84,7 +84,7 @@ namespace Replica::Effects
             }
             else if (!block.GetHasFlags(LexBlockTypes::Container))
             {
-                TokenDef startToken(block.src.GetWord(block.src.GetFirst(), g_WordBreakFilter));
+                TokenDef startToken(block.src.GetWord(block.src.GetData(), g_WordBreakFilter));
 
                 if (pSB->TryGetTokenFlags(startToken))
                 {
@@ -123,17 +123,17 @@ namespace Replica::Effects
                             const int subGroupCount = (int)capGroups.GetLength();
 
                             capSubGroups.AddRange(capGroups);
-                            capGroups.clear();
+                            capGroups.Clear();
 
                             // Create new parent group
-                            CaptureGroup& group = capGroups.emplace_back();
+                            CaptureGroup& group = capGroups.EmplaceBack();
                             group.subGroupStart = subGroupStart;
                             group.subGroupCount = subGroupCount;
                             group.capStart = (int)captures.GetLength();
                             group.capCount = (int)captureBuf.GetLength();
 
                             captures.AddRange(captureBuf);
-                            captureBuf.clear();
+                            captureBuf.Clear();
                         }
 
                         return nextMatch - start;
@@ -147,10 +147,10 @@ namespace Replica::Effects
 
     void SymbolParser::ClearMatchBuffers()
     {
-        capSubGroups.clear();
-        capGroups.clear();
-        captures.clear();
-        captureBuf.clear();
+        capSubGroups.Clear();
+        capGroups.Clear();
+        captures.Clear();
+        captureBuf.Clear();
     }
 
     int SymbolParser::TryMatchPatternNode(const MatchNode& pattern, int matchStart)
@@ -254,7 +254,7 @@ namespace Replica::Effects
                 else if (nextStart != matchStart)
                 { 
                     if (matchPattern.GetHasCapPattern())
-                        captureBuf.emplace_back(matchStart, matchPattern.GetCapPatterns());
+                        captureBuf.EmplaceBack(matchStart, matchPattern.GetCapPatterns());
 
                     matchStart = nextStart;
                 }
@@ -350,7 +350,7 @@ namespace Replica::Effects
                 capGroups.RemoveRange(state.groupStart, subGroupCount);
 
                 // Create new parent group
-                CaptureGroup& group = capGroups.emplace_back();
+                CaptureGroup& group = capGroups.EmplaceBack();
                 group.subGroupStart = subGroupStart;
                 group.subGroupCount = subGroupCount;
                 group.capStart = (int)captures.GetLength();
@@ -409,8 +409,8 @@ namespace Replica::Effects
                     PushSymbol(token.symbolID);
             }
 
-            tokenBuf.clear();
-            tokenParentBuf.clear();
+            tokenBuf.Clear();
+            tokenParentBuf.Clear();
         }
     }
 
@@ -455,7 +455,7 @@ namespace Replica::Effects
             CaptureTokens(*pStart);
 
             const int mainIndex = capStart + pStart->mainCap;
-            TokenNodeDef& owner = tokenParentBuf.emplace_back(tokenBuf[mainIndex]);
+            TokenNodeDef& owner = tokenParentBuf.EmplaceBack(tokenBuf[mainIndex]);
             tokenBuf.RemoveAt(mainIndex);
 
             owner.blockStart = node.srcStart;
@@ -470,7 +470,7 @@ namespace Replica::Effects
         const int tokenStart = (int)tokenBuf.GetLength();
         const IDynamicArray<CapturePattern>& patterns = *cap.pPatterns;
         const LexBlock& block = (*pSrcBlocks)[cap.blockID];
-        const char* pStart = block.src.GetFirst();
+        const char* pStart = block.src.GetData();
         const char* pLast = nullptr;
 
         for (int i = 0; i < patterns.GetLength(); i++)
@@ -512,8 +512,8 @@ namespace Replica::Effects
             pSB->TryGetTokenFlags(ident);
 
             ident.tokenFlags |= pattern.tokenType;
-            tokenBuf.emplace_back(ident, pattern.symbolType, cap.blockID);
-            pStart = block.src.FindWord(ident.name.GetLast() + 1, g_WordBreakFilter);
+            tokenBuf.EmplaceBack(ident, pattern.symbolType, cap.blockID);
+            pStart = block.src.FindWord(&ident.name.GetBack() + 1, g_WordBreakFilter);
         }
 
         PARSE_ASSERT_MSG((tokenBuf.GetLength() - tokenStart) == patterns.GetLength(), "Expected an identifier");
@@ -525,7 +525,7 @@ namespace Replica::Effects
         {
             TextBlock idText = ident.value;
             idText = idText.GetLastWord(&ident.value.back(), "", '0', '9');
-            ident.value = TextBlock(ident.value.data(), idText.GetFirst() - 1);
+            ident.value = TextBlock(ident.value.data(), idText.GetData() - 1);
 
             const int len = std::min((int)idText.GetLength(), 9);
             char buf[10];

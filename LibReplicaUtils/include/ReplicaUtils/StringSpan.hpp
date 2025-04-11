@@ -8,13 +8,13 @@ namespace Replica
 	/// Reallocation tolerant span using std::string. Non-owning. Previously obtained iterators and pointers 
 	/// may become invalid after reallocation, but span accessors provide updated pointers.
 	/// </summary>
-	class StringSpan : public VectorSpan<std::string, char>
+	class StringSpan : public VectorSpan<std::string>
 	{
 	public:
+		DEF_DYN_ARR_TRAITS(VectorSpan<std::string>)
 		using string = std::string;
 		using string_view = std::string_view;
-
-		using VectorSpan<string, char>::VectorSpan;
+		using VectorSpan<string>::VectorSpan;
 
 		/// <summary>
 		/// Returns pointer to first character in the span. Requires null-termination of substring.

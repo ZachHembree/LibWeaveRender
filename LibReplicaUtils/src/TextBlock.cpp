@@ -35,7 +35,7 @@ TextBlock::TextBlock(string& str) : Span(&str[0], str.length())
 TextBlock::TextBlock(string_view& str) : Span(&str[0], str.length())
 { }
 
-TextBlock::TextBlock(Span<char>& span) : Span(span.GetFirst(), span.GetLength())
+TextBlock::TextBlock(Span<char>& span) : Span(span.GetData(), span.GetLength())
 { }
 
 /// <summary>
@@ -65,9 +65,9 @@ int TextBlock::FindCount(const char ch, const char* pStart) const
     if (pStart == nullptr)
         pStart = this->pStart;
 
-    size_t remLen = UnsignedDelta(GetLast(), pStart);
+    size_t remLen = UnsignedDelta(&GetBack(), pStart);
 
-    if (pStart >= GetFirst() && remLen >= 1)
+    if (pStart >= GetData() && remLen >= 1)
     {
         for (size_t i = 0; i <= remLen; i++)
         {
@@ -126,12 +126,12 @@ const char* TextBlock::Find(const char* substr, int subLen, const char* pStart) 
     if (pStart == nullptr)
         pStart = this->pStart;
 
-    size_t remLen = UnsignedDelta(GetLast(), pStart);
+    size_t remLen = UnsignedDelta(&GetBack(), pStart);
 
     if (substr[subLen - 1] == '\0')
         subLen--;
 
-    if (pStart >= GetFirst() && remLen >= subLen)
+    if (pStart >= GetData() && remLen >= subLen)
     {
         for (size_t i = 0; i < remLen; i++)
         {
@@ -202,12 +202,12 @@ const char* TextBlock::Find(const char* substr, int subLen, const char* pStart)
     if (pStart == nullptr)
         pStart = this->pStart;
 
-    size_t remLen = UnsignedDelta(GetLast(), pStart);
+    size_t remLen = UnsignedDelta(&GetBack(), pStart);
 
     if (substr[subLen - 1] == '\0')
         subLen--;
 
-    if (pStart >= GetFirst() && remLen >= subLen)
+    if (pStart >= GetData() && remLen >= subLen)
     {
         for (size_t i = 0; i < remLen; i++)
         {
@@ -237,9 +237,9 @@ const char* TextBlock::Find(const char* substr, int subLen, const char* pStart)
 /// </summary>
 const char* TextBlock::FindStart(const char* pStart, const string_view& breakFilter, char min, char max) const
 {
-    pStart = ClampPtr(pStart, GetFirst(), GetLast());
+    pStart = ClampPtr(pStart, GetData(), &GetBack());
 
-    while (pStart < GetLast() && !(*pStart >= min && *pStart <= max) && breakFilter.find(*pStart) == string::npos)
+    while (pStart < &GetBack() && !(*pStart >= min && *pStart <= max) && breakFilter.find(*pStart) == string::npos)
         pStart++;
 
     return (char*)pStart;
@@ -250,10 +250,10 @@ const char* TextBlock::FindStart(const char* pStart, const string_view& breakFil
 /// </summary>
 const char* TextBlock::FindEnd(const char* pStart, const string_view& breakFilter, char min, char max) const
 {
-    pStart = ClampPtr(pStart, GetFirst(), GetLast());
+    pStart = ClampPtr(pStart, GetData(), &GetBack());
     const char* pCh = pStart;
 
-    while (pCh <= GetLast() && GetIsRangeChar(*pCh, breakFilter, min, max))
+    while (pCh <= &GetBack() && GetIsRangeChar(*pCh, breakFilter, min, max))
     {
         pStart = pCh;
         pCh++;
@@ -267,10 +267,10 @@ const char* TextBlock::FindEnd(const char* pStart, const string_view& breakFilte
 /// </summary>
 const char* TextBlock::FindLastStart(const char* pStart, const string_view& breakFilter, char min, char max) const
 {
-    pStart = ClampPtr(pStart, GetFirst(), GetLast());
+    pStart = ClampPtr(pStart, GetData(), &GetBack());
     const char* pCh = pStart;
 
-    while (pCh > GetFirst() && !(*pCh >= min && *pCh <= max) && breakFilter.find(*pCh) == string::npos)
+    while (pCh > GetData() && !(*pCh >= min && *pCh <= max) && breakFilter.find(*pCh) == string::npos)
         pCh--;
 
     do
@@ -278,7 +278,7 @@ const char* TextBlock::FindLastStart(const char* pStart, const string_view& brea
         pStart = pCh;
         pCh--;
     } 
-    while (pCh >= GetFirst() && GetIsRangeChar(*pCh, breakFilter, min, max));
+    while (pCh >= GetData() && GetIsRangeChar(*pCh, breakFilter, min, max));
 
     return (char*)pStart;
 }

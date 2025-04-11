@@ -32,7 +32,7 @@ ShaderLibBuilder::~ShaderLibBuilder() = default;
 void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_view libSrc)
 {
 	const uint repoID = (uint)repos.GetLength() << g_VariantGroupOffset;
-	VariantRepoDef& lib = repos.emplace_back();
+	VariantRepoDef& lib = repos.EmplaceBack();
 	lib.src.name = name;
 	lib.src.path = libPath;
 	pVariantGen->SetSrc(libPath, libSrc);
@@ -112,7 +112,9 @@ ShaderLibDef ShaderLibBuilder::ExportLibrary()
 	for (int i = 0; i < repos.GetLength(); i++)
 		lib.repos[i] = std::move(repos[i]);
 
-	repos.clear();
+	repos.Clear();
+	pShaderRegistry->WriteDefinition(lib.stringIDs, lib.regData);
+
 	return lib;
 }
 
@@ -161,7 +163,7 @@ void ShaderLibBuilder::GetEntryPoints()
 
 					if (!epNameShaderIDMap.contains(nameID))
 					{
-						ShaderEntrypoint& ep = entrypoints.emplace_back();
+						ShaderEntrypoint& ep = entrypoints.EmplaceBack();
 						epNameShaderIDMap.emplace(nameID, -1);
 						ep.name = name;
 						ep.stage = GetStageFromFlags(funcIdent[j].GetFlags());
@@ -212,7 +214,7 @@ void ShaderLibBuilder::GetEntryPoints()
 
 				if (!epNameShaderIDMap.contains(nameID))
 				{
-					ShaderEntrypoint& ep = entrypoints.emplace_back();
+					ShaderEntrypoint& ep = entrypoints.EmplaceBack();
 					epNameShaderIDMap.emplace(nameID, -1);
 					ep.name = name;
 					ep.stage = GetStageFromFlags(symbol.GetFlags());
@@ -234,7 +236,7 @@ void ShaderLibBuilder::GetEffects()
 		if (symbol.GetIsScope() && symbol.GetHasFlags(SymbolTypes::TechniqueDef))
 		{
 			ScopeHandle effectScope = *symbol.GetScope();
-			EffectBlock& effect = effectBlocks.emplace_back();
+			EffectBlock& effect = effectBlocks.EmplaceBack();
 			effect.nameID = pShaderRegistry->GetOrAddStringID(symbol.GetName());
 			effect.passStart = 0;
 			effect.passStart = (uint)effectPasses.GetLength();
@@ -281,7 +283,7 @@ void ShaderLibBuilder::GetEffects()
 
 void ShaderLibBuilder::AddPass(const ScopeHandle& passScope, string_view name)
 {
-	PassBlock& pass = effectPasses.emplace_back();
+	PassBlock& pass = effectPasses.EmplaceBack();
 	pass.nameID = pShaderRegistry->GetOrAddStringID(name);
 	pass.shaderStart = (uint)effectShaders.GetLength();
 
@@ -294,7 +296,7 @@ void ShaderLibBuilder::AddPass(const ScopeHandle& passScope, string_view name)
 			string_view shaderName = effectChild.GetName();
 			const uint stringID = pShaderRegistry->GetOrAddStringID(shaderName);
 			const uint shaderID = epNameShaderIDMap[stringID];
-			effectShaders.emplace_back(shaderID);
+			effectShaders.EmplaceBack(shaderID);
 		}
 	}
 
@@ -341,10 +343,10 @@ void ShaderLibBuilder::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, ui
 			for (uint k = 0; k < pass.shaderCount; k++)
 			{
 				const uint shaderIndex = pass.shaderStart + k;
-				idBuf.emplace_back(effectShaders[shaderIndex]);
+				idBuf.EmplaceBack(effectShaders[shaderIndex]);
 			}
 
-			effect.passes[j] = pShaderRegistry->GetOrAddEffectPass(idBuf);
+			passBuf.EmplaceBack(pShaderRegistry->GetOrAddEffectPass(idBuf));
 			pShaderRegistry->ReturnTmpIDBuffer(std::move(idBuf));
 		}
 
@@ -377,12 +379,12 @@ void ShaderLibBuilder::ClearVariant()
 	pAnalyzer->Clear();
 	pShaderGen->Clear();
 
-	entrypoints.clear();
+	entrypoints.Clear();
 	epNameShaderIDMap.clear();
 
-	effectBlocks.clear();
-	effectPasses.clear();
-	effectShaders.clear();
+	effectBlocks.Clear();
+	effectPasses.Clear();
+	effectShaders.Clear();
 
 	hlslBuf.clear();
 }

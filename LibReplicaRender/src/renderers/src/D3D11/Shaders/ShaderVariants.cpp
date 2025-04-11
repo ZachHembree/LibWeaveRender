@@ -6,7 +6,7 @@ using namespace Replica::D3D11;
 
 VertexShaderVariant::VertexShaderVariant(Device& dev, const ShaderDefHandle& def) :
 	ShaderVariant(dev, def),
-	layout(dev, def.GetBinSrc().GetPtr(), def.GetBinSrc().GetLength(), def.GetInLayout())
+	layout(dev, def.GetBinSrc().GetData(), def.GetBinSrc().GetLength(), def.GetInLayout())
 { }
 
 void VertexShaderVariant::Bind(Context & ctx, const ResourceSet & res) const

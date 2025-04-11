@@ -44,7 +44,7 @@ namespace Replica::D3D11
 			uint mipLevels = 1u,
 			ResourceAccessFlags accessFlags = ResourceAccessFlags::ReadWrite
 		)
-			: StagingTexture2D(dev, dim, data.GetPtr(), sizeof(T), format, accessFlags, mipLevels)
+			: StagingTexture2D(dev, dim, data.GetData(), sizeof(T), format, accessFlags, mipLevels)
 		{ }
 
 		/// <summary>
@@ -73,7 +73,7 @@ namespace Replica::D3D11
 		template<typename T>
 		void SetTextureData(Context& ctx, IDynamicArray<T>& data, ivec2 dim)
 		{
-			SetTextureData(ctx, data.GetPtr(), sizeof(T), dim);
+			SetTextureData(ctx, data.GetData(), sizeof(T), dim);
 		}
 
 		/// <summary>

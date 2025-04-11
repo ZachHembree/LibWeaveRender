@@ -26,7 +26,7 @@ uint StringIDBuilder::GetOrAddStringID(std::string_view str)
     else
     {
         const uint id = static_cast<uint>(strings.GetLength());
-        strings.emplace_back(ss);
+        strings.EmplaceBack(ss);
         idMap.emplace(ss, id);
 
         return id;
@@ -69,13 +69,13 @@ void StringIDBuilder::WriteDefinition(StringIDMapDef& def) const
     uint charCount = 0;
 
     // Calculate concatenated string buffer size and substring layout
-    def.substrings.reserve(2 * count);
+    def.substrings.Reserve(2 * count);
 
     for (uint i = 0; i < count; i++)
     {
         const uint subLen = (uint)strings[i].GetLength();
-        def.substrings.push_back(charCount);
-        def.substrings.push_back(subLen - 1); // Exclude null terminator
+        def.substrings.Add(charCount);
+        def.substrings.Add(subLen - 1); // Exclude null terminator
         charCount += subLen;
     }
 
@@ -85,7 +85,7 @@ void StringIDBuilder::WriteDefinition(StringIDMapDef& def) const
 
 void StringIDBuilder::Clear()
 {
-    strings.clear();
+    strings.Clear();
     idMap.clear();
     textBuf.clear();
     stringData.clear();

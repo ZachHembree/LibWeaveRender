@@ -18,7 +18,7 @@ namespace Replica::D3D11
 			Formats format = Formats::R8G8B8A8_UNORM,
 			uint mipLevels = 1u
 		)
-			: ResizeableTexture2D(dev, dim, data.GetPtr(), sizeof(T), format, mipLevels)
+			: ResizeableTexture2D(dev, dim, data.GetData(), sizeof(T), format, mipLevels)
 		{ }
 
 		/// <summary>
@@ -103,7 +103,7 @@ namespace Replica::D3D11
 		template<typename T>
 		void SetTextureData(Context& ctx, IDynamicArray<T>& data, ivec2 dim)
 		{
-			SetTextureData(ctx, data.GetPtr(), sizeof(T), dim);
+			SetTextureData(ctx, data.GetData(), sizeof(T), dim);
 		}
 
 		/// <summary>

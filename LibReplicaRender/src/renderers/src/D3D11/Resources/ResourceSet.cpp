@@ -36,7 +36,7 @@ void ResourceSet::ConstantGroup::SetValue(uint stringID, const Span<byte>& newVa
 	{
 		const Constant& value = constants[it->second];
 		REP_ASSERT_MSG(newValue.GetLength() == value.size, "Constant size does not match existing value");
-		memcpy(&data[value.offset], newValue.GetPtr(), newValue.GetLength());
+		memcpy(&data[value.offset], newValue.GetData(), newValue.GetLength());
 	}
 	else // Add new value
 	{
@@ -45,19 +45,19 @@ void ResourceSet::ConstantGroup::SetValue(uint stringID, const Span<byte>& newVa
 		const uint size = (uint)newValue.GetLength();
 
 		// Add constant descriptor
-		constants.emplace_back(stringID, size, offset);
+		constants.EmplaceBack(stringID, size, offset);
 		// Map stringID -> constant desc index
 		stringConstMap.emplace(stringID, index);
 		// Write value to contiguous vector buffer
-		data.reserve(offset + size);
+		data.Reserve(offset + size);
 		std::copy(newValue.begin(), newValue.end(), std::back_inserter(data));
 	}
 }
 
 void ResourceSet::ConstantGroup::Clear()
 {
-	data.clear();
-	constants.clear();
+	data.Clear();
+	constants.Clear();
 	stringConstMap.clear();
 }
 

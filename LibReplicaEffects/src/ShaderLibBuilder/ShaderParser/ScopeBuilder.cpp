@@ -18,7 +18,7 @@ void ScopeBuilder::Init()
     topScope = -1;
     pendingScopeSymbol = -1;
 
-    symbols.emplace_back(-1, 0, SymbolTypes::AnonScope);
+    symbols.EmplaceBack(-1, 0, SymbolTypes::AnonScope);
     AddScope(0);
 }
 
@@ -29,15 +29,15 @@ void ScopeBuilder::AddScope(const int symbolID, const int blockStart, const int 
     topScope = (int)scopes.GetLength();
 
     symbols[symbolID].scopeID = topScope;
-    ScopeData& scope = scopes.emplace_back();
+    ScopeData& scope = scopes.EmplaceBack();
     scope.symbolID = symbolID;
     scope.parentScope = parentID;
     scope.blockStart = blockStart;
     scope.blockCount = blockCount;
 
-    scopeSymbolMaps.emplace_back();
-    funcOverloadMaps.emplace_back();
-    scopeSymbolLists.emplace_back();
+    scopeSymbolMaps.EmplaceBack();
+    funcOverloadMaps.EmplaceBack();
+    scopeSymbolLists.EmplaceBack();
 }
 
 void ScopeBuilder::AddFuncToOverloadTable(const string_view name, const int symbolID)
@@ -53,20 +53,20 @@ void ScopeBuilder::AddFuncToOverloadTable(const string_view name, const int symb
 
 void ScopeBuilder::Clear()
 {
-    scopes.clear();
-    scopeSymbolMaps.clear();
-    funcOverloadMaps.clear();
-    scopeSymbolLists.clear();
+    scopes.Clear();
+    scopeSymbolMaps.Clear();
+    funcOverloadMaps.Clear();
+    scopeSymbolLists.Clear();
 
-    tokens.clear();
-    symbols.clear();
+    tokens.Clear();
+    symbols.Clear();
 
-    types.clear();
-    userTypes.clear();
-    functions.clear();
-    attributes.clear();
+    types.Clear();
+    userTypes.Clear();
+    functions.Clear();
+    attributes.Clear();
 
-    deferredSymbolBuf.clear();
+    deferredSymbolBuf.Clear();
     generatedText.clear();
 
     Init();
@@ -266,7 +266,7 @@ bool ScopeBuilder::GetHasSymbol(string_view name, int top) const
 int ScopeBuilder::GetNewToken(string_view value, TokenTypes flags, const int depth, const int blockID)
 {
     const int tokenID = (int)tokens.GetLength();
-    TokenNode& token = tokens.emplace_back();
+    TokenNode& token = tokens.EmplaceBack();
     token.value = value;
     token.type = flags;
     token.depth = depth;
@@ -284,7 +284,7 @@ int ScopeBuilder::GetNewTypeSpecifier(const int tokenID)
 {
     TokenNode& token = tokens[tokenID];
     token.subtypeID = (int)types.GetLength();
-    types.push_back(TryGetType(token.value));
+    types.Add(TryGetType(token.value));
 
     return token.subtypeID;
 }
@@ -293,7 +293,7 @@ int ScopeBuilder::GetNewAttribute(const int tokenID)
 {
     TokenNode& token = tokens[tokenID];
     token.subtypeID = (int)attributes.GetLength();
-    AttributeData& attribSpec = attributes.emplace_back();
+    AttributeData& attribSpec = attributes.EmplaceBack();
     attribSpec.semanticIndex = -1;
 
     return token.subtypeID;
@@ -302,7 +302,7 @@ int ScopeBuilder::GetNewAttribute(const int tokenID)
 int ScopeBuilder::GetNewSymbol(const int tokenID, SymbolTypes flags)
 {
     const int symbolID = (int)symbols.GetLength();
-    SymbolData& symbol = symbols.emplace_back();
+    SymbolData& symbol = symbols.EmplaceBack();
     symbol.identID = tokenID;
     symbol.scopeID = -1;
     symbol.type = flags;
@@ -316,7 +316,7 @@ int ScopeBuilder::GetNewFunc(const int tokenID, SymbolTypes flags)
     const int funcID = GetNewSymbol(tokenID, flags);
     TokenNode& token = tokens[tokenID];
     token.subtypeID = (int)functions.GetLength();
-    FunctionData& subtype = functions.emplace_back();
+    FunctionData& subtype = functions.EmplaceBack();
 
     return funcID;
 }
@@ -333,7 +333,7 @@ int ScopeBuilder::GetNewTypeAlias(const int tokenID, SymbolTypes flags)
             const ShaderTypeInfo* pType = TryGetType(child.value);
 
             ident.subtypeID = (int)types.GetLength();
-            types.push_back(pType);
+            types.Add(pType);
             break;
         }
     }
@@ -347,7 +347,7 @@ int ScopeBuilder::GetNewUserType(const int tokenID, SymbolTypes flags)
     TokenNode& token = tokens[tokenID];
     token.type |= TokenTypes::UserType;
     token.subtypeID = (int)userTypes.GetLength();
-    ShaderTypeInfo& type = userTypes.emplace_back();
+    ShaderTypeInfo& type = userTypes.EmplaceBack();
     type.name = token.value;
     type.flags = ShaderTypes::UserType;
     type.size = 0;
@@ -361,7 +361,7 @@ void ScopeBuilder::PushScope(const int firstBlock, const int depth)
     if (pendingScopeSymbol == -1)
     {
         const int symbolID = (int)symbols.GetLength();
-        symbols.emplace_back(-1, -1, SymbolTypes::AnonScope);
+        symbols.EmplaceBack(-1, -1, SymbolTypes::AnonScope);
         pendingScopeSymbol = symbolID;
     }
 
@@ -370,7 +370,7 @@ void ScopeBuilder::PushScope(const int firstBlock, const int depth)
     for (int index : deferredSymbolBuf)
         PushSymbol(index);
 
-    deferredSymbolBuf.clear();
+    deferredSymbolBuf.Clear();
     pendingScopeSymbol = -1;
 }
 
@@ -394,9 +394,9 @@ void ScopeBuilder::PushSymbol(const int symbolID, const bool isDeferred)
     const SymbolData& symbol = symbols[symbolID];
 
     if (isDeferred)
-        deferredSymbolBuf.push_back(symbolID);
+        deferredSymbolBuf.Add(symbolID);
     else if (symbol.GetHasFlags(SymbolTypes::Anonymous))
-        scopeSymbolLists[topScope].emplace_back(symbolID);
+        scopeSymbolLists[topScope].EmplaceBack(symbolID);
     else
     {
         const TokenNode& token = tokens[symbol.identID];
@@ -414,7 +414,7 @@ void ScopeBuilder::PushSymbol(const int symbolID, const bool isDeferred)
         PARSE_ASSERT_FMT(!GetHasSymbol(name), "Unexpected redefinition of symbol '{}'", name);
 
         scopeSymbolMaps[topScope].emplace(name, symbolID);
-        scopeSymbolLists[topScope].emplace_back(symbolID);
+        scopeSymbolLists[topScope].EmplaceBack(symbolID);
     }
 
     if (symbol.GetHasFlags(SymbolTypes::Scope))

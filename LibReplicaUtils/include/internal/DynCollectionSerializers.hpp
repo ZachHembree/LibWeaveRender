@@ -54,7 +54,7 @@ namespace Replica
 		// Write array size tag
 		ar(cereal::make_size_tag( static_cast<cereal::size_type>(src.GetLength()) ));
 		// Output data
-		ar(cereal::binary_data(src.GetPtr(), GetArrSize(src)));
+		ar(cereal::binary_data(src.GetData(), GetArrSize(src)));
 	}
 
 	// Non-boolean, non-binary write
@@ -94,7 +94,7 @@ namespace Replica
 		// Allocate destination
 		dst = ArrT(length); 
 		// Write deserialized data
-		ar(cereal::binary_data( dst.GetPtr(), static_cast<cereal::size_type>(length) * sizeof(T) ));
+		ar(cereal::binary_data( dst.GetData(), static_cast<cereal::size_type>(length) * sizeof(T) ));
 	}
 
 	// Non-boolean, non-binary read
@@ -146,11 +146,11 @@ namespace Replica
 
 		// Allocate destination
 		dst = ArrT();
-		dst.reserve(length);
+		dst.Reserve(length);
 
 		// Write deserialized data
 		for (size_t i = 0; i < length; i++)
-			ar(dst.emplace_back());
+			ar(dst.EmplaceBack());
 	}
 
 	// Interface templates used by Cereal

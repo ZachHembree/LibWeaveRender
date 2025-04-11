@@ -29,9 +29,9 @@ void ShaderGenerator::GetShaderSource(const SymbolTable& table, const IDynamicAr
 
 void ShaderGenerator::Clear()
 {
-	globalVarBuf.clear();
+	globalVarBuf.Clear();
 	globalVarDefBuf.clear();
-	sourceMasks.clear();
+	sourceMasks.Clear();
 }
 
 static void GetCorrectedMask(SourceMask& a, SourceMask& b)
@@ -106,7 +106,7 @@ void ShaderGenerator::GetMaskedSource(const IDynamicArray<LexBlock>& srcBlocks, 
 
 void ShaderGenerator::GetGlobalVariables(const SymbolTable& table, const int main)
 {
-	globalVarBuf.clear();
+	globalVarBuf.Clear();
 	optional<ScopeHandle> scope = table.GetSymbol(main).GetScope()->GetParentScope();
 
 	do
@@ -124,7 +124,7 @@ void ShaderGenerator::GetGlobalVariables(const SymbolTable& table, const int mai
 				var.GetType(type, modifiers);
 
 				if (!type.GetHasFlags(ShaderTypes::Resource) && (int)(modifiers & TokenTypes::TypeModifier) == 0)
-					globalVarBuf.emplace_back(child.GetID());
+					globalVarBuf.EmplaceBack(child.GetID());
 			}
 		}
 
@@ -138,7 +138,7 @@ void ShaderGenerator::GetGlobalVariables(const SymbolTable& table, const int mai
 void ShaderGenerator::GetSourceMask(const SymbolTable& table, const IDynamicArray<LexBlock>& srcBlocks,
 	const ShaderEntrypoint& main, const IDynamicArray<ShaderEntrypoint>& shaders)
 {
-	sourceMasks.clear();
+	sourceMasks.Clear();
 
 	// Mask replica tokens
 	for (int i = 0; i < table.GetTokenCount(); i++)
@@ -146,7 +146,7 @@ void ShaderGenerator::GetSourceMask(const SymbolTable& table, const IDynamicArra
 		TokenNodeHandle token = table.GetToken(i);
 
 		if (token.GetHasFlags(TokenTypes::AttribShaderDecl))
-			sourceMasks.emplace_back("", token.GetBlockStart(), token.GetBlockCount());
+			sourceMasks.EmplaceBack("", token.GetBlockStart(), token.GetBlockCount());
 	}
 
 	// Mask other shaders, but retain contents of main shader block if one exists
@@ -201,15 +201,15 @@ void ShaderGenerator::GenerateGlobalCBuffer(const SymbolTable& table, const IDyn
 			// Containers' contents are included in child blocks, only their bounding 
 			// characters are needed
 			if (srcBlocks[blockID].GetHasFlags(LexBlockTypes::StartContainer))
-				globalVarDefBuf.push_back(*srcBlocks[blockID].src.GetFirst());
+				globalVarDefBuf.push_back(srcBlocks[blockID].src.GetFront());
 			else if (srcBlocks[blockID].GetHasFlags(LexBlockTypes::EndContainer))
-				globalVarDefBuf.push_back(*srcBlocks[blockID].src.GetLast());
+				globalVarDefBuf.push_back(srcBlocks[blockID].src.GetBack());
 			else
 				globalVarDefBuf.append(srcBlocks[blockID].src);
 		}
 
 		globalVarDefBuf.append("\n");
-		sourceMasks.emplace_back("", firstBlock, lastBlock - firstBlock + 1);
+		sourceMasks.EmplaceBack("", firstBlock, lastBlock - firstBlock + 1);
 	}
 
 	globalVarDefBuf.append("}");
@@ -224,11 +224,11 @@ void ShaderGenerator::AddScopeMask(SymbolHandle symbol, bool isContentMasked)
 		lastBlock = scope.GetBlockStart() + scope.GetBlockCount() - 1;
 
 	if (isContentMasked)
-		sourceMasks.emplace_back("", firstBlock, lastBlock - firstBlock + 1);
+		sourceMasks.EmplaceBack("", firstBlock, lastBlock - firstBlock + 1);
 	else
 	{
-		sourceMasks.emplace_back("", firstBlock, scope.GetBlockStart() - firstBlock + 1);
-		sourceMasks.emplace_back("", lastBlock, 1);
+		sourceMasks.EmplaceBack("", firstBlock, scope.GetBlockStart() - firstBlock + 1);
+		sourceMasks.EmplaceBack("", lastBlock, 1);
 	}
 }
 
@@ -253,9 +253,9 @@ void ShaderGenerator::AddBlockRange(const IDynamicArray<LexBlock>& srcBlocks, in
 		}
 
 		if (block.GetHasFlags(LexBlockTypes::StartContainer))
-			srcOut.push_back(*block.src.GetFirst());
+			srcOut.push_back(block.src.GetFront());
 		else if (block.GetHasFlags(LexBlockTypes::EndContainer))
-				srcOut.push_back(*block.src.GetLast());
+				srcOut.push_back(block.src.GetBack());
 		else
 		{
 			srcOut.append(block.src);

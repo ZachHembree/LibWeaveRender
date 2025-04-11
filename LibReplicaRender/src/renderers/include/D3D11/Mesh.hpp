@@ -38,7 +38,7 @@ namespace Replica::D3D11
 			Device& device,
 			const MeshDef<Vert_T>& def
 		) :
-			Mesh(device, def.indices, def.vertices.GetPtr(), def.vertices.GetLength(), sizeof(Vert_T))
+			Mesh(device, def.indices, def.vertices.GetData(), def.vertices.GetLength(), sizeof(Vert_T))
 		{ }
 
 		template <typename Vert_T>
@@ -47,7 +47,7 @@ namespace Replica::D3D11
 			const IDynamicArray<Vert_T>& vertices,
 			const IDynamicArray<USHORT>& indices
 		) : 
-			Mesh(device, indices, vertices.GetPtr(), vertices.GetLength(), sizeof(Vert_T))
+			Mesh(device, indices, vertices.GetData(), vertices.GetLength(), sizeof(Vert_T))
 		{ }
 
 		Mesh(

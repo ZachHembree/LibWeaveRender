@@ -253,7 +253,7 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 		{
 			D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
 			WIN_THROW_HR(pReflect->GetInputParameterDesc(i, &paramDesc));
-			idBuf.emplace_back(GetIOElementDef(paramDesc, builder));
+			idBuf.EmplaceBack(GetIOElementDef(paramDesc, builder));
 		}
 
 		def.inLayoutID = builder.GetOrAddIOLayout(idBuf);
@@ -271,7 +271,7 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 		{
 			D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
 			WIN_THROW_HR(pReflect->GetOutputParameterDesc(i, &paramDesc));
-			idBuf.emplace_back(GetIOElementDef(paramDesc, builder));
+			idBuf.EmplaceBack(GetIOElementDef(paramDesc, builder));
 		}
 
 		def.outLayoutID = builder.GetOrAddIOLayout(idBuf);
@@ -314,11 +314,11 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 				varDef.offset = varDesc.StartOffset;
 				varDef.size = varDesc.Size;
 
-				constIDbuf.emplace_back(builder.GetOrAddConstant(varDef));
+				constIDbuf.EmplaceBack(builder.GetOrAddConstant(varDef));
 			}
 
 			constants.layoutID = builder.GetOrAddConstantLayout(constIDbuf);
-			groupIDbuf.emplace_back(builder.GetOrAddConstantBuffer(constants));
+			groupIDbuf.EmplaceBack(builder.GetOrAddConstantBuffer(constants));
 			builder.ReturnTmpIDBuffer(std::move(constIDbuf));
 		}
 
@@ -355,7 +355,7 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 				res.type = GetResourceType(resDesc);
 				res.slot = resDesc.BindPoint;
 
-				idBuf.emplace_back(builder.GetOrAddResource(res));
+				idBuf.EmplaceBack(builder.GetOrAddResource(res));
 				resIndex++;
 			}
 		}
@@ -377,7 +377,7 @@ static void GetReflectedMetadata(ShaderDef& def, ShaderRegistryBuilder& builder)
 
 	ComPtr<ID3D11ShaderReflection> pReflect;
 	WIN_THROW_HR(D3DReflect(
-		binSrc.GetPtr(), GetArrSize(binSrc),
+		binSrc.GetData(), GetArrSize(binSrc),
 		__uuidof(ID3D11ShaderReflection),
 		&pReflect
 	));

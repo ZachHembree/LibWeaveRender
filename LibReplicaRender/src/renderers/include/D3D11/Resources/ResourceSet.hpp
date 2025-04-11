@@ -49,7 +49,7 @@ namespace Replica::D3D11
 				else
 				{
 					stringViewMap.emplace(stringID, (uint)data.GetLength());
-					data.emplace_back(stringID, pValue);
+					data.EmplaceBack(stringID, pValue);
 				}
 			}
 
@@ -58,7 +58,7 @@ namespace Replica::D3D11
 			/// </summary>
 			void Clear()
 			{
-				data.clear();
+				data.Clear();
 				stringViewMap.clear();
 			}
 		};

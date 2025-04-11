@@ -28,7 +28,7 @@ namespace Replica::D3D11
 			uint mipLevels = 1u,
 			bool isReadonly = true
 		)
-			: Texture2D(dev, dim, data.GetPtr(), sizeof(T), format, isReadonly, mipLevels)
+			: Texture2D(dev, dim, data.GetData(), sizeof(T), format, isReadonly, mipLevels)
 		{ }
 
 		/// <summary>
@@ -89,7 +89,7 @@ namespace Replica::D3D11
 		template<typename T>
 		void SetTextureData(Context& ctx, IDynamicArray<T>& data, ivec2 dim)
 		{
-			SetTextureData(ctx, data.GetPtr(), sizeof(T), dim);
+			SetTextureData(ctx, data.GetData(), sizeof(T), dim);
 		}
 
 		/// <summary>

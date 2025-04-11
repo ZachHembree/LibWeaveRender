@@ -38,7 +38,7 @@ namespace Replica::D3D11
 			ResourceAccessFlags cpuAccess,
 			Device& device,
 			const IDynamicArray<T>& data) :
-			BufferBase(type, usage, cpuAccess, device, data.GetPtr(), (UINT)GetArrSize(data))
+			BufferBase(type, usage, cpuAccess, device, data.GetData(), (UINT)GetArrSize(data))
 		{ }
 
 		BufferBase();

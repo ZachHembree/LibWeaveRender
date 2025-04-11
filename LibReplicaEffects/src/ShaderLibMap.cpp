@@ -299,14 +299,14 @@ void ShaderLibMap::GetDefines(uint vID, Vector<uint>& defines) const
 	uint flagID = GetFlags(repoIndex, configIndex);
 
 	if (modeID != 0)
-		defines.emplace_back(modeIDs[modeID]);
+		defines.EmplaceBack(modeIDs[modeID]);
 
 	uint flagIndex = 0u;
 
 	while (flagID > 0u)
 	{
 		if ((flagID & 1u) == 1u)
-			defines.emplace_back(flagIDs[flagIndex]);
+			defines.EmplaceBack(flagIDs[flagIndex]);
 
 		flagIndex++;
 		flagID >>= 1u;
@@ -324,14 +324,14 @@ void ShaderLibMap::GetDefines(uint vID, Vector<string_view>& defines) const
 	uint flagID = GetFlags(repoIndex, configIndex);
 
 	if (modeID != 0)
-		defines.emplace_back(GetStringMap().GetString(modeIDs[modeID]));
+		defines.EmplaceBack(GetStringMap().GetString(modeIDs[modeID]));
 
 	uint flagIndex = 0u;
 
 	while (flagID > 0u)
 	{
 		if ((flagID & 1u) == 1u)
-			defines.emplace_back(GetStringMap().GetString(flagIDs[flagIndex]));
+			defines.EmplaceBack(GetStringMap().GetString(flagIDs[flagIndex]));
 
 		flagIndex++;
 		flagID >>= 1u;

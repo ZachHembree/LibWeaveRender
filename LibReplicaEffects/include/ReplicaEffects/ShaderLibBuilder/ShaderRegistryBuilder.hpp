@@ -275,7 +275,7 @@ namespace Replica::Effects
 			const uint newID = SetResourceType(index, type);
 
 			// Temporarily store new value in vector to ensure valid handle
-			values.emplace_back(newValue);
+			values.EmplaceBack(newValue);
 			// Create handle and search set
 			HashHandle handle(newID, values.GetHashFunc(), values.GetEqFunc());
 			const auto& it = resourceSet.find(handle);
@@ -285,7 +285,7 @@ namespace Replica::Effects
 			if (it != resourceSet.end())
 			{
 				// Value already existed, remove from vector and return existing ID
-				values.pop_back();
+				values.RemoveBack();
 				return it->GetID();
 			}
 			else
@@ -305,7 +305,7 @@ namespace Replica::Effects
 
 			// Temporarily store new value in vector to ensure valid handle
 			buffer.AddRange(ids);
-			const RegSpan<T>& layout = values.emplace_back(buffer, spanStart, ids.GetLength());
+			const DynSpan<T>& layout = values.EmplaceBack(buffer, spanStart, ids.GetLength());
 	
 			// Create handle and search set
 			HashHandle handle(newID, values.GetHashFunc(), values.GetEqFunc());
@@ -317,7 +317,7 @@ namespace Replica::Effects
 			{
 				// Value already existed, remove from vector and return existing ID
 				buffer.RemoveRange(spanStart, layout.GetLength());
-				values.pop_back();
+				values.RemoveBack();
 				return it->GetID();
 			}
 			else
