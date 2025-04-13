@@ -146,7 +146,7 @@ void ResizeableTexture2D::SetTextureData(Context& ctx, void* data, size_t stride
 
 	if (dim.x <= currentSize.x && dim.y <= currentSize.y)
 	{
-		GFX_ASSERT(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
+		D3D_CHECK_MSG(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
 
 		if (GetUsage() == ResourceUsages::Dynamic)
 			UpdateMapUnmap(ctx, data, stride, dim);
@@ -178,7 +178,7 @@ void ResizeableTexture2D::UpdateMapUnmap(Context& ctx, void* data, size_t stride
 	const size_t lnOffset = offset.x * offset.y;
 
 	D3D11_MAPPED_SUBRESOURCE msr;
-	GFX_THROW_FAILED(ctx->Map(
+	D3D_CHECK_HR_MSG(ctx->Map(
 		pRes.Get(),
 		0u,
 		D3D11_MAP_WRITE_DISCARD,

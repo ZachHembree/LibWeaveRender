@@ -144,19 +144,19 @@ void ShaderLibMap::InitMaps()
 
 ShaderDefHandle ShaderLibMap::GetShader(uint shaderID) const
 {
-	REP_ASSERT_MSG(shaderID != -1, "Shader ID invalid");
+	FX_CHECK_MSG(shaderID != -1, "Shader ID invalid");
 	return ShaderDefHandle(*pRegMap, shaderID);
 }
 
 EffectDefHandle ShaderLibMap::GetEffect(uint effectID) const
 {
-	REP_ASSERT_MSG(effectID != -1, "Effect ID invalid");
+	FX_CHECK_MSG(effectID != -1, "Effect ID invalid");
 	return EffectDefHandle(*pRegMap, effectID);
 }
 
 uint ShaderLibMap::TryGetDefaultShaderVariant(uint nameID) const
 {
-	REP_ASSERT_MSG(nameID != -1, "Name ID invalid");
+	FX_CHECK_MSG(nameID != -1, "Name ID invalid");
 	const auto& it = sharedVariantMap.shaders.find(nameID);
 
 	if (it != sharedVariantMap.shaders.end())
@@ -167,7 +167,7 @@ uint ShaderLibMap::TryGetDefaultShaderVariant(uint nameID) const
 
 uint ShaderLibMap::TryGetDefaultEffectVariant(uint nameID) const
 {
-	REP_ASSERT_MSG(nameID != -1, "Name ID invalid");
+	FX_CHECK_MSG(nameID != -1, "Name ID invalid");
 	const auto& it = sharedVariantMap.effects.find(nameID);
 
 	if (it != sharedVariantMap.effects.end())
@@ -178,10 +178,10 @@ uint ShaderLibMap::TryGetDefaultEffectVariant(uint nameID) const
 
 uint ShaderLibMap::TryGetShaderID(uint nameID, uint vID) const 
 {
-	REP_ASSERT_MSG(vID != -1 && nameID != -1, "Specified shader invalid");
+	FX_CHECK_MSG(vID != -1 && nameID != -1, "Specified shader invalid");
 	const uint repoIndex = GetRepoIndex(vID);
 	const uint cfgIndex = GetConfigIndex(vID);
-	REP_ASSERT_MSG(repoIndex >= 0 && cfgIndex >= 0
+	FX_CHECK_MSG(repoIndex >= 0 && cfgIndex >= 0
 		&& repoIndex < variantShaderMaps.GetLength() 
 		&& cfgIndex < variantShaderMaps[repoIndex].GetLength(),
 	"Shader variant ID invalid");
@@ -197,10 +197,10 @@ uint ShaderLibMap::TryGetShaderID(uint nameID, uint vID) const
 
 uint ShaderLibMap::TryGetEffectID(uint nameID, uint vID) const 
 {
-	REP_ASSERT_MSG(vID != -1 && nameID != -1, "Specified effect invalid");
+	FX_CHECK_MSG(vID != -1 && nameID != -1, "Specified effect invalid");
 	const uint repoIndex = GetRepoIndex(vID);
 	const uint cfgIndex = GetConfigIndex(vID);
-	REP_ASSERT_MSG(repoIndex >= 0 && cfgIndex >= 0
+	FX_CHECK_MSG(repoIndex >= 0 && cfgIndex >= 0
 		&& repoIndex < variantShaderMaps.GetLength()
 		&& cfgIndex < variantShaderMaps[repoIndex].GetLength(),
 		"Effect variant ID invalid");
@@ -216,9 +216,9 @@ uint ShaderLibMap::TryGetEffectID(uint nameID, uint vID) const
 
 uint ShaderLibMap::TryGetModeID(uint nameID, uint vID) const 
 {
-	REP_ASSERT_MSG(vID != -1 && nameID != -1, "Specified mode invalid");
+	FX_CHECK_MSG(vID != -1 && nameID != -1, "Specified mode invalid");
 	const uint repoIndex = GetRepoIndex(vID);
-	REP_ASSERT_MSG(repoIndex >= 0 && repoIndex < variantShaderMaps.GetLength(), "Mode variant ID invalid");
+	FX_CHECK_MSG(repoIndex >= 0 && repoIndex < variantShaderMaps.GetLength(), "Mode variant ID invalid");
 
 	const NameIndexMap& modeMap = variantModeMaps[repoIndex];
 	const auto& it = modeMap.find(nameID);
@@ -239,9 +239,9 @@ uint ShaderLibMap::TryGetFlags(const IDynamicArray<uint>& defines, uint vID) con
 
 uint ShaderLibMap::TryGetFlag(uint nameID, uint vID) const
 {
-	REP_ASSERT_MSG(vID != -1 && nameID != -1, "Specified flag invalid");
+	FX_CHECK_MSG(vID != -1 && nameID != -1, "Specified flag invalid");
 	const uint repoIndex = GetRepoIndex(vID);
-	REP_ASSERT_MSG(repoIndex >= 0 && repoIndex < variantShaderMaps.GetLength(), "Flag variant ID invalid");
+	FX_CHECK_MSG(repoIndex >= 0 && repoIndex < variantShaderMaps.GetLength(), "Flag variant ID invalid");
 
 	const NameIndexMap& flagMap = variantFlagMaps[repoIndex];
 	const auto& it = flagMap.find(nameID);
@@ -254,8 +254,8 @@ uint ShaderLibMap::TryGetFlag(uint nameID, uint vID) const
 
 bool ShaderLibMap::GetIsDefined(uint nameID, uint vID) const 
 {
-	REP_ASSERT_MSG(nameID != -1, "Name ID invalid");
-	REP_ASSERT_MSG(vID != -1, "Variant ID invalid");
+	FX_CHECK_MSG(nameID != -1, "Name ID invalid");
+	FX_CHECK_MSG(vID != -1, "Variant ID invalid");
 	const uint repoIndex = GetRepoIndex(vID);
 	const uint cfgIndex = GetConfigIndex(vID);
 	const auto& flagIt = variantFlagMaps[repoIndex].find(nameID);
@@ -290,7 +290,7 @@ bool ShaderLibMap::GetIsDefined(string_view name, uint vID) const
 
 void ShaderLibMap::GetDefines(uint vID, Vector<uint>& defines) const
 {
-	REP_ASSERT_MSG(vID != -1, "Variant ID invalid");
+	FX_CHECK_MSG(vID != -1, "Variant ID invalid");
 	const uint repoIndex = GetRepoIndex(vID);
 	const uint configIndex = GetConfigIndex(vID);
 	const uint modeID = GetModeIndex(repoIndex, configIndex);
@@ -315,7 +315,7 @@ void ShaderLibMap::GetDefines(uint vID, Vector<uint>& defines) const
 
 void ShaderLibMap::GetDefines(uint vID, Vector<string_view>& defines) const
 {
-	REP_ASSERT_MSG(vID != -1, "Variant ID invalid");
+	FX_CHECK_MSG(vID != -1, "Variant ID invalid");
 	const uint repoIndex = GetRepoIndex(vID);
 	const uint configIndex = GetConfigIndex(vID);
 	const uint modeID = GetModeIndex(repoIndex, configIndex);
@@ -340,7 +340,7 @@ void ShaderLibMap::GetDefines(uint vID, Vector<string_view>& defines) const
 
 uint ShaderLibMap::SetFlags(uint flags, bool value, uint vID) const 
 {
-	REP_ASSERT_MSG(vID != -1, "Variant ID invalid");
+	FX_CHECK_MSG(vID != -1, "Variant ID invalid");
 	const uint repoIndex = GetRepoIndex(vID);
 	const uint configIndex = GetConfigIndex(vID);
 	const uint fvCount = GetFlagVariantCount(repoIndex);

@@ -1,5 +1,6 @@
 #pragma once
 #include "ReplicaUtils/RepWinException.hpp"
+#include "ReplicaUtils/GlobalUtils.hpp"
 
 namespace Replica
 {

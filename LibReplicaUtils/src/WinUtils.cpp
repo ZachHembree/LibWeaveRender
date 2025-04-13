@@ -13,7 +13,7 @@ namespace Replica
 			NULL, NULL // Default/fallback chars, invalid for UTF8
 		);
 
-		WIN_ASSERT_NZ_LAST(size);
+		WIN_CHECK_NZ_LAST(size);
 		return (size_t)size;
 	}
 
@@ -26,7 +26,7 @@ namespace Replica
 			nullptr, 0 // Wide dst
 		);
 
-		WIN_ASSERT_NZ_LAST(size);
+		WIN_CHECK_NZ_LAST(size);
 		return (size_t)size;
 	}
 
@@ -35,7 +35,7 @@ namespace Replica
 		size_t dstSize = GetMultiByteSize_UTF16LE_TO_UTF8(src);
 		string dst(dstSize + 1, '\0');
 
-		WIN_ASSERT_NZ_LAST(WideCharToMultiByte(
+		WIN_CHECK_NZ_LAST(WideCharToMultiByte(
 			CP_UTF8,  // Code page
 			0, // No additional flags
 			&src[0], (int)src.size(), // Wide src
@@ -51,7 +51,7 @@ namespace Replica
 		size_t dstSize = GetWideSize_UTF8_TO_UTF16LE(src);
 		wstring dst(dstSize + 1, '\0');
 
-		WIN_ASSERT_NZ_LAST(MultiByteToWideChar(
+		WIN_CHECK_NZ_LAST(MultiByteToWideChar(
 			CP_UTF8, // Code page
 			0, // No additional flags
 			&src[0], (int)src.size(), // Narrow src	

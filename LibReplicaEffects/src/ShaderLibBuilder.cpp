@@ -177,7 +177,7 @@ void ShaderLibBuilder::GetEntryPoints()
 		ShaderEntrypoint& ep = entrypoints[i];
 		ScopeHandle global = pTable->GetScope(0);
 		const IDList* pFuncs = global.TryGetFuncOverloads(ep.name);
-
+		
 		if (pFuncs != nullptr && !pFuncs->empty())
 		{
 			const uint nameID = pShaderRegistry->GetOrAddStringID(ep.name);
@@ -189,7 +189,8 @@ void ShaderLibBuilder::GetEntryPoints()
 			}
 		}
 		else
-			PARSE_ERR("Shader declared in pragma but not defined")
+			FXBLOCK_THROW(*pAnalyzer, global.GetBlockStart(), 
+				"Shader '{}' declared in pragma but not defined", ep.name);
 	}
 	
 	// Shader blocks
@@ -217,7 +218,8 @@ void ShaderLibBuilder::GetEntryPoints()
 				}
 			}
 			else
-				PARSE_ERR("Shader block declared without an entrypoint definition")
+				FXBLOCK_THROW(*pAnalyzer, scope.GetBlockStart(), 
+					"Shader '{}' block declared without an entrypoint definition", name);
 		}
 	}
 }
@@ -247,9 +249,9 @@ void ShaderLibBuilder::GetEffects()
 
 				if (effectChild.GetHasFlags(SymbolTypes::TechniquePassDecl))
 				{
-					PARSE_ASSERT_MSG(!isPassDefaulted, 
-						"Defaulted passes and explicit passes cannot be used in the same effect.")
-
+					FXBLOCK_CHECK_MSG(!isPassDefaulted, *pAnalyzer, effectScope.GetBlockStart(),
+						"Defaulted passes and explicit passes cannot be used in the same effect");
+						
 					effect.passCount++;
 				}
 			}
@@ -290,7 +292,12 @@ void ShaderLibBuilder::AddPass(const ScopeHandle& passScope, string_view name)
 		{
 			string_view shaderName = effectChild.GetName();
 			const uint stringID = pShaderRegistry->GetOrAddStringID(shaderName);
-			const uint shaderID = epNameShaderIDMap[stringID];
+			const auto& it = epNameShaderIDMap.find(stringID);
+
+			FXBLOCK_CHECK_MSG(it != epNameShaderIDMap.end(), *pAnalyzer, effectChild.GetIdent().GetBlockStart(),
+				"Unrecognised shader name '{}' declared in effect", shaderName);
+
+			const uint shaderID = it->second;
 			effectShaders.EmplaceBack(shaderID);
 		}
 	}

@@ -62,7 +62,7 @@ namespace Replica::Effects
 
 	void VariantPreprocessor::GetVariant(const uint configID, string& dst, Vector<ShaderEntrypoint>& entrypoints)
 	{
-		PARSE_ASSERT_MSG(configID != -1 && configID < std::max<uint>(1u, GetVariantCount()), "Invalid variant ID");
+		FX_ASSERT_MSG(configID != -1 && configID < std::max<uint>(1u, GetVariantCount()), "Invalid variant ID");
 		pEntrypoints = &entrypoints;
 
 		// Initialize context to source
@@ -123,11 +123,11 @@ namespace Replica::Effects
 
 			if (!variantDefineSet.contains(span))
 			{ 
-				PARSE_ASSERT_MSG(variantFlags.GetLength() < g_VariantFlagLimit, "Flag pragma limit exceeded")
+				FXSYNTAX_CHECK_MSG(variantFlags.GetLength() < g_VariantFlagLimit, "Flag pragma limit exceeded");
 				variantDefineSet.emplace(span);
 			}
 			else
-				PARSE_ERR("Attempted to redefine pragma flag or mode")
+				FXSYNTAX_THROW("Attempted to redefine pragma flag or mode");
 		}
 	}
 
@@ -139,11 +139,11 @@ namespace Replica::Effects
 
 			if (!variantDefineSet.contains(span))
 			{ 
-				PARSE_ASSERT_MSG(variantModes.GetLength() < g_VariantModeLimit, "Mode pragma limit exceeded")		
+				FXSYNTAX_CHECK_MSG(variantModes.GetLength() < g_VariantModeLimit, "Mode pragma limit exceeded");
 				variantDefineSet.emplace(span);
 			}
 			else
-				PARSE_ERR("Attempted to redefine pragma flag or mode")
+				FXSYNTAX_THROW("Attempted to redefine pragma flag or mode");
 		}
 	}
 

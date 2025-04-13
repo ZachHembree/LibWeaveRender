@@ -331,8 +331,8 @@ void Context::SetViewport(int index, const Viewport& vp)
 /// </summary>
 void Context::SetViewports(const IDynamicArray<Viewport>& viewports, int offset)
 {
-	GFX_ASSERT((offset + viewports.GetLength()) <= D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
-		"Number of viewports supplied exceeds limit.")
+	D3D_ASSERT_MSG((offset + viewports.GetLength()) <= D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
+		"Number of viewports supplied exceeds limit.");
 
 	memcpy(currentVPs.GetData() + glm::max(offset, 0), viewports.GetData(), GetArrSize(viewports));
 
@@ -413,8 +413,8 @@ void Context::SetRenderTarget(IRenderTarget& rtv, IDepthStencil* depthStencil)
 /// </summary>
 void Context::SetRenderTargets(IDynamicArray<IRenderTarget>& rtvs, IDepthStencil* depthStencil)
 {
-	GFX_ASSERT(rtvs.GetLength() <= D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
-		"Number of render targets supplied exceeds limit.")
+	D3D_ASSERT_MSG(rtvs.GetLength() <= D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+		"Number of render targets supplied exceeds limit.");
 
 	if (depthStencil != nullptr)
 	{
@@ -511,10 +511,10 @@ static void ValidateResourceBounds(
 			srcMax = glm::min(src.GetSize(), srcOffset + srcSize) - srcSize,
 			dstMax = glm::min(dst.GetSize(), dstOffset + dstSize) - dstSize;
 
-		GFX_ASSERT(srcMax == srcOffset,
+		 D3D_CHECK_MSG(srcMax == srcOffset,
 			"[Blit] Source subregion exceeds the bounds of the source buffer.");
 
-		GFX_ASSERT(dstMax == dstOffset,
+		 D3D_CHECK_MSG(dstMax == dstOffset,
 			"[Blit] Destination subregion exceeds the bounds of the destination buffer.");
 
 		if (!canRescale)
@@ -522,7 +522,7 @@ static void ValidateResourceBounds(
 			srcMax = srcOffset + srcSize;
 			dstMax = dstOffset + dstSize;
 
-			GFX_ASSERT(srcMax.x <= dstMax.x && srcMax.y <= dstMax.y,
+			D3D_CHECK_MSG(srcMax.x <= dstMax.x && srcMax.y <= dstMax.y,
 				"[Blit] Source subregion exceeds the bounds of the destination buffer.");
 		}
 	}
@@ -677,15 +677,9 @@ void Context::Blit(IResizeableTexture2D& src, IResizeableTexture2D& dst)
 /// </summary>
 void Context::Blit(ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox, ivec4 dstBox)
 {
-	if (CanDirectCopy(src, dst, srcBox, dstBox))
-	{
-		ValidateResourceBounds(src, dst, srcBox, dstBox);
-		CopySubresource(*this, src, dst, srcBox, dstBox);
-	}
-	else
-	{
-		GFX_THROW("Failed to copy texture. Destination incompatible with source.");
-	}
+	D3D_CHECK_MSG(CanDirectCopy(src, dst, srcBox, dstBox), "Failed to copy texture. Destination incompatible with source.");
+	ValidateResourceBounds(src, dst, srcBox, dstBox);
+	CopySubresource(*this, src, dst, srcBox, dstBox);
 }
 
 /// <summary>

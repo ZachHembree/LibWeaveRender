@@ -16,7 +16,7 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	backBufRt(dev, this, &pBackBuf)
 {
 	ComPtr<IDXGIFactory2> dxgiFactory;
-	GFX_THROW_FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory2), &dxgiFactory));
+	D3D_CHECK_HR(CreateDXGIFactory1(__uuidof(IDXGIFactory2), &dxgiFactory));
 
 	DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsDesc = {};
 	fsDesc.RefreshRate.Denominator = 0; // Use current refresh rate
@@ -39,7 +39,7 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 	desc.Flags = 0;
 
-	GFX_THROW_FAILED(dxgiFactory->CreateSwapChainForHwnd(
+	D3D_CHECK_HR(dxgiFactory->CreateSwapChainForHwnd(
 		&dev.Get(),
 		wnd.GetWndHandle(),
 		&desc,
@@ -112,12 +112,12 @@ void SwapChain::ResizeBuffers(ivec2 dim, uint count, Formats format, uint flags)
 /// </summary>
 void SwapChain::Present(UINT syncInterval, UINT flags)
 {
-	GFX_THROW_FAILED(pSwap->Present(syncInterval, flags));
+	D3D_ASSERT_HR(pSwap->Present(syncInterval, flags));
 }
 
 void SwapChain::GetBuffers()
 {
 	ComPtr<ID3D11Resource> pRes;
-	GFX_THROW_FAILED(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&pRes));
-	GFX_THROW_FAILED(GetDevice()->CreateRenderTargetView(pRes.Get(), nullptr, &pBackBuf));
+	D3D_ASSERT_HR(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&pRes));
+	D3D_ASSERT_HR(GetDevice()->CreateRenderTargetView(pRes.Get(), nullptr, &pBackBuf));
 }

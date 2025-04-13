@@ -51,7 +51,7 @@ namespace Replica::D3D11
 			if (TryGetShader(shaderID, pShader))
 				return *pShader;
 			else
-				GFX_THROW("Invalid shader specified");
+				D3D_THROW("Invalid shader specified");
 		}
 
 		/// <summary>

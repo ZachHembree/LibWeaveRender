@@ -47,11 +47,11 @@ Texture2DBase::Texture2DBase(
 		D3D11_SUBRESOURCE_DATA initData = {};
 		initData.pSysMem = data;
 		initData.SysMemPitch = dim.x * stride;
-		GFX_THROW_FAILED(GetDevice()->CreateTexture2D(&desc, &initData, &pRes));
+		D3D_CHECK_HR(GetDevice()->CreateTexture2D(&desc, &initData, &pRes));
 	}
 	else if (dim.x != 0 && dim.y != 0)
 	{
-		GFX_THROW_FAILED(GetDevice()->CreateTexture2D(&desc, nullptr, &pRes));
+		D3D_CHECK_HR(GetDevice()->CreateTexture2D(&desc, nullptr, &pRes));
 	}
 }
 
@@ -87,7 +87,7 @@ void Texture2DBase::UpdateMapUnmap(Context& ctx, void* data)
 {
 	const ivec2 size = GetSize();
 	D3D11_MAPPED_SUBRESOURCE msr;
-	GFX_THROW_FAILED(ctx->Map(
+	D3D_CHECK_HR(ctx->Map(
 		pRes.Get(),
 		0u,
 		D3D11_MAP_WRITE_DISCARD,
@@ -125,7 +125,7 @@ void Texture2DBase::UpdateSubresource(Context& ctx, void* data, size_t stride)
 
 void Texture2DBase::LoadImageWIC(wstring_view file, ScratchImage& buffer)
 {
-	GFX_THROW_FAILED(LoadFromWICFile(
+	D3D_CHECK_HR(LoadFromWICFile(
 		file.data(),
 		WIC_FLAGS::WIC_FLAGS_FORCE_RGB,
 		nullptr,

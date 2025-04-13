@@ -155,7 +155,7 @@ static void GetPrecompShaderD3D11(
 	ShaderRegistryBuilder& builder
 )
 {
-	REP_ASSERT_MSG((int)stage > 0 && (int)stage < CompilerState::GetTargetCount(), "Invalid stage specified")
+	FXSYNTAX_CHECK_MSG((int)stage > 0 && (int)stage < CompilerState::GetTargetCount(), "Invalid stage specified");
 
 	// Create temporary null-terminated string copies
 	static thread_local string tmpPath;
@@ -191,9 +191,9 @@ static void GetPrecompShaderD3D11(
 	if (FAILED(hr))
 	{
 		if (errors.Get() != nullptr)
-			PARSE_ERR_FMT("{}", (char*)errors->GetBufferPointer())
+			FX_THROW("{}", (char*)errors->GetBufferPointer());
 		else
-			PARSE_ERR("Unknown compiler error")
+			FX_THROW("Unknown compiler error");
 	}
 
 	def.fileStringID = builder.GetOrAddStringID(srcFile);
@@ -252,7 +252,7 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 		for (uint i = 0; i < shaderDesc.InputParameters; i++)
 		{
 			D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
-			WIN_THROW_HR(pReflect->GetInputParameterDesc(i, &paramDesc));
+			WIN_CHECK_HR(pReflect->GetInputParameterDesc(i, &paramDesc));
 			idBuf.EmplaceBack(GetIOElementDef(paramDesc, builder));
 		}
 
@@ -270,7 +270,7 @@ static void GetIOLayout(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DES
 		for (uint i = 0; i < shaderDesc.OutputParameters; i++)
 		{
 			D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
-			WIN_THROW_HR(pReflect->GetOutputParameterDesc(i, &paramDesc));
+			WIN_CHECK_HR(pReflect->GetOutputParameterDesc(i, &paramDesc));
 			idBuf.EmplaceBack(GetIOElementDef(paramDesc, builder));
 		}
 
@@ -296,7 +296,7 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 		{
 			ID3D11ShaderReflectionConstantBuffer& cbuf = *pReflect->GetConstantBufferByIndex(i);
 			D3D11_SHADER_BUFFER_DESC cbufDesc;
-			WIN_THROW_HR(cbuf.GetDesc(&cbufDesc));
+			WIN_CHECK_HR(cbuf.GetDesc(&cbufDesc));
 
 			Vector<uint> constIDbuf = builder.GetTmpIDBuffer();
 			ConstBufDef constants;
@@ -307,7 +307,7 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 			{
 				ID3D11ShaderReflectionVariable& var = *cbuf.GetVariableByIndex(j);
 				D3D11_SHADER_VARIABLE_DESC varDesc;
-				WIN_THROW_HR(var.GetDesc(&varDesc));
+				WIN_CHECK_HR(var.GetDesc(&varDesc));
 
 				ConstDef varDef;
 				varDef.stringID = builder.GetOrAddStringID(string_view(varDesc.Name));
@@ -346,7 +346,7 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 		for (uint i = 0; i < shaderDesc.BoundResources; i++)
 		{
 			D3D11_SHADER_INPUT_BIND_DESC resDesc;
-			WIN_THROW_HR(pReflect->GetResourceBindingDesc(i, &resDesc));
+			WIN_CHECK_HR(pReflect->GetResourceBindingDesc(i, &resDesc));
 
 			if (resDesc.Type != D3D_SIT_CBUFFER)
 			{
@@ -376,14 +376,14 @@ static void GetReflectedMetadata(ShaderDef& def, ShaderRegistryBuilder& builder)
 	const IDynamicArray<byte>& binSrc = builder.GetShaderBin(def.byteCodeID);
 
 	ComPtr<ID3D11ShaderReflection> pReflect;
-	WIN_THROW_HR(D3DReflect(
+	WIN_CHECK_HR(D3DReflect(
 		binSrc.GetData(), GetArrSize(binSrc),
 		__uuidof(ID3D11ShaderReflection),
 		&pReflect
 	));
 
 	D3D11_SHADER_DESC shaderDesc;
-	WIN_THROW_HR(pReflect->GetDesc(&shaderDesc));
+	WIN_CHECK_HR(pReflect->GetDesc(&shaderDesc));
 	
 	GetIOLayout(pReflect.Get(), shaderDesc, def, builder);
 	GetConstantBuffers(pReflect.Get(), shaderDesc, def, builder);

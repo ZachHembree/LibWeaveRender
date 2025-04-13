@@ -43,7 +43,7 @@ namespace Replica
 			objectPool.push(std::move(object));
 			objectsOutstanding--;
 
-			REP_ASSERT_MSG(objectsOutstanding >= 0, "More objects returned to the pool than issued.")
+			REP_ASSERT_MSG(objectsOutstanding >= 0, "More objects returned to the pool than issued.");
 		}
 
 		/// <summary>

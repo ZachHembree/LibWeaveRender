@@ -12,7 +12,7 @@ ShaderRegistryBuilder::ShaderRegistryBuilder() :
 
 void ShaderRegistryBuilder::Clear()
 {
-	PARSE_ASSERT_MSG((idBufPool.GetObjectsOutstanding() + byteCodePool.GetObjectsOutstanding()) == 0,
+	FX_ASSERT_MSG((idBufPool.GetObjectsOutstanding() + byteCodePool.GetObjectsOutstanding()) == 0,
 		"Temporary buffers must be returned before finalizing or exporting shader regsitry.");
 
 	stringIDs.Clear();
@@ -87,7 +87,7 @@ void ShaderRegistryBuilder::ReturnTmpIDBuffer(Vector<uint>&& buf) { buf.Clear();
 
 ShaderRegistryDef::Handle ShaderRegistryBuilder::GetDefinition() const
 {
-	PARSE_ASSERT_MSG((idBufPool.GetObjectsOutstanding() + byteCodePool.GetObjectsOutstanding()) == 0,
+	FX_ASSERT_MSG((idBufPool.GetObjectsOutstanding() + byteCodePool.GetObjectsOutstanding()) == 0,
 		"Temporary buffers must be returned before finalizing or exporting shader regsitry.");
 
 	return

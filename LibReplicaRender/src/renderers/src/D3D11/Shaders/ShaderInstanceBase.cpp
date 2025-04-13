@@ -44,16 +44,13 @@ void ShaderInstanceBase::SetRWTexture(string_view name, IUnorderedAccess& rwTex)
 uint ShaderInstanceBase::GetStringID(string_view str) const
 {
 	uint id = -1;
-
-	if (TryGetStringID(str, id))
-		return id;
-	else
-		GFX_THROW("Cannot retrieve ID for unregistered string")
+	D3D_CHECK_MSG(TryGetStringID(str, id), "Cannot retrieve ID for unregistered string");
+	return id;
 }
 
 bool ShaderInstanceBase::TryGetStringID(string_view str, uint& id) const
 {
-	GFX_ASSERT(pLib != nullptr, "Cannot retrieve stringID from invalid shader library")
+	D3D_ASSERT_MSG(pLib != nullptr, "Cannot retrieve stringID from invalid shader library");
 	return pLib->GetStringMap().TryGetStringID(str, id);
 }
 

@@ -48,7 +48,7 @@ RWTexture2D::RWTexture2D(
 		vDesc.Texture2D.MostDetailedMip = 0;
 		vDesc.Texture2D.MipLevels = desc.MipLevels;
 
-		GFX_THROW_FAILED(dev->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
+		D3D_CHECK_HR(dev->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
 
 		// UAV
 		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
@@ -56,10 +56,10 @@ RWTexture2D::RWTexture2D(
 		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
 		uavDesc.Texture2D.MipSlice = 0;
 
-		GFX_THROW_FAILED(dev->CreateUnorderedAccessView(pRes.Get(), &uavDesc, &pUAV));
+		D3D_CHECK_HR(dev->CreateUnorderedAccessView(pRes.Get(), &uavDesc, &pUAV));
 
 		// RTV
-		GFX_THROW_FAILED(dev->CreateRenderTargetView(pRes.Get(), nullptr, &pRTV));
+		D3D_CHECK_HR(dev->CreateRenderTargetView(pRes.Get(), nullptr, &pRTV));
 	}
 }
 
@@ -126,7 +126,7 @@ void RWTexture2D::SetTextureData(Context& ctx, void* data, size_t stride, ivec2 
 {
 	if (dim == GetSize())
 	{
-		GFX_ASSERT(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
+		D3D_CHECK_MSG(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
 
 		if (GetUsage() == ResourceUsages::Dynamic)
 			UpdateMapUnmap(ctx, data, stride, dim);

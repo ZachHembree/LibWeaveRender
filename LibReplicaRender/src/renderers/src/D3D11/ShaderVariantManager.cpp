@@ -94,7 +94,7 @@ bool ShaderVariantManager::TryGetShader(uint shaderID, const ComputeShaderVarian
 
 const EffectVariant& ShaderVariantManager::GetEffect(uint effectID)
 {
-	GFX_ASSERT(effectID != -1, "EffectID out of range");
+	D3D_ASSERT_MSG(effectID != -1, "EffectID undefined");
 	const auto& it = effects.find(effectID);
 
 	if (it != effects.end())

@@ -53,6 +53,7 @@
     <ClInclude Include="src\pch.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ParseExcept.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">Create</PrecompiledHeader>

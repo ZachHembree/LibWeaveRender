@@ -132,24 +132,20 @@ Material& Renderer::GetDefaultMaterial(string_view name) const
 	const StringIDMap& stringMap = pDefaultShaders->GetStringMap();
 	uint stringID;
 
-	if (stringMap.TryGetStringID(name, stringID))
-	{
-		const auto& it = defaultMaterials.find(stringID);
+	D3D_CHECK_MSG(stringMap.TryGetStringID(name, stringID), "Default material undefined");
+	const auto& it = defaultMaterials.find(stringID);
 
-		if (it != defaultMaterials.end())
-		{
-			Material& mat = it->second;
-			mat.ResetDefines();
-			return mat;
-		}
-		else
-		{
-			const auto& pair = defaultMaterials.emplace(stringID, pDefaultShaders->GetMaterial(stringID));
-			return pair.first->second;
-		}
+	if (it != defaultMaterials.end())
+	{
+		Material& mat = it->second;
+		mat.ResetDefines();
+		return mat;
 	}
 	else
-		GFX_THROW("Default material undefined")
+	{
+		const auto& pair = defaultMaterials.emplace(stringID, pDefaultShaders->GetMaterial(stringID));
+		return pair.first->second;
+	}
 }
 
 /// <summary>
@@ -159,21 +155,17 @@ ComputeInstance& Renderer::GetDefaultCompute(string_view name) const
 {
 	const StringIDMap& stringMap = pDefaultShaders->GetStringMap();
 	uint stringID;
+	D3D_CHECK_MSG(stringMap.TryGetStringID(name, stringID), "Default compute shader undefined");
 
-	if (stringMap.TryGetStringID(name, stringID))
-	{
-		const auto& it = defaultCompute.find(stringID);
+	const auto& it = defaultCompute.find(stringID);
 
-		if (it != defaultCompute.end())
-			return it->second;
-		else
-		{
-			const auto& pair = defaultCompute.emplace(stringID, pDefaultShaders->GetComputeInstance(stringID));
-			return pair.first->second;
-		}
-	}
+	if (it != defaultCompute.end())
+		return it->second;
 	else
-		GFX_THROW("Default compute shader undefined")
+	{
+		const auto& pair = defaultCompute.emplace(stringID, pDefaultShaders->GetComputeInstance(stringID));
+		return pair.first->second;
+	}
 }
 
 /// <summary>

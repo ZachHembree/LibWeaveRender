@@ -222,7 +222,7 @@ namespace Replica::Effects
 				if (GetResourceType(id) == typeEnum)
 					return this->at(GetIndex(id));
 				else
-					REP_THROW_MSG("Resource type ID mismatch");
+					FX_THROW("Resource type ID mismatch");
 			}
 
 		private:

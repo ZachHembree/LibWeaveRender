@@ -42,7 +42,7 @@ Texture2D::Texture2D(
 		vDesc.Texture2D.MostDetailedMip = 0;
 		vDesc.Texture2D.MipLevels = desc.MipLevels;
 
-		GFX_THROW_FAILED(dev->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
+		D3D_CHECK_HR(dev->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
 	}
 }
 
@@ -109,7 +109,7 @@ void Texture2D::SetTextureData(Context& ctx, void* data, size_t stride, ivec2 di
 {
 	if (dim == GetSize())
 	{
-		GFX_ASSERT(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
+		D3D_CHECK_MSG(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
 
 		if (GetUsage() == ResourceUsages::Dynamic)
 			UpdateMapUnmap(ctx, data);

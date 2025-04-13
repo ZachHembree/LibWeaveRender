@@ -20,7 +20,7 @@ BufferBase::BufferBase(
 	ResourceBase(dev),
 	desc({})
 {
-	GFX_ASSERT(byteSize > 0, "Buffer size cannot be 0.");
+	D3D_ASSERT_MSG(byteSize > 0, "Buffer size cannot be 0.");
 	D3D11_SUBRESOURCE_DATA resDesc = {};
 
 	desc.Usage = (D3D11_USAGE)usage;
@@ -66,7 +66,7 @@ void BufferBase::SetData(Context& ctx, const void* data)
 {
 	if (GetSize() > 0)
 	{
-		GFX_ASSERT(GetUsage() != ResourceUsages::Immutable, "Cannot update Buffers without write access.");
+		D3D_ASSERT_MSG(GetUsage() != ResourceUsages::Immutable, "Cannot update Buffers without write access.");
 
 		if (GetUsage() == ResourceUsages::Dynamic)
 		{
@@ -87,7 +87,7 @@ void BufferBase::UpdateSubresource(Context& ctx, const void* data)
 void BufferBase::UpdateMapUnmap(Context& ctx, const void* data)
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
-	GFX_THROW_FAILED(ctx->Map(
+	D3D_ASSERT_HR(ctx->Map(
 		Get(),
 		0u,
 		D3D11_MAP_WRITE_DISCARD,

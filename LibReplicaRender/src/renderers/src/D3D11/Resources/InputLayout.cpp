@@ -56,8 +56,8 @@ InputLayout::InputLayout(
 {
 	if (desc.has_value())
 	{
-		GFX_ASSERT(desc->GetLength() <= 15, "Vertex input layout size limit exceeded")
-			D3D11_INPUT_ELEMENT_DESC descBuf[15];
+		D3D_ASSERT_MSG(desc->GetLength() <= D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "Vertex input layout size limit exceeded");
+		D3D11_INPUT_ELEMENT_DESC descBuf[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
 
 		for (int i = 0; i < desc->GetLength(); i++)
 		{
@@ -71,7 +71,7 @@ InputLayout::InputLayout(
 			descBuf[i].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 		}
 
-		GFX_THROW_FAILED(dev->CreateInputLayout(
+		D3D_CHECK_HR_MSG(dev->CreateInputLayout(
 			reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(&descBuf),
 			(uint)desc->GetLength(),
 			pVS,

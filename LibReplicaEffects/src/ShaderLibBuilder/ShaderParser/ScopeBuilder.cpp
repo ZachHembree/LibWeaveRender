@@ -377,16 +377,10 @@ void ScopeBuilder::PushScope(const int firstBlock, const int depth)
 void ScopeBuilder::PopScope(const int lastBlock)
 {
     ScopeData& scope = scopes[topScope];
+    FX_ASSERT_MSG(scope.parentScope >= 0, "Attempted to terminate global scope.");
 
-    if (scope.parentScope >= 0)
-    {
-        scope.blockCount = lastBlock - scope.blockStart + 1;
-        topScope = scope.parentScope;
-    }
-    else
-    {
-        PARSE_ERR("Attempted to terminate global scope.")
-    }
+    scope.blockCount = lastBlock - scope.blockStart + 1;
+    topScope = scope.parentScope;
 }
 
 void ScopeBuilder::PushSymbol(const int symbolID, const bool isDeferred)
@@ -411,7 +405,7 @@ void ScopeBuilder::PushSymbol(const int symbolID, const bool isDeferred)
         else
             name = token.value;
 
-        PARSE_ASSERT_FMT(!GetHasSymbol(name), "Unexpected redefinition of symbol '{}'", name);
+        FXSYNTAX_CHECK_MSG(!GetHasSymbol(name), "Unexpected redefinition of symbol '{}'", name);
 
         scopeSymbolMaps[topScope].emplace(name, symbolID);
         scopeSymbolLists[topScope].EmplaceBack(symbolID);
@@ -419,9 +413,7 @@ void ScopeBuilder::PushSymbol(const int symbolID, const bool isDeferred)
 
     if (symbol.GetHasFlags(SymbolTypes::Scope))
     {
-        if (pendingScopeSymbol == -1)
-            pendingScopeSymbol = symbolID;
-        else
-            PARSE_ERR("Only one pending scope can be queued")
+        FX_ASSERT_MSG(pendingScopeSymbol == -1, "Only one pending scope can be queued");
+        pendingScopeSymbol = symbolID;
     }
 }

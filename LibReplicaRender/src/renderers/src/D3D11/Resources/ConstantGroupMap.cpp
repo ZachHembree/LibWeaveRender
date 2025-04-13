@@ -65,7 +65,7 @@ const IDynamicArray<Span<byte>>& ConstantGroupMap::GetData(const GroupData& src)
 				const byte* pSrcStart = &src.data[srcConst.offset];
 				byte* pDstStart = &bufSpan[dstConst.offset];
 				
-				GFX_ASSERT(srcConst.size <= dstConst.size, "Constant data source cannot be larger than constant destination");
+				D3D_ASSERT_MSG(srcConst.size <= dstConst.size, "Constant data source cannot be larger than constant destination");
 				memcpy(pDstStart, pSrcStart, srcConst.size);
 			}
 		}

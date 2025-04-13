@@ -5,41 +5,7 @@
 using namespace std;
 using namespace Replica;
 
-RepWinException::RepWinException(int line, string_view file, HRESULT hr) noexcept :
-	RepException(line, file),
-	hr(hr)
-{ }
-
-const char* RepWinException::what() const noexcept
-{
-	ostringstream ss;
-
-	ss << GetType() << endl
-		<< "Error Code: " << GetErrorCode() << endl
-		<< "Description: " << GetErrorString() << endl
-		<< "Line: " << line << endl
-		<< "File: " << file << endl;
-
-	whatBuf = ss.str();
-	return whatBuf.c_str();
-}
-
-string RepWinException::GetErrorString() const noexcept
-{
-	return GetTranslatedErrorCode(hr);
-}
-
-HRESULT RepWinException::GetErrorCode() const noexcept
-{
-	return hr;
-}
-
-string_view RepWinException::GetType() const noexcept
-{
-	return "Windows Exception";
-}
-
-string RepWinException::GetTranslatedErrorCode(HRESULT hr) noexcept
+static string_view GetTranslatedErrorCode(HRESULT hr) noexcept
 {
 	char* lpBuf = nullptr;
 	DWORD msgLen = FormatMessageA(
@@ -55,13 +21,59 @@ string RepWinException::GetTranslatedErrorCode(HRESULT hr) noexcept
 
 	if (lpBuf != nullptr)
 	{
-		string errString(lpBuf);
+		static thread_local string errString;
+		errString.clear();
+		errString.append(lpBuf);
 		LocalFree(lpBuf);
 
 		return errString;
 	}
 	else
-	{
 		return "Unknown Error Code";
+}
+
+RepWinException::RepWinException() :
+	hr(E_FAIL)
+{ }
+
+RepWinException::RepWinException(HRESULT hr, string&& msg) noexcept :
+	hr(hr)
+{
+	if (msg.length() > 0)
+	{
+		this->msg = std::format(
+			"Error Code: {}\nDescription: {}\nMessage: {}\n",
+			hr, GetTranslatedErrorCode(hr), msg
+		);
+	}
+	else
+	{
+		this->msg = std::format(
+			"Error Code: {}\nDescription: {}\n",
+			hr, GetTranslatedErrorCode(hr)
+		);
 	}
 }
+
+RepWinException::RepWinException(const std::source_location& loc, HRESULT hr, string&& msg) noexcept :
+	hr(hr)
+{ 
+	if (msg.length() > 0)
+	{
+		this->msg = std::format(
+			"Error Code: {}\nDescription: {}\nLine: {}\nFile: {}\nMessage: {}\n",
+			hr, GetTranslatedErrorCode(hr), loc.line(), loc.file_name(), msg
+		);
+	}
+	else
+	{
+		this->msg = std::format(
+			"Error Code: {}\nDescription: {}\nLine: {}\nFile: {}\n",
+			hr, GetTranslatedErrorCode(hr), loc.line(), loc.file_name()
+		);
+	}
+}
+
+HRESULT RepWinException::GetErrorCode() const noexcept { return hr; }
+
+string_view RepWinException::GetType() const noexcept { return "Windows Exception"; }

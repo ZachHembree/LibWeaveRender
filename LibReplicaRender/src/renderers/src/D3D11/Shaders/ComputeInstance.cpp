@@ -27,7 +27,7 @@ void  ComputeInstance::Dispatch(Context& ctx, int groups) { Dispatch(ctx, ivec3(
 
 const ComputeShaderVariant& ComputeInstance::GetShader() const 
 { 
-	GFX_ASSERT(nameID != -1, "Cannot retrieve null shader")
+	D3D_ASSERT_MSG(nameID != -1, "Cannot retrieve null shader");
 
 	if (pCS == nullptr)
 	{

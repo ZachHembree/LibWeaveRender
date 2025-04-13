@@ -73,8 +73,7 @@ MinWindow::MinWindow(
 	);
 
 	// Check if window creation failed
-	if (hWnd == NULL)
-		throw WIN_THROW_LAST();
+	WIN_CHECK_LAST(hWnd != NULL);
 
 	// Make the window visible
 	ShowWindow(hWnd, SW_SHOW);
@@ -122,12 +121,13 @@ wstring MinWindow::GetWindowTitle() const
 
 void MinWindow::SetWindowTitle(wstring_view text)
 {
-	WIN_ASSERT_NZ_LAST(SetWindowTextW(hWnd, text.data()));
+	WIN_CHECK_NZ_LAST(SetWindowTextW(hWnd, text.data()));
 }
 
 WndStyle MinWindow::GetStyle() const
 {
 	WndStyle style;
+
 	style.x = (DWORD)GetWindowLongPtr(hWnd, GWL_STYLE);
 	WIN_ASSERT_NZ_LAST(style.x);
 
@@ -139,13 +139,13 @@ WndStyle MinWindow::GetStyle() const
 
 void MinWindow::SetStyle(WndStyle style)
 {
-	WIN_ASSERT_NZ_LAST(SetWindowLongPtr(hWnd, GWL_STYLE, style.x));
+	WIN_CHECK_NZ_LAST(SetWindowLongPtr(hWnd, GWL_STYLE, style.x));
 
 	if (style.y != 0L)
-		WIN_ASSERT_NZ_LAST(SetWindowLongPtr(hWnd, GWL_EXSTYLE, style.y));
+		WIN_CHECK_NZ_LAST(SetWindowLongPtr(hWnd, GWL_EXSTYLE, style.y));
 
 	// Update to reflect changes
-	WIN_ASSERT_NZ_LAST(SetWindowPos(
+	WIN_CHECK_NZ_LAST(SetWindowPos(
 		hWnd,
 		HWND_TOPMOST,
 		0, 0,
@@ -163,7 +163,7 @@ ivec2 MinWindow::GetPos() const
 
 void MinWindow::SetPos(ivec2 pos)
 {
-	WIN_ASSERT_NZ_LAST(SetWindowPos(
+	WIN_CHECK_NZ_LAST(SetWindowPos(
 		hWnd,
 		0,
 		pos.x, pos.y,
@@ -179,7 +179,7 @@ ivec2 MinWindow::GetSize() const
 
 void MinWindow::SetSize(ivec2 size)
 {
-	WIN_ASSERT_NZ_LAST(SetWindowPos(
+	WIN_CHECK_NZ_LAST(SetWindowPos(
 		hWnd,
 		HWND_TOP,
 		0, 0,
@@ -269,7 +269,7 @@ ivec2 MinWindow::GetMonitorDPI() const
 {
 	HMONITOR mon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
 	uivec2 dpi;
-	WIN_THROW_HR(GetDpiForMonitor(mon, MDT_EFFECTIVE_DPI, &dpi.x, &dpi.y));
+	WIN_CHECK_HR(GetDpiForMonitor(mon, MDT_EFFECTIVE_DPI, &dpi.x, &dpi.y));
 
 	return ivec2((int)dpi.x, (int)dpi.y);
 }
@@ -286,7 +286,7 @@ ivec2 MinWindow::GetMonitorPosition() const
 	MONITORINFO info;
 	info.cbSize = sizeof(MONITORINFO);
 
-	WIN_ASSERT_NZ_LAST(GetMonitorInfo(mon, &info));
+	WIN_CHECK_NZ_LAST(GetMonitorInfo(mon, &info));
 
 	RECT rect = info.rcMonitor;
 	return ivec2(rect.left, rect. top);
@@ -298,7 +298,7 @@ ivec2 MinWindow::GetMonitorResolution() const
 	MONITORINFO info;
 	info.cbSize = sizeof(MONITORINFO);
 
-	WIN_ASSERT_NZ_LAST(GetMonitorInfo(mon, &info));
+	WIN_CHECK_NZ_LAST(GetMonitorInfo(mon, &info));
 
 	RECT rect = info.rcMonitor;
 	return ivec2(rect.right - rect.left, rect.bottom - rect.top);
@@ -360,7 +360,7 @@ bool MinWindow::GetIsCursorVisible() const
 {
 	CURSORINFO info;
 	info.cbSize = sizeof(CURSORINFO);
-	WIN_ASSERT_NZ_LAST(GetCursorInfo(&info));
+	WIN_CHECK_NZ_LAST(GetCursorInfo(&info));
 
 	return info.flags == CURSOR_SHOWING;
 }

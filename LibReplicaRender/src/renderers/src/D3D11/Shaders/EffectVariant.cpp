@@ -35,7 +35,8 @@ EffectVariant::EffectVariant(ShaderVariantManager& lib, EffectDefHandle effectDe
 					passes[i][j] = &lib.GetShader<ComputeShaderVariant>(shaderID);
 					break;
 				default:
-					GFX_THROW("Unsupported effect shader specified")
+					D3D_ASSERT_MSG("Unsupported effect shader specified");
+					break;
 			}
 		}
 	}

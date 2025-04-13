@@ -1,30 +1,51 @@
 #pragma once
 #include "ReplicaUtils/RepWinException.hpp"
 
-#define GFX_ASSERT(x, msg) { if (!(x)) throw GfxAssertException(__LINE__, __FILE__, msg); }
-#define GFX_THROW_FAILED(x) { HRESULT hr = (x); if (FAILED(hr)) { throw GfxException(__LINE__, __FILE__, hr); } }
-#define GFX_THROW(msg) throw GfxAssertException(__LINE__, __FILE__, msg);
+#ifndef NDEBUG
+#define D3D_THROW(...) throw D3DException(std::source_location::current(), __VA_ARGS__)
+#define D3D_THROW_HR_MSG(HR, ...) throw D3DException(std::source_location::current(), HR, __VA_ARGS__)
+#else
+#define D3D_THROW(...) throw D3DException(__VA_ARGS__)
+#define D3D_THROW_HR_MSG(HR, ...) throw D3DException(HR, __VA_ARGS__)
+#endif // !NDEBUG
+
+#define D3D_CHECK_MSG(COND, ...) REP_CONDITION( COND, D3D_THROW(__VA_ARGS__) )
+#define D3D_CHECK(COND) REP_CONDITION( COND, D3D_THROW("Check failed") )
+#define D3D_CHECK_HR_MSG(HR, ...) do { HRESULT hr = (HR); if (FAILED(hr)) { D3D_THROW_HR_MSG(hr, __VA_ARGS__); } } while(0)
+#define D3D_CHECK_HR(HR) D3D_CHECK_HR_MSG(HR, "")
+
+#ifndef NDEBUG
+#define D3D_ASSERT_MSG(COND, ...) D3D_CHECK_MSG(COND, __VA_ARGS__)
+#define D3D_ASSERT(COND) D3D_CHECK_MSG(COND, "Assert failed")
+#define D3D_ASSERT_HR_MSG(HR, ...) D3D_CHECK_HR_MSG(HR, __VA_ARGS__)
+#define D3D_ASSERT_HR(HR) D3D_CHECK_HR_MSG(HR, "")
+#else
+#define D3D_ASSERT_MSG(COND, ...) REP_EMPTY()
+#define D3D_ASSERT(COND) REP_EMPTY()
+#define D3D_ASSERT_HR_MSG(HR, ...) REP_EMPTY()
+#define D3D_ASSERT_HR(HR) REP_EMPTY()
+#endif // !NDEBUG
 
 namespace Replica::D3D11
 {
-	class GfxException : public RepWinException
+	/// <summary>
+	/// Base class for all D3D exceptions
+	/// </summary>
+	class D3DException : public RepWinException
 	{
 	public:
-		GfxException(int line, const char* file, HRESULT hr) noexcept;
+		using RepWinException::RepWinException;
+
+		template<typename... FmtArgs>
+		D3DException(HRESULT hr, string_view fmt, FmtArgs... args) :
+			D3DException(hr, std::vformat(fmt, std::make_format_args(args...)))
+		{ }
+
+		template<typename... FmtArgs>
+		D3DException(const std::source_location& loc, HRESULT hr, string_view fmt, FmtArgs... args) :
+			D3DException(loc, hr, std::vformat(fmt, std::make_format_args(args...)))
+		{ }
 
 		string_view GetType() const noexcept override;
-	};
-
-	class GfxAssertException : public RepException
-	{
-	public:
-		GfxAssertException(int line, const char* file, const char* msg) noexcept;
-
-		const char* what() const noexcept override;
-
-		string_view GetType() const noexcept override;
-
-	private:
-		const char* msg;
 	};
 }

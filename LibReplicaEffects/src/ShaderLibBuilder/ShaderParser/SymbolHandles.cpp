@@ -157,7 +157,7 @@ const ShaderTypeInfo& FuncHandle::GetReturnType() const
 			return pSB->GetTypeData(child.subtypeID);
 	}
 
-	REP_THROW_MSG("Return type undefined");
+	FX_THROW("Return type undefined");
 }
 
 void FuncHandle::GetReturnType(ShaderTypeInfo& typeInfo, TokenTypes& typeFlags) const
@@ -177,7 +177,7 @@ void FuncHandle::GetReturnType(ShaderTypeInfo& typeInfo, TokenTypes& typeFlags) 
 		}
 	}
 
-	REP_THROW_MSG("Return type undefined");
+	FX_THROW("Return type undefined");
 }
 
 VarHandle::VarHandle(const ScopeBuilder& pSB, int id) :
@@ -202,7 +202,7 @@ const ShaderTypeInfo& VarHandle::GetType() const
 			return pSB->GetTypeData(child.subtypeID);
 	}
 
-	REP_THROW_MSG("Return type undefined");
+	FX_THROW("Return type undefined");
 }
 
 void VarHandle::GetType(ShaderTypeInfo& typeInfo, TokenTypes& typeFlags) const
@@ -222,7 +222,7 @@ void VarHandle::GetType(ShaderTypeInfo& typeInfo, TokenTypes& typeFlags) const
 		}
 	}
 
-	REP_THROW_MSG("Return type undefined");
+	FX_THROW("Return type undefined");
 }
 
 ScopeHandle::ScopeHandle(const ScopeBuilder& sb, int id) :

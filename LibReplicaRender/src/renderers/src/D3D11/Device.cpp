@@ -10,7 +10,7 @@ using namespace Replica::D3D11;
 Device::Device(Renderer& renderer) : pRenderer(&renderer)
 {
 	ComPtr<ID3D11DeviceContext> pContext;
-	GFX_THROW_FAILED(D3D11CreateDevice(
+	D3D_CHECK_HR(D3D11CreateDevice(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
@@ -26,7 +26,7 @@ Device::Device(Renderer& renderer) : pRenderer(&renderer)
 	context = Context(*this, pContext);
 }
 
-Renderer& Device::GetRenderer() const { GFX_ASSERT(pRenderer != nullptr, "Renderer cannot be null."); return *pRenderer; }
+Renderer& Device::GetRenderer() const { D3D_ASSERT_MSG(pRenderer != nullptr, "Renderer cannot be null."); return *pRenderer; }
 
 /// <summary>
 /// Returns reference to COM device interface
@@ -45,15 +45,15 @@ Context& Device::GetContext() { return this->context; }
 
 void Device::CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11VertexShader>& pVS)
 {
-	GFX_THROW_FAILED(pDev->CreateVertexShader(binSrc.GetData(), binSrc.GetLength(), nullptr, &pVS));
+	D3D_CHECK_HR(pDev->CreateVertexShader(binSrc.GetData(), binSrc.GetLength(), nullptr, &pVS));
 }
 
 void Device::CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11PixelShader>& pPS)
 {
-	GFX_THROW_FAILED(pDev->CreatePixelShader(binSrc.GetData(), binSrc.GetLength(), nullptr, &pPS));
+	D3D_CHECK_HR(pDev->CreatePixelShader(binSrc.GetData(), binSrc.GetLength(), nullptr, &pPS));
 }
 
 void Device::CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11ComputeShader>& pCS)
 {
-	GFX_THROW_FAILED(pDev->CreateComputeShader(binSrc.GetData(), binSrc.GetLength(), nullptr, &pCS));
+	D3D_CHECK_HR(pDev->CreateComputeShader(binSrc.GetData(), binSrc.GetLength(), nullptr, &pCS));
 }

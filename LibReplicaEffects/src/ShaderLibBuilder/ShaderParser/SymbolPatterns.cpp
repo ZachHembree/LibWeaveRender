@@ -337,7 +337,7 @@ bool MatchNode::GetHasMatchPatterns() const { return pMatchPatterns != nullptr; 
 
 const IDynamicArray<MatchPattern>& MatchNode::GetMatchPatterns() const
 {
-	REP_ASSERT_MSG(pMatchPatterns != nullptr, "Attempted to return null match patterns by reference")
+	FX_ASSERT_MSG(pMatchPatterns != nullptr, "Attempted to return null match patterns by reference");
 	return *pMatchPatterns;
 }
 
@@ -345,7 +345,7 @@ bool MatchNode::GetHasMatchNodes() const { return pNodes != nullptr; }
 
 const IDynamicArray<MatchNode>& MatchNode::GetMatchNodes() const
 {
-	REP_ASSERT_MSG(pNodes != nullptr, "Attempted to return null match nodes by reference")
+	FX_ASSERT_MSG(pNodes != nullptr, "Attempted to return null match nodes by reference");
 	return *pNodes;
 }
 
@@ -368,7 +368,7 @@ void MatchNode::PresortPattern()
 	// Reverse backward matching patterns
 	if (ep > 0)
 	{
-		REP_ASSERT_MSG(!isEntrypoint, "Multiple entrypoints cannot exist within the same matching pattern");
+		FX_ASSERT_MSG(!isEntrypoint, "Multiple entrypoints cannot exist within the same matching pattern");
 
 		for (int i = 0; i < ep; i++)
 			nodes[i].ReversePattern();
@@ -379,8 +379,8 @@ void MatchNode::PresortPattern()
 
 void MatchNode::ReversePattern()
 {
-	REP_ASSERT_MSG(!isEntrypoint, "Multiple entrypoints cannot exist within the same matching pattern");
-	REP_ASSERT_MSG(isForward, "Attempted to reverse matching pattern twice");
+	FX_ASSERT_MSG(!isEntrypoint, "Multiple entrypoints cannot exist within the same matching pattern");
+	FX_ASSERT_MSG(isForward, "Attempted to reverse matching pattern twice");
 	isForward = false;
 
 	if (pMatchPatterns != nullptr)

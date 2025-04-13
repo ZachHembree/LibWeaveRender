@@ -1,66 +1,89 @@
 #pragma once
-#include "boost/wave/cpp_exceptions.hpp"
 #include "ReplicaUtils/RepException.hpp"
-#include <format>
-#include <sstream>
 
-#define PARSE_ASSERT(x) { if (!(x)) { throw FxParseException(__LINE__, __FILE__); } }
-#define PARSE_ASSERT_MSG(x, errMsg) { if (!(x)) { throw FxParseException(__LINE__, __FILE__, errMsg); } }
+#ifndef NDEBUG
 
-#define PARSE_ASSERT_LEN(x)  { if (!(x)) { throw FxParseException(__LINE__, __FILE__, "Unexpected expression ending."); } }
-#define PARSE_ERR(errMsg) { throw FxParseException(__LINE__, __FILE__, errMsg); }
-#define PARSE_ERR_FMT(fmt, ...) \
-	{ \
-		string msg = std::format(fmt, __VA_ARGS__); \
-		throw FxParseException(__LINE__, __FILE__, msg.data()); \
-	}
-#define PARSE_ASSERT_FMT(x, fmt, ...) \
-	{ \
-		if (!(x)) \
-		{\
-			string msg = std::format(fmt, __VA_ARGS__); \
-			throw FxParseException(__LINE__, __FILE__, msg.data()); \
-		}\
-	}
+// Throw with source location for debug
+#define FX_THROW(...) throw ParseException(std::source_location::current(), __VA_ARGS__)
+#define FXSYNTAX_THROW(...) throw ParseSyntaxException(std::source_location::current(), __VA_ARGS__)
+#define FXBLOCK_THROW(CTX, BLOCK, ...) throw ParseSyntaxException(std::source_location::current(), CTX, BLOCK, __VA_ARGS__)
+
+#define FX_ASSERT(COND) REP_CONDITION(COND, FX_THROW("Assert failed") )
+#define FX_ASSERT_MSG(COND, ...) REP_CONDITION(COND, FX_THROW(__VA_ARGS__) )
+
+#define FXSYNTAX_ASSERT(COND) REP_CONDITION(COND, FXSYNTAX_THROW("Assert failed") )
+#define FXSYNTAX_ASSERT_MSG(COND, ...) REP_CONDITION(COND, FXSYNTAX_THROW(__VA_ARGS__) )
+
+#define FXBLOCK_ASSERT(COND,CTX, BLOCK) REP_CONDITION(COND, FXBLOCK_THROW(CTX, BLOCK, "Assert failed") )
+#define FXBLOCK_ASSERT_MSG(COND, CTX, BLOCK, ...) REP_CONDITION(COND, FXBLOCK_THROW(CTX, BLOCK, __VA_ARGS__) )
+
+#else
+
+// Throw without source location for release
+#define FX_THROW(...) throw ParseException(__VA_ARGS__)
+#define FXSYNTAX_THROW(...) throw ParseSyntaxException(__VA_ARGS__)
+#define FXBLOCK_THROW(CTX, BLOCK, ...) throw ParseSyntaxException(CTX, BLOCK, __VA_ARGS__)
+
+#define FX_ASSERT(COND) REP_EMPTY()
+#define FX_ASSERT_MSG(COND, ...) REP_EMPTY()
+
+#define FXSYNTAX_ASSERT(COND) REP_EMPTY()
+#define FXSYNTAX_ASSERT_MSG(COND, ...) REP_EMPTY()
+
+#define FXBLOCK_ASSERT(COND,CTX, BLOCK) REP_EMPTY()
+#define FXBLOCK_ASSERT_MSG(COND, CTX, BLOCK, ...) REP_EMPTY()
+
+#endif
+
+#define FX_CHECK(COND) REP_CONDITION(COND, FX_THROW("Check failed") )
+#define FX_CHECK_MSG(COND, ...) REP_CONDITION(COND, FX_THROW(__VA_ARGS__) )
+
+#define FXSYNTAX_CHECK(COND) REP_CONDITION(COND, FXSYNTAX_THROW("Check failed") )
+#define FXSYNTAX_CHECK_MSG(COND, ...) REP_CONDITION(COND, FXSYNTAX_THROW(__VA_ARGS__) )
+
+#define FXBLOCK_CHECK(COND,CTX, BLOCK) REP_CONDITION(COND, FXBLOCK_THROW(CTX, BLOCK, "Check failed") )
+#define FXBLOCK_CHECK_MSG(COND, CTX, BLOCK, ...) REP_CONDITION(COND, FXBLOCK_THROW(CTX, BLOCK, __VA_ARGS__) )
 
 namespace Replica::Effects
 {
-	/// <summary>
-	/// Base class for exceptions thrown by Wave
-	/// </summary>
-	using WaveException = boost::wave::cpp_exception;
+	class BlockAnalyzer;
 
-	class FxParseException : public WaveException
+	/// <summary>
+	/// Base class for all exceptions raised in the effect parser
+	/// </summary>
+	class ParseException : public RepException
 	{
 	public:
-		FxParseException(std::size_t line, char const* filename, string_view msg = "") noexcept :
-			WaveException(line, 0, filename)
-		{ 
-			if (msg.length() > 0)
-				desc = std::format("Line: {}\nFile: {}\nMessage: {}", line, filename, msg);
-			else
-				desc = std::format("Line: {}\nFile: {}", line, filename);
-		}
+		using RepException::RepException;
 
-		char const* what() const noexcept override
-		{
-			return "FX Parse Exception";
-		}
+		string_view GetType() const noexcept override;
 
-		virtual char const* description() const noexcept override
-		{
-			return desc.c_str();
-		}
+	};
 
-		int get_errorcode() const noexcept override { return 4; }
+	/// <summary>
+	/// Base class for all exceptions raised for syntax errors in parsed input. Automatically includes 
+	/// location in source file.
+	/// </summary>
+	class ParseSyntaxException : public ParseException
+	{
+	public:
+		using ParseException::ParseException;
 
-		int get_severity() const noexcept override { return 4; }
+		ParseSyntaxException(const std::source_location& loc, const BlockAnalyzer& ctx, int block, string&& msg);
 
-		char const* get_related_name() const throw() { return "<unknown>"; }
+		ParseSyntaxException(const BlockAnalyzer& ctx, int block, string&& msg);
 
-		bool is_recoverable() const noexcept override { return false; }
+		template<typename... FmtArgs>
+		ParseSyntaxException(const BlockAnalyzer& ctx, int block, string_view fmt, FmtArgs... args) :
+			ParseSyntaxException(std::vformat(fmt, std::make_format_args(args...)))
+		{ }
+
+		template<typename... FmtArgs>
+		ParseSyntaxException(const std::source_location& loc, const BlockAnalyzer& ctx, int block, string_view fmt, FmtArgs... args) :
+			ParseSyntaxException(loc, std::vformat(fmt, std::make_format_args(args...)))
+		{ }
 
 	protected:
-		string desc;
+		string parseMsg;
 	};
 }

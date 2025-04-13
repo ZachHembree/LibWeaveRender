@@ -45,7 +45,7 @@ namespace Replica::D3D11
 		void GetResources(const DataSrc& src, IDynamicArray<T*>& dst) const
 		{
 			const size_t count = GetCount();
-			GFX_ASSERT(dst.GetLength() >= count, "Resource dst array too small")
+			D3D_ASSERT_MSG(dst.GetLength() >= count, "Resource dst array too small");
 			memset(dst.GetData(), 0u, count * sizeof(T**));
 
 			for (const ResView& view : src)

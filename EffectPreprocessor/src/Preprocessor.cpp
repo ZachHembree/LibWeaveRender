@@ -39,28 +39,21 @@ template<typename T>
 static void SetParam(const IDynamicArray<string_view>& args, int& pos, T& param)
 {
     pos++;
+    FX_CHECK_MSG(pos < args.GetLength() && args[pos][0] != '-',
+        "Expected argument after {}", args[pos - 1]);
 
-    if (pos < args.GetLength() && args[pos][0] != '-')
-    {
-        param = args[pos];
-    }
-    else
-        PARSE_ERR_FMT("Expected argument after {}", args[pos - 1]);
+    param = args[pos];
 }
 
 static void SetStringParam(const IDynamicArray<string_view>& args, int& pos, string& param)
 {
     pos++;
+    FX_CHECK_MSG(pos < args.GetLength() && args[pos][0] != '-', 
+        "Expected argument after {}", args[pos - 1]);
+    FX_CHECK_MSG(param.empty(), 
+        "'{}' specified twice", args[pos - 1]);
 
-    if (pos < args.GetLength() && args[pos][0] != '-')
-    {
-        if (param.empty())
-            param = args[pos];
-        else
-            PARSE_ERR_FMT("{} specified twice", args[pos - 1]);
-    }
-    else
-        PARSE_ERR_FMT("Expected argument after {}", args[pos - 1]);
+    param = args[pos];
 }
 
 static void SetHeaderLib(const IDynamicArray<string_view>& args, int& pos) { isHeaderLib = true; }
@@ -76,44 +69,40 @@ static void SetOutput(const IDynamicArray<string_view>& args, int& pos) { SetStr
 static void SetInput(const IDynamicArray<string_view>& args, int& pos) 
 {
     pos++;
+    FX_CHECK_MSG(pos < args.GetLength() && args[pos][0] != '-', "Expected argument after {}", args[pos - 1]);
 
-    if (pos < args.GetLength() && args[pos][0] != '-')
+    string_view inPath = args[pos];
+    const char* pWild = nullptr;
+
+    for (int i = (int)inPath.length() - 1; i >= 0; i--)
     {
-        string_view inPath = args[pos];
-        const char* pWild = nullptr;
-
-        for (int i = (int)inPath.length() - 1; i >= 0; i--)
+        if (inPath[i] == '\\' || inPath[i] == '/')
+            break;
+        else if (inPath[i] == '*')
         {
-            if (inPath[i] == '\\' || inPath[i] == '/')
-                break;
-            else if (inPath[i] == '*')
-            {
-                pWild = &inPath[i];
-                break;
-            }
-        }
-
-        if (pWild == nullptr)
-            inputFiles.emplace(inPath);
-        else
-        {
-            const char *pExt = pWild + 1;
-            const char *pLast = &inPath[inPath.length() - 1];
-            PARSE_ASSERT_MSG(pLast >= pExt, "Expected file extension after wildcard.")
-
-            fs::path inDir;
-            string_view ext(pExt);
-
-            if (pWild > inPath.data())
-                inDir = string_view(inPath.data(), std::distance(inPath.data(), pWild - 1));
-            else
-                inDir = fs::current_path();
-
-            GetFilesByExtension(inDir, ext, inputFiles);
+            pWild = &inPath[i];
+            break;
         }
     }
+
+    if (pWild == nullptr)
+        inputFiles.emplace(inPath);
     else
-        PARSE_ERR_FMT("Expected argument after {}", args[pos - 1]);
+    {
+        const char* pExt = pWild + 1;
+        const char* pLast = &inPath[inPath.length() - 1];
+        FX_CHECK_MSG(pLast >= pExt, "Expected file extension after wildcard.");
+
+        fs::path inDir;
+        string_view ext(pExt);
+
+        if (pWild > inPath.data())
+            inDir = string_view(inPath.data(), std::distance(inPath.data(), pWild - 1));
+        else
+            inDir = fs::current_path();
+
+        GetFilesByExtension(inDir, ext, inputFiles);
+    }
 }
 
 typedef void (*OptionHandlerFunc)(const IDynamicArray<string_view>& args, int& pos);
@@ -173,17 +162,12 @@ static void GetInput(fs::path input, std::stringstream& ss)
     ss.clear();
     ss.str({});
 
-    if (!fs::exists(input))
-        PARSE_ERR("Input path does not exist");
-
-    if (!fs::is_regular_file(input))
-        PARSE_ERR("Input path is not a file");
+    FX_CHECK_MSG(fs::exists(input), "Input path does not exist");
+    FX_CHECK_MSG(fs::is_regular_file(input), "Input path is not a file");
 
     std::ifstream inputStream(input);
 
-    if (!inputStream.is_open())
-        PARSE_ERR_FMT("Failed to open input file: {}", input.string());
-
+    FX_CHECK_MSG(inputStream.is_open(), "Failed to open input file: {}");
     ss << inputStream.rdbuf();
 }
 
@@ -218,9 +202,7 @@ static void WriteBinary(const fs::path& output, const std::stringstream& ss)
 
     // Open output
     std::ofstream dstFile(output);
-
-    if (!dstFile.is_open())
-        PARSE_ERR_FMT("Failed to open output file: {}", output.string());
+    FX_CHECK_MSG(dstFile.is_open(), "Failed to open output file: {}");
 
     dstFile << ss.rdbuf();
 }
@@ -287,13 +269,13 @@ static void CreateLibrary()
         if (inputFiles.size() > 1)
         { 
             if (!isMerging)
-                REP_ASSERT_MSG(fs::is_directory(outPath), "Output path must be a directory.")
+                FX_CHECK_MSG(fs::is_directory(outPath), "Output path must be a directory.");
             else
-                REP_ASSERT_MSG(!fs::is_directory(outPath), "Output path must be a file.")
+                FX_CHECK_MSG(!fs::is_directory(outPath), "Output path must be a file.");
         }
     }
     else if (isMerging)
-        REP_THROW_MSG("Output file must be specified for merged libraries.")
+        FX_THROW("Output file must be specified for merged libraries.");
 
     // Parse source and generate library
     Stopwatch timer;
@@ -346,6 +328,8 @@ static void CreateLibrary()
 /// </summary>
 static void HandleOptions(const IDynamicArray<string_view>& args)
 {
+    FX_CHECK_MSG(inputFiles.empty(), "No input specified");
+
     for (int i = 1; i < args.GetLength(); i++)
     {
         const string_view& arg = args[i];
@@ -358,11 +342,9 @@ static void HandleOptions(const IDynamicArray<string_view>& args)
                 {
                     string_view opt = arg.substr(2);
                     const auto& it = s_OptionMap.find(opt);
+                    FX_CHECK_MSG(it != s_OptionMap.end(), "Unexpected argument: {}", arg);
 
-                    if (it != s_OptionMap.end())
-                        it->second(args, i);
-                    else
-                        PARSE_ERR_FMT("Unexpected argument: {}", arg);
+                    it->second(args, i);
                 }
                 else
                 {
@@ -371,11 +353,9 @@ static void HandleOptions(const IDynamicArray<string_view>& args)
                     for (char flag : flags)
                     {
                         const auto& it = s_FlagMap.find(flag);
+                        FX_CHECK_MSG(it != s_FlagMap.end(), "Unexpected flag: {}", arg);
 
-                        if (it != s_FlagMap.end())
-                            it->second(args, i);
-                        else
-                            PARSE_ERR_FMT("Unexpected flag: {}", flag);
+                        it->second(args, i);
                     }
                 }
             }
@@ -386,15 +366,12 @@ static void HandleOptions(const IDynamicArray<string_view>& args)
                 else if (outputDir.empty())
                     outputDir = arg;
                 else
-                    PARSE_ERR_FMT("Unexpected argument: {}", arg);
+                    FX_THROW("Unexpected argument: {}", arg);
             }
         }
         else
-            PARSE_ERR_FMT("Unexpected argument: {}", arg);
+            FX_THROW("Unexpected argument: {}", arg);
     }
-
-    if (inputFiles.empty())
-        PARSE_ERR_FMT("No input specified");
 }
 
 int main(int argc, char* argv[])
@@ -408,9 +385,7 @@ int main(int argc, char* argv[])
     LOG_INFO() << "RPFX Preprocessor";
     LOG_INFO() << "Working Dir: " << argv[0];
 
-#ifndef _DEBUG_VS
     try
-#endif
     {
 #ifndef _DEBUG
         DynamicArray<string_view> args(argc);
@@ -426,7 +401,7 @@ int main(int argc, char* argv[])
             {
                 string_view(argv[0]),
                 "--input", "*.rpfx",
-                "--output", "..\\EffectPreprocessor\\",
+                //"--output", "..\\EffectPreprocessor\\",
                 "-h"
             };
         }
@@ -442,16 +417,16 @@ int main(int argc, char* argv[])
         HandleOptions(args);
         CreateLibrary();
     }
+    catch (const ParseException& err)
+    {
+        LOG_ERROR() << "[" << err.GetType() << "] " << err.GetDescription();
+        code = 6;
+    }
 #ifndef _DEBUG_VS
     catch (const RepException& err)
     {
-        LOG_ERROR() << "[" << err.GetType() << "] " << err.what();
+        LOG_ERROR() << "[" << err.GetType() << "] " << err.GetDescription();
         code = 5;
-    }
-    catch (const WaveException& err)
-    {
-        LOG_ERROR() << err.description();
-        code = 4;
     }
     catch (const fs::filesystem_error& e) 
     {

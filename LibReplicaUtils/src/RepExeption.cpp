@@ -1,60 +1,27 @@
 #include "pch.hpp"
 #include "ReplicaUtils/RepException.hpp"
 
-using namespace std;
 using namespace Replica;
 
-RepException::RepException(int line, string_view file) noexcept :
-	line(line),
-	file(file)
+RepException::RepException(string&& msg) : 
+	msg(std::move(msg))
 { }
 
-const char* RepException::what() const noexcept
+RepException::RepException(const std::source_location& loc, string&& msg)
 {
-	ostringstream ss;
-
-	ss << GetType() << endl
-		<< "Line: " << line << endl
-		<< "File: " << file << endl;
-
-	whatBuf = ss.str();
-	return whatBuf.c_str();
+	if (msg.length() > 0)
+		this->msg = std::format("Line: {}\nFile: {}\nMessage: {}", loc.line(), loc.file_name(), msg);
+	else
+		this->msg = std::format("Line: {}\nFile: {}", loc.line(), loc.file_name());
 }
 
-int RepException::GetLine() const noexcept
-{
-	return line;
-}
-
-const std::string_view& RepException::GetFile() const noexcept
-{
-	return file;
-}
-
-string_view RepException::GetType() const noexcept
+string_view RepException::GetType() const noexcept 
 {
 	return "Replica Exception";
 }
 
-RepMsgException::RepMsgException(int line, string_view file, string_view msg) noexcept :
-	RepException(line, file),
-	msg(msg)
-{ }
+RepException::~RepException() noexcept = default;
 
-const char* RepMsgException::what() const noexcept
-{
-	ostringstream ss;
+string_view RepException::GetDescription() const noexcept { return msg; }
 
-	ss << GetType() << endl
-		<< "Line: " << line << endl
-		<< "File: " << file << endl
-		<< "Message: " << msg;
-
-	whatBuf = ss.str();
-	return whatBuf.c_str();
-}
-
-string_view RepMsgException::GetType() const noexcept
-{
-	return "Rep Msg Exception";
-}
+const char* RepException::what() const noexcept { return msg.c_str(); }

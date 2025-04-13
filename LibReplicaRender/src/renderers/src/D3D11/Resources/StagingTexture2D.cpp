@@ -69,7 +69,7 @@ void StagingTexture2D::SetTextureData(Context& ctx, void* data, size_t stride, i
 
 	if (dim.x <= dstSize.x && dim.y <= dstSize.y)
 	{
-		GFX_ASSERT(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
+		D3D_CHECK_MSG(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
 
 		if (GetUsage() == ResourceUsages::Dynamic)
 			UpdateMapUnmap(ctx, data);
@@ -107,7 +107,7 @@ Tex2DBufferHandle StagingTexture2D::GetBufferHandle(Context& ctx)
 		mapFlags = (D3D11_MAP)(mapFlags | D3D11_MAP_WRITE);
 
 	D3D11_MAPPED_SUBRESOURCE msr;
-	GFX_THROW_FAILED(ctx->Map(
+	D3D_CHECK_HR(ctx->Map(
 		pRes.Get(),
 		0u,
 		mapFlags,
@@ -124,10 +124,10 @@ Tex2DBufferHandle StagingTexture2D::GetBufferHandle(Context& ctx)
 /// </summary>
 void StagingTexture2D::ReturnBufferHandle(Context& ctx, Tex2DBufferHandle&& handle)
 {
-	GFX_ASSERT(handle.pParent != nullptr,
+	D3D_CHECK_MSG(handle.pParent != nullptr,
 		"Cannot return a null Texture Buffer Handle");
 
-	GFX_ASSERT(handle.pParent == this, 
+	D3D_CHECK_MSG(handle.pParent == this,
 		"Cannot return a Texture Buffer Handle to an object"
 		"that is not its parent");
 
@@ -153,7 +153,7 @@ void StagingTexture2D::WriteToFileWIC(Context& ctx, wstring_view path)
 		buffer.GetData()
 	};
 
-	GFX_THROW_FAILED(SaveToWICFile(
+	D3D_CHECK_HR(SaveToWICFile(
 		imageData, 
 		WIC_FLAGS_FORCE_SRGB,
 		GetWICCodec(WIC_CODEC_PNG), 

@@ -219,7 +219,7 @@ namespace Replica::Effects
         // disable template parsing until this point is reached again
         else 
         { 
-            PARSE_ASSERT_MSG(blockIndex >= 0 && blockIndex < (int)blocks.GetLength(), "Block index out of range")
+            FXSYNTAX_ASSERT_MSG(blockIndex >= 0 && blockIndex < (int)blocks.GetLength(), "Block index out of range");
 
             LexBlock& block = blocks[blockIndex];
             pPos = &block.src.GetBack();
@@ -241,7 +241,7 @@ namespace Replica::Effects
 
     void BlockAnalyzer::RevertContainer(int blockIndex)
     {
-        PARSE_ASSERT_MSG(blockIndex >= 0 && blockIndex < (int)blocks.GetLength(), "Block index out of range")
+        FXSYNTAX_ASSERT_MSG(blockIndex >= 0 && blockIndex < (int)blocks.GetLength(), "Block index out of range");
         const LexBlock& block = blocks[blockIndex];
 
         // Revert to block before container preamble
@@ -256,8 +256,8 @@ namespace Replica::Effects
     {
         LexBlockTypes delimType = GetDelimiterType(*pPos);
 
-        PARSE_ASSERT_FMT(GetHasFlags(delimType, LexBlockTypes::StartContainer),
-            "Unexpected expression {} on line: {}. Expected new container.", *pPos, line)
+        FXSYNTAX_CHECK_MSG(GetHasFlags(delimType, LexBlockTypes::StartContainer),
+            "Unexpected expression '{}' on line: {}. Expected new container.", *pPos, line);
 
         // If an unfinished angle bracket container is on the stack, revert it if a different container
         // type is started. More restrictive than a normal parser, but should be an acceptable simplification.
@@ -281,7 +281,7 @@ namespace Replica::Effects
     void BlockAnalyzer::EndContainer()
     {
         LexBlock* pCont = GetTopContainer();
-        PARSE_ASSERT_FMT(pCont != nullptr, "Unexpected closing '{}' on line: {}", *pPos, line);
+        FXSYNTAX_CHECK_MSG(pCont != nullptr, "Unexpected closing '{}' on line: {}", *pPos, line);
 
         // An opening '<' was previously classified as a potential template, but another container closed 
         // before it was ready. It will need to be reverted and reclassified.
@@ -296,22 +296,22 @@ namespace Replica::Effects
 
             if (pCont->GetHasFlags(LexBlockTypes::Scope))
             {
-                PARSE_ASSERT_FMT(GetHasFlags(delimType, LexBlockTypes::EndScope), 
+                FXSYNTAX_CHECK_MSG(GetHasFlags(delimType, LexBlockTypes::EndScope),
                     "Expected scope end '}}' on line: {}", line);
             }
             else if (pCont->GetHasFlags(LexBlockTypes::Parentheses))
             {
-                PARSE_ASSERT_FMT(GetHasFlags(delimType, LexBlockTypes::CloseParentheses), 
+                FXSYNTAX_CHECK_MSG(GetHasFlags(delimType, LexBlockTypes::CloseParentheses),
                     "Expected closing parentheses ')' on line: {}", line);
             }
             else if (pCont->GetHasFlags(LexBlockTypes::SquareBrackets))
             {
-                PARSE_ASSERT_FMT(GetHasFlags(delimType, LexBlockTypes::CloseSquareBrackets), 
+                FXSYNTAX_CHECK_MSG(GetHasFlags(delimType, LexBlockTypes::CloseSquareBrackets),
                     "Expected closing square bracket ']' on line: {}", line);
             }
 
             depth--;
-            PARSE_ASSERT_FMT(depth >= 0, "Unexpected closing '{}' on line: {}", *pPos, line)
+            FXSYNTAX_CHECK_MSG(depth >= 0, "Unexpected closing '{}' on line: {}", *pPos, line);
 
             // Finalize source range and line count in container opening
             containers.RemoveBack();
@@ -381,14 +381,14 @@ namespace Replica::Effects
         const char* pLastDigit = body.src.FindEnd(pFirstDigit, "", '0', '9');
         TextBlock numString(pFirstDigit, pLastDigit);
 
-        PARSE_ASSERT_FMT(*pFirstDigit >= '0' && *pFirstDigit <= '9',
+        FXSYNTAX_CHECK_MSG(*pFirstDigit >= '0' && *pFirstDigit <= '9',
             "Expected a line number after #line directive on line {}", line);
 
         int newLine = -1;
         string_view newPath;
         std::from_chars(&numString.GetFront(), &numString.GetBack() + 1, newLine);
 
-        PARSE_ASSERT_FMT(newLine >= 0,
+        FXSYNTAX_CHECK_MSG(newLine >= 0,
             "Expected a line number after #line directive on line {}", line);
 
         // New file path
@@ -417,15 +417,15 @@ namespace Replica::Effects
 
             if (top.GetHasFlags(LexBlockTypes::StartScope))
             {
-                PARSE_ERR_FMT("Unterminated scope '{{' starting on line {}", top.startLine);
+                FXSYNTAX_THROW("Unterminated scope '{{' starting on line {}", top.startLine);
             }
             else if (top.GetHasFlags(LexBlockTypes::OpenParentheses))
             {
-                PARSE_ERR_FMT("Unterminated parentheses '(' starting on line {}", top.startLine);
+                FXSYNTAX_THROW("Unterminated parentheses '(' starting on line {}", top.startLine);
             }
             else if (top.GetHasFlags(LexBlockTypes::OpenSquareBrackets))
             {
-                PARSE_ERR_FMT("Unterminated square bracket '[' starting on line {}", top.startLine);
+                FXSYNTAX_THROW("Unterminated square bracket '[' starting on line {}", top.startLine);
             }
             else if (top.GetHasFlags(LexBlockTypes::OpenAngleBrackets))
             {
@@ -434,7 +434,7 @@ namespace Replica::Effects
             }
         }
 
-        PARSE_ASSERT_MSG(depth == 0, "Internal container parsing error.")
+        FXSYNTAX_ASSERT_MSG(depth == 0, "Internal container parsing error.");
         return true;
     }
 

@@ -48,8 +48,7 @@ namespace Replica::Effects
 
         pAnalyzer = &src;
         pSB = &dst;
-        REP_ASSERT_MSG(pSB != nullptr, "Parse destination not set")
-
+        
         ParseSource();
     }
 
@@ -267,7 +266,7 @@ namespace Replica::Effects
 
     int SymbolParser::TryMatchBlockPattern(const MatchPattern& matchPattern, int matchStart, const int dir)
     {
-        REP_ASSERT_MSG(matchPattern.GetLength() > 0, "Empty matching patterns are not allowed");
+        FX_ASSERT_MSG(matchPattern.GetLength() > 0, "Empty matching patterns are not allowed");
 
         const bool isAlternation = matchPattern.GetHasFlags(MatchQualifiers::Alternation);
         const int last = (int)matchPattern.GetLength() - 1;
@@ -437,7 +436,7 @@ namespace Replica::Effects
             {
                 if (&cap != pStart)
                 {
-                    REP_ASSERT_MSG(cap.mainCap == -1, "Only one owner per token group is allowed");
+                    FX_ASSERT_MSG(cap.mainCap == -1, "Only one owner per token group is allowed");
                     CaptureTokens(cap);
                 }
             }
@@ -450,7 +449,7 @@ namespace Replica::Effects
             tokenParentBuf.RemoveRange(nodeStart, tokenParentBuf.GetLength() - nodeStart);
 
             // Get new parent
-            REP_ASSERT_MSG(pStart->mainCap != -1, "Owner specified but not captured");
+            FX_ASSERT_MSG(pStart->mainCap != -1, "Owner specified but not captured");
             const int capStart = (int)tokenBuf.GetLength();
             CaptureTokens(*pStart);
 
@@ -499,7 +498,7 @@ namespace Replica::Effects
                     }
                     else
                     {
-                        PARSE_ERR_FMT("Unexpected expression: {}", string_view(token.name))
+                        FXBLOCK_THROW(*pAnalyzer, cap.blockID, "Unexpected expression: {}", string_view(token.name));
                     }
 
                     pStart = block.src.FindWord(pLast + 1, g_WordBreakFilter);
@@ -516,7 +515,7 @@ namespace Replica::Effects
             pStart = block.src.FindWord(&ident.name.GetBack() + 1, g_WordBreakFilter);
         }
 
-        PARSE_ASSERT_MSG((tokenBuf.GetLength() - tokenStart) == patterns.GetLength(), "Expected an identifier");
+        FXBLOCK_CHECK_MSG((tokenBuf.GetLength() - tokenStart) == patterns.GetLength(), *pAnalyzer, cap.blockID, "Expected an identifier");
     }
 
     static void GetSemanticIndex(TokenNode& ident, AttributeData& attrib)

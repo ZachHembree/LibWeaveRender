@@ -38,19 +38,13 @@ ComputeInstance ShaderLibrary::GetComputeInstance(uint nameID)
 Material ShaderLibrary::GetMaterial(string_view effectName) 
 { 
 	uint id = -1;
-
-	if (GetStringMap().TryGetStringID(effectName, id))
-		return GetMaterial(id);
-	else
-		GFX_THROW("Invalid effect name")
+	D3D_CHECK_MSG(GetStringMap().TryGetStringID(effectName, id), "Invalid effect name");
+	return GetMaterial(id);
 }
 
 ComputeInstance ShaderLibrary::GetComputeInstance(string_view name) 
 {
 	uint id = -1;
-
-	if (GetStringMap().TryGetStringID(name, id))
-		return GetComputeInstance(id);
-	else
-		GFX_THROW("Invalid shader name")
+	D3D_CHECK_MSG(GetStringMap().TryGetStringID(name, id), "Invalid shader name");
+	return GetComputeInstance(id);
 }

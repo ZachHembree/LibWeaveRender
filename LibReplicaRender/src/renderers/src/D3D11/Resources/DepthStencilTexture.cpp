@@ -26,7 +26,7 @@ DepthStencilTexture::DepthStencilTexture(
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	dsDesc.DepthFunc = (D3D11_COMPARISON_FUNC)depthCmp;
 
-	GFX_THROW_FAILED(dev->CreateDepthStencilState(&dsDesc, &pState));
+	D3D_CHECK_HR(dev->CreateDepthStencilState(&dsDesc, &pState));
 
 	// View
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
@@ -34,7 +34,7 @@ DepthStencilTexture::DepthStencilTexture(
 	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDSV.Texture2D.MipSlice = 0u;
 
-	GFX_THROW_FAILED(dev->CreateDepthStencilView(pRes.Get(), &descDSV, &pDSV));
+	D3D_CHECK_HR(dev->CreateDepthStencilView(pRes.Get(), &descDSV, &pDSV));
 }
 
 void DepthStencilTexture::SetRange(vec2 range)

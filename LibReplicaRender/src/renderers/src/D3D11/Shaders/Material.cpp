@@ -30,7 +30,7 @@ void Material::Reset(Context& ctx, int pass) { GetEffect().Reset(ctx, pass); }
 
 const EffectVariant& Material::GetEffect() const 
 { 
-	GFX_ASSERT(nameID != -1, "Cannot access null effect");
+	D3D_ASSERT_MSG(nameID != -1, "Cannot access null effect");
 
 	if (pEffect == nullptr)
 	{

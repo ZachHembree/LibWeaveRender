@@ -8,7 +8,7 @@ using namespace Replica::D3D11;
 /// <summary>
 /// Returns the device associated with the child object
 /// </summary>
-Device& DeviceChild::GetDevice() const { GFX_ASSERT(pDev != nullptr, "Cannot get null reference."); return *pDev; }
+Device& DeviceChild::GetDevice() const { D3D_ASSERT_MSG(pDev != nullptr, "Cannot get null reference."); return *pDev; }
 
 /// <summary>
 /// Returns reference to renderer using this object

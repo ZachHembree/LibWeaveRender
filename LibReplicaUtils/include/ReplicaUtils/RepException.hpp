@@ -1,45 +1,71 @@
 #pragma once
 #include <exception>
-#include "ReplicaUtils/Utils.hpp"
+#include <source_location>
+#include <format>
+#include "ReplicaUtils/TextUtils.hpp"
 
-#define REP_THROW() { throw RepException(__LINE__, __FILE__); }
-#define REP_THROW_MSG(msg) { throw RepMsgException(__LINE__, __FILE__, msg); }
-#define REP_ASSERT(x) {if (!(x)) { throw RepException(__LINE__, __FILE__); }}
-#define REP_ASSERT_MSG(x, msg) {if (!(x)) { throw RepMsgException(__LINE__, __FILE__, msg); }}
+// Wraps a block in a conditional macro that behaves like a statement
+#define REP_CONDITION(COND, X) do { if (!(COND)) X; } while (0)
+// Empty macro that behaves like a statement
+#define REP_EMPTY() do while(0)
+
+#define REP_CHECK_MSG(COND, ...) REP_CONDITION(COND,  REP_THROW(__VA_ARGS__) )
+#define REP_CHECK(COND) REP_CHECK_MSG(COND, "Check failed")
+
+#ifndef NDEBUG
+
+#define REP_THROW(...) throw RepException(std::source_location::current(), __VA_ARGS__)
+#define REP_ASSERT(COND) REP_CHECK_MSG(COND, "Assert failed")
+#define REP_ASSERT_MSG(COND, ...) REP_CHECK_MSG(COND, __VA_ARGS__)
+
+#else
+
+#define REP_THROW(...) throw RepException(__VA_ARGS__)
+#define REP_ASSERT(COND) REP_EMPTY()
+#define REP_ASSERT_MSG(COND, ...) REP_EMPTY()
+
+#endif
 
 namespace Replica
 {
+	/// <summary>
+	/// Base class for all exceptions in Replica libraries
+	/// </summary>
 	class RepException : public std::exception
 	{
 	public:
-		RepException(int line, string_view file) noexcept;
+		RepException(string&& msg = "");
 
-		const char* what() const noexcept override;
+		RepException(const std::source_location& loc, string&& msg = "");
 
-		int GetLine() const noexcept;
+		template<typename... FmtArgs>
+		RepException(string_view fmt, FmtArgs&&... args) :
+			RepException(std::vformat(fmt, std::make_format_args(args...)))
+		{ }
 
-		const string_view& GetFile() const noexcept;
+		template<typename... FmtArgs>
+		RepException(const std::source_location& loc, string_view fmt, FmtArgs&&... args) :
+			RepException(loc, std::vformat(fmt, std::make_format_args(args...)))
+		{ }
 
+		virtual ~RepException() noexcept;
+
+		/// <summary>
+		/// Returns string describing the type of exception
+		/// </summary>
 		virtual string_view GetType() const noexcept;
 
-	protected:
-		mutable std::string whatBuf;
-		const int line;
-		string_view file;
-	};
+		/// <summary>
+		/// Returns string describing error details
+		/// </summary>
+		virtual string_view GetDescription() const noexcept;
 
-	class RepMsgException : public RepException
-	{
-	public:
-
-		RepMsgException(int line, string_view file, string_view msg) noexcept;
-
+		/// <summary>
+		/// Returns string describing error details
+		/// </summary>
 		const char* what() const noexcept override;
 
-		string_view GetType() const noexcept override;
-
 	protected:
-		string_view msg;
-
+		string msg;
 	};
 }
