@@ -263,6 +263,7 @@ powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -274,6 +275,12 @@ powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
 powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
   -TablePath "$(ProjectDir)src\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.cpp"</Command>
     </PreBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Lib>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">
     <ClCompile>
@@ -286,6 +293,7 @@ powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -297,6 +305,12 @@ powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
 powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
   -TablePath "$(ProjectDir)src\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.cpp"</Command>
     </PreBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Lib>
+      <AdditionalDependencies>$(SolutionDir)packages\boost_wave-vc143.1.87.0\lib\native\libboost_wave-vc143-mt-sgd-x64-1_87.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -311,6 +325,7 @@ powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibReplicaUtils\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -324,6 +339,12 @@ powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
 powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
   -TablePath "$(ProjectDir)src\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.cpp"</Command>
     </PreBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Lib>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

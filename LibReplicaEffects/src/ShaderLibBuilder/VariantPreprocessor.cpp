@@ -99,10 +99,29 @@ namespace Replica::Effects
 			ctx.add_macro_definition(variantModes[enumID]);
 
 		// Process directives
-		for (const WaveLexToken& token : ctx)
+		WaveTokenIterator it = ctx.begin();
+		WaveTokenIterator last = ctx.end();
+
+		while (true)
 		{
-			const WaveString& value = token.get_value();
-			std::copy(value.begin(), value.end(), std::back_inserter(dst));
+			try
+			{
+				if (it == last)
+					break;
+
+				WaveLexToken& token = *it;
+				const WaveString& value = token.get_value();
+				std::copy(value.begin(), value.end(), std::back_inserter(dst));
+			}
+			catch (const WaveException& err)
+			{
+				if (!err.is_recoverable())
+					FXSYNTAX_THROW("{}\nFile: {}\nLine: {}", err.description(), err.file_name(), err.line_no());
+				else
+					LOG_WARN() << err.description() << "\nFile: " << err.file_name() << "\nLine: " << err.line_no();
+			}
+
+			++it;
 		}
 
 		isInitialized = true;

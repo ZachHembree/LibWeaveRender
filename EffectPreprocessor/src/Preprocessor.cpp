@@ -387,7 +387,7 @@ int main(int argc, char* argv[])
 
     try
     {
-#ifndef _DEBUG
+#ifdef NDEBUG
         DynamicArray<string_view> args(argc);
 
         for (int i = 0; i < argc; i++)
@@ -417,12 +417,12 @@ int main(int argc, char* argv[])
         HandleOptions(args);
         CreateLibrary();
     }
-    catch (const EffectSyntaxException& err)
+    catch (const EffectParseException& err)
     {
         LOG_ERROR() << "[" << err.GetType() << "] " << err.GetDescription();
         code = 6;
     }
-#ifndef _DEBUG_VS
+#ifdef NDEBUG
     catch (const RepException& err)
     {
         LOG_ERROR() << "[" << err.GetType() << "] " << err.GetDescription();

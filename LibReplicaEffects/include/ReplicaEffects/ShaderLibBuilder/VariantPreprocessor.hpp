@@ -3,7 +3,6 @@
 #include <list>
 #include "ReplicaUtils/Utils.hpp"
 #include "ReplicaUtils/StringSpan.hpp"
-#include "boost/wave/cpp_exceptions.hpp"
 #include "ShaderEntrypoint.hpp"
 
 namespace Replica::Effects
@@ -13,11 +12,6 @@ namespace Replica::Effects
 
 	constexpr string_view g_VariantModesKeyword = "modes";
 	constexpr uint g_VariantModeLimit = 256u;
-
-	/// <summary>
-	/// Base class for exceptions thrown by Wave
-	/// </summary>
-	using WaveException = boost::wave::cpp_exception;
 
 	/// <summary>
 	/// Evaluates preprocessor directives for shaders and generates variants

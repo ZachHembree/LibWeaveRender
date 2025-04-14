@@ -58,15 +58,15 @@ void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_vie
 			}
 		}
 
+		if (configID == 0)
+			InitVariants(lib);
+
 		if (!isDuplicate) // Parse and precompile variants
 		{
 			const uint resCount = pShaderRegistry->GetUniqueResCount();
 
 			pAnalyzer->AnalyzeSource(libPath, pBuf->libText);
 			pTable->ParseBlocks(*pAnalyzer);
-
-			if (configID == 0)
-				InitVariants(lib);
 
 			// Shaders
 			GetEntryPoints();
@@ -136,6 +136,7 @@ void ShaderLibBuilder::InitVariants(VariantRepoDef& lib)
 	lib.variants = DynamicArray<VariantDef>(pVariantGen->GetVariantCount());
 
 	LOG_INFO() << "Variants declared: " << lib.variants.GetLength();
+	FX_CHECK_MSG(lib.variants.GetLength() != 0, "No shaders found.");
 }
 
 void ShaderLibBuilder::GetEntryPoints()

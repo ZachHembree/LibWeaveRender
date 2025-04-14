@@ -20,9 +20,9 @@
 #else
 
 // Throw without source location for release
-#define FX_THROW(...) throw ParseException(__VA_ARGS__)
-#define FXSYNTAX_THROW(...) throw ParseSyntaxException(__VA_ARGS__)
-#define FXBLOCK_THROW(CTX, BLOCK, ...) throw ParseSyntaxException(CTX, BLOCK, __VA_ARGS__)
+#define FX_THROW(...) throw EffectParseException(__VA_ARGS__)
+#define FXSYNTAX_THROW(...) throw EffectSyntaxException(__VA_ARGS__)
+#define FXBLOCK_THROW(CTX, BLOCK, ...) throw EffectSyntaxException(CTX, BLOCK, __VA_ARGS__)
 
 #define FX_ASSERT(COND) REP_EMPTY(COND)
 #define FX_ASSERT_MSG(COND, ...) REP_EMPTY(COND)
@@ -54,7 +54,19 @@ namespace Replica::Effects
 	class EffectParseException : public RepException
 	{
 	public:
-		using RepException::RepException;
+		EffectParseException(string&& msg = "");
+
+		EffectParseException(const std::source_location& loc, string&& msg = "");
+
+		template<typename... FmtArgs>
+		EffectParseException(string_view fmt, FmtArgs&&... args) :
+			EffectParseException(std::vformat(fmt, std::make_format_args(args...)))
+		{ }
+
+		template<typename... FmtArgs>
+		EffectParseException(const std::source_location& loc, string_view fmt, FmtArgs&&... args) :
+			EffectParseException(loc, std::vformat(fmt, std::make_format_args(args...)))
+		{ }
 
 		string_view GetType() const noexcept override;
 	};
