@@ -10,5 +10,5 @@
 #include "ReplicaUtils/Utils.hpp"
 #include "ReplicaUtils/Math.hpp"
 #include "ReplicaEffects/ShaderLibBuilder/WaveConfig.hpp"
-#include "ReplicaEffects/ParseExcept.hpp"
+#include "ReplicaEffects/EffectParseException.hpp"
 #include "ReplicaUtils/Logger.hpp"

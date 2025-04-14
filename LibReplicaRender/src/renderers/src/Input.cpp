@@ -1,6 +1,6 @@
 #include "pch.hpp"
 #include "ReplicaUtils/Win32.hpp"
-#include "../src/utils/include/Input.hpp"
+#include "../src/renderers/include/Input.hpp"
 
 using namespace glm;
 using namespace Replica;

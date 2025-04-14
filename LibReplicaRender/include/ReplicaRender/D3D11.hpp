@@ -3,13 +3,13 @@
 #include "ReplicaUtils/Math.hpp"
 #include <d3d11.h>
 
-#include "../src/utils/include/GfxException.hpp"
+#include "../src/renderers/include/D3DException.hpp"
 
 #include "../src/renderers/include/D3D11/Context.hpp"
 #include "../src/renderers/include/D3D11/Device.hpp"
 #include "../src/renderers/include/D3D11/Renderer.hpp"
 #include "../src/renderers/include/D3D11/RenderComponent.hpp"
-#include "../src/utils/include/Input.hpp"
+#include "../src/renderers/include/Input.hpp"
 
 #include "../src/renderers/include/D3D11/Viewport.hpp"
 #include "../src/renderers/include/D3D11/Mesh.hpp"

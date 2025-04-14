@@ -4,7 +4,7 @@
 #include <memory>
 #include <thread>
 #include "ReplicaUtils/WinUtils.hpp"
-#include "ReplicaEffects/ParseExcept.hpp"
+#include "ReplicaEffects/EffectParseException.hpp"
 #include "ReplicaEffects/ShaderLibBuilder/ShaderCompiler.hpp"
 
 #pragma comment(lib, "dxguid.lib")

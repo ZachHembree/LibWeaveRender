@@ -3,7 +3,7 @@
 #include "ReplicaUtils/Math.hpp"
 #include <d3d11.h>
 
-#include "../src/utils/include/GfxException.hpp"
+#include "../src/renderers/include/D3DException.hpp"
 
 namespace Replica::D3D11
 {

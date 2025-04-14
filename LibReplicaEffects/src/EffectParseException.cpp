@@ -1,16 +1,16 @@
 #include "pch.hpp"
-#include "ReplicaEffects/ParseExcept.hpp"
+#include "ReplicaEffects/EffectParseException.hpp"
 #include "ReplicaEffects/ShaderLibBuilder/ShaderParser/BlockAnalyzer.hpp"
 
 using namespace Replica;
 using namespace Replica::Effects;
 
-string_view ParseException::GetType() const noexcept
+string_view EffectParseException::GetType() const noexcept
 {
 	return "FX Parse Error";
 }
 
-ParseSyntaxException::ParseSyntaxException(const std::source_location& loc,
+EffectSyntaxException::EffectSyntaxException(const std::source_location& loc,
 	const BlockAnalyzer& ctx, int block, string&& msg)
 {
 	const LexBlock& fxLoc = ctx.GetBlocks()[block];
@@ -36,7 +36,7 @@ ParseSyntaxException::ParseSyntaxException(const std::source_location& loc,
 	}
 }
 
-ParseSyntaxException::ParseSyntaxException(const BlockAnalyzer& ctx, int block, string&& msg)
+EffectSyntaxException::EffectSyntaxException(const BlockAnalyzer& ctx, int block, string&& msg)
 {
 	const LexBlock& fxLoc = ctx.GetBlocks()[block];
 	const LexFile& fxSrc = ctx.GetSourceFiles()[fxLoc.file];

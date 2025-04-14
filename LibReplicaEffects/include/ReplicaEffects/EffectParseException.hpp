@@ -4,9 +4,9 @@
 #ifndef NDEBUG
 
 // Throw with source location for debug
-#define FX_THROW(...) throw ParseException(std::source_location::current(), __VA_ARGS__)
-#define FXSYNTAX_THROW(...) throw ParseSyntaxException(std::source_location::current(), __VA_ARGS__)
-#define FXBLOCK_THROW(CTX, BLOCK, ...) throw ParseSyntaxException(std::source_location::current(), CTX, BLOCK, __VA_ARGS__)
+#define FX_THROW(...) throw EffectParseException(std::source_location::current(), __VA_ARGS__)
+#define FXSYNTAX_THROW(...) throw EffectSyntaxException(std::source_location::current(), __VA_ARGS__)
+#define FXBLOCK_THROW(CTX, BLOCK, ...) throw EffectSyntaxException(std::source_location::current(), CTX, BLOCK, __VA_ARGS__)
 
 #define FX_ASSERT(COND) REP_IF_NOT(COND, FX_THROW("Assert failed") )
 #define FX_ASSERT_MSG(COND, ...) REP_IF_NOT(COND, FX_THROW(__VA_ARGS__) )
@@ -51,36 +51,35 @@ namespace Replica::Effects
 	/// <summary>
 	/// Base class for all exceptions raised in the effect parser
 	/// </summary>
-	class ParseException : public RepException
+	class EffectParseException : public RepException
 	{
 	public:
 		using RepException::RepException;
 
 		string_view GetType() const noexcept override;
-
 	};
 
 	/// <summary>
 	/// Base class for all exceptions raised for syntax errors in parsed input. Automatically includes 
 	/// location in source file.
 	/// </summary>
-	class ParseSyntaxException : public ParseException
+	class EffectSyntaxException : public EffectParseException
 	{
 	public:
-		using ParseException::ParseException;
+		using EffectParseException::EffectParseException;
 
-		ParseSyntaxException(const std::source_location& loc, const BlockAnalyzer& ctx, int block, string&& msg);
+		EffectSyntaxException(const std::source_location& loc, const BlockAnalyzer& ctx, int block, string&& msg);
 
-		ParseSyntaxException(const BlockAnalyzer& ctx, int block, string&& msg);
+		EffectSyntaxException(const BlockAnalyzer& ctx, int block, string&& msg);
 
 		template<typename... FmtArgs>
-		ParseSyntaxException(const BlockAnalyzer& ctx, int block, string_view fmt, FmtArgs... args) :
-			ParseSyntaxException(std::vformat(fmt, std::make_format_args(args...)))
+		EffectSyntaxException(const BlockAnalyzer& ctx, int block, string_view fmt, FmtArgs... args) :
+			EffectSyntaxException(std::vformat(fmt, std::make_format_args(args...)))
 		{ }
 
 		template<typename... FmtArgs>
-		ParseSyntaxException(const std::source_location& loc, const BlockAnalyzer& ctx, int block, string_view fmt, FmtArgs... args) :
-			ParseSyntaxException(loc, std::vformat(fmt, std::make_format_args(args...)))
+		EffectSyntaxException(const std::source_location& loc, const BlockAnalyzer& ctx, int block, string_view fmt, FmtArgs... args) :
+			EffectSyntaxException(loc, std::vformat(fmt, std::make_format_args(args...)))
 		{ }
 
 	protected:

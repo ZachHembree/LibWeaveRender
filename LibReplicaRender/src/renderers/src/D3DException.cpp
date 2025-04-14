@@ -1,6 +1,6 @@
 #include "pch.hpp"
 #include <sstream>
-#include "../src/utils/include/GfxException.hpp"
+#include "../src/renderers/include/D3DException.hpp"
 
 using namespace std;
 using namespace Replica;

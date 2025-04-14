@@ -27,7 +27,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ReplicaEffects\ParseExcept.hpp" />
+    <ClInclude Include="include\ReplicaEffects\EffectParseException.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderRegistryBuilder.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderDataHandles.hpp" />
     <ClInclude Include="include\ReplicaEffects\ShaderLibBuilder\ShaderDataHashes.hpp" />
@@ -53,7 +53,7 @@
     <ClInclude Include="src\pch.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ParseExcept.cpp" />
+    <ClCompile Include="src\EffectParseException.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">Create</PrecompiledHeader>

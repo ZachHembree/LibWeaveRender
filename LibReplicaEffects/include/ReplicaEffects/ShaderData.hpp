@@ -1,6 +1,6 @@
 #pragma once
 #include "ReplicaUtils/Math.hpp"
-#include "ReplicaEffects/ParseExcept.hpp"
+#include "ReplicaEffects/EffectParseException.hpp"
 #include "ReplicaUtils/StringIDMap.hpp"
 #include "ReplicaUtils/VectorSpan.hpp"
 #include "ReplicaEffects/ShaderLibBuilder/ShaderParser/SymbolEnums.hpp"

@@ -1,6 +1,6 @@
 #include "pch.hpp"
 #include <charconv>
-#include "ReplicaEffects/ParseExcept.hpp"
+#include "ReplicaEffects/EffectParseException.hpp"
 #include "ReplicaEffects/ShaderLibBuilder/ShaderParser/BlockAnalyzer.hpp"
 
 namespace Replica::Effects

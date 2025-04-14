@@ -3,7 +3,7 @@
 #include <fstream>
 #include <filesystem>
 #include <unordered_map>
-#include "ReplicaEffects/ParseExcept.hpp"
+#include "ReplicaEffects/EffectParseException.hpp"
 #include "ReplicaUtils/Logger.hpp"
 #include "ReplicaEffects/ShaderLibBuilder.hpp"
 
@@ -417,7 +417,7 @@ int main(int argc, char* argv[])
         HandleOptions(args);
         CreateLibrary();
     }
-    catch (const ParseException& err)
+    catch (const EffectSyntaxException& err)
     {
         LOG_ERROR() << "[" << err.GetType() << "] " << err.GetDescription();
         code = 6;
