@@ -20,22 +20,26 @@ const char* ClampPtr(const char* ptr, const char* min, const char* max)
 TextBlock::TextBlock() : Span()
 { }
 
-TextBlock::TextBlock(const char* pStart) : Span(pStart, 1)
-{ }
-
 TextBlock::TextBlock(const char* pStart, size_t length) : Span(pStart, length)
+{
+    if (length > 0 && GetBack() == '\0')
+        this->length--;
+}
+
+TextBlock::TextBlock(const char* pStart, const char* pEnd) : 
+    TextBlock(pStart, UnsignedDelta(pEnd + 1, pStart))
 { }
 
-TextBlock::TextBlock(const char* pStart, const char* pEnd) : Span(pStart, pEnd)
+TextBlock::TextBlock(const char* pStart) : TextBlock(pStart, 1)
 { }
 
-TextBlock::TextBlock(string& str) : Span(&str[0], str.length())
+TextBlock::TextBlock(string& str) : TextBlock(&str[0], str.length())
 { }
 
-TextBlock::TextBlock(string_view& str) : Span(&str[0], str.length())
+TextBlock::TextBlock(string_view& str) : TextBlock(&str[0], str.length())
 { }
 
-TextBlock::TextBlock(Span<char>& span) : Span(span.GetData(), span.GetLength())
+TextBlock::TextBlock(Span<char>& span) : TextBlock(span.GetData(), span.GetLength())
 { }
 
 /// <summary>
