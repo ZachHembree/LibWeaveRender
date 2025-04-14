@@ -36,11 +36,16 @@ namespace Replica::Effects
         Name = 1 << 15,
         Body = 1 << 16,
 
+        LineDirective = 1 << 17 | Directive,
+
         StartContainer = Start | Container,
         EndContainer = End | Container,
 
         DirectiveName = Name | Directive,
         DirectiveBody = Body | Directive,
+
+        LineDirectiveName = DirectiveName | LineDirective,
+        LineDirectiveBody = DirectiveBody | LineDirective,
 
         SemicolonSeparator = Semicolon | Separator,
         ColonSeparator = Colon | Separator,
@@ -167,7 +172,7 @@ namespace Replica::Effects
 
         void AddDirective();
 
-        void ProcessLineDirective(const LexBlock& body);
+        void ProcessLineDirective(LexBlock& body);
 
         void SetState(int blockIndex);
 

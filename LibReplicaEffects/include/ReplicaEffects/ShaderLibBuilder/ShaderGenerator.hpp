@@ -9,13 +9,13 @@ namespace Replica::Effects
 
 	struct SourceMask
 	{
-		string_view altText;
+		TextBlock altText;
 		int startBlock;
 		int blockCount;
 
 		SourceMask();
 
-		SourceMask(string_view altText, int startBlock = -1, int blockCount = -1);
+		SourceMask(TextBlock altText, int startBlock = -1, int blockCount = -1);
 
 		bool GetIsMasking() const;
 

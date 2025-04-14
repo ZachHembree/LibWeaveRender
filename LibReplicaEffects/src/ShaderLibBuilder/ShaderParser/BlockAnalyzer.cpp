@@ -357,7 +357,10 @@ namespace Replica::Effects
         bool isLineDirective = false;
 
         if (name.src.StartsWith("#line"))
+        {
             isLineDirective = true;
+            name.type |= LexBlockTypes::LineDirective;
+        }
 
         LexBlock& body = blocks.EmplaceBack();
         body.depth = depth;
@@ -374,7 +377,7 @@ namespace Replica::Effects
             ProcessLineDirective(body);
     }
 
-    void BlockAnalyzer::ProcessLineDirective(const LexBlock& body) 
+    void BlockAnalyzer::ProcessLineDirective(LexBlock& body) 
     {
         // New line number
         const char* pFirstDigit = body.src.FindStart(body.src.GetData(), "", '0', '9');
@@ -397,12 +400,14 @@ namespace Replica::Effects
             const char* pFileStart = body.src.Find('"', pLastDigit + 1);
             const char* pFileEnd = body.src.FindEnd(pFileStart + 1, """");
             newPath = TextBlock(pFileStart, pFileEnd);
-        }
-        else
-            newPath = files.GetBack().filePath;
 
-        files.EmplaceBack(newPath, newLine);
+            if (files.IsEmpty() || files.GetBack().filePath != newPath)
+                files.EmplaceBack(newPath, newLine);
+        }
+
         line = newLine;
+        body.type |= LexBlockTypes::LineDirective;
+        body.startLine = newLine - 1;
     }
     
     /// <summary>

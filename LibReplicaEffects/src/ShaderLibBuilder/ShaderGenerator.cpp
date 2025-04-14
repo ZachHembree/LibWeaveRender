@@ -5,13 +5,21 @@
 
 using namespace Replica::Effects;
 
-SourceMask::SourceMask() : altText(nullptr, 0), startBlock(0), blockCount(0) { }
+static void AppendLineDirective(int line, string& srcOut)
+{
+	if (!srcOut.empty() && srcOut.back() != '\n')
+		srcOut.push_back('\n');
 
-SourceMask::SourceMask(string_view altText, int startBlock, int blockCount) :
+	std::format_to(std::back_inserter(srcOut), "#line {}\n", line);
+}
+
+SourceMask::SourceMask() : altText(), startBlock(0), blockCount(0) { }
+
+SourceMask::SourceMask(TextBlock altText, int startBlock, int blockCount) :
 	altText(altText), startBlock(startBlock), blockCount(blockCount)
 {}
 
-bool SourceMask::GetIsMasking() const { return altText.data() != nullptr; }
+bool SourceMask::GetIsMasking() const { return altText.GetData() != nullptr; }
 
 int SourceMask::GetLastBlock() const { return startBlock + blockCount - 1; }
 
@@ -89,13 +97,16 @@ void ShaderGenerator::GetMaskedSource(const IDynamicArray<LexBlock>& srcBlocks, 
 		AddBlockRange(srcBlocks, blockIndex, mask.startBlock - 1, srcOut, line);
 
 		// Append alternate text
-		if (mask.altText.length() > 0)
+		if (mask.altText.GetLength() > 0)
 		{
 			const int lastLine = srcBlocks[mask.GetLastBlock()].GetLastLine();
-			std::format_to(std::back_inserter(srcOut), "\n#line {}\n", srcBlocks[mask.startBlock].startLine);
+			const int startLine = srcBlocks[mask.startBlock].startLine;
+
+			if (line != startLine)
+				AppendLineDirective(srcBlocks[mask.startBlock].startLine, srcOut);
+				
 			srcOut.append(mask.altText);
-			std::format_to(std::back_inserter(srcOut), "\n#line {}\n", lastLine);
-			line = lastLine;
+			line = startLine + mask.altText.FindCount('\n');
 		}
 
 		blockIndex = mask.startBlock + mask.blockCount;
@@ -238,30 +249,56 @@ void ShaderGenerator::AddBlockRange(const IDynamicArray<LexBlock>& srcBlocks, in
 	{
 		const LexBlock& block = srcBlocks[start];
 
-		if (!block.GetHasFlags(LexBlockTypes::EndContainer))
+		if ((start + 1) <= end && block.GetHasFlags(LexBlockTypes::LineDirectiveName))
 		{
-			if ((block.startLine - line) > 3)
-			{
-				std::format_to(std::back_inserter(srcOut), "\n#line {}\n", block.startLine);
-				line = block.startLine;
-			}
-			else while (line < block.startLine)
-			{
+			FXSYNTAX_ASSERT_MSG(srcBlocks[start + 1].GetHasFlags(LexBlockTypes::LineDirectiveBody),
+				"Expected line directive body after #line");
+
+			const LexBlock& body = srcBlocks[start + 1];
+			line = body.startLine + 1;
+
+			if (!srcOut.empty() && srcOut.back() != '\n')
 				srcOut.push_back('\n');
-				line++;
-			}
-		}
 
-		if (block.GetHasFlags(LexBlockTypes::StartContainer))
-			srcOut.push_back(block.src.GetFront());
-		else if (block.GetHasFlags(LexBlockTypes::EndContainer))
-				srcOut.push_back(block.src.GetBack());
-		else
-		{
 			srcOut.append(block.src);
-			line += block.lineCount;
+			srcOut.append(body.src);
+			start += 2;
 		}
+		else
+		{ 
+			if (!block.GetHasFlags(LexBlockTypes::EndContainer))
+			{
+				if ((block.startLine - line) > 3)
+				{
+					AppendLineDirective(block.startLine, srcOut);
+					line = block.startLine;
+				}
+				else while (line < block.startLine)
+				{
+					srcOut.push_back('\n');
+					line++;
+				}
+			}
 
-		start++;
+			if (block.GetHasFlags(LexBlockTypes::StartContainer))
+				srcOut.push_back(block.src.GetFront());
+			else if (block.GetHasFlags(LexBlockTypes::EndContainer))
+				srcOut.push_back(block.src.GetBack());
+			else if (block.GetHasFlags(LexBlockTypes::DirectiveName))
+			{
+				if (!srcOut.empty() && srcOut.back() != '\n')
+					srcOut.push_back('\n');
+
+				srcOut.append(block.src);
+				line += block.lineCount;
+			}
+			else
+			{
+				srcOut.append(block.src);
+				line += block.lineCount;
+			}
+
+			start++;
+		}
 	}
 }
