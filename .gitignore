@@ -369,3 +369,5 @@ imgui/imgui/.github/
 EffectPreprocessor/ShaderTest.hpp
 
 EffectPreprocessor/ShaderTest.rpfx
+
+EffectPreprocessor/output_debug.bin
