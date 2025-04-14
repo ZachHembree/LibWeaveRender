@@ -14,8 +14,8 @@
 
 #define WIN_THROW_HR(HR) WIN_THROW_HR_MSG(HR, "")
 
-#define WIN_CHECK_HR_MSG(HR, ...) do { HRESULT hr = (HR); if (FAILED(hr)) { WIN_THROW_HR_MSG(hr, __VA_ARGS__); } } while(0)
-#define WIN_CHECK_LAST_MSG(COND, ...) REP_CONDITION(COND, WIN_CHECK_HR_MSG(GetLastError(), __VA_ARGS__))
+#define WIN_CHECK_HR_MSG(HR, ...) do { HRESULT _hr = (HR); if (FAILED(_hr)) { WIN_THROW_HR_MSG(_hr, __VA_ARGS__); } } while(0)
+#define WIN_CHECK_LAST_MSG(COND, ...) REP_IF_NOT(COND, WIN_CHECK_HR_MSG(GetLastError(), __VA_ARGS__))
 #define WIN_CHECK_NZ_LAST_MSG(X, ...) WIN_CHECK_LAST_MSG((X) != 0, __VA_ARGS__)
 
 #define WIN_CHECK_HR(HR) WIN_CHECK_HR_MSG(HR, "Check failed")
@@ -31,13 +31,13 @@
 #define WIN_ASSERT_LAST(COND) WIN_CHECK_LAST_MSG(COND, "Assert failed")
 #define WIN_ASSERT_NZ_LAST(X) WIN_CHECK_NZ_LAST_MSG(X, "Assert failed")
 #else
-#define WIN_ASSERT_HR_MSG(HR, ...) REP_EMPTY()
-#define WIN_ASSERT_LAST_MSG(COND, ...) REP_EMPTY()
-#define WIN_ASSERT_NZ_LAST_MSG(X, ...) REP_EMPTY()
+#define WIN_ASSERT_HR_MSG(HR, ...) REP_EMPTY(HR)
+#define WIN_ASSERT_LAST_MSG(COND, ...) REP_EMPTY(COND)
+#define WIN_ASSERT_NZ_LAST_MSG(X, ...) REP_EMPTY(X)
 
-#define WIN_ASSERT_HR(HR) REP_EMPTY()
-#define WIN_ASSERT_LAST(COND) REP_EMPTY()
-#define WIN_ASSERT_NZ_LAST(X) REP_EMPTY()
+#define WIN_ASSERT_HR(HR) REP_EMPTY(HR)
+#define WIN_ASSERT_LAST(COND) REP_EMPTY(COND)
+#define WIN_ASSERT_NZ_LAST(X) REP_EMPTY(X)
 #endif
 
 namespace Replica

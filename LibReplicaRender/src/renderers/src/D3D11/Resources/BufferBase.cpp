@@ -87,7 +87,7 @@ void BufferBase::UpdateSubresource(Context& ctx, const void* data)
 void BufferBase::UpdateMapUnmap(Context& ctx, const void* data)
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
-	D3D_ASSERT_HR(ctx->Map(
+	D3D_CHECK_HR(ctx->Map(
 		Get(),
 		0u,
 		D3D11_MAP_WRITE_DISCARD,

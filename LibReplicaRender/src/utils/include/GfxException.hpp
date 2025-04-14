@@ -9,8 +9,8 @@
 #define D3D_THROW_HR_MSG(HR, ...) throw D3DException(HR, __VA_ARGS__)
 #endif // !NDEBUG
 
-#define D3D_CHECK_MSG(COND, ...) REP_CONDITION( COND, D3D_THROW(__VA_ARGS__) )
-#define D3D_CHECK(COND) REP_CONDITION( COND, D3D_THROW("Check failed") )
+#define D3D_CHECK_MSG(COND, ...) REP_IF_NOT( COND, D3D_THROW(__VA_ARGS__) )
+#define D3D_CHECK(COND) REP_IF_NOT( COND, D3D_THROW("Check failed") )
 #define D3D_CHECK_HR_MSG(HR, ...) do { HRESULT hr = (HR); if (FAILED(hr)) { D3D_THROW_HR_MSG(hr, __VA_ARGS__); } } while(0)
 #define D3D_CHECK_HR(HR) D3D_CHECK_HR_MSG(HR, "")
 
@@ -20,10 +20,10 @@
 #define D3D_ASSERT_HR_MSG(HR, ...) D3D_CHECK_HR_MSG(HR, __VA_ARGS__)
 #define D3D_ASSERT_HR(HR) D3D_CHECK_HR_MSG(HR, "")
 #else
-#define D3D_ASSERT_MSG(COND, ...) REP_EMPTY()
-#define D3D_ASSERT(COND) REP_EMPTY()
-#define D3D_ASSERT_HR_MSG(HR, ...) REP_EMPTY()
-#define D3D_ASSERT_HR(HR) REP_EMPTY()
+#define D3D_ASSERT_MSG(COND, ...) REP_EMPTY(COND)
+#define D3D_ASSERT(COND) REP_EMPTY(COND)
+#define D3D_ASSERT_HR_MSG(HR, ...) REP_EMPTY(HR)
+#define D3D_ASSERT_HR(HR) REP_EMPTY(HR)
 #endif // !NDEBUG
 
 namespace Replica::D3D11

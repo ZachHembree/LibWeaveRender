@@ -5,11 +5,11 @@
 #include "ReplicaUtils/TextUtils.hpp"
 
 // Wraps a block in a conditional macro that behaves like a statement
-#define REP_CONDITION(COND, X) do { if (!(COND)) X; } while (0)
+#define REP_IF_NOT(COND, X) do { const bool _isCond = (COND); if (!_isCond) X; } while (0)
 // Empty macro that behaves like a statement
-#define REP_EMPTY() do while(0)
+#define REP_EMPTY(X) do { (void)(X); } while(0)
 
-#define REP_CHECK_MSG(COND, ...) REP_CONDITION(COND,  REP_THROW(__VA_ARGS__) )
+#define REP_CHECK_MSG(COND, ...) REP_IF_NOT(COND,  REP_THROW(__VA_ARGS__) )
 #define REP_CHECK(COND) REP_CHECK_MSG(COND, "Check failed")
 
 #ifndef NDEBUG
@@ -21,8 +21,8 @@
 #else
 
 #define REP_THROW(...) throw RepException(__VA_ARGS__)
-#define REP_ASSERT(COND) REP_EMPTY()
-#define REP_ASSERT_MSG(COND, ...) REP_EMPTY()
+#define REP_ASSERT(COND) REP_EMPTY(COND)
+#define REP_ASSERT_MSG(COND, ...) REP_EMPTY(COND)
 
 #endif
 

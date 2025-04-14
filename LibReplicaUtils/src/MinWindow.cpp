@@ -157,7 +157,7 @@ void MinWindow::SetStyle(WndStyle style)
 ivec2 MinWindow::GetPos() const
 {
 	RECT rect;
-	WIN_ASSERT_NZ_LAST(GetWindowRect(hWnd, &rect));
+	WIN_CHECK_NZ_LAST(GetWindowRect(hWnd, &rect));
 	return ivec2(rect.left, rect.top);
 }
 

@@ -244,6 +244,8 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
 /// </summary>
 static void CreateLibrary()
 {
+    FX_CHECK_MSG(!inputFiles.empty(), "No input specified");
+
     static ShaderLibBuilder libBuilder;
     static std::stringstream streamBuf;
 
@@ -328,8 +330,6 @@ static void CreateLibrary()
 /// </summary>
 static void HandleOptions(const IDynamicArray<string_view>& args)
 {
-    FX_CHECK_MSG(inputFiles.empty(), "No input specified");
-
     for (int i = 1; i < args.GetLength(); i++)
     {
         const string_view& arg = args[i];
@@ -401,8 +401,8 @@ int main(int argc, char* argv[])
             {
                 string_view(argv[0]),
                 "--input", "*.rpfx",
-                //"--output", "..\\EffectPreprocessor\\",
-                "-h"
+                "--output", "..\\EffectPreprocessor\\",
+                "-hm"
             };
         }
         else
