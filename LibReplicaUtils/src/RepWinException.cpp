@@ -5,27 +5,24 @@
 using namespace std;
 using namespace Replica;
 
-static string_view GetTranslatedErrorCode(HRESULT hr) noexcept
+static string GetTranslatedErrorCode(HRESULT hr) noexcept
 {
-	char* lpBuf = nullptr;
-	DWORD msgLen = FormatMessageA(
+	wchar_t* lpBuf = nullptr;
+	DWORD msgLen = FormatMessageW(
 		// Alloc Mem for Message + Write Address to Ptr Var | Search Sys Tables for Message
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr,
 		hr,
 		0, // Auto lang ID
-		(LPSTR)&lpBuf,
+		(wchar_t*)&lpBuf,
 		0,
 		nullptr
 	);
 
 	if (lpBuf != nullptr)
 	{
-		static thread_local string errString;
-		errString.clear();
-		errString.append(lpBuf);
+		string errString = GetMultiByteString_UTF16LE_TO_UTF8(wstring_view(lpBuf));
 		LocalFree(lpBuf);
-
 		return errString;
 	}
 	else
