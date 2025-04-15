@@ -86,12 +86,12 @@ namespace Replica::Effects
 
 		template<typename... FmtArgs>
 		EffectSyntaxException(const BlockAnalyzer& ctx, int block, string_view fmt, FmtArgs... args) :
-			EffectSyntaxException(std::vformat(fmt, std::make_format_args(args...)))
+			EffectSyntaxException(ctx, block, std::vformat(fmt, std::make_format_args(args...)))
 		{ }
 
 		template<typename... FmtArgs>
 		EffectSyntaxException(const std::source_location& loc, const BlockAnalyzer& ctx, int block, string_view fmt, FmtArgs... args) :
-			EffectSyntaxException(loc, std::vformat(fmt, std::make_format_args(args...)))
+			EffectSyntaxException(loc, ctx, block, std::vformat(fmt, std::make_format_args(args...)))
 		{ }
 
 	protected:

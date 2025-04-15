@@ -43,9 +43,9 @@ EffectSyntaxException::EffectSyntaxException(const std::source_location& loc,
 	if (msg.length() > 0)
 	{
 		this->msg = std::format(
-			"Line: {}\nFile: {}\n{}\n"
+			"{}\nLine: {}\nFile: {}\n"
 			"[DEBUG INTERNAL] File: {} Line: {}", 
-			fxLoc.startLine, fxSrc.filePath, msg, // Input file location
+			msg, fxLoc.startLine, fxSrc.filePath, // Input file location
 			loc.file_name(), loc.line() // Internal debug location
 		);
 	}
