@@ -7,18 +7,58 @@
 #include "ReplicaUtils/Utils.hpp"
 #include "ObjectPool.hpp"
 
+#ifndef REP_LOG_LEVEL
+#ifdef NDEBUG
+#define REP_LOG_LEVEL 3 // Debug logging disabled by default in release
+#else
+#define REP_LOG_LEVEL 4 // Default to maximum logging in debug
+#endif // !NDEBUG
+#endif 
+
+#define REP_LOG_ERROR_LEVEL 1
+#define REP_LOG_WARN_LEVEL 2
+#define REP_LOG_INFO_LEVEL 3
+#define REP_LOG_DEBUG_LEVEL 4
+
+#if REP_LOG_LEVEL >= REP_LOG_ERROR_LEVEL
+#define LOG_ERROR() Replica::Logger::Log(Replica::Logger::Level::Error)
+#else
+#define LOG_ERROR() Replica::Logger::GetNullMessage()
+#endif
+
+#if REP_LOG_LEVEL >= REP_LOG_WARN_LEVEL
+#define LOG_WARN() Replica::Logger::Log(Replica::Logger::Level::Warning)
+#else
+#define LOG_WARN() Replica::Logger::GetNullMessage()
+#endif
+
+#if REP_LOG_LEVEL >= REP_LOG_INFO_LEVEL
+#define LOG_INFO() Replica::Logger::Log(Replica::Logger::Level::Info)
+#else
+#define LOG_INFO() Replica::Logger::GetNullMessage()
+#endif
+
+#if REP_LOG_LEVEL >= REP_LOG_DEBUG_LEVEL
+#define LOG_DEBUG() Replica::Logger::Log(Replica::Logger::Level::Debug)
+#else
+#define LOG_DEBUG() Replica::Logger::GetNullMessage()
+#endif
+
 namespace Replica
 { 
     class Logger
     {
     public:
-        enum class Level : byte
+        using MessageBuffer = std::unique_ptr<std::stringstream>;
+
+        enum class Level : uint
         {
             Unknown = 0,
-            Info = 1,
-            Error = 2,
-            Warning = 3,
-            Debug = 4
+            Error = REP_LOG_ERROR_LEVEL,
+            Warning = REP_LOG_WARN_LEVEL,
+            Info = REP_LOG_INFO_LEVEL,
+            Debug = REP_LOG_DEBUG_LEVEL,
+            Discard = 10
         };
 
         /// <summary>
@@ -28,22 +68,35 @@ namespace Replica
         {
             MAKE_MOVE_ONLY(Message)
 
-            Message(Level level, std::stringstream&& msgBuf);
+            Message();
+
+            Message(Level level, MessageBuffer&& msgBuf);
 
             ~Message();
 
             template <typename T>
             Message& operator<<(const T& value)
             {
-                msgBuf << value;
+                if (level != Level::Discard)
+                    *pMsgBuf << value;
+
                 return *this;
             }
 
         private:
             Level level;
-            std::stringstream msgBuf;
+            MessageBuffer pMsgBuf;
 
             static const char* GetLevelName(Level level);
+        };
+
+        /// <summary>
+        /// Empty message handler for discarding logs below a set threshold
+        /// </summary>
+        struct NullMessage
+        {
+            template <typename T>
+            const NullMessage& operator<<(const T&) const { return *this; }
         };
 
         /// <summary>
@@ -52,7 +105,7 @@ namespace Replica
         static bool GetIsInitialized();
 
         /// <summary>
-        /// Initializes the log to the given output stream
+        /// Initializes the log to the given output stream. Caller is responsible for stream lifetime.
         /// </summary>
         static void Init(std::ostream& logOut);
 
@@ -62,7 +115,7 @@ namespace Replica
         static void InitToFile(std::string_view path);
 
         /// <summary>
-        /// Adds an output stream to the logger.
+        /// Adds an output stream to the logger. Caller is responsible for stream lifetime.
         /// </summary>
         static void AddStream(std::ostream& logOut);
 
@@ -76,24 +129,29 @@ namespace Replica
         /// </summary>
         static Message Log(Level level);
 
+        /// <summary>
+        /// Returns an empty log message stream object
+        /// </summary>
+        static const NullMessage& GetNullMessage();
+
+        /// <summary>
+        /// Returns true if the given logging level is enabled
+        /// </summary>
+        static constexpr bool GetIsLevelEnabled(Logger::Level level);
+
+        /// <summary>
+        /// Sets runtime logging level
+        /// </summary>
+        static void SetLogLevel(Logger::Level level);
+
+    private:
+        MAKE_MOVE_ONLY(Logger)
+
+        Logger();
+
+        ~Logger();
+
         static void AddTimestamp(std::ostream& stream);
-
-        template <typename T> 
-        static void WriteValue(const T& value)
-        {
-            std::lock_guard<std::mutex> lock(mutex);
-
-            if (!instance.isInitialized)
-                throw std::runtime_error("Tried to write to uninitialized log.");
-
-            for (std::ostream* pOut : instance.logStreams)
-            {
-                if (pOut->rdstate() == std::ios::goodbit)
-                    *pOut << value;
-                else
-                    throw std::runtime_error("Failed to write to log stream.");
-            }
-        }
 
         template <typename T>
         static void WriteLine(const T& value)
@@ -112,28 +170,18 @@ namespace Replica
             }
         }
 
-    private:
-        MAKE_MOVE_ONLY(Logger)
+        static MessageBuffer GetStrBuf();
 
-        Logger();
-
-        ~Logger();
-
-        static std::stringstream GetStrBuf();
-
-        static void ReturnStrBuf(std::stringstream&&);
+        static void ReturnStrBuf(MessageBuffer&&);
 
         static Logger instance;
+        static const NullMessage nullMsg;
         static std::mutex mutex;
 
         std::fstream logFile;
         Vector<std::ostream*> logStreams;
-        ObjectPool<std::stringstream> sstreamPool;
+        ObjectPool<MessageBuffer> sstreamPool;
         bool isInitialized;
+        uint logLevel;
     };
 }
-
-#define LOG_INFO() Replica::Logger::Log(Replica::Logger::Level::Info)
-#define LOG_ERROR() Replica::Logger::Log(Replica::Logger::Level::Error)
-#define LOG_WARN() Replica::Logger::Log(Replica::Logger::Level::Warning)
-#define LOG_DEBUG() Replica::Logger::Log(Replica::Logger::Level::Debug)
