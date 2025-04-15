@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugVS|Win32">
@@ -27,56 +27,96 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Preprocessor.cpp" />
+    <ClInclude Include="include\WeaveUtils\Logger.hpp" />
+    <ClInclude Include="include\WeaveUtils\ObjectPool.hpp" />
+    <ClInclude Include="include\WeaveUtils\GlobalUtils.hpp" />
+    <ClInclude Include="include\WeaveUtils\StringIDBuilder.hpp" />
+    <ClInclude Include="include\WeaveUtils\StringSpan.hpp" />
+    <ClInclude Include="include\WeaveUtils\VectorSpan.hpp" />
+    <ClInclude Include="src\pch.hpp" />
+    <ClInclude Include="include\WeaveUtils\Serialization.hpp" />
+    <ClInclude Include="include\internal\DynCollectionSerializers.hpp" />
+    <ClInclude Include="include\WeaveUtils\DataBufferHandle.hpp" />
+    <ClInclude Include="include\WeaveUtils\DynamicCollections.hpp" />
+    <ClInclude Include="include\WeaveUtils\MinWindow.hpp" />
+    <ClInclude Include="include\WeaveUtils\WeaveException.hpp" />
+    <ClInclude Include="include\WeaveUtils\LeanWin.hpp" />
+    <ClInclude Include="include\WeaveUtils\Int.hpp" />
+    <ClInclude Include="include\WeaveUtils\WeaveWinException.hpp" />
+    <ClInclude Include="include\WeaveUtils\Span.hpp" />
+    <ClInclude Include="include\WeaveUtils\Stopwatch.hpp" />
+    <ClInclude Include="include\WeaveUtils\TextBlock.hpp" />
+    <ClInclude Include="include\WeaveUtils\TextUtils.hpp" />
+    <ClInclude Include="include\internal\DeltaUtils.hpp" />
+    <ClInclude Include="include\WeaveUtils\WindowComponentBase.hpp" />
+    <ClInclude Include="include\WeaveUtils\Math.hpp" />
+    <ClInclude Include="include\WeaveUtils\Utils.hpp" />
+    <ClInclude Include="include\WeaveUtils\Win32.hpp" />
+    <ClInclude Include="include\WeaveUtils\WinUtils.hpp" />
+    <ClInclude Include="include\WeaveUtils\StringIDMap.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\FXHelpText.hpp" />
+    <ClCompile Include="src\Logger.cpp" />
+    <ClCompile Include="src\MinWindow.cpp" />
+    <ClCompile Include="src\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\WeaveException.cpp" />
+    <ClCompile Include="src\Math.cpp" />
+    <ClCompile Include="src\WinUtils.cpp" />
+    <ClCompile Include="src\WeaveWinException.cpp" />
+    <ClCompile Include="src\Stopwatch.cpp" />
+    <ClCompile Include="src\StringIDBuilder.cpp" />
+    <ClCompile Include="src\StringIDMap.cpp" />
+    <ClCompile Include="src\TextBlock.cpp" />
+    <ClCompile Include="src\TextUtils.cpp" />
+    <ClCompile Include="src\internal\DeltaUtils.cpp" />
+    <ClCompile Include="src\WindowComponentBase.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{8e328ed7-fcc1-41d5-ab9e-42a658758fb5}</ProjectGuid>
-    <RootNamespace>RPFXPreprocessor</RootNamespace>
+    <ProjectGuid>{92e1bc9f-cbaf-48e3-b299-b61fffbb5be9}</ProjectGuid>
+    <RootNamespace>LibWeaveUtils</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>EffectPreprocessor</ProjectName>
+    <ProjectName>LibWeaveUtils</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -127,55 +167,48 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
     <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
-    <TargetName>wfxc</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">
     <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
     <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
-    <TargetName>wfxc</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
     <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
-    <TargetName>wfxc</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -183,64 +216,58 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_DEBUG_VS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\Debug\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\Debug\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -248,41 +275,23 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\boost.1.87.0\build\boost.targets" Condition="Exists('..\packages\boost.1.87.0\build\boost.targets')" />
-    <Import Project="..\packages\boost_thread-vc143.1.87.0\build\boost_thread-vc143.targets" Condition="Exists('..\packages\boost_thread-vc143.1.87.0\build\boost_thread-vc143.targets')" />
-    <Import Project="..\packages\boost_wave-vc143.1.87.0\build\boost_wave-vc143.targets" Condition="Exists('..\packages\boost_wave-vc143.1.87.0\build\boost_wave-vc143.targets')" />
-    <Import Project="..\packages\boost_filesystem-vc143.1.87.0\build\boost_filesystem-vc143.targets" Condition="Exists('..\packages\boost_filesystem-vc143.1.87.0\build\boost_filesystem-vc143.targets')" />
-    <Import Project="..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets" Condition="Exists('..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets')" />
-  </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\boost.1.87.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.87.0\build\boost.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_thread-vc143.1.87.0\build\boost_thread-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_thread-vc143.1.87.0\build\boost_thread-vc143.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_wave-vc143.1.87.0\build\boost_wave-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_wave-vc143.1.87.0\build\boost_wave-vc143.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_filesystem-vc143.1.87.0\build\boost_filesystem-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_filesystem-vc143.1.87.0\build\boost_filesystem-vc143.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets'))" />
-  </Target>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

@@ -2,24 +2,24 @@
 #include <string_view>
 
 constexpr std::string_view g_FX_HelpText = R"HELPTEXT(
-RPFX Preprocessor - Shader Library Compiler (v0.1.0)
+WFX Preprocessor - Shader Library Compiler (v0.1.0)
 ----------------------------------------------------
-Preprocesses and compiles Replica Effects (.rpfx) shader source files into
+Preprocesses and compiles Weave Effects (.wfx) shader source files into
 optimized, deployable shader libraries. These libraries can be output as
 binary files (.bin) for runtime loading or as C++ header files (.hpp) for
 embedding directly into application code.
 
 USAGE:
-    rpfx --input <file|pattern> [--output <path>] [options]
-    rpfx --help
+    wfxc --input <file|pattern> [--output <path>] [options]
+    wfxc --help
 
 OPTIONS:
     --input <file|pattern>
-                      Specifies the input RPFX file(s).
-                      - Use a specific filename (e.g., 'myshader.rpfx').
-                      - Use a wildcard pattern (e.g., '*.rpfx') to process
+                      Specifies the input WFX file(s).
+                      - Use a specific filename (e.g., 'myshader.wfx').
+                      - Use a wildcard pattern (e.g., '*.wfx') to process
                         all matching files in the current directory or the
-                        specified path's directory (e.g., 'shaders/*.rpfx').
+                        specified path's directory (e.g., 'shaders/*.wfx').
                       This option is REQUIRED.
 
     --output <path>
@@ -59,30 +59,30 @@ OPTIONS:
     --help            Display this help message and exit.
 
 EXAMPLES:
-    # Compile all .rpfx files in the current directory into separate .bin files
-    rpfx --input "*.rpfx"
+    # Compile all .wfx files in the current directory into separate .bin files
+    wfxc --input "*.wfx"
 
     # Compile a single file into a specific output directory as a C++ header
-    rpfx --input myshaders/common.rpfx --output compiled/ --header
+    wfxc --input myshaders/common.wfx --output compiled/ --header
 
-    # Compile all .rpfx files in 'src_shaders/' and merge them into a single
+    # Compile all .wfx files in 'src_shaders/' and merge them into a single
     # binary library for Shader Model 6.0
-    rpfx --input "src_shaders/*.rpfx" --output libs/shader_bundle.bin --merge --feature-level 6_0
+    wfxc --input "src_shaders/*.wfx" --output libs/shader_bundle.bin --merge --feature-level 6_0
 
     # Compile a single file with debugging enabled to a specific output file
-    rpfx --input test.rpfx --output test_debug.bin --debug
+    wfxc --input test.wfx --output test_debug.bin --debug
 
 EXIT CODES:
      0: Success
      1: Unknown error occurred
      2: Standard C++ exception caught
      3: Filesystem error (I/O, permissions, path not found)
-     4: Replica framework internal error
+     4: Weave framework internal error
      5: Effect parsing/compilation error (check logs for details)
     10: Critical initialization error (e.g., cannot initialize logging)
 
 NOTES:
-    - Detailed logs are written to 'rpfx.log' in the directory where the
+    - Detailed logs are written to 'wfxc.log' in the directory where the
       preprocessor is executed. Check this file for detailed error messages.
 
 )HELPTEXT";

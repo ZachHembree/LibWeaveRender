@@ -350,19 +350,19 @@ MigrationBackup/
 
 *.cso
 
-ReplicaRenderer/src/renderers/include/D3D11/ShaderSrc/
+WeaveRenderer/src/renderers/include/D3D11/ShaderSrc/
 
-LibReplicaRender/src/renderers/include/D3D11/ShaderSrc/
+LibWeaveRender/src/renderers/include/D3D11/ShaderSrc/
 
 Notes.md
 
-ReplicaDebug
+WeaveDebug
 
-ReplicaEffectsPreprocessor
+WeaveEffectsPreprocessor
 
-ReplicaRenderer.code-workspace
+WeaveRenderer.code-workspace
 
-LibReplicaDevelop.sln
+LibWeaveDevelop.sln
 
 imgui/imgui/.github/
 
@@ -371,3 +371,7 @@ EffectPreprocessor/ShaderTest.hpp
 EffectPreprocessor/ShaderTest.rpfx
 
 EffectPreprocessor/output_debug.bin
+
+EffectPreprocessor/ShaderTest.wfx
+
+*.code-workspace

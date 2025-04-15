@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugVS|Win32">
@@ -27,56 +27,103 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Preprocessor.cpp" />
+    <ClInclude Include="include\WeaveEffects\EffectParseException.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderRegistryBuilder.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderDataHandles.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderDataHashes.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderCompiler.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderDataSerialization.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderEntrypoint.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderGenerator.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibMap.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderParser\BlockAnalyzer.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderParser\ScopeBuilder.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderData.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderParser\SymbolData.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderParser\SymbolEnums.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderParser\SymbolParser.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderParser\SymbolPatterns.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderRegistryMap.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\SymbolHandles.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\SymbolTable.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\VariantPreprocessor.hpp" />
+    <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\WaveConfig.hpp" />
+    <ClInclude Include="src\pch.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\EffectParseException.cpp" />
+    <ClCompile Include="src\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\ShaderData.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderRegistryBuilder.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderCompilerD3D11.cpp" />
+    <ClCompile Include="src\ShaderDataHandles.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderGenerator.cpp" />
+    <ClCompile Include="src\ShaderLibMap.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\BlockAnalyzer.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\MatchingPatterns.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\ScopeBuilder.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\SymbolHandles.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\SymbolKeywords.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\SymbolParser.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\SymbolPatterns.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderParser\SymbolTable.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\ShaderRegistryMap.cpp" />
+    <ClCompile Include="src\ShaderLibBuilder\VariantPreprocessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\FXHelpText.hpp" />
+    <None Include="shaderTypeTableGen.ps1" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{8e328ed7-fcc1-41d5-ab9e-42a658758fb5}</ProjectGuid>
-    <RootNamespace>RPFXPreprocessor</RootNamespace>
+    <ProjectGuid>{eb854810-589c-435b-8672-fdaa5c230a75}</ProjectGuid>
+    <RootNamespace>LibWeaveEffects</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>EffectPreprocessor</ProjectName>
+    <ProjectName>LibWeaveEffects</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -127,54 +174,57 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
     <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
-    <TargetName>wfxc</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">
     <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
     <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
-    <TargetName>wfxc</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
     <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
-    <TargetName>wfxc</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibWeaveUtils\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>cd $(ProjectDir)
+powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
+  -TablePath "$(ProjectDir)src\ShaderLibGen\ShaderParser\ShaderTypeInfo.cpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibWeaveUtils\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>cd $(ProjectDir)
+powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
+  -TablePath "$(ProjectDir)src\ShaderLibGen\ShaderParser\ShaderTypeInfo.cpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -183,64 +233,85 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibWeaveUtils\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>cd $(ProjectDir)
+powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
+  -TablePath "$(ProjectDir)src\ShaderLibGen\ShaderParser\ShaderTypeInfo.cpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibWeaveUtils\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>cd $(ProjectDir)
+powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
+  -TablePath "$(ProjectDir)src\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.cpp"</Command>
     </PreBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Lib>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_DEBUG_VS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibWeaveUtils\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\Debug\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\Debug\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>cd $(ProjectDir)
+powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
+  -TablePath "$(ProjectDir)src\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.cpp"</Command>
     </PreBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Lib>
+      <AdditionalDependencies>$(SolutionDir)packages\boost_wave-vc143.1.87.0\lib\native\libboost_wave-vc143-mt-sgd-x64-1_87.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -248,41 +319,50 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibWeaveUtils\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>cd $(ProjectDir)
+powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
+  -TablePath "$(ProjectDir)src\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.cpp"</Command>
     </PreBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Lib>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\boost.1.87.0\build\boost.targets" Condition="Exists('..\packages\boost.1.87.0\build\boost.targets')" />
+    <Import Project="..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets" Condition="Exists('..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets')" />
     <Import Project="..\packages\boost_thread-vc143.1.87.0\build\boost_thread-vc143.targets" Condition="Exists('..\packages\boost_thread-vc143.1.87.0\build\boost_thread-vc143.targets')" />
     <Import Project="..\packages\boost_wave-vc143.1.87.0\build\boost_wave-vc143.targets" Condition="Exists('..\packages\boost_wave-vc143.1.87.0\build\boost_wave-vc143.targets')" />
     <Import Project="..\packages\boost_filesystem-vc143.1.87.0\build\boost_filesystem-vc143.targets" Condition="Exists('..\packages\boost_filesystem-vc143.1.87.0\build\boost_filesystem-vc143.targets')" />
-    <Import Project="..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets" Condition="Exists('..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\boost.1.87.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.87.0\build\boost.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets'))" />
     <Error Condition="!Exists('..\packages\boost_thread-vc143.1.87.0\build\boost_thread-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_thread-vc143.1.87.0\build\boost_thread-vc143.targets'))" />
     <Error Condition="!Exists('..\packages\boost_wave-vc143.1.87.0\build\boost_wave-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_wave-vc143.1.87.0\build\boost_wave-vc143.targets'))" />
     <Error Condition="!Exists('..\packages\boost_filesystem-vc143.1.87.0\build\boost_filesystem-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_filesystem-vc143.1.87.0\build\boost_filesystem-vc143.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_chrono-vc143.1.87.0\build\boost_chrono-vc143.targets'))" />
   </Target>
 </Project>

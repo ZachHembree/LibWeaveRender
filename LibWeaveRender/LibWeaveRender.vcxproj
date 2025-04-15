@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugVS|Win32">
+      <Configuration>DebugVS</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugVS|x64">
+      <Configuration>DebugVS</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{8d991dca-1e4a-416f-b200-01877db93e29}</ProjectGuid>
+    <RootNamespace>D3D11Renderer</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>LibWeaveRender</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SharedPaths.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SharedPaths.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SharedPaths.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SharedPaths.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SharedPaths.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SharedPaths.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">
+    <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|Win32'">
+    <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableModules>false</EnableModules>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;$(ProjectDir)src\renderers\include</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <FxCompile>
+      <ObjectFileOutput>$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableModules>false</EnableModules>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;$(ProjectDir)src\renderers\include</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <FxCompile>
+      <ObjectFileOutput>$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableModules>false</EnableModules>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;$(ProjectDir)src\renderers\include</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <FxCompile>
+      <ObjectFileOutput>$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableModules>false</EnableModules>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;$(ProjectDir)src\renderers\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);</AdditionalDependencies>
+    </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+      <ObjectFileOutput>$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)EffectPreprocessor\Build\x64\$(Configuration)\bin\wfxc.exe -hm^
+    --input "$(ProjectDir)res\*.rpfx"^
+    --output "$(ProjectDir)src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableModules>false</EnableModules>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;$(ProjectDir)src\renderers\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);</AdditionalDependencies>
+    </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+      <ObjectFileOutput>$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)EffectPreprocessor\Build\x64\$(Configuration)\bin\wfxc.exe -hm^
+    --input "$(ProjectDir)res\*.rpfx"^
+    --output "$(ProjectDir)src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableModules>false</EnableModules>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)packages\directxtex_desktop_2019.2022.7.30.1\include;$(ProjectDir)res;$(ProjectDir)include;$(ProjectDir)src;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;$(ProjectDir)src\renderers\include</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+      <DisableOptimizations>false</DisableOptimizations>
+      <EnableDebuggingInformation>false</EnableDebuggingInformation>
+      <ObjectFileOutput>$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)EffectPreprocessor\Build\x64\$(Configuration)\bin\wfxc.exe -hm^
+    --input "$(ProjectDir)res\*.rpfx"^
+    --output "$(ProjectDir)src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\renderers\src\D3D11\Resources\ResizeableTexture2D.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\ResourceBase.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\ResourceSet.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\StagingTexture2D.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\DeviceChild.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\RWTexture2D.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\DepthStencilTexture.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\ImguiHandler.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\RenderComponent.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\Texture2D.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\ShaderLibrary.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Shaders\BuiltInShaders.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\ConstantGroupMap.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\ConstantBuffer.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\RTHandle.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Context.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\Sampler.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\Texture2DBase.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\VertexBuffer.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\IndexBuffer.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\InputLayout.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Mesh.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Shaders\ComputeInstance.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Shaders\ShaderVariantBase.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Shaders\ShaderVariants.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\ShaderVariantManager.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\SwapChain.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\BufferBase.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Device.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Renderer.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Shaders\EffectVariant.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Shaders\Material.cpp" />
+    <ClCompile Include="src\renderers\src\D3DException.cpp" />
+    <ClCompile Include="src\renderers\src\Input.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\WeaveRender\D3D11.hpp" />
+    <ClInclude Include="include\WeaveRender\Imgui.hpp" />
+    <ClInclude Include="src\pch.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\InternalD3D11.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Shaders\ShaderInstanceBase.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\ResizeableTexture2D.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\ResourceSet.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\ResourceEnums.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\RWTexture2D.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\StagingTexture2D.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\Texture2D.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\ShaderLibrary.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\DepthStencilTexture.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\TextureEnums.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\ImguiHandler.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\ImguiRenderComponent.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\RenderComponent.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\BufferBase.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\ConstantBuffer.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\ConstantGroupMap.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Context.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Device.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\DeviceChild.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\Formats.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\InputLayout.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\IAsset.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\ResourceBase.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Shaders\BuiltInShaders.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\RTHandle.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\Sampler.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Shaders\ComputeInstance.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\Texture2DBase.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Shaders\ShaderVariantBase.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Shaders\ShaderVariants.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\IDrawable.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Shaders\EffectVariant.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Shaders\Material.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Mesh.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Primitives.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\ResourceMap.hpp" />
+    <ClCompile Include="src\renderers\src\D3D11\ImguiRenderComponent.cpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Viewport.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\SwapChain.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\IndexBuffer.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Renderer.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\Resources\VertexBuffer.hpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Shaders\ShaderInstanceBase.cpp" />
+    <ClInclude Include="src\renderers\include\D3DException.hpp" />
+    <ClInclude Include="src\renderers\include\Input.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="res\DefaultShaders.rpfx" />
+    <None Include="src\renderers\include\D3D11\ShaderVariantManager.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\directxtex_desktop_2019.2025.3.25.2\build\native\directxtex_desktop_2019.targets" Condition="Exists('..\packages\directxtex_desktop_2019.2025.3.25.2\build\native\directxtex_desktop_2019.targets')" />
+    <Import Project="..\packages\directxtk_desktop_2019.2025.3.21.2\build\native\directxtk_desktop_2019.targets" Condition="Exists('..\packages\directxtk_desktop_2019.2025.3.21.2\build\native\directxtk_desktop_2019.targets')" />
+    <Import Project="..\packages\Microsoft.XAudio2.Redist.1.2.13\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('..\packages\Microsoft.XAudio2.Redist.1.2.13\build\native\Microsoft.XAudio2.Redist.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\directxtex_desktop_2019.2025.3.25.2\build\native\directxtex_desktop_2019.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtex_desktop_2019.2025.3.25.2\build\native\directxtex_desktop_2019.targets'))" />
+    <Error Condition="!Exists('..\packages\directxtk_desktop_2019.2025.3.21.2\build\native\directxtk_desktop_2019.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2019.2025.3.21.2\build\native\directxtk_desktop_2019.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.XAudio2.Redist.1.2.13\build\native\Microsoft.XAudio2.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.XAudio2.Redist.1.2.13\build\native\Microsoft.XAudio2.Redist.targets'))" />
+  </Target>
+</Project>
