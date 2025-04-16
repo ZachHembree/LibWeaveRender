@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include "WeaveEffects/EffectParseException.hpp"
 #include "WeaveUtils/Logger.hpp"
+#include "WeaveUtils/GenericMain.hpp"
 #include "WeaveEffects/ShaderLibBuilder.hpp"
 #include "FXHelpText.hpp"
 
@@ -329,8 +330,6 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
  */
 static void CreateLibrary()
 {
-    FX_CHECK_MSG(!inputFiles.empty(), "No input files specified. Use --input <file> or --input <*.ext>.");
-
     ShaderLibBuilder libBuilder;
     std::stringstream streamBuf;
 
@@ -453,6 +452,8 @@ static void CreateLibrary()
  */
 static void HandleOptions(const IDynamicArray<string_view>& args)
 {
+    FX_CHECK_MSG(args.GetLength() > 1, "No arguments provided");
+
     for (int i = 1; i < args.GetLength(); ++i)
     {
         const string_view& arg = args[i];
@@ -495,118 +496,122 @@ static void HandleOptions(const IDynamicArray<string_view>& args)
                 FX_THROW("Unexpected positional argument: {}. Use --input and --output options.", arg);
         }
     }
+
+    if (!shouldShowHelp)
+        FX_CHECK_MSG(!inputFiles.empty(), "No input files specified. Use --input <file> or --input <*.ext>.");
 }
 
-static bool TryInitLog(const fs::path& workingDir)
+// Converts c-string arguments into dynamic array of string_views 
+static DynamicArray<string_view> GetArgs(int argc, char* argv[])
 {
-    try
-    {
-        // Initialize logging to file and console
-        const string logFilePath = (workingDir / "wfxc.log").string();
-        Logger::InitToFile(logFilePath);
-        Logger::AddStream(std::cout);
-        return true;
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "FATAL: Failed to initialize logger: " << e.what() << std::endl;
-        return false;
-    }
-}
-
-int main(int argc, char* argv[])
-{
-    int exitCode = 0;
-    const fs::path workingDir = fs::current_path();
-  
-    if (!TryInitLog(workingDir))
-        return 10;
-
-    try
-    {
-        DynamicArray<string_view> args(argc);
+    DynamicArray<string_view> args(argc);
 
 #ifdef NDEBUG
-        for (int i = 0; i < argc; ++i)
-            args[i] = string_view(argv[i]);
+    for (int i = 0; i < argc; ++i)
+        args[i] = string_view(argv[i]);
 
 #else // Debug Build - Use hardcoded defaults if no args provided
-        if (argc == 1)
+    if (argc == 1)
+    {
+        args =
         {
-            args =
-            {
-                string_view(argv[0]),
-                "--input", "*.wfx",
-                "--output", "output_debug",
-                "--feature-level", "5_0",
-                 "-m",
-            };
-        }
-        else
-        {
-            // Use actual command line args if provided
-            for (int i = 0; i < argc; ++i)
-                args[i] = string_view(argv[i]);
-        }
+            string_view(argv[0]),
+            "--input", "*.wfx",
+            "--output", "output_debug",
+            "--feature-level", "5_0",
+             "-m",
+        };
+    }
+    else
+    {
+        // Use actual command line args if provided
+        for (int i = 0; i < argc; ++i)
+            args[i] = string_view(argv[i]);
+    }
 
 #endif
-        if (args.GetLength() < 2)
+
+    return args;
+}
+
+/**
+ * @brief Main control function for CLI execution.
+ *
+ * Handles argument parsing, logger initialization, and library execution.
+ * Uses GenericMain() to wrap each major stage for consistent exception handling.
+ *
+ * @param args Pre-parsed string_view arguments.
+ * @return int Exit code representing success or failure.
+ */
+static int RunCLI(const IDynamicArray<string_view>& args)
+{
+    // Handle arguments
+    int exitCode = 0;
+    const GenericMainT<const IDynamicArray<string_view>&> OptionFunc = HandleOptions;
+    exitCode = GenericMain(std::cerr, OptionFunc, args);
+
+    if (exitCode != 0)
+        shouldShowHelp = true; // Incorrect arguments
+
+    if (shouldShowHelp) // Early exit
+    {
+        std::cout << g_FX_HelpText;
+    }
+    else // Normal startup
+    {
+        // Initialize logging
+        const GenericMainT<const fs::path&> LogFunc = [](const fs::path& logPath)
         {
-            std::cerr << "Error: No arguments provided";
-            shouldShowHelp = true;
-        }
-        else
+            // Initialize logging to file and console
+            Logger::InitToFile(logPath);
+            Logger::AddStream(std::cout);
+        };
+
+        const fs::path logPath = (fs::current_path() / "wfxc.log");
+        exitCode = GenericMain(std::cerr, LogFunc, logPath);
+
+        if (exitCode != 0)
+            return exitCode; // Log init failed
+
+        // Preprocess shaders
+        const GenericMainT<const IDynamicArray<string_view>&> LibFunc = [](const IDynamicArray<string_view>& args)
         {
             LOG_INFO() << "WFX Preprocessor Initializing...";
-            LOG_INFO() << "Working Directory: " << workingDir.string();
+            LOG_INFO() << "Working Directory: " << fs::current_path().string();
 
             // Log the command line used to invoke the program
             std::stringstream cmdLine;
-            for (int i = 0; i < argc; ++i) { cmdLine << argv[i] << " "; }
-            LOG_INFO() << "Command Line: " << cmdLine.str();
+            for (string_view arg : args)
+            { cmdLine << arg << " "; }
 
-            HandleOptions(args);
+            LOG_INFO() << "Command Line: " << cmdLine.view();
 
-            if (!shouldShowHelp)
-            {
-                CreateLibrary();
-                LOG_INFO() << "Processing completed successfully.";
-            }
-        }
+            CreateLibrary();
+            LOG_INFO() << "Processing completed successfully.";
+        };
 
-        if (shouldShowHelp)
-            std::cout << g_FX_HelpText;
+        auto logErr = LOG_ERROR();
+        exitCode = GenericMain(logErr, LibFunc, args);
     }
-    catch (const EffectParseException& err)
-    {
-        LOG_ERROR() << "[" << err.GetType() << "] " << err.GetDescription();
-        exitCode = 5;
-    }
-#ifdef NDEBUG
-    catch (const WeaveException& err)
-    {
-        LOG_ERROR() << "[" << err.GetType() << "] " << err.GetDescription();
-        exitCode = 4;
-    }
-    catch (const fs::filesystem_error& e)
-    {
-        LOG_ERROR() << "Filesystem Error: " << e.what();
-        // Log paths involved if available (e.g., e.path1(), e.path2())
-        if (!e.path1().empty()) LOG_ERROR() << "  Path1: " << e.path1();
-        if (!e.path2().empty()) LOG_ERROR() << "  Path2: " << e.path2();
-        exitCode = 3;
-    }
-    catch (const std::exception& err)
-    {
-        LOG_ERROR() << "Standard Exception: " << err.what();
-        exitCode = 2;
-    }
-    catch (...)
-    {
-        LOG_ERROR() << "An unknown exception occurred.";
-        exitCode = 1;
-    }
-#else
+
+    return exitCode;
+}
+
+/**
+ * @brief Application entry point.
+ *
+ * Initializes the argument list and delegates execution to the CLI runner.
+ *
+ * @param argc Argument count.
+ * @param argv Argument values.
+ * @return int Process exit code.
+ */
+int main(int argc, char* argv[])
+{
+    const DynamicArray<string_view> args = GetArgs(argc, argv);
+    const int exitCode = RunCLI(args);
+
+#ifndef NDEBUG
     (void)std::getchar();
 #endif
 
