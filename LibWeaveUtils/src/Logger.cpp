@@ -25,11 +25,10 @@ namespace Weave
         instance.isInitialized = true;
     }
 
-    void Logger::InitToFile(std::string_view path)
+    void Logger::InitToFile(const std::filesystem::path& logPath)
     {
-        std::filesystem::path logPath(path);
         instance.logFile = std::fstream(logPath, std::ios::out | std::ios::trunc);
-        WV_CHECK_MSG(instance.logFile.is_open(), "Failed to open log file: {}", path);
+        WV_CHECK_MSG(instance.logFile.is_open(), "Failed to open log file: {}", logPath.string());
 
         Init(instance.logFile);
     }
@@ -108,17 +107,15 @@ namespace Weave
     Logger::Message::Message(Level level, MessageBuffer&& pBuf) :
         level(level), 
         pMsgBuf(std::move(pBuf))
-    {
-        // Start timestamp
-        AddTimestamp(*pMsgBuf);
-        *pMsgBuf << std::format("[{}] ", GetLevelName(level));
-    }
+    { }
 
     Logger::Message::~Message()
     {
-        if (level != Level::Discard)
+        if (pMsgBuf.get() != nullptr)
         {
-            Logger::WriteLine(pMsgBuf->view());
+            if (!pMsgBuf->view().empty())
+                Logger::WriteLine(pMsgBuf->view());
+
             Logger::ReturnStrBuf(std::move(pMsgBuf));
         }
     }

@@ -78,7 +78,15 @@ namespace Weave
             Message& operator<<(const T& value)
             {
                 if (level != Level::Discard)
+                {
+                    if (pMsgBuf->view().empty())
+                    {
+                        AddTimestamp(*pMsgBuf);
+                        *pMsgBuf << std::format("[{}] ", GetLevelName(level));
+                    }
+
                     *pMsgBuf << value;
+                }
 
                 return *this;
             }
@@ -112,7 +120,7 @@ namespace Weave
         /// <summary>
         /// Creates a new log file at the given path and sets it as the output for the logger.
         /// </summary>
-        static void InitToFile(std::string_view path);
+        static void InitToFile(const std::filesystem::path& logPath);
 
         /// <summary>
         /// Adds an output stream to the logger. Caller is responsible for stream lifetime.
