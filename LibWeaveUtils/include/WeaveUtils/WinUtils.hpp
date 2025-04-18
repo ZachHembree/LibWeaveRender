@@ -1,42 +1,40 @@
 #pragma once
-// Just trimming some fat from the windows headers
-#define WIN32_LEAN_AND_MEAN
-#define NOGDICAPMASKS
-#define NOSYSMETRICS
-#define NOMENUS
-#define NOICONS
-#define NOSYSCOMMANDS
-#define NORASTEROPS
-#define OEMRESOURCE
-#define NOATOM
-#define NOCLIPBOARD
-#define NOCOLOR
-#define NOCTLMGR
-#define NODRAWTEXT
-#define NOKERNEL
-#define NOMEMMGR
-#define NOMETAFILE
-#define NOOPENFILE
-#define NOSCROLL
-#define NOSERVICE
-#define NOSOUND
-#define NOTEXTMETRIC
-#define NOWH
-#define NOCOMM
-#define NOKANJI
-#define NOHELP
-#define NOPROFILER
-#define NODEFERWINDOWPOS
-#define NOMCX
-#define NORPC
-#define NOPROXYSTUB
-#define NOIMAGE
-#define NOTAPE
-#define NOMINMAX
 
-#include <wrl.h>
-#include <cstdint>
-#include <glm/glm.hpp>
+// Essential defines
+#define WIN32_LEAN_AND_MEAN      // Exclude rarely-used stuff from Windows headers
+#define NOMINMAX                 // Exclude min/max macros
+// Exclude GDI + related defines
+#define NOGDI
+#define NOBITMAP
+// Exclude User32 components
+#define NOSYSMETRICS             // System metrics
+#define NOMENUS                  // Menus
+#define NOICONS                  // Icons
+#define NOSYSCOMMANDS            // System commands (minimize, maximize, close)
+#define NOCLIPBOARD              // Clipboard APIs
+#define NOCTLMGR                 // Control manager routines
+#define NOSCROLL                 // Scroll bar routines
+#define NOWH                     // Window Hooks
+#define NODEFERWINDOWPOS         // DeferWindowPos routines
+// Exclude other less common APIs
+#define NOATOM                   // Atom manipulation routines
+#define NOMEMMGR                 // Global/Local memory routines
+#define NOOPENFILE               // OpenFile routine
+#define NOSERVICE                // Service Controller routines
+#define NOSOUND                  // Sound APIs
+#define NOCOMM                   // Communication APIs
+#define NOKANJI                  // Kanji support stuff
+#define NOHELP                   // Help engine interfaces
+#define NOPROFILER               // Profiler APIs
+#define NOMCX                    // Modem Configuration Extensions
+#define NORPC                    // RPC stuff (often covered by LEAN_AND_MEAN)
+#define NOPROXYSTUB              // RPC stuff (often covered by LEAN_AND_MEAN)
+#define NOIMAGE                  // LoadImage routine
+#define NOTAPE                   // Tape APIs
+#define NOKERNEL
+
+#include <wrl.h> 
+#include "WeaveUtils/Math.hpp"
 #include "WeaveUtils/Utils.hpp"
 
 namespace Weave

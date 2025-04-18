@@ -1,6 +1,6 @@
 #include "pch.hpp"
-#include "D3D11/InternalD3D11.hpp"
 #include "WeaveUtils/Win32.hpp"
+#include "D3D11/InternalD3D11.hpp"
 #include "D3D11/SwapChain.hpp"
 
 using namespace Weave;
