@@ -18,6 +18,10 @@ namespace Weave
 	template<typename T>
 	using tvec4 = glm::tvec4<T>;
 
+	typedef glm::tvec2<uint> uivec2;
+	typedef glm::tvec3<uint> uivec3;
+	typedef glm::tvec4<uint> uivec4;
+
 	using vec2 = glm::vec2;
 	using vec3 = glm::vec3;
 	using vec4 = glm::vec4;

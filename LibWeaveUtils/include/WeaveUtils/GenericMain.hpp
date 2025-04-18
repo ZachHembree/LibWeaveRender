@@ -38,9 +38,12 @@ namespace Weave
     {
         int exitCode = 0;
 
+#ifndef WV_TRACE_EXCEPT
         try
         {
+#endif
             MainFunc(std::forward<FuncArgsT>(funcArgs)...);
+#ifndef WV_TRACE_EXCEPT
         }
         catch (const WeaveException& err)
         {
@@ -65,7 +68,7 @@ namespace Weave
             errStream << "An unknown exception occurred." << '\n';
             exitCode = 1;
         }
-
+#endif
         return exitCode;
     }
 }

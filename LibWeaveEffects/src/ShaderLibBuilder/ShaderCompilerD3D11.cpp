@@ -3,7 +3,7 @@
 #include <d3dcompiler.h>
 #include <memory>
 #include <thread>
-#include "WeaveUtils/WinUtils.hpp"
+#include "WeaveUtils/WeaveWinException.hpp"
 #include "WeaveEffects/EffectParseException.hpp"
 #include "WeaveEffects/ShaderLibBuilder/ShaderCompiler.hpp"
 
