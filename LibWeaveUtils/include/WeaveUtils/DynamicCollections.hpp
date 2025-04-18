@@ -168,6 +168,11 @@ namespace Weave
 		virtual const_reference GetBack() const { return (*this)[GetLength() - 1]; }
 
 		/// <summary>
+		/// Returns true if the array is empty
+		/// </summary>
+		virtual bool IsEmpty() const { return GetLength() == 0; }
+
+		/// <summary>
 		/// Returns a reference to the element at the given index
 		/// </summary>
 		virtual reference at(size_t index) { return (*this)[index]; }
@@ -283,6 +288,24 @@ namespace Weave
 	/// </summary>
 	template<typename T>
 	size_t GetArrSize(const std::vector<T>& arr) { return arr.size() * sizeof(T); }
+
+	/// <summary>
+	/// Fills an array with all zeroes. Only valid if T is plain old data.
+	/// </summary>
+	template<typename T> requires std::is_trivial_v<T>
+	void SetArrNull(IDynamicArray<T>& arr) { memset(arr.GetData(), 0u, GetArrSize(arr)); }
+
+	/// <summary>
+	/// Fills an array with all zeroes. Only valid if T is plain old data.
+	/// </summary>
+	template<typename T> requires std::is_trivial_v<T>
+	void SetArrNull(IDynamicArray<T>& arr, size_t length) { memset(arr.GetData(), 0u, sizeof(T) * length); }
+
+	/// <summary>
+	/// Fills an array with all zeroes. Only valid if T is plain old data.
+	/// </summary>
+	template<typename T> requires std::is_trivial_v<T>
+	void SetArrNull(IDynamicArray<T>& arr, ptrdiff_t offset, size_t length) { memset(arr.GetData() + offset, 0u, sizeof(T) * length); }
 
 	/// <summary>
 	/// Dynamically allocated array with members of type T and a fixed length.

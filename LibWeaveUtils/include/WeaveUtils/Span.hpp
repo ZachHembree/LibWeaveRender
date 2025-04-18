@@ -1,6 +1,7 @@
 #pragma once
 #include "internal/DeltaUtils.hpp"
 #include "DynamicCollections.hpp"
+#include <array>
 
 // Allocates temporary stack allocated array with alloca, and wraps it in a span
 #define ALLOCA_SPAN(SPAN, COUNT, TYPE) \
@@ -42,6 +43,12 @@ namespace Weave
 		Span(T* pMain, size_t offset, size_t length) :
 			pStart(pMain + offset),
 			length(length)
+		{ }
+
+		template<size_t N>
+		Span(std::array<T, N>& arr) :
+			pStart(arr.data()), 
+			length(arr.size())
 		{ }
 
 		Span(const Span& other) = default;
