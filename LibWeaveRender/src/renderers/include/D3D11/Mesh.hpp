@@ -63,12 +63,12 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Updates any resources needed prior to drawing
 		/// </summary>
-		void Setup(Context& ctx) override;
+		void Setup(ContextBase& ctx) override;
 
 		/// <summary>
 		/// Draws the object
 		/// </summary>
-		void Draw(Context& ctx, Material& mat) override;
+		void Draw(ContextBase& ctx, Material& mat) override;
 
 		/// <summary>
 		/// Returns the number of indices in the index buffer

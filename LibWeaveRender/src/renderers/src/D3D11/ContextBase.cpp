@@ -5,9 +5,10 @@
 #include "D3D11/ContextState.hpp"
 #include "D3D11/Viewport.hpp"
 #include "D3D11/Primitives.hpp"
-#include "D3D11/Shaders/ShaderVariants.hpp"
 #include "D3D11/Resources/ResourceSet.hpp"
 #include "D3D11/Resources/VertexBuffer.hpp"
+#include "D3D11/Shaders/ShaderVariants.hpp"
+#include "D3D11/Shaders/Material.hpp"
 
 using namespace Weave;
 using namespace Weave::D3D11;
@@ -306,6 +307,16 @@ void ContextBase::BindResources(const VertexShaderVariant& shader, const Resourc
 	pContext->IASetInputLayout(pLayout);
 }
 
+static void ClearUAVs(ID3D11DeviceContext* pContext, uint count)
+{
+	if (count > 0)
+	{
+		D3D_ASSERT_MSG(count <= D3D11_1_UAV_SLOT_COUNT, "UAV slot count exceeded maximum.");
+		ALLOCA_SPAN_NULL(nullRW, count, ID3D11UnorderedAccessView*);
+		pContext->CSSetUnorderedAccessViews(0, count, nullRW.GetData(), nullptr);
+	}
+}
+
 void ContextBase::BindShader(const ShaderVariantBase& shader, const ResourceSet& resSrc)
 {
 	const ShadeStages stage = shader.GetStage();
@@ -352,6 +363,9 @@ void ContextBase::BindShader(const ShaderVariantBase& shader, const ResourceSet&
 	// Bind Shader Resource Views (SRVs)
 	if (shader.GetResViewMap() != nullptr && resSrc.GetSRVs().GetLength() > 0)
 	{
+		// Avoid RAW contention and force sync
+		ClearUAVs(pContext.Get(), pState->uavCount);
+
 		const ResourceViewMap& srvMap = *shader.GetResViewMap();
 		const ResourceViewMap::DataT& srvSrc = resSrc.GetSRVs();
 
@@ -438,7 +452,27 @@ void ContextBase::Dispatch(const ComputeShaderVariant& cs, ivec3 groups, const R
 {
 	BindShader(cs, res);
 	pContext->Dispatch(groups.x, groups.y, groups.z);
-	UnbindShader(cs);
+}
+
+void ContextBase::Draw(Mesh& mesh, Material& mat)
+{
+	Span meshSpan(&mesh);
+	Draw(meshSpan, mat);
+}
+
+void ContextBase::Draw(IDynamicArray<Mesh>& meshes, Material& mat)
+{
+	for (Mesh& mesh : meshes)
+	{
+		mesh.Setup(*this);
+
+		for (uint pass = 0; pass < mat.GetPassCount(); pass++)
+		{
+			mat.Setup(*this, pass);
+			pContext->DrawIndexed(mesh.GetIndexCount(), 0, 0);
+			mat.Reset(*this, pass);
+		}
+	}
 }
 
 static void WriteBufferSubresource(ID3D11DeviceContext& ctx, BufferBase& dst, const IDynamicArray<byte>& src)

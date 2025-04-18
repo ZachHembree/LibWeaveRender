@@ -10,6 +10,6 @@ namespace Weave::D3D11
 	class IAsset
 	{
 	public:
-		virtual void Setup(Context& ctx) = 0;
+		virtual void Setup(ContextBase& ctx) = 0;
 	};
 }

@@ -68,16 +68,5 @@ namespace Weave::D3D11
 		/// Copies the contents of a texture to a render target
 		/// </summary>
 		void Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox = ivec4(0));
-
-		/// <summary>
-		/// Draws an indexed, non-instanced triangle meshes using the given material
-		/// </summary>
-		void Draw(Mesh& mesh, Material& mat);
-
-		/// <summary>
-		/// Draws a group of indexed, non-instanced triangle meshes using the given material
-		/// </summary>
-		void Draw(IDynamicArray<Mesh>& meshes, Material& mat);
-
 	};
 }

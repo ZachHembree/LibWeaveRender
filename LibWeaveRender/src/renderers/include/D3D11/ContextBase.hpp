@@ -162,6 +162,16 @@ namespace Weave::D3D11
 		void Dispatch(const ComputeShaderVariant& cs, ivec3 groups, const ResourceSet& res);
 
 		/// <summary>
+		/// Draws an indexed, non-instanced triangle meshes using the given material
+		/// </summary>
+		void Draw(Mesh& mesh, Material& mat);
+
+		/// <summary>
+		/// Draws a group of indexed, non-instanced triangle meshes using the given material
+		/// </summary>
+		void Draw(IDynamicArray<Mesh>& meshes, Material& mat);
+
+		/// <summary>
 		/// Fully overwrites the contents of the buffer with the given data
 		/// </summary>
 		void SetBufferData(BufferBase& dst, const IDynamicArray<byte>& data);

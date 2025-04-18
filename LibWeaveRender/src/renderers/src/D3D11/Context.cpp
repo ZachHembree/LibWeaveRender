@@ -297,36 +297,4 @@ void Context::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 		pContext->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
 }
 
-/// <summary>
-/// Draw indexed, non-instanced triangle meshes using the given material
-/// </summary>
-void Context::Draw(Mesh& mesh, Material& mat)
-{
-	mesh.Setup(*this);
-
-	for (uint pass = 0; pass < mat.GetPassCount(); pass++)
-	{
-		mat.Setup(*this, pass);
-		pContext->DrawIndexed(mesh.GetIndexCount(), 0, 0);
-		mat.Reset(*this, pass);
-	}
-}
-
-/// <summary>
-/// Draws a group of indexed, non-instanced triangle meshes using the given material
-/// </summary>
-void Context::Draw(IDynamicArray<Mesh>& meshes, Material& mat)
-{
-	for (Mesh& mesh : meshes)
-	{
-		mesh.Setup(*this);
-
-		for (uint pass = 0; pass < mat.GetPassCount(); pass++)
-		{
-			mat.Setup(*this, pass);
-			pContext->DrawIndexed(mesh.GetIndexCount(), 0, 0);
-			mat.Reset(*this, pass);
-		}
-	}
-}
 
