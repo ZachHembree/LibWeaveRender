@@ -1,5 +1,5 @@
 #pragma once
-#include <d3d11.h>
+#include "../InternalD3D11.hpp"
 
 namespace Weave::D3D11
 {

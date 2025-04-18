@@ -1,6 +1,6 @@
 #pragma once
 #include "WeaveUtils/WinUtils.hpp"
-#include <d3d11.h>
+#include "InternalD3D11.hpp"
 #include "Context.hpp"
 
 namespace Weave::D3D11
@@ -22,12 +22,12 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns pointer to COM device interface
 		/// </summary>
-		ID3D11Device& Get();
+		ID3D11Device1& Get();
 
 		/// <summary>
 		/// Returns reference to COM device interface
 		/// </summary>
-		ID3D11Device* operator->();
+		ID3D11Device1* operator->();
 
 		/// <summary>
 		/// Returns reference to immediate context
@@ -42,7 +42,7 @@ namespace Weave::D3D11
 
 	private:
 		Renderer* pRenderer;
-		ComPtr<ID3D11Device> pDev;
+		ComPtr<ID3D11Device1> pDev;
 		Context context;
 	};
 }

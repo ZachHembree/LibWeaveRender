@@ -2,7 +2,7 @@
 #pragma warning(disable: 4250)
 
 #include "WeaveUtils/Math.hpp"
-#include <d3d11.h>
+#include "../InternalD3D11.hpp"
 #include "DeviceChild.hpp"
 #include "ResourceEnums.hpp"
 #include "Formats.hpp"
