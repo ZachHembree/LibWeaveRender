@@ -178,17 +178,17 @@ namespace Weave::Effects
 
     BITWISE_ALL(SymbolTypes, ulong)
 
-    enum class ShadeStages : byte
+    enum class ShadeStages : sbyte
     {
-        Unknown = 0,
-        Vertex = 1,
-        Hull = 2,
-        Domain = 3,
-        Geometry = 4,
-        Pixel = 5,
-        Compute = 6,
+        Unknown = -1,
+        Vertex = 0,
+        Hull = 1,
+        Domain = 2,
+        Geometry = 3,
+        Pixel = 4,
+        Compute = 5,
 
-        ShadeStageCount = Compute
+        ShadeStageCount
     };
 
     /// <summary>

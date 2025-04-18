@@ -579,12 +579,12 @@ static int RunCLI(const IDynamicArray<string_view>& args)
             LOG_INFO() << "WFX Preprocessor Initializing...";
             LOG_INFO() << "Working Directory: " << fs::current_path().string();
 
-            // Log the command line used to invoke the program
-            std::stringstream cmdLine;
-            for (string_view arg : args)
-            { cmdLine << arg << " "; }
-
-            LOG_INFO() << "Command Line: " << cmdLine.view();
+            {
+                // Log the command line used to invoke the program
+                auto cmdLine = LOG_INFO();
+                cmdLine << "Command Line: ";
+                for (string_view arg : args) { cmdLine << arg << " "; }
+            }
 
             CreateLibrary();
             LOG_INFO() << "Processing completed successfully.";

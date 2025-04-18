@@ -121,7 +121,7 @@ namespace Weave::Effects
         for (int i = s_TokenShaderStart; i <= s_TokenShaderEnd; i++)
         {
             if (((ulong)flags & (1ull << i)) > 0)
-                return (ShadeStages)(i - s_TokenShaderStart + 1);
+                return (ShadeStages)(i - s_TokenShaderStart);
         }
 
         return ShadeStages::Unknown;
@@ -132,7 +132,7 @@ namespace Weave::Effects
         for (int i = s_SymbolShaderStart; i <= s_SymbolShaderEnd; i++)
         {
             if (((ulong)flags & (1ull << i)) > 0)
-                return (ShadeStages)(i - s_SymbolShaderStart + 1);
+                return (ShadeStages)(i - s_SymbolShaderStart);
         }
 
         return ShadeStages::Unknown;

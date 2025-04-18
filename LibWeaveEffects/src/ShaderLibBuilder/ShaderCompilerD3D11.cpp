@@ -65,7 +65,6 @@ private:
 	// Per stage shader model prefixes
 	static constexpr string_view TargetPrefixesD3D11[] =
 	{
-		"Unknown",
 		"vs_",
 		"hs_",
 		"ds_",
@@ -155,7 +154,7 @@ static void GetPrecompShaderD3D11(
 	ShaderRegistryBuilder& builder
 )
 {
-	FXSYNTAX_CHECK_MSG((int)stage > 0 && (int)stage < CompilerState::GetTargetCount(), "Invalid stage specified");
+	FXSYNTAX_CHECK_MSG((int)stage >= 0 && (int)stage < CompilerState::GetTargetCount(), "Invalid stage specified");
 
 	// Create temporary null-terminated string copies
 	static thread_local string tmpPath;
