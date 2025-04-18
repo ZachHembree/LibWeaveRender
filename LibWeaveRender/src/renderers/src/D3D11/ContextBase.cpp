@@ -382,7 +382,8 @@ void ContextBase::UnbindResources(const ComputeShaderVariant& shader)
 
 void ContextBase::UnbindResources(const VertexShaderVariant& shader)
 {
-	
+	pState->pInputLayout = nullptr;
+	pContext->IASetInputLayout(pState->pInputLayout);
 }
 
 void ContextBase::UnbindShader(const ShaderVariantBase& shader)

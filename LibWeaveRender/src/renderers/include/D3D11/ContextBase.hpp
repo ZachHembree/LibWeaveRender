@@ -4,7 +4,6 @@
 #include "WeaveUtils/WinUtils.hpp"
 #include "Resources/DeviceChild.hpp"
 #include "Resources/ResourceBase.hpp"
-#include "Shaders/Material.hpp"
 
 struct ID3D11DeviceContext;
 
