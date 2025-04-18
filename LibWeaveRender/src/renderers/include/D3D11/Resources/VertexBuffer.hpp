@@ -19,8 +19,9 @@ namespace Weave::D3D11
 		VertexBuffer(
 			Device& device,
 			const void* data,
-			size_t count,
-			size_t stride,
+			uint count,
+			uint stride,
+			uint offset = 0,
 			ResourceUsages usage = ResourceUsages::Default,
 			ResourceAccessFlags cpuAccess = ResourceAccessFlags::None
 		);
@@ -34,17 +35,22 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns the number of elements in the buffer
 		/// </summary>
-		UINT GetLength() const;
-
-		UINT GetStride() const { return stride; }
+		uint GetLength() const;
 
 		/// <summary>
-		/// Binds the vertex buffer to the given slot
+		/// Returns the buffer's size in bytes
 		/// </summary>
-		void Bind(Context& ctx, UINT slot = 0u, UINT offset = 0u);
+		uint GetStride() const;
+
+		/// <summary>
+		/// Returns the number of bytes between the first element between the first element 
+		/// in the VB and the first element that will be used
+		/// </summary>
+		uint GetOffset() const;
 
 	private:
-		UINT count;
-		UINT stride;
+		uint count;
+		uint stride;
+		uint offset;
 	};
 }

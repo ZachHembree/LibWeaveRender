@@ -12,7 +12,6 @@ namespace Weave::D3D11
 	class Texture2DBase : public virtual ITexture2DBase, public ResourceBase
 	{
 	public:
-
 		/// <summary>
 		/// Returns the dimensions of the texture
 		/// </summary>
@@ -94,9 +93,5 @@ namespace Weave::D3D11
 			void* data = nullptr,
 			uint pixelStride = 0u
 		);
-
-		void UpdateMapUnmap(Context& ctx, void* data);
-
-		void UpdateSubresource(Context& ctx, void* data, size_t stride);
 	};
 }

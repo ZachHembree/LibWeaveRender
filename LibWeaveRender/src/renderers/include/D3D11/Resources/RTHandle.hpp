@@ -88,7 +88,7 @@ namespace Weave::D3D11
 		/// Clears the render target to the given color
 		/// </summary>
 		void Clear(
-			Context& ctx,
+			ContextBase& ctx,
 			vec4 color = vec4(0)
 		) override;
 

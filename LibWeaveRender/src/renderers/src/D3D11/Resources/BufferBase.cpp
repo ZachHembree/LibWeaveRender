@@ -1,6 +1,7 @@
 #include "pch.hpp"
 #include "D3D11/InternalD3D11.hpp"
 #include "D3D11/Resources/BufferBase.hpp"
+#include "D3D11/ContextBase.hpp"
 #include "D3D11/Context.hpp"
 #include "D3D11/Device.hpp"
 
@@ -15,7 +16,7 @@ BufferBase::BufferBase(
 	ResourceAccessFlags cpuAccess, 
 	Device& dev, 
 	const void* data, 
-	const UINT byteSize
+	const uint byteSize
 ) :
 	ResourceBase(dev),
 	desc({})
@@ -34,18 +35,11 @@ BufferBase::BufferBase(
 	resDesc.SysMemSlicePitch = 0;
 
 	if (data != nullptr)
-	{
-		(dev->CreateBuffer(&desc, &resDesc, &pBuf));
-	}
+		D3D_CHECK_HR(dev->CreateBuffer(&desc, &resDesc, &pBuf));
 	else
-	{
-		(dev->CreateBuffer(&desc, nullptr, &pBuf));
-	}
+		D3D_CHECK_HR(dev->CreateBuffer(&desc, nullptr, &pBuf));
 }
 
-/// <summary>
-/// Returns the size of the buffer in bytes
-/// </summary>
 ID3D11Buffer* BufferBase::Get() { return pBuf.Get(); }
 
 ID3D11Buffer** const BufferBase::GetAddressOf() { return pBuf.GetAddressOf(); }
@@ -54,7 +48,7 @@ ID3D11Resource* BufferBase::GetResource() { return Get(); }
 
 ID3D11Resource** const BufferBase::GetResAddress() { return reinterpret_cast<ID3D11Resource**>(GetAddressOf()); }
 
-UINT BufferBase::GetSize() const { return desc.ByteWidth; }
+uint BufferBase::GetSize() const { return desc.ByteWidth; }
 
 ResourceUsages BufferBase::GetUsage() const { return (ResourceUsages)desc.Usage; }
 
@@ -62,39 +56,7 @@ ResourceBindFlags BufferBase::GetBindFlags() const { return (ResourceBindFlags)d
 
 ResourceAccessFlags BufferBase::GetAccessFlags() const { return (ResourceAccessFlags)desc.CPUAccessFlags; }
 
-void BufferBase::SetData(Context& ctx, const void* data)
+void BufferBase::SetData(ContextBase& ctx, const IDynamicArray<byte>& data)
 {
-	if (GetSize() > 0)
-	{
-		D3D_ASSERT_MSG(GetUsage() != ResourceUsages::Immutable, "Cannot update Buffers without write access.");
-
-		if (GetUsage() == ResourceUsages::Dynamic)
-		{
-			UpdateMapUnmap(ctx, data);
-		}
-		else
-		{
-			UpdateSubresource(ctx, data);
-		}
-	}
-}
-
-void BufferBase::UpdateSubresource(Context& ctx, const void* data)
-{
-	ctx->UpdateSubresource( Get(), 0, nullptr, data, GetSize(), GetSize());
-}
-
-void BufferBase::UpdateMapUnmap(Context& ctx, const void* data)
-{
-	D3D11_MAPPED_SUBRESOURCE msr;
-	D3D_CHECK_HR(ctx->Map(
-		Get(),
-		0u,
-		D3D11_MAP_WRITE_DISCARD,
-		0u,
-		&msr
-	));
-
-	memcpy(msr.pData, data, GetSize());
-	ctx->Unmap(Get(), 0u);
+	ctx.SetBufferData(*this, data);
 }

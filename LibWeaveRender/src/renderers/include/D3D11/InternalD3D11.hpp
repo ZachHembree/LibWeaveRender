@@ -16,4 +16,6 @@ namespace Weave::D3D11
 #endif // !NDEBUG
 
 	constexpr size_t g_ConstantBufferAlignment = 16;
+
+	static constexpr uint g_ShadeStageCount = 6;
 }

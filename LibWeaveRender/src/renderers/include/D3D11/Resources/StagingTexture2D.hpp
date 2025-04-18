@@ -5,6 +5,7 @@ namespace Weave::D3D11
 {
 	class StagingTexture2D;
 	class Tex2DBufferHandle;
+	class Context;
 
 	/// <summary>
 	/// Class representing a 2D Texture that can only be directly accessed by
@@ -64,23 +65,24 @@ namespace Weave::D3D11
 		/// Updates texture with contents of a scratch image, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
-		void SetTextureWIC(Context& ctx, wstring_view file, DirectX::ScratchImage& buffer);
+		void SetTextureWIC(ContextBase& ctx, wstring_view file, DirectX::ScratchImage& buffer);
 
 		/// <summary>
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
 		template<typename T>
-		void SetTextureData(Context& ctx, IDynamicArray<T>& data, ivec2 dim)
+		void SetTextureData(ContextBase& ctx, const IDynamicArray<T>& src, ivec2 dim)
 		{
-			SetTextureData(ctx, data.GetData(), sizeof(T), dim);
+			Span<byte> srcBytes(reinterpret_cast<byte*>(src.GetData()), GetArrSize(src));
+			SetTextureData(ctx, srcBytes, sizeof(T), dim);
 		}
 
 		/// <summary>
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
-		void SetTextureData(Context& ctx, void* data, size_t stride, ivec2 dim);
+		void SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 dim);
 
 		/// <summary>
 		/// Returns a temporary handle to a mapped buffer backing the texture

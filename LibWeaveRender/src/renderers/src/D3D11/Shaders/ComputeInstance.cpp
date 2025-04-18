@@ -19,11 +19,11 @@ ComputeInstance::ComputeInstance(ComputeInstance&&) noexcept = default;
 
 ComputeInstance& ComputeInstance::operator=(ComputeInstance&&) noexcept = default;
 
-void ComputeInstance::Dispatch(Context & ctx, ivec3 groups) { ctx.Dispatch(GetShader(), groups, *pRes); }
+void ComputeInstance::Dispatch(ContextBase& ctx, ivec3 groups) { ctx.Dispatch(GetShader(), groups, *pRes); }
 
-void  ComputeInstance::Dispatch(Context& ctx, ivec2 groups) { Dispatch(ctx, ivec3(groups.x, groups.y, 1)); }
+void  ComputeInstance::Dispatch(ContextBase& ctx, ivec2 groups) { Dispatch(ctx, ivec3(groups.x, groups.y, 1)); }
 
-void  ComputeInstance::Dispatch(Context& ctx, int groups) { Dispatch(ctx, ivec3(groups, 1, 1)); }
+void  ComputeInstance::Dispatch(ContextBase& ctx, int groups) { Dispatch(ctx, ivec3(groups, 1, 1)); }
 
 const ComputeShaderVariant& ComputeInstance::GetShader() const 
 { 

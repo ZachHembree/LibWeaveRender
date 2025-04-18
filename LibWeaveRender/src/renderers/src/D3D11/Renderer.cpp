@@ -233,6 +233,8 @@ void Renderer::Update()
 	const ivec2 bodySize = GetWindow().GetBodySize();
 
 	ctx.Reset();
+	// Temporary
+	pDev->GetContext().SetPrimitiveTopology(PrimTopology::TRIANGLELIST);
 
 	// Clear back buffer
 	pSwap->GetBackBuf().Clear(ctx);
@@ -246,9 +248,9 @@ void Renderer::Update()
 
 	// Bind back buffer as render target
 	if (useDefaultDS)
-		ctx.SetRenderTarget(pSwap->GetBackBuf(), *pDefaultDS);
+		ctx.BindRenderTarget(pSwap->GetBackBuf(), *pDefaultDS);
 	else
-		ctx.SetRenderTarget(pSwap->GetBackBuf());
+		ctx.BindRenderTarget(pSwap->GetBackBuf());
 
 	BeforeDraw(ctx);
 

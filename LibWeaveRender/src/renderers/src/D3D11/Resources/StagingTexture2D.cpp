@@ -52,45 +52,43 @@ StagingTexture2D::StagingTexture2D(Device& dev, ivec2 dim, void* data,
 /// Updates texture with contents of a scratch image, assuming compatible formats.
 /// Allocates new Texture2D if the dimensions aren't the same.
 /// </summary>
-void StagingTexture2D::SetTextureWIC(Context& ctx, wstring_view file, DirectX::ScratchImage& buffer)
+void StagingTexture2D::SetTextureWIC(ContextBase& ctx, wstring_view file, DirectX::ScratchImage& buffer)
 {
 	LoadImageWIC(file, buffer);
 	const Image& img = *buffer.GetImage(0, 0, 0);
-	SetTextureData(ctx, img.pixels, 4 * sizeof(uint8_t), ivec2(img.width, img.height));
+	const uint pixStride = 4 * sizeof(byte);
+	const ivec2 dim(img.width, img.height);
+	const uint totalBytes = pixStride * dim.x * dim.y;
+	Span srcBytes(img.pixels, totalBytes);
+
+	SetTextureData(ctx, srcBytes, pixStride, dim);
 }
 
 /// <summary>
 /// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 /// Allocates new Texture2D if the dimensions aren't the same.
 /// </summary>
-void StagingTexture2D::SetTextureData(Context& ctx, void* data, size_t stride, ivec2 dim)
+void StagingTexture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 srcDim)
 {
 	const ivec2 dstSize = GetSize();
 
-	if (dim.x <= dstSize.x && dim.y <= dstSize.y)
+	if (srcDim.x <= dstSize.x && srcDim.y <= dstSize.y)
 	{
-		D3D_CHECK_MSG(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
-
-		if (GetUsage() == ResourceUsages::Dynamic)
-			UpdateMapUnmap(ctx, data);
-		else
-			UpdateSubresource(ctx, data, stride);
+		ctx.SetTextureData(*this, src, pixStride, srcDim);
 	}
 	else
 	{
 		pRes.Reset();
 		*this = std::move(StagingTexture2D(
 			GetDevice(),
-			dim,
-			data,
-			(UINT)stride,
+			srcDim,
+			(void*)src.GetData(),
+			(UINT)pixStride,
 			GetFormat(),
 			desc.MipLevels,
 			GetAccessFlags()
 		));
 	}
-
-	pRes->GetDesc(&desc);
 }
 
 /// <summary>

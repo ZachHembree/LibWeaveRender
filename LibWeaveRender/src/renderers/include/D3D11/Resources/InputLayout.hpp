@@ -31,11 +31,6 @@ namespace Weave::D3D11
 		/// </summary>
 		ID3D11InputLayout* Get() const;
 
-		/// <summary>
-		/// Binds the layout to the input assembler for the associated context
-		/// </summary>
-		void Bind(Context& ctx) const;
-
 	private:
 		ComPtr<ID3D11InputLayout> pLayout;
 	};

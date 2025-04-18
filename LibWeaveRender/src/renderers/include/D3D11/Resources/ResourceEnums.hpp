@@ -5,8 +5,8 @@
 namespace Weave::D3D11
 {
 	/// <summary>
-		/// Specifies how a buffer will be used
-		/// </summary>
+	/// Specifies how a buffer will be used
+	/// </summary>
 	enum class ResourceUsages
 	{
 		/// <summary>
@@ -53,7 +53,7 @@ namespace Weave::D3D11
 	BITWISE_ALL(ResourceBindFlags, UINT)
 
 	/// <summary>
-	/// Specifies types of CPU access allowed for mapable resources
+	/// Specifies types of CPU access allowed for mappable resources
 	/// </summary>
 	enum class ResourceAccessFlags : UINT
 	{

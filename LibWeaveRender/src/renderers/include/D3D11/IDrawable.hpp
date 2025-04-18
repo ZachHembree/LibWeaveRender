@@ -5,6 +5,7 @@ namespace Weave::D3D11
 {
 	class Context;
 	class EffectVariant;
+	class Material;
 
 	/// <summary>
 	/// Interface for types that can be drawn

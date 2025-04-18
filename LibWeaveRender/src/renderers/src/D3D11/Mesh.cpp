@@ -25,8 +25,8 @@ namespace Weave::D3D11
 	/// </summary>
 	void Mesh::Setup(Context& ctx)
 	{
-		vBuf.Bind(ctx);
-		iBuf.Bind(ctx);
+		ctx.BindVertexBuffer(vBuf);
+		ctx.BindIndexBuffer(iBuf);
 	}
 
 	/// <summary>

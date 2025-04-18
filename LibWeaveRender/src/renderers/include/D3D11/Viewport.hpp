@@ -10,6 +10,8 @@ namespace Weave::D3D11
 	/// </summary>
 	struct Viewport
 	{
+		USE_DEFAULT_CMP(Viewport)
+
 		/// <summary>
 		/// Offset in pixels from the top left corner. 
 		/// Usually (0, 0).

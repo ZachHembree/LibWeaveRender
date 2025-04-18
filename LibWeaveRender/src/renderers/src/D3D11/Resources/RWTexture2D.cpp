@@ -114,33 +114,25 @@ ID3D11RenderTargetView* RWTexture2D::GetRTV() { return pRTV.Get(); }
 
 ID3D11RenderTargetView** const RWTexture2D::GetAddressRTV() { return pRTV.GetAddressOf(); }
 
-/// <summary>
-/// Clears the texture to the given color
-/// </summary>
-void RWTexture2D::Clear( Context& ctx, vec4 color)
+void RWTexture2D::Clear(ContextBase& ctx, vec4 color)
 {
-	ctx->ClearRenderTargetView(pRTV.Get(), reinterpret_cast<float*>(&color));
+	ctx.ClearRenderTarget(*this);
 }
 
-void RWTexture2D::SetTextureData(Context& ctx, void* data, size_t stride, ivec2 dim)
+void RWTexture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 srcDim)
 {
-	if (dim == GetSize())
+	if (srcDim == GetSize())
 	{
-		D3D_CHECK_MSG(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
-
-		if (GetUsage() == ResourceUsages::Dynamic)
-			UpdateMapUnmap(ctx, data, stride, dim);
-		else
-			UpdateSubresource(ctx, data, stride, dim);
+		ctx.SetTextureData(*this, src, pixStride, srcDim);
 	}
 	else
 	{
 		pRes.Reset();
 		*this = std::move(RWTexture2D(
 			GetDevice(),
-			dim,
-			data,
-			(UINT)stride,
+			srcDim,
+			(void*)src.GetData(),
+			(UINT)pixStride,
 			GetFormat(),
 			desc.MipLevels
 		));

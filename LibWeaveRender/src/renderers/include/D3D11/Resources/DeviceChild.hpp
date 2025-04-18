@@ -5,7 +5,6 @@ namespace Weave::D3D11
 {
 	class Device;
 	class Renderer;
-	class Context;
 
 	/// <summary>
 	/// Base class for types representing interfaces to device resources

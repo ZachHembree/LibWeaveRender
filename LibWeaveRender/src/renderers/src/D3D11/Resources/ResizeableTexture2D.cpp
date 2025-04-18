@@ -62,7 +62,7 @@ ResizeableTexture2D::ResizeableTexture2D(
 	Device& dev,
 	Formats format,
 	ivec2 dim,
-	UINT mipLevels,
+	uint mipLevels,
 	bool isDynamic
 ) :
 	ResizeableTexture2D(
@@ -140,88 +140,42 @@ vec2 ResizeableTexture2D::GetRenderScale() const
 	return renderScale;
 }
 
-void ResizeableTexture2D::SetTextureData(Context& ctx, void* data, size_t stride, ivec2 dim)
+void ResizeableTexture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 srcDim)
 {
 	const ivec2 currentSize = GetSize();
 
-	if (dim.x <= currentSize.x && dim.y <= currentSize.y)
+	if (srcDim.x <= currentSize.x && srcDim.y <= currentSize.y)
 	{
-		D3D_CHECK_MSG(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
-
-		if (GetUsage() == ResourceUsages::Dynamic)
-			UpdateMapUnmap(ctx, data, stride, dim);
-		else
-			UpdateSubresource(ctx, data, stride, dim);
+		ctx.SetTextureData(*this, src, pixStride, srcDim, GetRenderOffset());
 	}
 	else
 	{
 		pRes.Reset();
 		*this = std::move(ResizeableTexture2D(
 			GetDevice(),
-			dim,
+			srcDim,
 			GetFormat(),
 			GetUsage(),
 			GetBindFlags(),
 			GetAccessFlags(),
 			desc.MipLevels,
-			data, (uint)stride
+			(void*)src.GetData(), (uint)pixStride
 		));
 	}
-
-	pRes->GetDesc(&desc);
-}
-
-void ResizeableTexture2D::UpdateMapUnmap(Context& ctx, void* data, size_t stride, ivec2 dim)
-{
-	const ivec2 dstSize = GetRenderSize(),
-		offset = GetRenderOffset();
-	const size_t lnOffset = offset.x * offset.y;
-
-	D3D11_MAPPED_SUBRESOURCE msr;
-	D3D_CHECK_HR_MSG(ctx->Map(
-		pRes.Get(),
-		0u,
-		D3D11_MAP_WRITE_DISCARD,
-		0u,
-		&msr
-	));
-
-	for (int i = 0; i < dim.x; i++)
-	{
-		byte* const lnStart = (byte*)msr.pData + lnOffset + (i * stride * dstSize.y);
-		memcpy(lnStart, (byte*)data + (i * stride * dim.y), stride * dim.y);
-	}
-
-	ctx->Unmap(pRes.Get(), 0u);
-}
-
-void ResizeableTexture2D::UpdateSubresource(Context& ctx, void* data, size_t stride, ivec2 dim)
-{
-	const ivec2 dstSize = GetRenderSize(),
-		offset = GetRenderOffset();
-
-	D3D11_BOX dstBox;
-	dstBox.left = offset.x;
-	dstBox.right = offset.x + dstSize.x;
-	dstBox.top = offset.y;
-	dstBox.bottom = offset.y + dstSize.y;
-	dstBox.front = 0;
-	dstBox.back = 1;
-
-	ctx->UpdateSubresource(
-		pRes.Get(),
-		0,
-		&dstBox,
-		data,
-		(UINT)(stride * dim.x),
-		(UINT)(stride * dim.x * dim.y)
-	);
 }
 
 ResizeableTexture2D ResizeableTexture2D::FromImageWIC(Device& dev, wstring_view file)
 {
 	ScratchImage buf;
 	LoadImageWIC(file, buf);
+
+	if (buf.GetImage(0, 0, 0)->format != DXGI_FORMAT_R8G8B8A8_UNORM)
+	{
+		ScratchImage converted;
+		DirectX::Convert(*buf.GetImage(0, 0, 0), DXGI_FORMAT_R8G8B8A8_UNORM, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, converted);
+		buf = std::move(converted);
+	}
+
 	const Image& img = *buf.GetImage(0, 0, 0);
 
 	return ResizeableTexture2D(dev,

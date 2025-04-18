@@ -82,8 +82,3 @@ InputLayout::InputLayout(
 }
 
 ID3D11InputLayout* InputLayout::Get() const { return pLayout.Get(); };
-
-void InputLayout::Bind(Context& ctx) const
-{
-	ctx->IASetInputLayout(Get());
-}

@@ -106,12 +106,10 @@ ID3D11RenderTargetView* RTHandle::GetRTV() { return *ppRTV; }
 ID3D11RenderTargetView** const RTHandle::GetAddressRTV() { return ppRTV; }
 
 void RTHandle::Clear(
-	Context& ctx,
+	ContextBase& ctx,
 	vec4 color
 )
 {
 	if (ppRTV != nullptr)
-	{ 
-		ctx->ClearRenderTargetView(*ppRTV, reinterpret_cast<float*>(&color));
-	}
+		ctx.ClearRenderTarget(*this, color);
 }

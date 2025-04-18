@@ -28,6 +28,8 @@ const IDynamicArray<ResView<ID3D11ShaderResourceView>>& ResourceSet::GetSRVs() c
 
 const IDynamicArray<ResView<ID3D11UnorderedAccessView>>& ResourceSet::GetUAVs() const { return rwTextures.data; }
 
+uint ResourceSet::GetConstantCount() const { return (uint)constants.constants.GetLength(); }
+
 void ResourceSet::ConstantGroup::SetValue(uint stringID, const Span<byte>& newValue)
 {
 	const auto& it = stringConstMap.find(stringID);

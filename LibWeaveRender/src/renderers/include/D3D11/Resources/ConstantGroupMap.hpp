@@ -20,6 +20,7 @@ namespace Weave::D3D11
 	public:
 		using GroupData = ResourceSet::ConstantGroup;
 		using ConstantData = ResourceSet::Constant;
+		using Data = IDynamicArray<Span<byte>>;
 
 		MAKE_MOVE_ONLY(ConstantGroupMap)
 
@@ -39,7 +40,7 @@ namespace Weave::D3D11
 		/// Reads unordered constants from ResourceSet into internal fixed layout 
 		/// buffers and returns a reference.
 		/// </summary>
-		const IDynamicArray<Span<byte>>& GetData(const GroupData& src) const;
+		const Data& GetData(const GroupData& src) const;
 		
 		/// <summary>
 		/// Returns the combined size, in bytes, of all CBs in the group

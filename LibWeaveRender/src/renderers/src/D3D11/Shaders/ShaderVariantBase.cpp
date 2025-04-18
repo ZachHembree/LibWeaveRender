@@ -1,15 +1,29 @@
 #include "pch.hpp"
 #include "D3D11/InternalD3D11.hpp"
-#include "D3D11/Context.hpp"
+#include "D3D11/ContextBase.hpp"
 #include "D3D11/ShaderLibrary.hpp"
 #include "D3D11/Shaders/ShaderVariantBase.hpp"
 
 using namespace Weave;
 using namespace Weave::D3D11;
 
+ShaderVariantBase::ShaderVariantBase(ShaderVariantBase&& other) noexcept = default;
+
+ShaderVariantBase& ShaderVariantBase::operator=(ShaderVariantBase&& other) noexcept = default;
+
 uint ShaderVariantBase::GetNameID() const { return def.GetNameID(); }
 
 ShaderDefHandle ShaderVariantBase::GetDefinition() const { return def; }
+
+const ConstantGroupMap* ShaderVariantBase::GetConstantMap() const { return pConstants.get(); }
+
+IDynamicArray<ConstantBuffer>& ShaderVariantBase::GetConstantBuffers() const { return cbufs; }
+
+const ResourceViewMap* ShaderVariantBase::GetResViewMap() const { return pSrvMap.get(); }
+
+const SamplerMap* ShaderVariantBase::GetSampMap() const { return pSampMap.get(); }
+
+const UnorderedAccessMap* ShaderVariantBase::GetUAVMap() const { return nullptr; }
 
 ShaderVariantBase::ShaderVariantBase() :
 	DeviceChild()
@@ -17,53 +31,25 @@ ShaderVariantBase::ShaderVariantBase() :
 
 ShaderVariantBase::ShaderVariantBase(Device& dev, const ShaderDefHandle& def) :
 	DeviceChild(dev),
-	def(def),
-	constants(def.GetConstantBuffers()),
-	sampMap(def.GetResources(), ShaderTypes::Sampler),
-	srvMap(def.GetResources(), ShaderTypes::Texture)
+	def(def)
 { 
 	std::optional<ConstBufGroupHandle> bufData = def.GetConstantBuffers();
 
 	if (bufData.has_value())
 	{ 
+		pConstants.reset(new ConstantGroupMap(bufData));
 		cbufs = UniqueArray<ConstantBuffer>(bufData->GetLength());
 
 		for (int i = 0; i < cbufs.GetLength(); i++)
 			cbufs[i] = ConstantBuffer(dev, (*bufData)[i].GetSize());
 	}
-}
 
-ShaderVariantBase::ShaderVariantBase(ShaderVariantBase&& other) noexcept = default;
+	std::optional<ResourceGroupHandle> resData = def.GetResources();
 
-ShaderVariantBase& ShaderVariantBase::operator=(ShaderVariantBase&& other) noexcept = default;
-
-void ShaderVariantBase::MapResources(Context& ctx, const ResourceSet& res) const
-{
-	const ShadeStages stage = def.GetStage();
-
-	if (sampMap.GetCount() > 0)
-		ctx.SetSamplers(res.GetSamplers(), sampMap, stage);
-
-	if (srvMap.GetCount() > 0)
-		ctx.SetSRVs(res.GetSRVs(), srvMap, stage);
-
-	if (constants.GetBufferCount() > 0)
+	if (resData.has_value())
 	{
-		const IDynamicArray<Span<byte>>& constData = res.GetMappedConstants(constants);
-		ctx.SetConstants(constData, cbufs, stage);
+		pSampMap.reset(new SamplerMap(resData));
+		pSrvMap.reset(new ResourceViewMap(resData));
 	}
 }
 
-void ShaderVariantBase::UnmapResources(Context& ctx) const
-{
-	const ShadeStages stage = def.GetStage();
-
-	if (sampMap.GetCount() > 0)
-		ctx.ClearSamplers(0, (uint)sampMap.GetCount(), stage);
-
-	if (srvMap.GetCount() > 0)
-		ctx.ClearSRVs(0, (uint)srvMap.GetCount(), stage);
-
-	if (constants.GetBufferCount() > 0)
-		ctx.ClearConstants(0, (uint)constants.GetBufferCount(), stage);
-}

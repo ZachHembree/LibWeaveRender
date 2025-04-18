@@ -1,279 +1,27 @@
 #include "pch.hpp"
-#include <d3dcompiler.h>
 #include "WeaveUtils/Span.hpp"
 #include "WeaveRender/D3D11.hpp"
 #include "D3D11/Shaders/ShaderVariants.hpp"
 #include "D3D11/Device.hpp"
+#include "D3D11/ContextState.hpp"
 
 using namespace glm;
 using namespace Weave;
 using namespace Weave::D3D11;
 
-Context::Context(Device& dev, ComPtr<ID3D11DeviceContext>& pContext) :
-	DeviceChild(dev),
-	pContext(pContext),
-	currentVS(nullptr),
-	currentPS(nullptr),
-	currentCS(nullptr),
-	currentVPs(D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE),
-	currentRTVs(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, nullptr),
-	currentDSV(nullptr),
-	currentDSS(nullptr),
-	vpCount(0),
-	rtvCount(0)
-{ 
-	IASetPrimitiveTopology(PrimTopology::TRIANGLELIST);
-}
-
-Context::Context() : 
-	DeviceChild(),
-	currentVS(nullptr),
-	currentPS(nullptr),
-	currentCS(nullptr),
-	currentDSV(nullptr),
-	currentDSS(nullptr),
-	rtvCount(0)
+Context::Context() :
+	ContextBase()
 { }
 
-/// <summary>
-/// Returns reference to renderer using this context
-/// </summary>
-Renderer& Context::GetRenderer()
-{
-	return GetDevice().GetRenderer();
-}
+Context::Context(Device& dev, ComPtr<ID3D11DeviceContext>&& pContext) :
+	ContextBase(dev, std::move(pContext))
+{ }
 
-void Context::SetSamplers(const SamplerMap::DataSrc& sampMap, const SamplerMap& map, ShadeStages stage)
-{
-	ALLOCA_SPAN(arr, map.GetCount(), ID3D11SamplerState*);
-	map.GetResources(sampMap, arr);
+Context::Context(Context&&) noexcept = default;
 
-	switch (stage)
-	{
-	case ShadeStages::Vertex:
-		Get().VSSetSamplers(0, (UINT)arr.GetLength(), arr.GetData());
-		break;
-	case ShadeStages::Pixel:
-		Get().PSSetSamplers(0, (UINT)arr.GetLength(), arr.GetData());
-		break;
-	case ShadeStages::Compute:
-		Get().CSSetSamplers(0, (UINT)arr.GetLength(), arr.GetData());
-		break;
-	}
-}
+Context& Context::operator=(Context&&) noexcept = default;
 
-void Context::SetUAVs(const UnorderedAccessMap::DataSrc& uavs, const UnorderedAccessMap& map)
-{
-	ALLOCA_SPAN(arr, map.GetCount(), ID3D11UnorderedAccessView*);
-	map.GetResources(uavs, arr);
-
-	Get().CSSetUnorderedAccessViews(0, (UINT)arr.GetLength(), arr.GetData(), 0);
-}
-
-void Context::SetSRVs(const ResourceViewMap::DataSrc& srvMap, const ResourceViewMap& map, ShadeStages stage)
-{
-	ALLOCA_SPAN(arr, map.GetCount(), ID3D11ShaderResourceView*);
-	map.GetResources(srvMap, arr);
-
-	switch (stage)
-	{
-	case ShadeStages::Vertex:
-		Get().VSSetShaderResources(0, (UINT)arr.GetLength(), arr.GetData());
-		break;
-	case ShadeStages::Pixel:
-		Get().PSSetShaderResources(0, (UINT)arr.GetLength(), arr.GetData());
-		break;
-	case ShadeStages::Compute:
-		Get().CSSetShaderResources(0, (UINT)arr.GetLength(), arr.GetData());
-		break;
-	}
-}
-
-void Context::SetConstants(const IDynamicArray<Span<byte>>& cbufData, IDynamicArray<ConstantBuffer>& cBuffers, ShadeStages stage)
-{
-	for (int i = 0; i < cbufData.GetLength(); i++)
-		cBuffers[i].SetData(*this, cbufData[i].GetData());
-
-	ALLOCA_ARR(pCBs, cBuffers.GetLength(), ID3D11Buffer*);
-
-	for (int i = 0; i < cBuffers.GetLength(); i++)
-		pCBs[i] = cBuffers[i].Get();
-
-	switch (stage)
-	{
-	case ShadeStages::Vertex:
-		Get().VSSetConstantBuffers(0u, (uint)cBuffers.GetLength(), pCBs);
-		break;
-	case ShadeStages::Pixel:
-		Get().PSSetConstantBuffers(0u, (uint)cBuffers.GetLength(), pCBs);
-		break;
-	case ShadeStages::Compute:
-		Get().CSSetConstantBuffers(0u, (uint)cBuffers.GetLength(), pCBs);
-		break;
-	}
-}
-
-void Context::ClearSamplers(const uint start, const uint count, ShadeStages stage)
-{
-	ALLOCA_ARR_NULL(nullSamp, count, ID3D11SamplerState*);
-
-	switch (stage)
-	{
-	case ShadeStages::Vertex:
-		Get().VSSetSamplers(start, count, nullSamp);
-		break;
-	case ShadeStages::Pixel:
-		Get().PSSetSamplers(start, count, nullSamp);
-		break;
-	case ShadeStages::Compute:
-		Get().CSSetSamplers(start, count, nullSamp);
-		break;
-	}
-}
-
-void Context::ClearUAVs(const uint start, const uint count)
-{
-	ALLOCA_ARR_NULL(nullUAVs, count, ID3D11UnorderedAccessView*);
-	Get().CSSetUnorderedAccessViews(start, count, nullUAVs, 0);
-}
-
-void Context::ClearSRVs(const uint start, const uint count, ShadeStages stage)
-{
-	ALLOCA_ARR_NULL(nullSRV, count, ID3D11ShaderResourceView*);
-
-	switch (stage)
-	{
-	case ShadeStages::Vertex:
-		Get().VSSetShaderResources(start, count, nullSRV);
-		break;
-	case ShadeStages::Pixel:
-		Get().PSSetShaderResources(start, count, nullSRV);
-		break;
-	case ShadeStages::Compute:
-		Get().CSSetShaderResources(start, count, nullSRV);
-		break;
-	}
-}
-
-void Context::ClearConstants(const uint start, const uint count, ShadeStages stage)
-{
-	ALLOCA_ARR_NULL(nullCBs, count, ID3D11Buffer*);
-
-	switch (stage)
-	{
-	case ShadeStages::Vertex:
-		Get().VSSetConstantBuffers(start, count, nullCBs);
-		break;
-	case ShadeStages::Pixel:
-		Get().PSSetConstantBuffers(start, count, nullCBs);
-		break;
-	case ShadeStages::Compute:
-		Get().CSSetConstantBuffers(start, count, nullCBs);
-		break;
-	}
-}
-
-void Context::BindShader(const VertexShaderVariant& vs, const ResourceSet& res)
-{
-	if (&vs != currentVS || currentVS == nullptr)
-	{
-		UnbindShader(ShadeStages::Vertex);
-		vs.MapResources(*this, res);
-		Get().VSSetShader(vs.Get(), nullptr, 0);
-		currentVS = &vs;
-	}
-}
-
-void Context::BindShader(const PixelShaderVariant& ps, const ResourceSet& res)
-{
-	if (&ps != currentPS || currentPS == nullptr)
-	{
-		UnbindShader(ShadeStages::Pixel);
-		ps.MapResources(*this, res);
-		Get().PSSetShader(ps.Get(), nullptr, 0);
-		currentPS = &ps;
-	}
-}
-
-void Context::BindShader(const ComputeShaderVariant& cs, const ResourceSet& res)
-{
-	// If different or not set
-	if (&cs != currentCS || currentCS == nullptr)
-	{
-		UnbindShader(ShadeStages::Compute);
-		cs.MapResources(*this, res);
-		Get().CSSetShader(cs.Get(), nullptr, 0);
-		currentCS = &cs;
-	}
-}
-
-void Context::UnbindShader(ShadeStages stage)
-{
-	switch (stage)
-	{
-	case ShadeStages::Vertex:
-		if (currentVS != nullptr)
-		{
-			currentVS->UnmapResources(*this); // Clear resources
-			Get().VSSetShader(nullptr, nullptr, 0); // Clear shader
-			currentVS = nullptr;
-		}
-		break;
-	case ShadeStages::Pixel:
-		if (currentPS != nullptr)
-		{
-			currentPS->UnmapResources(*this);
-			Get().PSSetShader(nullptr, nullptr, 0);
-			currentPS = nullptr;
-		}
-		break;
-	case ShadeStages::Compute:
-		if (currentCS != nullptr)
-		{
-			currentCS->UnmapResources(*this);
-			Get().CSSetShader(nullptr, nullptr, 0);
-			currentCS = nullptr;
-		}
-		break;
-	}
-}
-
-void Context::Dispatch(const ComputeShaderVariant& cs, ivec3 groups, const ResourceSet& res)
-{
-	BindShader(cs, res);
-	Get().Dispatch(groups.x, groups.y, groups.z);
-	UnbindShader(ShadeStages::Compute);
-}
-
-bool Context::GetIsBound(const VertexShaderVariant* vs) const { return currentVS != nullptr && vs == currentVS; }
-
-bool Context::GetIsBound(const PixelShaderVariant* ps) const { return currentPS != nullptr && ps == currentPS; }
-
-bool Context::GetIsBound(const ComputeShaderVariant* cs) const { return currentCS != nullptr && cs == currentCS; }
-
-void Context::Reset()
-{
-	UnbindShader(ShadeStages::Vertex);
-	UnbindShader(ShadeStages::Pixel);
-	UnbindShader(ShadeStages::Compute);
-
-	pContext->OMSetRenderTargets(0, nullptr, nullptr);
-	pContext->RSSetViewports(0, nullptr);
-	pContext->OMSetDepthStencilState(nullptr, 0);
-
-	currentDepthRange = vec2(0);
-	currentDSV = nullptr;
-	currentDSS = nullptr;
-
-	memset(currentVPs.GetData(), 0, GetArrSize(currentVPs));
-	vpCount = 0;
-
-	memset(currentRTVs.GetData(), 0, GetArrSize(currentRTVs));
-	rtvCount = 0;
-
-	vpSpan = Span<Viewport>();
-	rtvSpan = Span<ID3D11RenderTargetView*>();
-}
+Context::~Context() = default;
 
 /// <summary>
 /// Returns reference to context interface
@@ -284,206 +32,6 @@ ID3D11DeviceContext& Context::Get() const { return *pContext.Get(); }
 /// Returns pointer to context interface
 /// </summary>
 ID3D11DeviceContext* Context::operator->() const { return pContext.Get(); }
-
-/// <summary>
-/// Returns the number of viewports currently bound
-/// </summary>
-const int Context::GetViewportCount() const
-{
-	return vpCount;
-}
-
-/// <summary>
-/// Returns the viewport bound to the given index.
-/// </summary>
-const Viewport& Context::GetViewport(int index) const
-{
-	return vpSpan[index];
-}
-
-/// <summary>
-/// Returns an array of the viewports currently bound
-/// </summary>
-const IDynamicArray<Viewport>& Context::GetViewports() const
-{
-	return vpSpan;
-}
-
-/// <summary>
-/// Binds the given viewport to the rasterizer stage
-/// </summary>
-void Context::SetViewport(int index, const vec2& size, const vec2& offset, const vec2& depth)
-{
-	Viewport vp = { offset, size, depth };
-	SetViewports(Span(&vp), index);
-}
-
-/// <summary>
-/// Binds the given viewport to the rasterizer stage
-/// </summary>
-void Context::SetViewport(int index, const Viewport& vp)
-{
-	SetViewports(Span((Viewport*)&vp), index);
-}
-
-/// <summary>
-/// Binds the given collection of viewports to the rasterizer stage
-/// </summary>
-void Context::SetViewports(const IDynamicArray<Viewport>& viewports, int offset)
-{
-	D3D_ASSERT_MSG((offset + viewports.GetLength()) <= D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
-		"Number of viewports supplied exceeds limit.");
-
-	memcpy(currentVPs.GetData() + glm::max(offset, 0), viewports.GetData(), GetArrSize(viewports));
-
-	vpCount = std::max(vpCount, (uint)(offset + viewports.GetLength()));
-	pContext->RSSetViewports(vpCount, (D3D11_VIEWPORT*)currentVPs.GetData());
-
-	vpSpan = Span(currentVPs.GetData(), vpCount);
-}
-
-/// <summary>
-/// Binds the given buffer as the depth stencil buffer doesn't overwrite render targets. Set to nullptr
-/// to unbind.
-/// </summary>
-void Context::SetDepthStencilBuffer(IDepthStencil& depthStencil)
-{
-	if (currentDSS != depthStencil.GetState())
-	{
-		currentDSS = depthStencil.GetState();
-		pContext->OMSetDepthStencilState(currentDSS, 1);
-		currentDepthRange = depthStencil.GetRange();
-	}
-
-	currentDSV = depthStencil.GetDSV();
-	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetData(), currentDSV);
-}
-
-/// <summary>
-/// Returns the number of render targets currently bound
-/// </summary>
-int Context::GetRenderTargetCount() const
-{
-	return rtvCount;
-}
-
-/// <summary>
-/// Returns the render target view bound to the given index.
-/// </summary>
-ID3D11RenderTargetView* Context::GetRenderTarget(int index) const
-{
-	return rtvSpan[index];
-}
-
-/// <summary>
-/// Returns an array of the render target views currently bound
-/// </summary>
-const IDynamicArray<ID3D11RenderTargetView*>& Context::GetRenderTargets() const
-{
-	return rtvSpan;
-}
-
-/// <summary>
-/// Binds the given buffer as a render target. Doesn't unbind previously set depth-stencil buffers.
-/// </summary>
-void Context::SetRenderTarget(IRenderTarget& rt, IDepthStencil& ds)
-{
-	SetRenderTarget(rt, &ds);
-}
-
-/// <summary>
-/// Binds the given buffer as a render target. Doesn't unbind previously set depth-stencil buffers.
-/// </summary>
-void Context::SetRenderTargets(IDynamicArray<IRenderTarget>& rtvs, IDepthStencil& ds)
-{
-	SetRenderTargets(rtvs, &ds);
-}
-
-/// <summary>
-/// Binds the given buffer as a render target. Doesn't unbind previously set depth-stencil buffers.
-/// </summary>
-void Context::SetRenderTarget(IRenderTarget& rtv, IDepthStencil* depthStencil)
-{
-	Span rtvSpan(&rtv);
-	SetRenderTargets(rtvSpan, depthStencil);
-}
-
-/// <summary>
-/// Binds the given buffers as render targets. Doesn't unbind previously set depth-stencil buffers.
-/// </summary>
-void Context::SetRenderTargets(IDynamicArray<IRenderTarget>& rtvs, IDepthStencil* depthStencil)
-{
-	D3D_ASSERT_MSG(rtvs.GetLength() <= D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
-		"Number of render targets supplied exceeds limit.");
-
-	if (depthStencil != nullptr)
-	{
-		if (currentDSS != depthStencil->GetState())
-		{
-			currentDSS = depthStencil->GetState();
-			pContext->OMSetDepthStencilState(currentDSS, 1);
-			currentDepthRange = depthStencil->GetRange();
-		}
-
-		currentDSV = depthStencil->GetDSV();
-	}
-	else
-	{
-		currentDSV = nullptr;
-		currentDSS = nullptr;
-	}
-
-	rtvCount = (uint)rtvs.GetLength();
-
-	for (int i = 0; i < (int)rtvCount; i++)
-		currentRTVs[i] = rtvs[i].GetRTV();
-
-	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetData(), currentDSV);
-	rtvSpan = Span(currentRTVs.GetData(), rtvCount);
-
-	// Update viewports for render textures
-	Viewport viewports[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]({});
-
-	for (int i = 0; i < (int)rtvCount; i++)
-	{
-		viewports[i] = 
-		{ 
-			rtvs[i].GetRenderOffset(), 
-			rtvs[i].GetRenderSize(), 
-			currentDepthRange 
-		};
-	}
-
-	SetViewports(Span((Viewport*)&viewports, rtvCount));
-}
-
-/// <summary>
-/// Binds a vertex buffer to the given slot
-/// </summary>
-void Context::IASetVertexBuffer(VertexBuffer& vertBuffer, int slot)
-{
-	UINT offset = 0, stride = vertBuffer.GetStride();
-	pContext->IASetVertexBuffers(slot, 1, vertBuffer.GetAddressOf(), &stride, &offset);
-}
-
-/// <summary>
-/// Determines how vertices are interpreted by the input assembler
-/// </summary>
-void Context::IASetPrimitiveTopology(PrimTopology topology)
-{
-	pContext->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)topology);
-}
-
-/// <summary>
-/// Binds an array of buffers starting at the given slot
-/// </summary>
-void Context::IASetVertexBuffers(IDynamicArray<VertexBuffer>& vertBuffers, int startSlot)
-{
-	for (int i = 0; i < vertBuffers.GetLength(); i++)
-	{
-		IASetVertexBuffer(vertBuffers[i], startSlot + i);
-	}
-}
 
 static void ValidateResourceBounds(
 	IColorBuffer2D& src, 
@@ -705,12 +253,27 @@ void Context::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 	Renderer& renderer = GetRenderer();
 	Mesh& quad = renderer.GetDefaultMesh("FSQuad");
 	Material& quadFX = renderer.GetDefaultMaterial("PosTextured2D");
+	Viewport vp = 
+	{
+		.offset = dst.GetRenderOffset(),
+		.size = dst.GetRenderSize(),
+		.zDepth = vec2(0)
+	};
+	bool wasRtvSet = false;
+	bool wasVpSet = false;
 
-	ID3D11RenderTargetView* const lastRTV = GetRenderTarget(0);
-	const Viewport& lastVP = GetViewport(0);
-
-	pContext->OMSetRenderTargets(1, dst.GetAddressRTV(), nullptr);
-	SetViewport(0, dst.GetRenderSize(), dst.GetRenderOffset());
+	// Manually set render target if it isn't already set
+	if (dst.GetRTV() != pState->renderTargets[0])
+	{
+		pContext->OMSetRenderTargets(1, dst.GetAddressRTV(), nullptr);
+		wasRtvSet = true;
+	}
+	// Manually set VP if it isn't set
+	if (vp != pState->viewports[0])
+	{
+		pContext->RSSetViewports(1, (D3D11_VIEWPORT*)&vp);
+		wasVpSet = true;
+	}
 
 	const ivec2 srcRenderSize = vec2(srcBox.x, srcBox.y);
 	const vec2 scale = vec2(srcRenderSize) / vec2(src.GetSize()),
@@ -727,8 +290,11 @@ void Context::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 
 	Draw(quad, quadFX);
 
-	pContext->OMSetRenderTargets(rtvCount, currentRTVs.GetData(), currentDSV);
-	SetViewport(0, lastVP);
+	// Manually restore previous state if changed
+	if (wasRtvSet)
+		pContext->OMSetRenderTargets(pState->rtCount, pState->renderTargets.GetData(), pState->GetDepthStencilView());
+	if (wasVpSet)
+		pContext->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
 }
 
 /// <summary>

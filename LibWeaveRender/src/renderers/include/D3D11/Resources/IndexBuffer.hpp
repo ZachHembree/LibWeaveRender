@@ -23,14 +23,9 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns the number of elements in the buffer
 		/// </summary>
-		UINT GetLength() const;
-
-		/// <summary>
-		/// Binds an index buffer to the input assembler. Used with DrawIndexed().
-		/// </summary>
-		void Bind(Context& ctx, UINT offset = 0);
+		uint GetLength() const;
 
 	private:
-		UINT count;
+		uint count;
 	};
 }

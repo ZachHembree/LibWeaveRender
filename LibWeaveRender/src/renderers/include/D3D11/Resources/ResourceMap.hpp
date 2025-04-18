@@ -12,12 +12,12 @@ namespace Weave::D3D11
 	/// <summary>
 	/// Template for mapping shader resources to pipeline slots using string IDs
 	/// </summary>
-	template<typename T>
+	template<typename T, ShaderTypes TypeEnum>
 	class ResourceMap
 	{
 	public:
-		using ResView = ResourceSet::ResView<T>;
-		using DataSrc = IDynamicArray<ResView>;
+		using ViewT = ResourceSet::ResView<T>;
+		using DataT = IDynamicArray<ViewT>;
 
 		ResourceMap() = default;
 		ResourceMap(const ResourceMap&) = default;
@@ -25,7 +25,7 @@ namespace Weave::D3D11
 		ResourceMap& operator=(const ResourceMap& other) = default;
 		ResourceMap& operator=(ResourceMap&& other) = default;
 
-		ResourceMap(const std::optional<ResourceGroupHandle>& resources, ShaderTypes type)
+		ResourceMap(const std::optional<ResourceGroupHandle>& resources)
 		{
 			if (resources.has_value())
 			{ 
@@ -33,7 +33,7 @@ namespace Weave::D3D11
 
 				for (int i = 0; i < resources->GetLength(); i++)
 				{
-					if ((*resources)[i].GetHasFlags(type))
+					if ((*resources)[i].GetHasFlags(TypeEnum))
 					{
 						resourceMap.emplace((*resources)[i].stringID, count);
 						count++;
@@ -42,13 +42,13 @@ namespace Weave::D3D11
 			}
 		}
 
-		void GetResources(const DataSrc& src, IDynamicArray<T*>& dst) const
+		void GetResources(const DataT& src, IDynamicArray<T*>& dst) const
 		{
 			const size_t count = GetCount();
 			D3D_ASSERT_MSG(dst.GetLength() >= count, "Resource dst array too small");
 			memset(dst.GetData(), 0u, count * sizeof(T**));
 
-			for (const ResView& view : src)
+			for (const ViewT& view : src)
 			{
 				const auto& it = resourceMap.find(view.stringID);
 
@@ -70,18 +70,18 @@ namespace Weave::D3D11
 		std::unordered_map<uint, uint> resourceMap;
 	};
 
-	class SamplerMap : public ResourceMap<ID3D11SamplerState>
+	class SamplerMap : public ResourceMap<ID3D11SamplerState, ShaderTypes::Sampler>
 	{
-		using ResourceMap<ID3D11SamplerState>::ResourceMap;
+		using ResourceMap<ID3D11SamplerState, ShaderTypes::Sampler>::ResourceMap;
 	};
 
-	class ResourceViewMap : public ResourceMap<ID3D11ShaderResourceView>
+	class ResourceViewMap : public ResourceMap<ID3D11ShaderResourceView, ShaderTypes::Texture>
 	{ 
-		using ResourceMap<ID3D11ShaderResourceView>::ResourceMap;
+		using ResourceMap<ID3D11ShaderResourceView, ShaderTypes::Texture>::ResourceMap;
 	};
 
-	class UnorderedAccessMap : public ResourceMap<ID3D11UnorderedAccessView>
+	class UnorderedAccessMap : public ResourceMap<ID3D11UnorderedAccessView, ShaderTypes::RandomWrite>
 	{
-		using ResourceMap<ID3D11UnorderedAccessView>::ResourceMap;
+		using ResourceMap<ID3D11UnorderedAccessView, ShaderTypes::RandomWrite>::ResourceMap;
 	};
 }

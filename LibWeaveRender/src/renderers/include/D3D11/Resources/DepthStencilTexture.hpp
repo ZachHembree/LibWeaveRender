@@ -48,11 +48,11 @@ namespace Weave::D3D11
 		/// Clears the texture
 		/// </summary>
 		void Clear(
-			Context& ctx,
+			ContextBase& ctx,
 			DSClearFlags clearFlags = DSClearFlags::Depth,
 			float depthClear = 1.0f,
 			UINT8 stencilClear = 0
-		) const override;
+		) override;
 
 	private:
 		ComPtr<ID3D11DepthStencilState> pState;

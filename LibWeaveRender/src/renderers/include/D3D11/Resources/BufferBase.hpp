@@ -3,6 +3,11 @@
 
 namespace Weave::D3D11
 {
+	class ContextBase;
+
+	/// <summary>
+	/// Abstract base for GPU buffer types
+	/// </summary>
 	class BufferBase : public ResourceBase
 	{
 	public:
@@ -15,17 +20,30 @@ namespace Weave::D3D11
 		ID3D11Resource** const GetResAddress();
 
 		/// <summary>
-		/// Returns the size of the buffer in bytes
+		/// Returns the total size of the buffer in bytes.
 		/// </summary>
-		UINT GetSize() const;
+		uint GetSize() const;
 
+		/// <summary>
+		/// Specifies how/if the CPU accesses the buffer
+		/// </summary>
 		ResourceUsages GetUsage() const;
 
+		/// <summary>
+		/// Indicates D3D11 buffer subtype, e.g. vertex, index, constant, etc.
+		/// </summary>
 		ResourceBindFlags GetBindFlags() const;
 
+		/// <summary>
+		/// Specifies CPU access rules for mappable resources
+		/// </summary>
 		ResourceAccessFlags GetAccessFlags() const;
 
-		void SetData(Context& ctx, const void* data);
+		/// <summary>
+		/// Writes the given data to the buffer. Writing to an unsupported buffer type will throw
+		/// an exception.
+		/// </summary>
+		void SetData(ContextBase& ctx, const IDynamicArray<byte>& data);
 
 	protected:
 		D3D11_BUFFER_DESC desc;
@@ -38,7 +56,7 @@ namespace Weave::D3D11
 			ResourceAccessFlags cpuAccess,
 			Device& device,
 			const IDynamicArray<T>& data) :
-			BufferBase(type, usage, cpuAccess, device, data.GetData(), (UINT)GetArrSize(data))
+			BufferBase(type, usage, cpuAccess, device, data.GetData(), (uint)GetArrSize(data))
 		{ }
 
 		BufferBase();
@@ -49,10 +67,6 @@ namespace Weave::D3D11
 			ResourceAccessFlags cpuAccess, 
 			Device& device, 
 			const void* data, 
-			const UINT byteSize);
-
-		void UpdateSubresource(Context& ctx, const void* data);
-
-		void UpdateMapUnmap(Context& ctx, const void* data);
+			const uint byteSize);
 	};
 }

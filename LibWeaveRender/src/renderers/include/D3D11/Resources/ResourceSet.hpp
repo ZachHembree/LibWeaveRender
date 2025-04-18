@@ -107,6 +107,8 @@ namespace Weave::D3D11
 
 		const IDynamicArray<ResView<ID3D11UnorderedAccessView>>& GetUAVs() const;
 
+		uint GetConstantCount() const;
+
 		const IDynamicArray<Span<byte>>& GetMappedConstants(const ConstantGroupMap& map) const;
 
 		void Clear()

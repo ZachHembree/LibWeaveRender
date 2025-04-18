@@ -5,6 +5,8 @@
 
 #include "../src/renderers/include/D3DException.hpp"
 
+#include "../src/renderers/include/D3D11/ContextBase.hpp"
+
 #include "../src/renderers/include/D3D11/Context.hpp"
 #include "../src/renderers/include/D3D11/Device.hpp"
 #include "../src/renderers/include/D3D11/Renderer.hpp"

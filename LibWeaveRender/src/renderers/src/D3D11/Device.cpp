@@ -22,8 +22,8 @@ Device::Device(Renderer& renderer) : pRenderer(&renderer)
 		nullptr,
 		&pContext
 	));
-
-	context = Context(*this, pContext);
+	
+	context = Context(*this, std::move(pContext));
 }
 
 Renderer& Device::GetRenderer() const { D3D_ASSERT_MSG(pRenderer != nullptr, "Renderer cannot be null."); return *pRenderer; }

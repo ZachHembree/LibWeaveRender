@@ -9,6 +9,8 @@
 
 namespace Weave::D3D11
 {
+	class ContextBase;
+
 	class IResource
 	{
 	public:
@@ -128,10 +130,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Clears the render target to the given color
 		/// </summary>
-		virtual void Clear(
-			Context& ctx,
-			vec4 color = vec4(0)
-		) = 0;
+		virtual void Clear(ContextBase& ctx, vec4 color = vec4(0)) = 0;
 	};
 
 	/// <summary>
@@ -179,11 +178,11 @@ namespace Weave::D3D11
 		/// Clears the texture
 		/// </summary>
 		virtual void Clear(
-			Context& ctx,
+			ContextBase& ctx,
 			DSClearFlags clearFlags = DSClearFlags::Depth,
 			float depthClear = 1.0f,
 			UINT8 stencilClear = 0
-		) const = 0;
+		) = 0;
 	};
 
 	/// <summary>

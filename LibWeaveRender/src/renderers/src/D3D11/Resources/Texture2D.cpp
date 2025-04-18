@@ -62,7 +62,7 @@ Texture2D::Texture2D(
 		isReadonly ? ResourceUsages::Immutable : ResourceUsages::Default,
 		ResourceBindFlags::ShaderResource,
 		ResourceAccessFlags::None,
-		1u,
+		mipLevels,
 		data, stride
 	)
 { }
@@ -71,7 +71,7 @@ Texture2D::Texture2D(
 	Device& dev,
 	Formats format,
 	ivec2 dim,
-	UINT mipLevels,
+	uint mipLevels,
 	bool isDynamic
 ) :
 	Texture2D(
@@ -81,7 +81,7 @@ Texture2D::Texture2D(
 		isDynamic ? ResourceUsages::Dynamic : ResourceUsages::Default,
 		ResourceBindFlags::ShaderResource,
 		isDynamic ? ResourceAccessFlags::Write : ResourceAccessFlags::None,
-		1u,
+		mipLevels,
 		nullptr, 0u
 	)
 { }
@@ -98,46 +98,53 @@ ID3D11ShaderResourceView* Texture2D::GetSRV() { return pSRV.Get(); }
 
 ID3D11ShaderResourceView** const Texture2D::GetSRVAddress() { return pSRV.GetAddressOf(); }
 
-void Texture2D::SetTextureWIC(Context& ctx, wstring_view file, ScratchImage& buffer)
+void Texture2D::SetTextureWIC(ContextBase& ctx, wstring_view file, ScratchImage& buffer)
 {
 	LoadImageWIC(file, buffer);
 	const Image& img = *buffer.GetImage(0, 0, 0);
-	SetTextureData(ctx, img.pixels, 4 * sizeof(uint8_t), ivec2(img.width, img.height));
+	const uint pixStride = 4 * sizeof(byte);
+	const ivec2 dim(img.width, img.height);
+	const uint totalBytes = pixStride * dim.x * dim.y;
+	Span srcBytes(img.pixels, totalBytes);
+
+	SetTextureData(ctx, srcBytes, pixStride, dim);
 }
 
-void Texture2D::SetTextureData(Context& ctx, void* data, size_t stride, ivec2 dim)
+void Texture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 srcDim)
 {
-	if (dim == GetSize())
+	if (srcDim == GetSize())
 	{
-		D3D_CHECK_MSG(GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
-
-		if (GetUsage() == ResourceUsages::Dynamic)
-			UpdateMapUnmap(ctx, data);
-		else
-			UpdateSubresource(ctx, data, stride);
+		ctx.SetTextureData(*this, src, pixStride, srcDim);
+		this->pixelStride = pixStride;
 	}
 	else
 	{
 		pRes.Reset();
 		*this = std::move(Texture2D(
 			GetDevice(),
-			dim,
+			srcDim,
 			GetFormat(),
 			GetUsage(),
 			GetBindFlags(),
 			GetAccessFlags(),
 			desc.MipLevels,
-			data, (uint)stride
+			(void*)src.GetData(), (uint)pixStride
 		));
 	}
-
-	pRes->GetDesc(&desc);
 }
 
 Texture2D Texture2D::FromImageWIC(Device& dev, wstring_view file, bool isReadOnly)
 {
 	ScratchImage buf;
 	LoadImageWIC(file, buf);
+
+	if (buf.GetImage(0, 0, 0)->format != DXGI_FORMAT_R8G8B8A8_UNORM)
+	{
+		ScratchImage converted;
+		DirectX::Convert(*buf.GetImage(0, 0, 0), DXGI_FORMAT_R8G8B8A8_UNORM, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, converted);
+		buf = std::move(converted);
+	}
+
 	const Image& img = *buf.GetImage(0, 0, 0);
 
 	return Texture2D(dev,

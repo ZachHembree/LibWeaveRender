@@ -20,11 +20,11 @@ namespace Weave::D3D11
 
 		ComputeInstance& operator=(ComputeInstance&&) noexcept;
 
-		void Dispatch(Context& ctx, ivec3 groups);
+		void Dispatch(ContextBase& ctx, ivec3 groups);
 
-		void Dispatch(Context& ctx, ivec2 groups);
+		void Dispatch(ContextBase& ctx, ivec2 groups);
 
-		void Dispatch(Context& ctx, int groups);
+		void Dispatch(ContextBase& ctx, int groups);
 
 	protected:
 		mutable const ComputeShaderVariant* pCS;
