@@ -232,7 +232,6 @@ void Renderer::Update()
 	Context& ctx = pDev->GetContext();
 	const ivec2 bodySize = GetWindow().GetBodySize();
 
-	ctx.Reset();
 	// Temporary
 	pDev->GetContext().SetPrimitiveTopology(PrimTopology::TRIANGLELIST);
 
@@ -260,6 +259,7 @@ void Renderer::Update()
 
 	// Present frame
 	pSwap->Present(1u, 0);
+	ctx.UnbindRenderTargets();
 
 	AfterDraw(ctx);
 }
