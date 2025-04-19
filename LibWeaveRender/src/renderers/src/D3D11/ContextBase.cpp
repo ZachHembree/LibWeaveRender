@@ -262,8 +262,11 @@ void ContextBase::UnbindVertexBuffers(sint startSlot, uint count)
 
 void ContextBase::BindIndexBuffer(IndexBuffer& indexBuffer, uint byteOffset)
 {
-	pState->pIndexBuffer = indexBuffer.Get();
-	pContext->IASetIndexBuffer(pState->pIndexBuffer, (DXGI_FORMAT)Formats::R16_UINT, byteOffset);
+	if (pState->pIndexBuffer != indexBuffer.Get())
+	{
+		pState->pIndexBuffer = indexBuffer.Get();
+		pContext->IASetIndexBuffer(pState->pIndexBuffer, (DXGI_FORMAT)indexBuffer.GetFormat(), byteOffset);
+	}
 }
 
 void ContextBase::UnbindIndexBuffer()
@@ -271,7 +274,7 @@ void ContextBase::UnbindIndexBuffer()
 	if (pState->pIndexBuffer != nullptr)
 	{
 		pState->pIndexBuffer = nullptr;
-		pContext->IASetIndexBuffer(nullptr, (DXGI_FORMAT)Formats::R16_UINT, 0);
+		pContext->IASetIndexBuffer(nullptr, (DXGI_FORMAT)Formats::UNKNOWN, 0);
 	}
 }
 

@@ -3,13 +3,23 @@
 
 namespace Weave::D3D11
 { 
+	/// <summary>
+	/// Contains a list of indices for arranging a set of vertices into a mesh. 
+	/// Indices can be 16 or 32 bit unsigned integers.
+	/// </summary>
 	class IndexBuffer : public BufferBase
 	{
 	public:
+		IndexBuffer(
+			Device& device,
+			const IDynamicArray<ushort>& data,
+			ResourceUsages usage = ResourceUsages::Default,
+			ResourceAccessFlags cpuAccess = ResourceAccessFlags::None
+		);
 
 		IndexBuffer(
 			Device& device,
-			const IDynamicArray<USHORT>& data,
+			const IDynamicArray<uint>& data,
 			ResourceUsages usage = ResourceUsages::Default,
 			ResourceAccessFlags cpuAccess = ResourceAccessFlags::None
 		);
@@ -25,7 +35,14 @@ namespace Weave::D3D11
 		/// </summary>
 		uint GetLength() const;
 
+		/// <summary>
+		/// Returns the format of the indices stored by the buffer, either 32 bit
+		/// or 16 bit unsigned integers.
+		/// </summary>
+		Formats GetFormat() const;
+
 	private:
 		uint count;
+		Formats format;
 	};
 }

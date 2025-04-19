@@ -6,21 +6,31 @@
 using namespace Weave::D3D11;
 
 IndexBuffer::IndexBuffer(Device& device, 
-	const IDynamicArray<USHORT>& data, 
+	const IDynamicArray<ushort>& data,
 	ResourceUsages usage, 
 	ResourceAccessFlags cpuAccess
 ) :
 	count((uint)data.GetLength()),
-	BufferBase(ResourceBindFlags::Index, usage, cpuAccess, device, data)
+	BufferBase(ResourceBindFlags::Index, usage, cpuAccess, device, data),
+	format(Formats::R16_UINT)
 { }
 
-IndexBuffer::IndexBuffer() : count(0) {}
+IndexBuffer::IndexBuffer(Device& device,
+	const IDynamicArray<uint>& data,
+	ResourceUsages usage,
+	ResourceAccessFlags cpuAccess
+) :
+	count((uint)data.GetLength()),
+	BufferBase(ResourceBindFlags::Index, usage, cpuAccess, device, data),
+	format(Formats::R32_UINT)
+{ }
+
+IndexBuffer::IndexBuffer() : count(0), format(Formats::UNKNOWN) {}
 
 IndexBuffer::IndexBuffer(IndexBuffer&&) = default;
 
 IndexBuffer& IndexBuffer::operator=(IndexBuffer&&) = default;
 
-/// <summary>
-/// Returns the number of elements in the buffer
-/// </summary>
 uint IndexBuffer::GetLength() const { return count; }
+
+Formats IndexBuffer::GetFormat() const { return format; }
