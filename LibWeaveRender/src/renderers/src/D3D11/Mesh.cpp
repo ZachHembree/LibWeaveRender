@@ -4,29 +4,56 @@
 namespace Weave::D3D11
 {
 	Mesh::Mesh(
-		Device& device, 
-		const IDynamicArray<USHORT>& indices, 
-		const void* vertices, 
-		size_t vCount, 
-		size_t vStride
+		Device& device,
+		const IDynamicArray<ushort>& indices,
+		const void* vertices,
+		size_t vCount,
+		size_t vStride,
+		PrimTopology topology
 	) :
 		vBuf(device, vertices, vCount, vStride),
 		iBuf(device, indices),
 		translation(0),
 		rotation(1, 0, 0, 0),
-		scale(1)
+		scale(1),
+		topology(topology)
 	{ }
 
-	Mesh::Mesh() : translation(0), rotation(0, 0, 0, 0), scale(0)
+	Mesh::Mesh(
+		Device& device,
+		const IDynamicArray<uint>& indices,
+		const void* vertices,
+		size_t vCount,
+		size_t vStride,
+		PrimTopology topology
+	) :
+		vBuf(device, vertices, vCount, vStride),
+		iBuf(device, indices),
+		translation(0),
+		rotation(1, 0, 0, 0),
+		scale(1),
+		topology(topology)
+	{}
+
+	Mesh::Mesh() : 
+		translation(0), 
+		rotation(0, 0, 0, 0), 
+		scale(0), 
+		topology(PrimTopology::UNDEFINED)
 	{ }
+
+	PrimTopology Mesh::GetTopology() const { return topology; }
 
 	/// <summary>
 	/// Updates any resources needed prior to drawing
 	/// </summary>
 	void Mesh::Setup(ContextBase& ctx)
 	{
+		ctx.SetPrimitiveTopology(topology);
 		ctx.BindVertexBuffer(vBuf);
-		ctx.BindIndexBuffer(iBuf);
+
+		if (iBuf.GetLength() > 0)
+			ctx.BindIndexBuffer(iBuf);
 	}
 
 	/// <summary>

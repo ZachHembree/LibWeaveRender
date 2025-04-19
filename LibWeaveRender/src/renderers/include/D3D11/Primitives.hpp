@@ -3,73 +3,21 @@
 
 #include "Mesh.hpp"
 
-namespace Weave::D3D11
-{
-	/// <summary>
-	/// Determines how vertex topology is interpreted by the input assembler
-	/// </summary>
-	enum class PrimTopology
-	{
-		UNDEFINED = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED,
-		POINTLIST = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST,
-		LINELIST = D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
-		LINESTRIP = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP,
-		TRIANGLELIST = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-		TRIANGLESTRIP = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
-		LINELIST_ADJ = D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ,
-		LINESTRIP_ADJ = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ,
-		TRIANGLELIST_ADJ = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ,
-		TRIANGLESTRIP_ADJ = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ,
-		CP1_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST,
-		CP2_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST,
-		CP3_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST,
-		CP4_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST,
-		CP5_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_5_CONTROL_POINT_PATCHLIST,
-		CP6_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_6_CONTROL_POINT_PATCHLIST,
-		CP7_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_7_CONTROL_POINT_PATCHLIST,
-		CP8_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_8_CONTROL_POINT_PATCHLIST,
-		CP9_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_9_CONTROL_POINT_PATCHLIST,
-		CP10_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_10_CONTROL_POINT_PATCHLIST,
-		CP11_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_11_CONTROL_POINT_PATCHLIST,
-		CP12_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST,
-		CP13_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_13_CONTROL_POINT_PATCHLIST,
-		CP14_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_14_CONTROL_POINT_PATCHLIST,
-		CP15_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_15_CONTROL_POINT_PATCHLIST,
-		CP16_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_16_CONTROL_POINT_PATCHLIST,
-		CP17_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_17_CONTROL_POINT_PATCHLIST,
-		CP18_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_18_CONTROL_POINT_PATCHLIST,
-		CP19_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_19_CONTROL_POINT_PATCHLIST,
-		CP20_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_20_CONTROL_POINT_PATCHLIST,
-		CP21_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_21_CONTROL_POINT_PATCHLIST,
-		CP22_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_22_CONTROL_POINT_PATCHLIST,
-		CP23_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_23_CONTROL_POINT_PATCHLIST,
-		CP24_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_24_CONTROL_POINT_PATCHLIST,
-		CP25_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_25_CONTROL_POINT_PATCHLIST,
-		CP26_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_26_CONTROL_POINT_PATCHLIST,
-		CP27_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_27_CONTROL_POINT_PATCHLIST,
-		CP28_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_28_CONTROL_POINT_PATCHLIST,
-		CP29_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_29_CONTROL_POINT_PATCHLIST,
-		CP30_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_30_CONTROL_POINT_PATCHLIST,
-		CP31_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_31_CONTROL_POINT_PATCHLIST,
-		CP32_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_32_CONTROL_POINT_PATCHLIST
-	};
-}
-
 namespace Weave::D3D11::Primitives
 {
 	/// <summary>
 	/// Generates a cone mesh with the given number of subdivisions
 	/// </summary>
-	template<typename Vert_T>
-	MeshDef<Vert_T> GenerateCone(int subdivisions)
+	template<typename VertT>
+	MeshDef<VertT> GenerateCone(int subdivisions)
 	{
 		constexpr float tau = 2.0f * glm::pi<float>();
 		const float inc = tau / subdivisions;
 		const int vertCount = (subdivisions + 2);
 		float rad = 0.0f;
 
-		UniqueArray<Vert_T> vertices(vertCount);
-		UniqueArray<USHORT> indices(3 * 2 * vertCount + 3);
+		UniqueArray<VertT> vertices(vertCount);
+		UniqueArray<ushort> indices(3 * 2 * vertCount + 3);
 
 		for (int i = 0; i < (int)vertices.GetLength() - 2; i++)
 		{
@@ -108,8 +56,8 @@ namespace Weave::D3D11::Primitives
 	/// <summary>
 	/// Generates a cylinder mesh with the given number of subdivisions
 	/// </summary>
-	template<typename Vert_T>
-	MeshDef<Vert_T> GenerateCylinder(int subdivisions)
+	template<typename VertT>
+	MeshDef<VertT> GenerateCylinder(int subdivisions)
 	{
 		constexpr float tau = 2.0f * glm::pi<float>();
 		const float inc = tau / subdivisions;
@@ -117,8 +65,8 @@ namespace Weave::D3D11::Primitives
 			vMid = (vertCount / 2 - 1);
 		float rad = 0.0f;
 
-		UniqueArray<Vert_T> vertices(vertCount);
-		UniqueArray<USHORT> indices((3 * 4 * vertCount));
+		UniqueArray<VertT> vertices(vertCount);
+		UniqueArray<ushort> indices((3 * 4 * vertCount));
 
 		for (int i = 0; i < vMid; i++)
 		{
@@ -172,14 +120,14 @@ namespace Weave::D3D11::Primitives
 	/// <summary>
 	/// Generates a subdivided UV sphere mesh
 	/// </summary>
-	template<typename Vert_T>
-	MeshDef<Vert_T> GenerateSphere(ivec2 subdiv)
+	template<typename VertT>
+	MeshDef<VertT> GenerateSphere(ivec2 subdiv)
 	{
 		constexpr float pi = glm::pi<float>();
 		const ivec2 vDim = subdiv + 1;
 		const vec2 inc = pi / vec2(subdiv);
-		UniqueArray<Vert_T> vertices(vDim.x * vDim.y);
-		UniqueArray<USHORT> indices(3 * 2 * subdiv.x * (subdiv.y - 1));
+		UniqueArray<VertT> vertices(vDim.x * vDim.y);
+		UniqueArray<ushort> indices(3 * 2 * subdiv.x * (subdiv.y - 1));
 
 		for (int i = 0; i < vDim.x; i++)
 		{
@@ -238,15 +186,15 @@ namespace Weave::D3D11::Primitives
 	/// <summary>
 	/// Generates subdivided plane
 	/// </summary>
-	template<typename Vert_T>
-	MeshDef<Vert_T> GeneratePlane(ivec2 subdiv = ivec2(0), float scale = 1.0f)
+	template<typename VertT>
+	MeshDef<VertT> GeneratePlane(ivec2 subdiv = ivec2(0), float scale = 1.0f)
 	{
 		++subdiv;
 
 		const vec2 incr(scale / vec2(subdiv));
 		const ivec2 dim = subdiv + 1;
-		UniqueArray<Vert_T> vertices(dim.x * dim.y);
-		UniqueArray<USHORT> indices(6 * subdiv.x * subdiv.y);
+		UniqueArray<VertT> vertices(dim.x * dim.y);
+		UniqueArray<ushort> indices(6 * subdiv.x * subdiv.y);
 		scale *= 0.5f;
 
 		for (int i = 0; i < dim.x; i++)
@@ -280,16 +228,16 @@ namespace Weave::D3D11::Primitives
 	/// <summary>
 	/// Generates subdivided cube
 	/// </summary>
-	template<typename Vert_T>
-	MeshDef<Vert_T> GenerateCube(ivec2 subdiv = ivec2(0))
+	template<typename VertT>
+	MeshDef<VertT> GenerateCube(ivec2 subdiv = ivec2(0))
 	{
 		++subdiv;
 
 		const ivec2 dim = subdiv + 1;
 		const vec2 incr = 1.0f / vec2(subdiv);
 		const int faceSize = dim.x * dim.y;
-		UniqueArray<Vert_T> vertices(6 * faceSize);
-		UniqueArray<USHORT> indices(6 * vertices.GetLength());
+		UniqueArray<VertT> vertices(6 * faceSize);
+		UniqueArray<ushort> indices(6 * vertices.GetLength());
 
 		for (int i = 0; i < dim.x; i++)
 		{

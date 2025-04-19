@@ -232,9 +232,6 @@ void Renderer::Update()
 	Context& ctx = pDev->GetContext();
 	const ivec2 bodySize = GetWindow().GetBodySize();
 
-	// Temporary
-	pDev->GetContext().SetPrimitiveTopology(PrimTopology::TRIANGLELIST);
-
 	// Clear back buffer
 	pSwap->GetBackBuf().Clear(ctx);
 
