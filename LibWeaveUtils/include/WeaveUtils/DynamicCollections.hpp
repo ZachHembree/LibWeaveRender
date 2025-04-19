@@ -6,7 +6,8 @@
 #include <memory>
 #include <functional>
 #include <concepts>
-#include "WeaveUtils/GlobalUtils.hpp"
+#include "GlobalUtils.hpp"
+#include "WeaveException.hpp"
 
 // Defines type aliases for templated IDynamicArray types
 #define DEF_DYN_ARR_TRAITS(BASE) \
@@ -238,7 +239,7 @@ namespace Weave
 	/// Returns the size of the array in bytes
 	/// </summary>
 	template<typename T>
-	size_t GetArrSize(const IDynamicArray<T>& arr) { return arr.GetLength() * sizeof(T); }
+	inline size_t GetArrSize(const IDynamicArray<T>& arr) { return arr.GetLength() * sizeof(T); }
 
 	/// <summary>
 	/// Returns true if the contents of the arrays are equal
@@ -257,7 +258,7 @@ namespace Weave
 
 	template<typename T, typename IndexT>
 	requires std::is_integral<IndexT>::value
-	T& GetArrayAtIndex(T* pStart, IndexT index, IndexT length)
+	inline T& GetArrayAtIndex(T* pStart, IndexT index, IndexT length)
 	{
 #if _CONTAINER_DEBUG_LEVEL > 0
 		if (index >= length)
@@ -275,37 +276,47 @@ namespace Weave
 	/// Returns true if the contents of the arrays are equal
 	/// </summary>
 	template<typename T>
-	bool operator==(const IDynamicArray<T>& left, const IDynamicArray<T>& right) { return GetIsArrDataEqual(left, right); }
+	inline bool operator==(const IDynamicArray<T>& left, const IDynamicArray<T>& right) { return GetIsArrDataEqual(left, right); }
 
 	/// <summary>
 	/// Returns true if the contents of the arrays are NOT equal
 	/// </summary>
 	template<typename T>
-	bool operator!=(const IDynamicArray<T>& left, const IDynamicArray<T>& right) { return !GetIsArrDataEqual(left, right); }
+	inline bool operator!=(const IDynamicArray<T>& left, const IDynamicArray<T>& right) { return !GetIsArrDataEqual(left, right); }
 
 	/// <summary>
 	/// Returns the size of the array in bytes
 	/// </summary>
 	template<typename T>
-	size_t GetArrSize(const std::vector<T>& arr) { return arr.size() * sizeof(T); }
+	inline size_t GetArrSize(const std::vector<T>& arr) { return arr.size() * sizeof(T); }
 
 	/// <summary>
 	/// Fills an array with all zeroes. Only valid if T is plain old data.
 	/// </summary>
 	template<typename T> requires std::is_trivial_v<T>
-	void SetArrNull(IDynamicArray<T>& arr) { memset(arr.GetData(), 0u, GetArrSize(arr)); }
+	inline void SetArrNull(IDynamicArray<T>& arr) { memset(arr.GetData(), 0u, GetArrSize(arr)); }
 
 	/// <summary>
 	/// Fills an array with all zeroes. Only valid if T is plain old data.
 	/// </summary>
 	template<typename T> requires std::is_trivial_v<T>
-	void SetArrNull(IDynamicArray<T>& arr, size_t length) { memset(arr.GetData(), 0u, sizeof(T) * length); }
+	inline void SetArrNull(IDynamicArray<T>& arr, size_t length) { memset(arr.GetData(), 0u, sizeof(T) * length); }
 
 	/// <summary>
 	/// Fills an array with all zeroes. Only valid if T is plain old data.
 	/// </summary>
 	template<typename T> requires std::is_trivial_v<T>
-	void SetArrNull(IDynamicArray<T>& arr, ptrdiff_t offset, size_t length) { memset(arr.GetData() + offset, 0u, sizeof(T) * length); }
+	inline void SetArrNull(IDynamicArray<T>& arr, ptrdiff_t offset, size_t length) { memset(arr.GetData() + offset, 0u, sizeof(T) * length); }
+
+	/// <summary>
+	/// Performs a direct memcpy from one array to another. Only valid for plain data.
+	/// </summary>
+	template<typename T> requires std::is_trivial_v<T>
+	inline void ArrMemCopy(IDynamicArray<T>& dst, const IDynamicArray<T>& src)
+	{
+		WV_ASSERT_MSG(dst.GetLength() >= src.GetLength(), "Destination array cannot be smaller than source array.");
+		memcpy(dst.GetData(), src.GetData(), GetArrSize(src));
+	}
 
 	/// <summary>
 	/// Dynamically allocated array with members of type T and a fixed length.

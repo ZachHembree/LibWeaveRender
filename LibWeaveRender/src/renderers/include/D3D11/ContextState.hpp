@@ -31,6 +31,7 @@ namespace Weave::D3D11
 
 		struct StageState
 		{
+			ShadeStages stage;
 			const ShaderVariantBase* pShader;
 			UniqueArray<ID3D11SamplerState*> samplers;
 			UniqueArray<ID3D11Buffer*> cbuffers;

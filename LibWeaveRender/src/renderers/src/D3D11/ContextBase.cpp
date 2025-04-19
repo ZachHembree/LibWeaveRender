@@ -289,34 +289,99 @@ bool ContextBase::GetIsBound(const ShaderVariantBase& shader) const
 	return pState->GetStage(stage).pShader == &shader;
 }
 
+/// <summary>
+/// Updates resources bound in the state cache and returns the size of the bound resource range
+/// affected that requires update.
+/// </summary>
+template<typename ResT>
+static uint TryUpdateResources(
+	ID3D11DeviceContext* pContext, 
+	ShadeStages stage, 
+	IDynamicArray<ResT*>& stateRes, 
+	uint& stateCount, 
+	IDynamicArray<ResT*>& newRes
+)
+{
+	const Span<ResT*> stateSpan(stateRes.GetData(), stateCount);
+
+	if (stateSpan != newRes)
+	{
+		const uint oldCount = stateCount;
+		const uint newCount = (uint)newRes.GetLength();
+		const uint updateCount = std::max(oldCount, newCount);
+		stateCount = newCount;
+
+		// Write new resources to state cache
+		ArrMemCopy(stateRes, newRes);
+
+		// Set extra range to null
+		if (oldCount > newCount)
+			SetArrNull(stateRes, newCount, oldCount - newCount);
+
+		return updateCount;
+	}
+	else
+		return 0;
+}
+
+/// <summary>
+/// Updates resources bound in the state cache and returns the size of the bound resource range
+/// affected that requires update.
+/// </summary>
+template<typename ResT, typename MapT, typename DataT>
+static uint TryUpdateResources(
+	ID3D11DeviceContext* pContext, 
+	ShadeStages stage, 
+	IDynamicArray<ResT*>& stateRes, 
+	uint& stateCount,
+	const DataT& resSrc,
+	const MapT* pResMap
+)
+{
+	if (pResMap != nullptr && pResMap->GetCount() > 0)
+	{
+		// Map resources into temporary array
+		ALLOCA_SPAN(newRes, pResMap->GetCount(), ResT*);
+		pResMap->GetResources(resSrc, newRes);
+
+		// Populate the state cache based on the mapped resources
+		return TryUpdateResources(pContext, stage, stateRes, stateCount, newRes);
+	}
+	else if (stateCount > 0)
+	{
+		const uint updateCount = stateCount;
+		SetArrNull(stateRes, stateCount);
+		stateCount = 0;
+
+		return updateCount;
+	}
+	else
+		return 0;
+}
+
 void ContextBase::BindResources(const ComputeShaderVariant& shader, const ResourceSet& resSrc)
 {
-	if (shader.GetUAVMap() != nullptr && resSrc.GetUAVs().GetLength() > 0)
-	{
-		const UnorderedAccessMap& uavMap = *shader.GetUAVMap();
-		const UnorderedAccessMap::DataT& uavSrc = resSrc.GetUAVs();
-
-		// Populate the state cache array based on the map and source resources
-		pState->uavCount = (uint)uavMap.GetCount();
-		uavMap.GetResources(uavSrc, pState->uavs);
-		pContext->CSSetUnorderedAccessViews(0, pState->uavCount, pState->uavs.GetData(), nullptr);
-	}
+	if (const uint updateCount = TryUpdateResources(
+			pContext.Get(), 
+			ShadeStages::Compute, 
+			pState->uavs, 
+			pState->uavCount,
+			resSrc.GetUAVs(),
+			shader.GetUAVMap()
+		); 
+		updateCount > 0
+	)
+	{ pContext->CSSetUnorderedAccessViews(0, updateCount, pState->uavs.GetData(), nullptr); }
 }
 
 void ContextBase::BindResources(const VertexShaderVariant& shader, const ResourceSet& resSrc)
 {
 	ID3D11InputLayout* pLayout = shader.GetInputLayout().Get();
-	pState->pInputLayout = pLayout;
-	pContext->IASetInputLayout(pLayout);
-}
-
-static void ClearUAVs(ID3D11DeviceContext* pContext, uint count)
-{
-	if (count > 0)
+	
+	if (pLayout != pState->pInputLayout)
 	{
-		D3D_ASSERT_MSG(count <= D3D11_1_UAV_SLOT_COUNT, "UAV slot count exceeded maximum.");
-		ALLOCA_SPAN_NULL(nullRW, count, ID3D11UnorderedAccessView*);
-		pContext->CSSetUnorderedAccessViews(0, count, nullRW.GetData(), nullptr);
+		pState->pInputLayout = pLayout;
+		pContext->IASetInputLayout(pState->pInputLayout);
 	}
 }
 
@@ -325,13 +390,9 @@ void ContextBase::BindShader(const ShaderVariantBase& shader, const ResourceSet&
 	const ShadeStages stage = shader.GetStage();
 	ContextState::StageState& stageState = pState->GetStage(stage);
 
-	if (stageState.pShader == &shader)
-		return;
-	else
-		stageState.pShader = &shader;
-
 	// Bind Shader Object
-	SetShader(stage, pContext.Get(), shader.Get(), nullptr, 0);
+	if (stageState.pShader != &shader)
+		SetShader(stage, pContext.Get(), shader.Get(), nullptr, 0);
 
 	// Bind Constant Buffers (and upload data)
 	if (shader.GetConstantMap() != nullptr && resSrc.GetConstantCount() > 0)
@@ -339,43 +400,60 @@ void ContextBase::BindShader(const ShaderVariantBase& shader, const ResourceSet&
 		const ConstantGroupMap& constMap = *shader.GetConstantMap();
 		const ConstantGroupMap::Data& constSrc = resSrc.GetMappedConstants(constMap);
 		IDynamicArray<ConstantBuffer>& cbufs = shader.GetConstantBuffers();
-		stageState.cbufCount = (uint)cbufs.GetLength();
+		ALLOCA_SPAN(newCbufs, cbufs.GetLength(), ID3D11Buffer*);
 
-		// Upload data to each ConstantBuffer object and store its ID3D11Buffer* in the state cache
-		for (int i = 0; i < cbufs.GetLength(); i++)
+		// Upload data to each ConstantBuffer object
+		for (uint i = 0; i < constMap.GetBufferCount(); i++)
 		{
 			SetBufferData(cbufs[i], constSrc[i]);
-			stageState.cbuffers[i] = cbufs[i].Get();
+			newCbufs[i] = cbufs[i].Get();
 		}
 
+		const uint cbufUpdates = TryUpdateResources(pContext.Get(), stage, stageState.cbuffers, stageState.cbufCount, newCbufs);
+
+		if (cbufUpdates > 0)
+			SetConstantBuffers(stage, pContext.Get(), 0, cbufUpdates, stageState.cbuffers.GetData());
+	}
+	else if (stageState.cbufCount > 0)
+	{
+		SetArrNull(stageState.cbuffers, stageState.cbufCount);
 		SetConstantBuffers(stage, pContext.Get(), 0, stageState.cbufCount, stageState.cbuffers.GetData());
+		stageState.cbufCount = 0;
 	}
 
 	// Bind Samplers
-	if (shader.GetSampMap() != nullptr && resSrc.GetSamplers().GetLength() > 0)
-	{
-		const SamplerMap& sampMap = *shader.GetSampMap();
-		const SamplerMap::DataT& sampSrc = resSrc.GetSamplers();
-
-		// Populate the state cache array based on the map and source resources
-		stageState.sampCount = (uint)sampMap.GetCount();
-		sampMap.GetResources(sampSrc, stageState.samplers);
-		SetSamplers(stage, pContext.Get(), 0, stageState.sampCount, stageState.samplers.GetData());
-	}
+	if (const uint updateCount = TryUpdateResources(
+			pContext.Get(),
+			stage,
+			stageState.samplers,
+			stageState.sampCount,
+			resSrc.GetSamplers(),
+			shader.GetSampMap()
+		); 
+		updateCount > 0
+	)
+	{ SetSamplers(stage, pContext.Get(), 0, updateCount, stageState.samplers.GetData()); }
 
 	// Bind Shader Resource Views (SRVs)
-	if (shader.GetResViewMap() != nullptr && resSrc.GetSRVs().GetLength() > 0)
-	{
-		// Avoid RAW contention and force sync
-		ClearUAVs(pContext.Get(), pState->uavCount);
-
-		const ResourceViewMap& srvMap = *shader.GetResViewMap();
-		const ResourceViewMap::DataT& srvSrc = resSrc.GetSRVs();
-
-		// Populate the state cache array based on the map and source resources
-		stageState.srvCount = (uint)srvMap.GetCount();
-		srvMap.GetResources(srvSrc, stageState.resViews);
-		SetShaderResources(stage, pContext.Get(), 0, stageState.srvCount, stageState.resViews.GetData());
+	if (const uint updateCount = TryUpdateResources(
+			pContext.Get(),
+			stage,
+			stageState.resViews,
+			stageState.srvCount,
+			resSrc.GetSRVs(),
+			shader.GetResViewMap()
+		);
+		updateCount > 0
+	)
+	{ 
+		if (pState->uavCount > 0)
+		{
+			SetArrNull(pState->uavs, pState->uavCount);
+			pContext->CSSetUnorderedAccessViews(0, pState->uavCount, pState->uavs.GetData(), nullptr);
+			pState->uavCount = 0;
+		}
+		
+		SetShaderResources(stage, pContext.Get(), 0, updateCount, stageState.resViews.GetData()); 
 	}
 
 	// CS specific handling
@@ -411,33 +489,6 @@ void ContextBase::UnbindShader(const ShaderVariantBase& shader)
 	// State Check: Only unbind if this shader is the one currently active
 	if (stageState.pShader == &shader)
 	{
-		// Unbind Constant Buffers
-		if (shader.GetConstantMap() != nullptr)
-		{
-			SetArrNull(stageState.cbuffers, stageState.cbufCount);
-			SetConstantBuffers(stage, pContext.Get(), 0, stageState.cbufCount, stageState.cbuffers.GetData());
-		}
-
-		// Unbind Samplers
-		if (shader.GetSampMap() != nullptr)
-		{
-			SetArrNull(stageState.samplers, stageState.sampCount);
-			SetSamplers(stage, pContext.Get(), 0, stageState.sampCount, stageState.samplers.GetData());
-		}
-
-		// Unbind Shader Resource Views (SRVs)
-		if (shader.GetResViewMap() != nullptr)
-		{
-			SetArrNull(stageState.resViews, stageState.srvCount);
-			SetShaderResources(stage, pContext.Get(), 0, stageState.srvCount, stageState.resViews.GetData());
-		}
-
-		if (stage == ShadeStages::Compute)
-			UnbindResources(static_cast<const ComputeShaderVariant&>(shader));
-		else if (stage == ShadeStages::Vertex)
-			UnbindResources(static_cast<const VertexShaderVariant&>(shader));
-
-		// Unbind Shader Object
 		SetShader(stage, pContext.Get(), nullptr, nullptr, 0);
 		stageState.pShader = nullptr;
 	}

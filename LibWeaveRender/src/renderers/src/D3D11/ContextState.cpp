@@ -27,6 +27,7 @@ ContextState& ContextState::operator=(ContextState&& rhs) noexcept = default;
 ContextState::~ContextState() = default;
 
 ContextState::StageState::StageState() :
+	stage(ShadeStages::Unknown),
 	pShader(nullptr),
 	samplers(D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, nullptr),
 	cbuffers(D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, nullptr),
@@ -54,6 +55,10 @@ void ContextState::Init()
 	uavs = UniqueArray<ID3D11UnorderedAccessView*>(D3D11_1_UAV_SLOT_COUNT, nullptr);
 
 	stages = UniqueArray<StageState>(g_ShadeStageCount);
+
+	for (uint i = 0; i < g_ShadeStageCount; i++)
+		stages[i].stage = (ShadeStages)i;
+
 	isInitialized = true;
 }
 
