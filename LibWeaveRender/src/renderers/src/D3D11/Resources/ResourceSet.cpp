@@ -22,11 +22,11 @@ void ResourceSet::SetUAV(uint stringID, IUnorderedAccess& uav) { rwTextures.SetR
 
 void ResourceSet::SetConstant(uint stringID, const Span<byte>& newValue) { constants.SetValue(stringID, newValue); }
 
-const IDynamicArray<ResView<Sampler>>& ResourceSet::GetSamplers() const { return sampMap.data; }
+const ResourceSet::SamplerList& ResourceSet::GetSamplers() const { return sampMap.data; }
 
-const IDynamicArray<ResView<IShaderResource>>& ResourceSet::GetSRVs() const { return textures.data; }
+const ResourceSet::SRVList& ResourceSet::GetSRVs() const { return textures.data; }
 
-const IDynamicArray<ResView<IUnorderedAccess>>& ResourceSet::GetUAVs() const { return rwTextures.data; }
+const ResourceSet::UAVList& ResourceSet::GetUAVs() const { return rwTextures.data; }
 
 uint ResourceSet::GetConstantCount() const { return (uint)constants.constants.GetLength(); }
 
@@ -63,7 +63,7 @@ void ResourceSet::ConstantGroup::Clear()
 	stringConstMap.clear();
 }
 
-const IDynamicArray<Span<byte>>& ResourceSet::GetMappedConstants(const ConstantGroupMap& map) const
+const ResourceSet::ConstantData& ResourceSet::GetMappedConstants(const ConstantGroupMap& map) const
 {
 	return map.GetData(constants);
 }

@@ -2,27 +2,35 @@
 #include <unordered_map>
 #include "WeaveEffects/ShaderData.hpp"
 #include "Resources/ResourceBase.hpp"
-#include "Resources/Sampler.hpp"
+#include "D3D11/Resources/ResourceMap.hpp"
+#include "D3D11/Resources/ResourceSet.hpp"
 
 namespace Weave::D3D11
 {
 	using Effects::ShadeStages;
+	using Effects::ShaderTypes;
 
 	struct Viewport;
+	class IDepthStencil;
+
 	enum class PrimTopology;
 	class InputLayout;
-
-	class IDepthStencil;
 	class VertexBuffer;
+
+	class ConstantBuffer;
 	class ResourceSet;
+	class Sampler;
 	class ShaderVariantBase;
 
+	/// <summary>
+	/// Stores mirrored state of a D3D11 context
+	/// </summary>
 	class ContextState
 	{
 	public:
 		MAKE_NO_COPY(ContextState);
 
-		using SamplerList = IDynamicArray<ID3D11SamplerState*>;
+		using SamplerList = IDynamicArray<Sampler*>;
 		using CBufList = IDynamicArray<ID3D11Buffer*>;
 		using SRVList = IDynamicArray<IShaderResource*>;
 		using UAVList = IDynamicArray<IUnorderedAccess*>;
@@ -37,7 +45,7 @@ namespace Weave::D3D11
 			const ShaderVariantBase* pShader;
 			UniqueArray<Sampler*> samplers;
 			UniqueArray<ID3D11Buffer*> cbuffers;
-			UniqueArray<IShaderResource*> resViews;
+			UniqueArray<IShaderResource*> srvs;
 
 			uint sampCount;
 			uint cbufCount;
@@ -68,7 +76,6 @@ namespace Weave::D3D11
 		uint uavCount;
 
 		UniqueArray<StageState> stages;
-		std::unordered_map<IResource*, ShadeStages> resUsageMap;
 
 		ContextState();
 
@@ -78,12 +85,24 @@ namespace Weave::D3D11
 
 		~ContextState();
 
+		/// <summary>
+		/// Initializes internal buffers
+		/// </summary>
 		void Init();
 
+		/// <summary>
+		/// Clears internal buffers
+		/// </summary>
 		void Reset();
 
+		/// <summary>
+		/// Returns true if the state has been initialized
+		/// </summary>
 		bool GetIsValid() const;
 
+		/// <summary>
+		/// Returns state information for the given stage
+		/// </summary>
 		StageState& GetStage(ShadeStages stage);
 
 		ID3D11DepthStencilView* GetDepthStencilView() const;
@@ -92,7 +111,54 @@ namespace Weave::D3D11
 
 		vec2 GetDepthStencilRange() const;
 
+		/// <summary>
+		/// Updates resources bound in the state cache and returns the size of the bound resource range
+		/// affected that requires update.
+		/// </summary>
+		uint TryUpdateResources(ShadeStages stage, IDynamicArray<ConstantBuffer>& cbufs);
+
+		/// <summary>
+		/// Updates resources bound in the state cache and returns the size of the bound resource range
+		/// affected that requires update.
+		/// </summary>
+		uint TryUpdateResources(ShadeStages stage, const ResourceSet::SamplerList& resSrc, const SamplerMap* pMap);
+
+		/// <summary>
+		/// Updates resources bound in the state cache and returns the size of the bound resource range
+		/// affected that requires update.
+		/// </summary>
+		uint TryUpdateResources(ShadeStages stage, const ResourceSet::SRVList& resSrc, const ResourceViewMap* pMap);
+
+		/// <summary>
+		/// Updates resources bound in the state cache and returns the size of the bound resource range
+		/// affected that requires update.
+		/// </summary>
+		uint TryUpdateResources(const ResourceSet::UAVList& resSrc, const UnorderedAccessMap* pMap);
+
 	private:
 		bool isInitialized;
+
+		/// <summary>
+		/// Updates resources bound in the state cache and returns the size of the bound resource range
+		/// affected that requires update.
+		/// </summary>
+		template<typename ResT>
+		uint TryUpdateResources(
+			IDynamicArray<ResT*>& stateRes,
+			uint& stateCount,
+			IDynamicArray<ResT*>& newRes
+		);
+
+		/// <summary>
+		/// Updates resources bound in the state cache and returns the size of the bound resource range
+		/// affected that requires update.
+		/// </summary>
+		template<typename ResT, typename MapT, typename DataT>
+		uint TryUpdateResources(
+			IDynamicArray<ResT*>& stateRes,
+			uint& stateCount,
+			const DataT& resSrc,
+			const MapT* pResMap
+		);
 	};
 }

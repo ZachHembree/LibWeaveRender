@@ -54,7 +54,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns the layout map for shader resource views. Returns nullptr if undefined or empty.
 		/// </summary>
-		const ResourceViewMap* GetResViewMap() const;
+		const ResourceViewMap* GetSRVMap() const;
 
 		/// <summary>
 		/// Returns the layout map for sampler states. Returns nullptr if undefined or empty.

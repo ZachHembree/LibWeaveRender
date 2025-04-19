@@ -13,7 +13,7 @@ namespace Weave::D3D11
 	/// </summary>
 	class ResourceSet
 	{
-	public:
+	public:		
 		MAKE_NO_COPY(ResourceSet)
 
 		/// <summary>
@@ -25,6 +25,11 @@ namespace Weave::D3D11
 			uint stringID;
 			T* pView;
 		};
+
+		using SamplerList = IDynamicArray<ResView<Sampler>>;
+		using SRVList = IDynamicArray<ResView<IShaderResource>>;
+		using UAVList = IDynamicArray<ResView<IUnorderedAccess>>;
+		using ConstantData = IDynamicArray<Span<byte>>;
 
 		/// <summary>
 		/// Stores mappings for string ID <-> view lookup
@@ -102,15 +107,15 @@ namespace Weave::D3D11
 		template<typename T>
 		void SetConstant(uint stringID, const T& value) { constants.SetValue(stringID, {(byte*)(&value), sizeof(T)}); }
 
-		const IDynamicArray<ResView<Sampler>>& GetSamplers() const;
+		const SamplerList& GetSamplers() const;
 
-		const IDynamicArray<ResView<IShaderResource>>& GetSRVs() const;
+		const ResourceSet::SRVList& GetSRVs() const;
 
-		const IDynamicArray<ResView<IUnorderedAccess>>& GetUAVs() const;
+		const ResourceSet::UAVList& GetUAVs() const;
 
 		uint GetConstantCount() const;
 
-		const IDynamicArray<Span<byte>>& GetMappedConstants(const ConstantGroupMap& map) const;
+		const ConstantData& GetMappedConstants(const ConstantGroupMap& map) const;
 
 		void Clear()
 		{

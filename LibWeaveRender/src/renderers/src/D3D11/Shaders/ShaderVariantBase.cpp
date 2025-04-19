@@ -19,7 +19,7 @@ const ConstantGroupMap* ShaderVariantBase::GetConstantMap() const { return pCons
 
 IDynamicArray<ConstantBuffer>& ShaderVariantBase::GetConstantBuffers() const { return cbufs; }
 
-const ResourceViewMap* ShaderVariantBase::GetResViewMap() const { return pSrvMap.get(); }
+const ResourceViewMap* ShaderVariantBase::GetSRVMap() const { return pSrvMap.get(); }
 
 const SamplerMap* ShaderVariantBase::GetSampMap() const { return pSampMap.get(); }
 

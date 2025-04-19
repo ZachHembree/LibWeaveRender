@@ -4,7 +4,7 @@
 #include "D3D11/ContextBase.hpp"
 #include "D3D11/ContextState.hpp"
 #include "D3D11/Viewport.hpp"
-#include "D3D11/Primitives.hpp"
+#include "D3D11/Mesh.hpp"
 #include "D3D11/Resources/ResourceSet.hpp"
 #include "D3D11/Resources/VertexBuffer.hpp"
 #include "D3D11/Shaders/ShaderVariants.hpp"
@@ -289,83 +289,16 @@ bool ContextBase::GetIsBound(const ShaderVariantBase& shader) const
 	return pState->GetStage(stage).pShader == &shader;
 }
 
-/// <summary>
-/// Updates resources bound in the state cache and returns the size of the bound resource range
-/// affected that requires update.
-/// </summary>
-template<typename ResT>
-static uint TryUpdateResources(
-	IDynamicArray<ResT*>& stateRes, 
-	uint& stateCount, 
-	IDynamicArray<ResT*>& newRes
-)
-{
-	const Span<ResT*> stateSpan(stateRes.GetData(), stateCount);
-
-	if (stateSpan != newRes)
-	{
-		const uint oldCount = stateCount;
-		const uint newCount = (uint)newRes.GetLength();
-		const uint updateCount = std::max(oldCount, newCount);
-		stateCount = newCount;
-
-		// Write new resources to state cache
-		ArrMemCopy(stateRes, newRes);
-
-		// Set extra range to null
-		if (oldCount > newCount)
-			SetArrNull(stateRes, newCount, oldCount - newCount);
-
-		return updateCount;
-	}
-	else
-		return 0;
-}
-
-/// <summary>
-/// Updates resources bound in the state cache and returns the size of the bound resource range
-/// affected that requires update.
-/// </summary>
-template<typename ResT, typename MapT, typename DataT>
-static uint TryUpdateResources(
-	IDynamicArray<ResT*>& stateRes, 
-	uint& stateCount,
-	const DataT& resSrc,
-	const MapT* pResMap
-)
-{
-	if (pResMap != nullptr && pResMap->GetCount() > 0)
-	{
-		// Map resources into temporary array
-		ALLOCA_SPAN(newRes, pResMap->GetCount(), ResT*);
-		pResMap->GetResources(resSrc, newRes);
-
-		// Populate the state cache based on the mapped resources
-		return TryUpdateResources(stateRes, stateCount, newRes);
-	}
-	else if (stateCount > 0)
-	{
-		const uint updateCount = stateCount;
-		SetArrNull(stateRes, stateCount);
-		stateCount = 0;
-
-		return updateCount;
-	}
-	else
-		return 0;
-}
-
 void ContextBase::BindResources(const ComputeShaderVariant& shader, const ResourceSet& resSrc)
 {
-	if (const uint updateCount = TryUpdateResources(
-			pState->uavs, 
-			pState->uavCount,
-			resSrc.GetUAVs(),
-			shader.GetUAVMap()
-		); 
-		updateCount > 0
-	)
-	{ CSSetUnorderedAccessViews(pContext.Get(), 0, updateCount, pState->uavs.GetData()); }
+	if (const uint updateCount = pState->TryUpdateResources(resSrc.GetUAVs(), shader.GetUAVMap()); updateCount > 0)
+	{
+		// Conflicts will be visible here. Incomming UAVs may conflict with preexisting SRVs. If the conflicting
+		// SRVs are bound to the same stage, then an error should be raised. OM UAVs are not supported yet, so
+		// that means compute only.
+		
+		CSSetUnorderedAccessViews(pContext.Get(), 0, updateCount, pState->uavs.GetData());
+	}
 }
 
 void ContextBase::BindResources(const VertexShaderVariant& shader, const ResourceSet& resSrc)
@@ -384,66 +317,37 @@ void ContextBase::BindShader(const ShaderVariantBase& shader, const ResourceSet&
 	const ShadeStages stage = shader.GetStage();
 	ContextState::StageState& stageState = pState->GetStage(stage);
 
-	// Bind Shader Object
+	// Bind shader
 	if (stageState.pShader != &shader)
 		SetShader(pContext.Get(), stage, shader.Get(), nullptr, 0);
 
-	// Bind Constant Buffers (and upload data)
+	// Upload constants
 	if (shader.GetConstantMap() != nullptr && resSrc.GetConstantCount() > 0)
 	{
 		const ConstantGroupMap& constMap = *shader.GetConstantMap();
 		const ConstantGroupMap::Data& constSrc = resSrc.GetMappedConstants(constMap);
 		IDynamicArray<ConstantBuffer>& cbufs = shader.GetConstantBuffers();
-		ALLOCA_SPAN(newCbufs, cbufs.GetLength(), ID3D11Buffer*);
 
 		// Upload data to each ConstantBuffer object
 		for (uint i = 0; i < constMap.GetBufferCount(); i++)
-		{
 			SetBufferData(cbufs[i], constSrc[i]);
-			newCbufs[i] = cbufs[i].Get();
-		}
-
-		const uint cbufUpdates = TryUpdateResources(stageState.cbuffers, stageState.cbufCount, newCbufs);
-
-		if (cbufUpdates > 0)
-			SetConstantBuffers(pContext.Get(), stage, 0, cbufUpdates, stageState.cbuffers.GetData());
 	}
-	else if (stageState.cbufCount > 0)
-	{
-		SetArrNull(stageState.cbuffers, stageState.cbufCount);
-		SetConstantBuffers(pContext.Get(), stage, 0, stageState.cbufCount, stageState.cbuffers.GetData());
-		stageState.cbufCount = 0;
-	}
+
+	// Bind constant buffers
+	if (const uint updateCount = pState->TryUpdateResources(stage, shader.GetConstantBuffers()); updateCount > 0)
+		SetConstantBuffers(pContext.Get(), stage, 0, updateCount, stageState.cbuffers.GetData());
 
 	// Bind Samplers
-	if (const uint updateCount = TryUpdateResources(
-			stageState.samplers,
-			stageState.sampCount,
-			resSrc.GetSamplers(),
-			shader.GetSampMap()
-		); 
-		updateCount > 0
-	)
-	{ SetSamplers(pContext.Get(), stage, 0, updateCount, stageState.samplers.GetData()); }
+	if (const uint updateCount = pState->TryUpdateResources(stage, resSrc.GetSamplers(), shader.GetSampMap()); updateCount > 0)
+		SetSamplers(pContext.Get(), stage, 0, updateCount, stageState.samplers.GetData());
 
 	// Bind Shader Resource Views (SRVs)
-	if (const uint updateCount = TryUpdateResources(
-			stageState.resViews,
-			stageState.srvCount,
-			resSrc.GetSRVs(),
-			shader.GetResViewMap()
-		);
-		updateCount > 0
-	)
+	if (const uint updateCount = pState->TryUpdateResources(stage, resSrc.GetSRVs(), shader.GetSRVMap()); updateCount > 0)
 	{ 
-		if (pState->uavCount > 0)
-		{
-			SetArrNull(pState->uavs, pState->uavCount);
-			CSSetUnorderedAccessViews(pContext.Get(), 0, pState->uavCount, pState->uavs.GetData());
-			pState->uavCount = 0;
-		}
-		
-		SetShaderResources(pContext.Get(), stage, 0, updateCount, stageState.resViews.GetData());
+		// Conflicts will be visible here. Incomming SRVs may conflict with previously bound UAVs. Conflicts within the same
+		// stage are not an error at this point, but will be if the new UAVs conflict with the new SRVs.
+
+		SetShaderResources(pContext.Get(), stage, 0, updateCount, stageState.srvs.GetData()); 
 	}
 
 	// CS specific handling
@@ -459,7 +363,7 @@ void ContextBase::UnbindResources(const ComputeShaderVariant& shader)
 	// Unbind Unordered Access Views (UAVs)
 	if (shader.GetUAVMap() != nullptr)
 	{
-		const uint count = shader.GetUAVMap()->GetCount();
+		const uint count = (uint)shader.GetUAVMap()->GetCount();
 		SetArrNull(pState->uavs, count);
 		CSSetUnorderedAccessViews(pContext.Get(), 0, count, pState->uavs.GetData());
 	}
