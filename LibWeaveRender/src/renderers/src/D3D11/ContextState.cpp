@@ -52,7 +52,7 @@ void ContextState::Init()
 	vertexBuffers = UniqueArray<ID3D11Buffer*>(D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, nullptr);
 	vbStrides = UniqueArray<uint>(D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, 0);
 	vbOffsets = UniqueArray<uint>(D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, 0);
-	uavs = UniqueArray<ID3D11UnorderedAccessView*>(D3D11_1_UAV_SLOT_COUNT, nullptr);
+	uavs = UniqueArray<IUnorderedAccess*>(D3D11_1_UAV_SLOT_COUNT, nullptr);
 
 	stages = UniqueArray<StageState>(g_ShadeStageCount);
 

@@ -1,5 +1,7 @@
 #include "pch.hpp"
 #include "D3D11/ContextUtils.hpp"
+#include "D3D11/Resources/ResourceBase.hpp"
+#include "D3D11/Resources/Sampler.hpp"
 
 using namespace Weave;
 using namespace Weave::D3D11;
@@ -28,10 +30,16 @@ namespace Weave::D3D11
 		&ID3D11DeviceContext::CSSetConstantBuffers
 	};
 
-	void SetConstantBuffers(ShadeStages stage, ID3D11DeviceContext* pCtx, UINT startSlot, UINT numBuffers, ID3D11Buffer* const* pCBufs)
+	void SetConstantBuffers(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, uint count, ID3D11Buffer* const* pBufs)
 	{
+		if (count == 0)
+			return;
+
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
-		(pCtx->*s_ConstBufSetters[(int)stage])(startSlot, numBuffers, pCBufs);
+		D3D_ASSERT_MSG((startSlot + count) <= D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT,
+			"Constant buffer limit exceeded: {}", (startSlot + count));
+
+		(pCtx->*s_ConstBufSetters[(int)stage])(startSlot, count, pBufs);
 	}
 
 	/*
@@ -48,10 +56,20 @@ namespace Weave::D3D11
 		&ID3D11DeviceContext::CSSetSamplers
 	};
 
-	void SetSamplers(ShadeStages stage, ID3D11DeviceContext* pCtx, UINT startSlot, UINT count, ID3D11SamplerState* const* pSamplers)
+	void SetSamplers(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, uint count, Sampler* const* pSamps)
 	{
+		if (count == 0)
+			return;
+
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
-		(pCtx->*s_SamplerSetters[(int)stage])(startSlot, count, pSamplers);
+		D3D_ASSERT_MSG((startSlot + count) <= D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, 
+			"Sampler slot limit exceeded: {}", (startSlot + count));
+		ALLOCA_SPAN(views, count, ID3D11SamplerState*);
+
+		for (uint i = 0; i < count; i++)
+			views[i] = pSamps[i] != nullptr ? pSamps[i]->Get() : nullptr;
+
+		(pCtx->*s_SamplerSetters[(int)stage])(startSlot, count, views.GetData());
 	}
 
 	/*
@@ -68,10 +86,36 @@ namespace Weave::D3D11
 		&ID3D11DeviceContext::CSSetShaderResources
 	};
 
-	void SetShaderResources(ShadeStages stage, ID3D11DeviceContext* pCtx, UINT startSlot, UINT count, ID3D11ShaderResourceView* const* pSRVs)
+	void SetShaderResources(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, uint count, IShaderResource* const* pRes)
 	{
+		if (count == 0)
+			return;
+
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
-		(pCtx->*s_ResViewSetters[(int)stage])(startSlot, count, pSRVs);
+		D3D_ASSERT_MSG((startSlot + count) <= D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, 
+			"Resource view count exceeded: {}", (startSlot + count));
+		ALLOCA_SPAN(views, count, ID3D11ShaderResourceView*);
+
+		for (uint i = 0; i < count; i++)
+			views[i] = pRes[i] != nullptr ? pRes[i]->GetSRV() : nullptr;
+
+		(pCtx->*s_ResViewSetters[(int)stage])(startSlot, count, views.GetData());
+	}
+
+	void CSSetUnorderedAccessViews(ID3D11DeviceContext* pCtx, uint startSlot, uint count, IUnorderedAccess* const* pRes, const uint* pInitialCounts)
+	{
+		if (count == 0)
+			return;
+
+		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
+		D3D_ASSERT_MSG((startSlot + count) <= D3D11_1_UAV_SLOT_COUNT,
+			"Resource view count exceeded: {}", (startSlot + count));
+		ALLOCA_SPAN(views, count, ID3D11UnorderedAccessView*);
+
+		for (uint i = 0; i < count; i++)
+			views[i] = pRes[i] != nullptr ? pRes[i]->GetUAV() : nullptr;
+
+		pCtx->CSSetUnorderedAccessViews(startSlot, count, views.GetData(), pInitialCounts);
 	}
 
 	/*
@@ -128,7 +172,7 @@ namespace Weave::D3D11
 		&CSSetShader
 	};
 
-	void SetShader(ShadeStages stage, ID3D11DeviceContext* pCtx, ID3D11DeviceChild* pShader, ID3D11ClassInstance* const* ppClassInstances, UINT numClassInstances)
+	void SetShader(ID3D11DeviceContext* pCtx, ShadeStages stage, ID3D11DeviceChild* pShader, ID3D11ClassInstance* const* ppClassInstances, UINT numClassInstances)
 	{
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
 		s_ShaderSetters[(int)stage](pCtx, pShader, ppClassInstances, numClassInstances);

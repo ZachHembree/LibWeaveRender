@@ -25,7 +25,7 @@ namespace Weave::D3D11
 		virtual ID3D11Resource** const GetResAddress() = 0;
 	};
 
-	class ResourceBase : public virtual IResource, public DeviceChild
+	class ResourceBase : public IResource, public DeviceChild
 	{
 	public:
 
@@ -44,7 +44,7 @@ namespace Weave::D3D11
 	/// <summary>
 	/// Interface for types that can be bound as a shader resource
 	/// </summary>
-	class IShaderResource
+	class IShaderResource : public virtual IResource
 	{
 	public:
 		/// <summary>
@@ -136,10 +136,9 @@ namespace Weave::D3D11
 	/// <summary>
 	/// Interface for types that can be used for unordered access
 	/// </summary>
-	class IUnorderedAccess
+	class IUnorderedAccess : public virtual IResource
 	{
-	public:
-		
+	public:	
 		/// <summary>
 		/// Returns pointer to UAV interface
 		/// </summary>
@@ -214,5 +213,4 @@ namespace Weave::D3D11
 	/// </summary>
 	class IRWTexture2D : public virtual IResizeableTexture2D, public virtual IRenderTarget, public IUnorderedAccess
 	{ };
-
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "WeaveUtils/Span.hpp"
 #include "ResourceBase.hpp"
+#include "Sampler.hpp"
 #include <unordered_map>
 
 namespace Weave::D3D11
@@ -90,22 +91,22 @@ namespace Weave::D3D11
 
 		ResourceSet& operator=(ResourceSet&&) noexcept;
 
-		void SetSampler(uint stringID, const ComPtr<ID3D11SamplerState>& pSamp);
+		void SetSampler(uint stringID, Sampler& samp);
 
-		void SetSRV(uint stringID, const ComPtr<ID3D11ShaderResourceView>& pSRV);
+		void SetSRV(uint stringID, IShaderResource& srv);
 
-		void SetUAV(uint stringID, const ComPtr<ID3D11UnorderedAccessView>& pUAV);
+		void SetUAV(uint stringID, IUnorderedAccess& uav);
 
 		void SetConstant(uint stringID, const Span<byte>& newValue);
 
 		template<typename T>
 		void SetConstant(uint stringID, const T& value) { constants.SetValue(stringID, {(byte*)(&value), sizeof(T)}); }
 
-		const IDynamicArray<ResView<ID3D11SamplerState>>& GetSamplers() const;
+		const IDynamicArray<ResView<Sampler>>& GetSamplers() const;
 
-		const IDynamicArray<ResView<ID3D11ShaderResourceView>>& GetSRVs() const;
+		const IDynamicArray<ResView<IShaderResource>>& GetSRVs() const;
 
-		const IDynamicArray<ResView<ID3D11UnorderedAccessView>>& GetUAVs() const;
+		const IDynamicArray<ResView<IUnorderedAccess>>& GetUAVs() const;
 
 		uint GetConstantCount() const;
 
@@ -121,8 +122,8 @@ namespace Weave::D3D11
 
 	private:	
 		ConstantGroup constants;
-		ViewMap<ID3D11SamplerState> sampMap;
-		ViewMap<ID3D11ShaderResourceView> textures;
-		ViewMap<ID3D11UnorderedAccessView> rwTextures;
+		ViewMap<Sampler> sampMap;
+		ViewMap<IShaderResource> textures;
+		ViewMap<IUnorderedAccess> rwTextures;
 	};
 }

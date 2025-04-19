@@ -14,19 +14,19 @@ ResourceSet::ResourceSet(ResourceSet&&) noexcept = default;
 
 ResourceSet& ResourceSet::operator=(ResourceSet&&) noexcept = default;
 
-void ResourceSet::SetSampler(uint stringID, const ComPtr<ID3D11SamplerState>& pSamp) { sampMap.SetResource(stringID, pSamp.Get()); }
+void ResourceSet::SetSampler(uint stringID, Sampler& samp) { sampMap.SetResource(stringID, &samp); }
 
-void ResourceSet::SetSRV(uint stringID, const ComPtr<ID3D11ShaderResourceView>& pSRV) { textures.SetResource(stringID, pSRV.Get()); }
+void ResourceSet::SetSRV(uint stringID, IShaderResource& srv) { textures.SetResource(stringID, &srv); }
 
-void ResourceSet::SetUAV(uint stringID, const ComPtr<ID3D11UnorderedAccessView>& pUAV) { rwTextures.SetResource(stringID, pUAV.Get()); }
+void ResourceSet::SetUAV(uint stringID, IUnorderedAccess& uav) { rwTextures.SetResource(stringID, &uav); }
 
 void ResourceSet::SetConstant(uint stringID, const Span<byte>& newValue) { constants.SetValue(stringID, newValue); }
 
-const IDynamicArray<ResView<ID3D11SamplerState>>& ResourceSet::GetSamplers() const { return sampMap.data; }
+const IDynamicArray<ResView<Sampler>>& ResourceSet::GetSamplers() const { return sampMap.data; }
 
-const IDynamicArray<ResView<ID3D11ShaderResourceView>>& ResourceSet::GetSRVs() const { return textures.data; }
+const IDynamicArray<ResView<IShaderResource>>& ResourceSet::GetSRVs() const { return textures.data; }
 
-const IDynamicArray<ResView<ID3D11UnorderedAccessView>>& ResourceSet::GetUAVs() const { return rwTextures.data; }
+const IDynamicArray<ResView<IUnorderedAccess>>& ResourceSet::GetUAVs() const { return rwTextures.data; }
 
 uint ResourceSet::GetConstantCount() const { return (uint)constants.constants.GetLength(); }
 

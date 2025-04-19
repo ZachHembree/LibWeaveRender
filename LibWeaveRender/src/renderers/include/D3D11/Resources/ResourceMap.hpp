@@ -18,6 +18,7 @@ namespace Weave::D3D11
 	public:
 		using ViewT = ResourceSet::ResView<T>;
 		using DataT = IDynamicArray<ViewT>;
+		static constexpr ShaderTypes Type = TypeEnum;
 
 		ResourceMap() = default;
 		ResourceMap(const ResourceMap&) = default;
@@ -70,18 +71,18 @@ namespace Weave::D3D11
 		std::unordered_map<uint, uint> resourceMap;
 	};
 
-	class SamplerMap : public ResourceMap<ID3D11SamplerState, ShaderTypes::Sampler>
+	class SamplerMap : public ResourceMap<Sampler, ShaderTypes::Sampler>
 	{
-		using ResourceMap<ID3D11SamplerState, ShaderTypes::Sampler>::ResourceMap;
+		using ResourceMap<Sampler, ShaderTypes::Sampler>::ResourceMap;
 	};
 
-	class ResourceViewMap : public ResourceMap<ID3D11ShaderResourceView, ShaderTypes::Texture>
+	class ResourceViewMap : public ResourceMap<IShaderResource, ShaderTypes::Texture>
 	{ 
-		using ResourceMap<ID3D11ShaderResourceView, ShaderTypes::Texture>::ResourceMap;
+		using ResourceMap<IShaderResource, ShaderTypes::Texture>::ResourceMap;
 	};
 
-	class UnorderedAccessMap : public ResourceMap<ID3D11UnorderedAccessView, ShaderTypes::RandomWrite>
+	class UnorderedAccessMap : public ResourceMap<IUnorderedAccess, ShaderTypes::RandomWrite>
 	{
-		using ResourceMap<ID3D11UnorderedAccessView, ShaderTypes::RandomWrite>::ResourceMap;
+		using ResourceMap<IUnorderedAccess, ShaderTypes::RandomWrite>::ResourceMap;
 	};
 }

@@ -1,6 +1,8 @@
 #pragma once
+#include <unordered_map>
 #include "WeaveEffects/ShaderData.hpp"
 #include "Resources/ResourceBase.hpp"
+#include "Resources/Sampler.hpp"
 
 namespace Weave::D3D11
 {
@@ -22,8 +24,8 @@ namespace Weave::D3D11
 
 		using SamplerList = IDynamicArray<ID3D11SamplerState*>;
 		using CBufList = IDynamicArray<ID3D11Buffer*>;
-		using SRVList = IDynamicArray<ID3D11ShaderResourceView*>;
-		using UAVList = IDynamicArray<ID3D11UnorderedAccessView*>;
+		using SRVList = IDynamicArray<IShaderResource*>;
+		using UAVList = IDynamicArray<IUnorderedAccess*>;
 
 		using RenderTargetList = IDynamicArray<ID3D11RenderTargetView*>;
 		using ViewportList = IDynamicArray<Viewport>;
@@ -33,9 +35,9 @@ namespace Weave::D3D11
 		{
 			ShadeStages stage;
 			const ShaderVariantBase* pShader;
-			UniqueArray<ID3D11SamplerState*> samplers;
+			UniqueArray<Sampler*> samplers;
 			UniqueArray<ID3D11Buffer*> cbuffers;
-			UniqueArray<ID3D11ShaderResourceView*> resViews;
+			UniqueArray<IShaderResource*> resViews;
 
 			uint sampCount;
 			uint cbufCount;
@@ -58,7 +60,7 @@ namespace Weave::D3D11
 		UniqueArray<ID3D11Buffer*> vertexBuffers;
 		UniqueArray<uint> vbStrides;
 		UniqueArray<uint> vbOffsets;
-		UniqueArray<ID3D11UnorderedAccessView*> uavs;
+		UniqueArray<IUnorderedAccess*> uavs;
 
 		uint rtCount;
 		uint vpCount;
@@ -66,6 +68,7 @@ namespace Weave::D3D11
 		uint uavCount;
 
 		UniqueArray<StageState> stages;
+		std::unordered_map<IResource*, ShadeStages> resUsageMap;
 
 		ContextState();
 
