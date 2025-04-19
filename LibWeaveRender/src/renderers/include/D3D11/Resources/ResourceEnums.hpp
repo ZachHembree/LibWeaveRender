@@ -50,8 +50,6 @@ namespace Weave::D3D11
 		RWTexture = ShaderResource | RenderTarget | UnorderedAccess
 	};
 
-	BITWISE_ALL(ResourceBindFlags, UINT)
-
 	/// <summary>
 	/// Specifies types of CPU access allowed for mappable resources
 	/// </summary>
@@ -63,8 +61,6 @@ namespace Weave::D3D11
 		ReadWrite = Read | Write
 	};
 
-	BITWISE_ALL(ResourceAccessFlags, UINT)
-
 	enum class DSClearFlags : int
 	{
 		None = 0,
@@ -72,7 +68,4 @@ namespace Weave::D3D11
 		Stencil = D3D11_CLEAR_STENCIL,
 		DepthStencil = Depth | Stencil
 	};
-
-	BITWISE_ALL(DSClearFlags, int)
-
 }

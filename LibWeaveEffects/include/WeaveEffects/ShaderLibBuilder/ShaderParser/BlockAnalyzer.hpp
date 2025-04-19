@@ -70,8 +70,6 @@ namespace Weave::Effects
         CloseAngleBrackets = AngleBrackets | EndContainer
     };
 
-    BITWISE_ALL(LexBlockTypes, uint);
-
     /// <summary>
     /// Source file associated with LexBlocks
     /// </summary>

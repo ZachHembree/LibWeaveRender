@@ -100,8 +100,6 @@ namespace Weave::Effects
         TypeModifierMask = Static | Const
     };
 
-    BITWISE_ALL(TokenTypes, uint)
-
     enum class SymbolTypes : ulong
     {
         Unknown = 0x0,
@@ -175,8 +173,6 @@ namespace Weave::Effects
 
         ShaderMask = Vertex | Hull | Domain | Geometry | Pixel | Compute
     };
-
-    BITWISE_ALL(SymbolTypes, ulong)
 
     enum class ShadeStages : sbyte
     {

@@ -17,8 +17,6 @@ enum class MouseKey : unsigned int
 	xButton2 = 0x10
 };
 
-BITWISE_ALL(MouseKey, unsigned int)
-
 namespace Weave
 {
 	class InputHandler : public WindowComponentBase

@@ -1,56 +1,7 @@
 #pragma once
 #include "WeaveUtils/Int.hpp"
+#include <type_traits>
 
-// Enum bitwise utils
-#define BITWISE_AND(T, T_INT) \
-        inline constexpr T operator& (const T& a, const T& b)\
-        {\
-            return (T)(static_cast<T_INT>(a) & static_cast<T_INT>(b));\
-        }\
-        inline constexpr T& operator&=(T& a, const T& b)\
-        {\
-            a = (T)(static_cast<T_INT>(a) & static_cast<T_INT>(b));\
-            return a;\
-        }
-#define BITWISE_OR(T, T_INT) \
-        inline constexpr T operator| (const T& a, const T& b)\
-        {\
-            return (T)(static_cast<T_INT>(a) | static_cast<T_INT>(b));\
-        }\
-        inline constexpr T& operator|=(T& a, const T& b)\
-        {\
-            a = (T)(static_cast<T_INT>(a) | static_cast<T_INT>(b));\
-            return a;\
-        }
-#define BITWISE_NEGATE(T, T_INT) \
-        inline constexpr T operator~ (const T& a)\
-        {\
-            return (T)(~static_cast<T_INT>(a));\
-        }
-#define BITSHIFT_LEFT(T, T_INT) \
-        inline constexpr T operator<<(const T& a, T_INT b)\
-        {\
-            return (T)(static_cast<T_INT>(a) << b);\
-        }\
-        inline constexpr T& operator<<=(T& a, T_INT b)\
-        {\
-            a = (T)(static_cast<T_INT>(a) << b); \
-            return a;\
-        }
-#define BITSHIFT_RIGHT(T, T_INT) \
-        inline constexpr T operator>>(const T& a, T_INT b)\
-        {\
-            return (T)(static_cast<T_INT>(a) >> b);\
-        }\
-        inline constexpr T& operator>>=(T& a, T_INT b)\
-        {\
-            a = (T)(static_cast<T_INT>(a) >> b);\
-            return a;\
-        }
-#define BITSHIFT_ALL(T, T_INT) \
-    BITSHIFT_LEFT(T, T_INT) BITSHIFT_RIGHT(T, T_INT)
-#define BITWISE_ALL(T, T_INT) BITWISE_AND(T, T_INT) BITWISE_OR(T, T_INT) BITWISE_NEGATE(T, T_INT) \
-    BITSHIFT_ALL(T, T_INT)
 // Default constructor and copy/move operator utils
 // Delete copy/move
 #define MAKE_NO_COPY(Type) \
@@ -94,3 +45,70 @@
 #define ALLOCA_ARR_NULL(ARR_PTR, COUNT, TYPE) \
     TYPE* ARR_PTR = (TYPE*)alloca(COUNT * sizeof(TYPE)); \
     memset( ARR_PTR, 0u, (COUNT * sizeof(TYPE)) );
+
+// Concept to constrain templates to enum types
+template <typename T>
+concept EnumType = std::is_enum_v<T>;
+
+// Bitwise AND
+template <EnumType T>
+inline constexpr T operator&(const T& a, const T& b) {
+    using T_INT = std::underlying_type_t<T>;
+    return static_cast<T>(static_cast<T_INT>(a) & static_cast<T_INT>(b));
+}
+
+template <EnumType T>
+inline constexpr T& operator&=(T& a, const T& b) {
+    using T_INT = std::underlying_type_t<T>;
+    a = static_cast<T>(static_cast<T_INT>(a) & static_cast<T_INT>(b));
+    return a;
+}
+
+// Bitwise OR
+template <EnumType T>
+inline constexpr T operator|(const T& a, const T& b) {
+    using T_INT = std::underlying_type_t<T>;
+    return static_cast<T>(static_cast<T_INT>(a) | static_cast<T_INT>(b));
+}
+
+template <EnumType T>
+inline constexpr T& operator|=(T& a, const T& b) {
+    using T_INT = std::underlying_type_t<T>;
+    a = static_cast<T>(static_cast<T_INT>(a) | static_cast<T_INT>(b));
+    return a;
+}
+
+// Bitwise Negation
+template <EnumType T>
+inline constexpr T operator~(const T& a) {
+    using T_INT = std::underlying_type_t<T>;
+    return static_cast<T>(~static_cast<T_INT>(a));
+}
+
+// Left Shift
+template <EnumType T, std::integral U>
+inline constexpr T operator<<(const T& a, U b) {
+    using T_INT = std::underlying_type_t<T>;
+    return static_cast<T>(static_cast<T_INT>(a) << b);
+}
+
+template <EnumType T, std::integral U>
+inline constexpr T& operator<<=(T& a, U b) {
+    using T_INT = std::underlying_type_t<T>;
+    a = static_cast<T>(static_cast<T_INT>(a) << b);
+    return a;
+}
+
+// Right Shift
+template <EnumType T, std::integral U>
+inline constexpr T operator>>(const T& a, U b) {
+    using T_INT = std::underlying_type_t<T>;
+    return static_cast<T>(static_cast<T_INT>(a) >> b);
+}
+
+template <EnumType T, std::integral U>
+inline constexpr T& operator>>=(T& a, U b) {
+    using T_INT = std::underlying_type_t<T>;
+    a = static_cast<T>(static_cast<T_INT>(a) >> b);
+    return a;
+}

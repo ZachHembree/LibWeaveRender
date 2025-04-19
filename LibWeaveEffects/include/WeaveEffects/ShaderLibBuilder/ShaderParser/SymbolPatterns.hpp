@@ -36,8 +36,6 @@ namespace Weave::Effects
 		ZeroOrMore = OneOrMore | Optional
 	};
 
-	BITWISE_ALL(MatchQualifiers, byte)
-
 	/// <summary>
 	/// Qualified LexBlockTypes used in a BlockPattern that may repeat multiple 
 	/// times, once, or may be entirely optional, depending on the MatchQualifier.

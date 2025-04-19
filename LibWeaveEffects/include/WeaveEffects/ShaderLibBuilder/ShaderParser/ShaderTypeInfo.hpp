@@ -78,8 +78,6 @@ namespace Weave::Effects
         Min16UInt = Min16 | UnsignedInt,
     };
 
-    BITWISE_ALL(ShaderTypes, ulong)
-
 	struct ShaderTypeInfo
 	{
         string_view name;
