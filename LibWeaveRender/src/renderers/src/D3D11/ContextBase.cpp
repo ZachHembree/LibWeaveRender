@@ -293,7 +293,7 @@ void ContextBase::BindResources(const ComputeShaderVariant& shader, const Resour
 {
 	if (const uint updateCount = pState->TryUpdateResources(resSrc.GetUAVs(), shader.GetUAVMap()); updateCount > 0)
 	{
-		for (uint i = 0; i < (uint)ShadeStages::Compute; i++)
+		for (uint i = 0; i < (uint)ShadeStages::Compute; i++) // Clear all potentially conflicting SRVs
 		{
 			ContextState::StageState& ss = pState->GetStage((ShadeStages)i);
 
@@ -352,7 +352,7 @@ void ContextBase::BindShader(const ShaderVariantBase& shader, const ResourceSet&
 	// Bind Shader Resource Views (SRVs)
 	if (const uint updateCount = pState->TryUpdateResources(stage, resSrc.GetSRVs(), shader.GetSRVMap()); updateCount > 0)
 	{ 
-		if (pState->uavCount > 0)
+		if (pState->uavCount > 0) // Clear all potentially conflicting UAVs
 		{
 			SetArrNull(pState->uavs, pState->uavCount);
 			CSSetUnorderedAccessViews(pContext.Get(), 0, pState->uavCount, pState->uavs.GetData());
@@ -375,9 +375,9 @@ void ContextBase::UnbindResources(const ComputeShaderVariant& shader)
 	// Unbind Unordered Access Views (UAVs)
 	if (shader.GetUAVMap() != nullptr)
 	{
-		const uint count = (uint)shader.GetUAVMap()->GetCount();
-		SetArrNull(pState->uavs, count);
-		CSSetUnorderedAccessViews(pContext.Get(), 0, count, pState->uavs.GetData());
+		SetArrNull(pState->uavs, pState->uavCount);
+		CSSetUnorderedAccessViews(pContext.Get(), 0, pState->uavCount, pState->uavs.GetData());
+		pState->uavCount = 0;
 	}
 }
 
@@ -582,8 +582,9 @@ void ContextBase::UnbindViewports(sint index, uint count)
 	D3D_ASSERT_MSG((index + count) <= D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
 		"Viewport range specified out of range.");
 
-	pState->vpCount = count;
+	SetArrNull(pState->viewports, index, count);
 	pContext->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
+	pState->vpCount = index;
 }
 
 void ContextBase::BindViewports(const IDynamicArray<Viewport>& viewports, sint offset)
