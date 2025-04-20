@@ -293,10 +293,18 @@ void ContextBase::BindResources(const ComputeShaderVariant& shader, const Resour
 {
 	if (const uint updateCount = pState->TryUpdateResources(resSrc.GetUAVs(), shader.GetUAVMap()); updateCount > 0)
 	{
-		// Conflicts will be visible here. Incomming UAVs may conflict with preexisting SRVs. If the conflicting
-		// SRVs are bound to the same stage, then an error should be raised. OM UAVs are not supported yet, so
-		// that means compute only.
-		
+		for (uint i = 0; i < (uint)ShadeStages::Compute; i++)
+		{
+			ContextState::StageState& ss = pState->GetStage((ShadeStages)i);
+
+			if (ss.srvCount > 0)
+			{
+				SetArrNull(ss.srvs, ss.srvCount);
+				SetShaderResources(pContext.Get(), ss.stage, 0, ss.srvCount, ss.srvs.GetData());
+				ss.srvCount = 0;
+			}
+		}
+
 		CSSetUnorderedAccessViews(pContext.Get(), 0, updateCount, pState->uavs.GetData());
 	}
 }
@@ -315,10 +323,10 @@ void ContextBase::BindResources(const VertexShaderVariant& shader, const Resourc
 void ContextBase::BindShader(const ShaderVariantBase& shader, const ResourceSet& resSrc)
 {
 	const ShadeStages stage = shader.GetStage();
-	ContextState::StageState& stageState = pState->GetStage(stage);
+	const ContextState::StageState& ss = pState->GetStage(stage);
 
 	// Bind shader
-	if (stageState.pShader != &shader)
+	if (ss.pShader != &shader)
 		SetShader(pContext.Get(), stage, shader.Get(), nullptr, 0);
 
 	// Upload constants
@@ -335,19 +343,23 @@ void ContextBase::BindShader(const ShaderVariantBase& shader, const ResourceSet&
 
 	// Bind constant buffers
 	if (const uint updateCount = pState->TryUpdateResources(stage, shader.GetConstantBuffers()); updateCount > 0)
-		SetConstantBuffers(pContext.Get(), stage, 0, updateCount, stageState.cbuffers.GetData());
+		SetConstantBuffers(pContext.Get(), stage, 0, updateCount, ss.cbuffers.GetData());
 
 	// Bind Samplers
 	if (const uint updateCount = pState->TryUpdateResources(stage, resSrc.GetSamplers(), shader.GetSampMap()); updateCount > 0)
-		SetSamplers(pContext.Get(), stage, 0, updateCount, stageState.samplers.GetData());
+		SetSamplers(pContext.Get(), stage, 0, updateCount, ss.samplers.GetData());
 
 	// Bind Shader Resource Views (SRVs)
 	if (const uint updateCount = pState->TryUpdateResources(stage, resSrc.GetSRVs(), shader.GetSRVMap()); updateCount > 0)
 	{ 
-		// Conflicts will be visible here. Incomming SRVs may conflict with previously bound UAVs. Conflicts within the same
-		// stage are not an error at this point, but will be if the new UAVs conflict with the new SRVs.
+		if (pState->uavCount > 0)
+		{
+			SetArrNull(pState->uavs, pState->uavCount);
+			CSSetUnorderedAccessViews(pContext.Get(), 0, pState->uavCount, pState->uavs.GetData());
+			pState->uavCount = 0;
+		}
 
-		SetShaderResources(pContext.Get(), stage, 0, updateCount, stageState.srvs.GetData()); 
+		SetShaderResources(pContext.Get(), stage, 0, updateCount, ss.srvs.GetData()); 
 	}
 
 	// CS specific handling
@@ -378,12 +390,12 @@ void ContextBase::UnbindResources(const VertexShaderVariant& shader)
 void ContextBase::UnbindShader(const ShaderVariantBase& shader)
 {
 	const ShadeStages stage = shader.GetStage();
-	ContextState::StageState& stageState = pState->GetStage(stage);
+	ContextState::StageState& ss = pState->GetStage(stage);
 
-	if (stageState.pShader == &shader)
+	if (ss.pShader == &shader)
 	{
 		SetShader(pContext.Get(), stage, nullptr, nullptr, 0);
-		stageState.pShader = nullptr;
+		ss.pShader = nullptr;
 	}
 }
 
