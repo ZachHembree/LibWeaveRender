@@ -38,9 +38,9 @@ namespace Weave::D3D11
 		/// </summary>
 		uint GetShaderCount(const int pass) const;
 
-		void Setup(ContextBase& ctx, int pass, const ResourceSet& res) const;
+		void Setup(CtxBase& ctx, int pass, const ResourceSet& res) const;
 
-		void Reset(ContextBase& ctx, int pass) const;
+		void Reset(CtxBase& ctx, int pass) const;
 
 	private:
 		using PassHandle = UniqueArray<const ShaderVariantBase*>;

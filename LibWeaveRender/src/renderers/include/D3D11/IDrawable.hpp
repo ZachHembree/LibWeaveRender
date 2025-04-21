@@ -3,7 +3,7 @@
 
 namespace Weave::D3D11
 {
-	class ContextBase;
+	class CtxBase;
 	class EffectVariant;
 	class Material;
 
@@ -13,6 +13,6 @@ namespace Weave::D3D11
 	class IDrawable : public IAsset
 	{
 	public:
-		virtual void Draw(ContextBase& ctx, Material& mat) = 0;
+		virtual void Draw(CtxBase& ctx, Material& mat) = 0;
 	};
 }

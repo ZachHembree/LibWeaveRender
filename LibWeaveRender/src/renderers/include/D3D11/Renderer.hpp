@@ -157,14 +157,14 @@ namespace Weave::D3D11
 		bool fitToWindow;
 		bool useDefaultDS;
 
-		void BeforeDraw(Context& ctx);
+		void BeforeDraw(CtxImm& ctx);
 
-		void DrawEarly(Context& ctx);
+		void DrawEarly(CtxImm& ctx);
 
-		void Draw(Context& ctx);
+		void Draw(CtxImm& ctx);
 
-		void DrawLate(Context& ctx);
+		void DrawLate(CtxImm& ctx);
 
-		void AfterDraw(Context& ctx);
+		void AfterDraw(CtxImm& ctx);
 	};
 }

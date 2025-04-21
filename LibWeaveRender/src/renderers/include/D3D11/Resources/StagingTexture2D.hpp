@@ -4,7 +4,8 @@
 
 namespace Weave::D3D11
 {
-	class Context;
+	class CtxImm;
+	class CtxBase;
 
 	/// <summary>
 	/// Class representing a 2D Texture that can only be directly accessed by
@@ -64,14 +65,14 @@ namespace Weave::D3D11
 		/// Updates texture with contents of a scratch image, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
-		void SetTextureWIC(ContextBase& ctx, wstring_view file, DirectX::ScratchImage& buffer);
+		void SetTextureWIC(CtxBase& ctx, wstring_view file, DirectX::ScratchImage& buffer);
 
 		/// <summary>
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
 		template<typename T>
-		void SetTextureData(ContextBase& ctx, const IDynamicArray<T>& src, ivec2 dim)
+		void SetTextureData(CtxBase& ctx, const IDynamicArray<T>& src, ivec2 dim)
 		{
 			Span<byte> srcBytes(reinterpret_cast<byte*>(src.GetData()), GetArrSize(src));
 			SetTextureData(ctx, srcBytes, sizeof(T), dim);
@@ -81,29 +82,29 @@ namespace Weave::D3D11
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
-		void SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 dim);
+		void SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 dim);
 
 		/// <summary>
 		/// Returns a temporary handle to a mapped buffer backing the texture
 		/// </summary>
-		MappedBufferHandle GetBufferHandle(Context& ctx);
+		MappedBufferHandle GetBufferHandle(CtxImm& ctx);
 
 		/// <summary>
 		/// Returns and unmaps a previously acquired buffer handle accessed using GetBufferHandle()
 		/// </summary>
-		void ReturnBufferHandle(Context& ctx, MappedBufferHandle&& handle);
+		void ReturnBufferHandle(CtxBase& ctx, MappedBufferHandle&& handle);
 
 		/// <summary>
 		/// Writes the contents of the texture to a PNG in the give file path. Requires
 		/// CPU read access.
 		/// </summary>
-		void WriteToFileWIC(Context& ctx, string_view file);
+		void WriteToFileWIC(CtxImm& ctx, string_view file);
 
 		/// <summary>
 		/// Writes the contents of the texture to a PNG in the give file path. Requires
 		/// CPU read access.
 		/// </summary>
-		void WriteToFileWIC(Context& ctx, wstring_view file);
+		void WriteToFileWIC(CtxImm& ctx, wstring_view file);
 
 	private:
 

@@ -1,8 +1,8 @@
 #include "pch.hpp"
 #include "D3D11/InternalD3D11.hpp"
 #include "D3D11/Resources/BufferBase.hpp"
-#include "D3D11/ContextBase.hpp"
-#include "D3D11/Context.hpp"
+#include "D3D11/CtxBase.hpp"
+#include "D3D11/CtxImm.hpp"
 #include "D3D11/Device.hpp"
 
 using namespace Weave::D3D11;
@@ -56,7 +56,7 @@ ResourceBindFlags BufferBase::GetBindFlags() const { return (ResourceBindFlags)d
 
 ResourceAccessFlags BufferBase::GetAccessFlags() const { return (ResourceAccessFlags)desc.CPUAccessFlags; }
 
-void BufferBase::SetData(ContextBase& ctx, const IDynamicArray<byte>& data)
+void BufferBase::SetData(CtxBase& ctx, const IDynamicArray<byte>& data)
 {
 	ctx.SetBufferData(*this, data);
 }

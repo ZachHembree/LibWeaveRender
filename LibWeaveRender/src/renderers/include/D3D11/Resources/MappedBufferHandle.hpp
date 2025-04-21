@@ -4,7 +4,8 @@
 
 namespace Weave::D3D11
 {
-	class Context;
+	class CtxImm;
+	class CtxBase;
 
 	/// <summary>
 	/// Provides temporary access to a mapped resource buffer as a 1D contiguous span.
@@ -47,7 +48,7 @@ namespace Weave::D3D11
 		uint GetByteSize() const;
 
 	protected:
-		friend Context;
+		friend CtxImm;
 		D3D11_MAPPED_SUBRESOURCE msr;		
 		uint subresIndex;	
 

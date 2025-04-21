@@ -17,9 +17,9 @@ namespace Weave::D3D11
 
 		~ImguiRenderComponent();
 
-		void Setup(Context& ctx) override;
+		void Setup(CtxImm& ctx) override;
 
-		void DrawLate(Context& ctx) override;
+		void DrawLate(CtxImm& ctx) override;
 
 	private:
 		

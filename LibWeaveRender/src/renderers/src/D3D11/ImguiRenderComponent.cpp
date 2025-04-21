@@ -25,7 +25,7 @@ ImguiRenderComponent::~ImguiRenderComponent()
 	ImGui_ImplDX11_Shutdown();
 }
 
-void ImguiRenderComponent::Setup(Context& ctx)
+void ImguiRenderComponent::Setup(CtxImm& ctx)
 {
 	if (ImGui::GetCurrentContext() != nullptr)
 	{ 
@@ -38,7 +38,7 @@ void ImguiRenderComponent::Setup(Context& ctx)
 	}
 }
 
-void ImguiRenderComponent::DrawLate(Context& ctx)
+void ImguiRenderComponent::DrawLate(CtxImm& ctx)
 {
 	if (ImGui::GetCurrentContext() != nullptr)
 	{ 

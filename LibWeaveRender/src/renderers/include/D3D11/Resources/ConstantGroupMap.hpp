@@ -9,7 +9,6 @@ namespace Weave::D3D11
 	using Effects::ConstBufDefHandle;
 	using Effects::ConstDef;
 
-	class Context;
 	class ConstantBuffer;
 
 	/// <summary>

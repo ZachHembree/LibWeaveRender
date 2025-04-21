@@ -2,7 +2,7 @@
 
 namespace Weave::D3D11
 {
-	class Context;
+	class CtxBase;
 
 	/// <summary>
 	/// Interface for types used as resources by types of IDrawable
@@ -10,6 +10,6 @@ namespace Weave::D3D11
 	class IAsset
 	{
 	public:
-		virtual void Setup(ContextBase& ctx) = 0;
+		virtual void Setup(CtxBase& ctx) = 0;
 	};
 }

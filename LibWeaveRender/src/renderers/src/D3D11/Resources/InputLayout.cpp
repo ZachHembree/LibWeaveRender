@@ -2,7 +2,7 @@
 #include "WeaveUtils/StringIDMap.hpp"
 #include "D3D11/InternalD3D11.hpp"
 #include "D3D11/Resources/InputLayout.hpp"
-#include "D3D11/Context.hpp"
+#include "D3D11/CtxImm.hpp"
 #include "D3D11/Device.hpp"
 
 using namespace Weave;

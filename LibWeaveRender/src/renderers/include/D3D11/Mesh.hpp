@@ -6,7 +6,7 @@
 namespace Weave::D3D11
 {
 	class Device;
-	class Context;
+	class CtxBase;
 	class Material;
 
 	/// <summary>
@@ -140,12 +140,12 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Updates any resources needed prior to drawing
 		/// </summary>
-		void Setup(ContextBase& ctx) override;
+		void Setup(CtxBase& ctx) override;
 
 		/// <summary>
 		/// Draws the object
 		/// </summary>
-		void Draw(ContextBase& ctx, Material& mat) override;
+		void Draw(CtxBase& ctx, Material& mat) override;
 
 		/// <summary>
 		/// Returns the number of indices in the index buffer

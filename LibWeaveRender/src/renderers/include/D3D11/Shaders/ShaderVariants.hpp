@@ -1,7 +1,7 @@
 #pragma once
 #include "ShaderVariantBase.hpp"
 #include "../Resources/InputLayout.hpp"
-#include "../Context.hpp"
+#include "../CtxImm.hpp"
 #include "../Device.hpp"
 
 namespace Weave::D3D11

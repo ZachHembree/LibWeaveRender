@@ -24,9 +24,9 @@ uint Material::GetPassCount() const { return GetEffect().GetPassCount(); }
 
 uint Material::GetShaderCount(int pass) const { return GetEffect().GetShaderCount(pass); }
 
-void Material::Setup(ContextBase& ctx, int pass) { GetEffect().Setup(ctx, pass, *pRes); }
+void Material::Setup(CtxBase& ctx, int pass) { GetEffect().Setup(ctx, pass, *pRes); }
 
-void Material::Reset(ContextBase& ctx, int pass) { GetEffect().Reset(ctx, pass); }
+void Material::Reset(CtxBase& ctx, int pass) { GetEffect().Reset(ctx, pass); }
 
 const EffectVariant& Material::GetEffect() const 
 { 

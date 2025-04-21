@@ -28,7 +28,7 @@ Device::Device(Renderer& renderer) : pRenderer(&renderer)
 	D3D_CHECK_HR(pCtxBase->QueryInterface(__uuidof(ID3D11DeviceContext1), &pCtxImm));
 
 	ComPtr<ID3D11DeviceContext1> pCtxCpy = pCtxImm;
-	context = Context(*this, std::move(pCtxCpy));
+	context = CtxImm(*this, std::move(pCtxCpy));
 }
 
 Renderer& Device::GetRenderer() const { D3D_ASSERT_MSG(pRenderer != nullptr, "Renderer cannot be null."); return *pRenderer; }
@@ -39,7 +39,7 @@ ID3D11Device1* Device::operator->() { return pDev.Get(); }
 
 ID3D11DeviceContext1* Device::GetImmediateContext() { return pCtxImm.Get(); }
 
-Context& Device::GetContext() { return this->context; }
+CtxImm& Device::GetContext() { return this->context; }
 
 void Device::CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11VertexShader>& pVS)
 {

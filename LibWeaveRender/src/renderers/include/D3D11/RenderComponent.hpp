@@ -8,7 +8,7 @@ namespace Weave
 
 namespace Weave::D3D11
 {
-	class Context;
+	class CtxImm;
 	class Renderer;
 	class Device;
 
@@ -26,19 +26,19 @@ namespace Weave::D3D11
 		/// Updates before draw, but after the state and resources for the previous
 		/// frame have been cleaned up.
 		/// </summary>
-		virtual void Setup(Context& ctx) { }
+		virtual void Setup(CtxImm& ctx) { }
 
-		virtual void DrawEarly(Context& ctx) { }
+		virtual void DrawEarly(CtxImm& ctx) { }
 
-		virtual void Draw(Context& ctx) { }
+		virtual void Draw(CtxImm& ctx) { }
 
-		virtual void DrawLate(Context& ctx) { }
+		virtual void DrawLate(CtxImm& ctx) { }
 
 		/// <summary>
 		/// Called after swap chain present but before any resources have been released
 		/// or cleaned up.
 		/// </summary>
-		virtual void AfterDraw(Context& ctx) { }
+		virtual void AfterDraw(CtxImm& ctx) { }
 
 		/// <summary>
 		/// Returns reference to the renderer this component is attached to

@@ -3,7 +3,7 @@
 
 namespace Weave::D3D11
 {
-	class ContextBase;
+	class CtxBase;
 
 	/// <summary>
 	/// Abstract base for GPU buffer types
@@ -43,7 +43,7 @@ namespace Weave::D3D11
 		/// Writes the given data to the buffer. Writing to an unsupported buffer type will throw
 		/// an exception.
 		/// </summary>
-		void SetData(ContextBase& ctx, const IDynamicArray<byte>& data);
+		void SetData(CtxBase& ctx, const IDynamicArray<byte>& data);
 
 	protected:
 		D3D11_BUFFER_DESC desc;

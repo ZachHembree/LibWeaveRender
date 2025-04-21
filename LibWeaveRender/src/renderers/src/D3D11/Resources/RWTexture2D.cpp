@@ -2,7 +2,7 @@
 #include <DirectXTex.h>
 #include "D3D11/InternalD3D11.hpp"
 #include "D3D11/Device.hpp"
-#include "D3D11/Context.hpp"
+#include "D3D11/CtxImm.hpp"
 #include "D3D11/Resources/RWTexture2D.hpp"
 
 using namespace DirectX;
@@ -114,12 +114,12 @@ ID3D11RenderTargetView* RWTexture2D::GetRTV() { return pRTV.Get(); }
 
 ID3D11RenderTargetView** const RWTexture2D::GetAddressRTV() { return pRTV.GetAddressOf(); }
 
-void RWTexture2D::Clear(ContextBase& ctx, vec4 color)
+void RWTexture2D::Clear(CtxBase& ctx, vec4 color)
 {
 	ctx.ClearRenderTarget(*this);
 }
 
-void RWTexture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
+void RWTexture2D::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
 {
 	if (srcDim == GetSize())
 	{

@@ -58,7 +58,7 @@ uint EffectVariant::GetPassCount() const { return (uint)def.GetPassCount(); }
 /// </summary>
 uint EffectVariant::GetShaderCount(const int pass) const { return (uint)def.GetShaderCount(pass); }
 
-void EffectVariant::Setup(ContextBase& ctx, int pass, const ResourceSet& res) const
+void EffectVariant::Setup(CtxBase& ctx, int pass, const ResourceSet& res) const
 {
 	for (int i = 0; i < passes[pass].GetLength(); i++)
 	{
@@ -67,7 +67,7 @@ void EffectVariant::Setup(ContextBase& ctx, int pass, const ResourceSet& res) co
 	}
 }
 
-void EffectVariant::Reset(ContextBase& ctx, int pass) const
+void EffectVariant::Reset(CtxBase& ctx, int pass) const
 {
 	for (int i = 0; i < passes[pass].GetLength(); i++)
 	{

@@ -229,7 +229,7 @@ bool Renderer::UnregisterComponent(RenderComponentBase& component)
 void Renderer::Update()
 {
 	// Reset binds
-	Context& ctx = pDev->GetContext();
+	CtxImm& ctx = pDev->GetContext();
 	const ivec2 bodySize = GetWindow().GetBodySize();
 
 	// Clear back buffer
@@ -261,7 +261,7 @@ void Renderer::Update()
 	AfterDraw(ctx);
 }
 
-void Renderer::BeforeDraw(Context& ctx)
+void Renderer::BeforeDraw(CtxImm& ctx)
 { 
 	for (RenderComponentBase* pComp : pComponents)
 	{
@@ -269,7 +269,7 @@ void Renderer::BeforeDraw(Context& ctx)
 	}
 }
 
-void Renderer::DrawEarly(Context& ctx)
+void Renderer::DrawEarly(CtxImm& ctx)
 { 
 	for (RenderComponentBase* pComp : pComponents)
 	{
@@ -277,7 +277,7 @@ void Renderer::DrawEarly(Context& ctx)
 	}
 }
 
-void Renderer::Draw(Context& ctx)
+void Renderer::Draw(CtxImm& ctx)
 {
 	for (RenderComponentBase* pComp : pComponents)
 	{
@@ -285,7 +285,7 @@ void Renderer::Draw(Context& ctx)
 	}
 }
 
-void Renderer::DrawLate(Context& ctx)
+void Renderer::DrawLate(CtxImm& ctx)
 {
 	for (RenderComponentBase* pComp : pComponents)
 	{
@@ -293,7 +293,7 @@ void Renderer::DrawLate(Context& ctx)
 	}	
 }
 
-void Renderer::AfterDraw(Context& ctx)
+void Renderer::AfterDraw(CtxImm& ctx)
 {
 	for (RenderComponentBase* pComp : pComponents)
 	{

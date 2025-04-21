@@ -80,14 +80,14 @@ namespace Weave::D3D11
 		/// Updates texture with contents of a scratch image, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
-		void SetTextureWIC(ContextBase& ctx, wstring_view file, DirectX::ScratchImage& buffer);
+		void SetTextureWIC(CtxBase& ctx, wstring_view file, DirectX::ScratchImage& buffer);
 
 		/// <summary>
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
 		template<typename T>
-		void SetTextureData(ContextBase& ctx, const IDynamicArray<T>& src, uivec2 dim)
+		void SetTextureData(CtxBase& ctx, const IDynamicArray<T>& src, uivec2 dim)
 		{
 			Span<byte> srcBytes(reinterpret_cast<byte*>(src.GetData()), GetArrSize(src));
 			SetTextureData(ctx, srcBytes, sizeof(T), dim);
@@ -97,7 +97,7 @@ namespace Weave::D3D11
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
-		virtual void SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 dim);
+		virtual void SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 dim);
 
 		/// <summary>
 		/// Initializes new Texture2D from WIC-compatible image 

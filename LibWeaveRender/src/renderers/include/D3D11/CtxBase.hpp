@@ -37,10 +37,10 @@ namespace Weave::D3D11
 	/// <summary>
 	/// Abstract base class for immediate and deferred device contexts
 	/// </summary>
-	class ContextBase : public DeviceChild
+	class CtxBase : public DeviceChild
 	{
 	public:
-		MAKE_NO_COPY(ContextBase);
+		MAKE_NO_COPY(CtxBase);
 
 		/// <summary>
 		/// Returns true if the context is immediate, or false if deferred.
@@ -263,13 +263,13 @@ namespace Weave::D3D11
 		std::unique_ptr<ContextState> pState;
 		bool isImmediate;
 
-		ContextBase();
+		CtxBase();
 
-		ContextBase(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx);
+		CtxBase(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx);
 
-		ContextBase(ContextBase&&) noexcept;
+		CtxBase(CtxBase&&) noexcept;
 
-		ContextBase& operator=(ContextBase&&) noexcept;
+		CtxBase& operator=(CtxBase&&) noexcept;
 
 		/// <summary>
 		/// Binds subtype-specific resources to the pipeline

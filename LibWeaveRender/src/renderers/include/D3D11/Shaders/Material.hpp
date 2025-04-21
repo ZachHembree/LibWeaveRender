@@ -33,12 +33,12 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Prepares shaders and resources for the given pass before a draw call
 		/// </summary>
-		void Setup(ContextBase& ctx, int pass);
+		void Setup(CtxBase& ctx, int pass);
 
 		/// <summary>
 		/// Cleans up state of the given pass
 		/// </summary>
-		void Reset(ContextBase& ctx, int pass);
+		void Reset(CtxBase& ctx, int pass);
 
 	private:
 		mutable const EffectVariant* pEffect;

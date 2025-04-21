@@ -52,7 +52,7 @@ StagingTexture2D::StagingTexture2D(Device& dev, ivec2 dim, void* data,
 /// Updates texture with contents of a scratch image, assuming compatible formats.
 /// Allocates new Texture2D if the dimensions aren't the same.
 /// </summary>
-void StagingTexture2D::SetTextureWIC(ContextBase& ctx, wstring_view file, DirectX::ScratchImage& buffer)
+void StagingTexture2D::SetTextureWIC(CtxBase& ctx, wstring_view file, DirectX::ScratchImage& buffer)
 {
 	LoadImageWIC(file, buffer);
 	const Image& img = *buffer.GetImage(0, 0, 0);
@@ -68,7 +68,7 @@ void StagingTexture2D::SetTextureWIC(ContextBase& ctx, wstring_view file, Direct
 /// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 /// Allocates new Texture2D if the dimensions aren't the same.
 /// </summary>
-void StagingTexture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 srcDim)
+void StagingTexture2D::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 srcDim)
 {
 	const ivec2 dstSize = GetSize();
 
@@ -94,7 +94,7 @@ void StagingTexture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte
 /// <summary>
 /// Returns a temporary handle to a mapped buffer backing the texture
 /// </summary>
-MappedBufferHandle StagingTexture2D::GetBufferHandle(Context& ctx)
+MappedBufferHandle StagingTexture2D::GetBufferHandle(CtxImm& ctx)
 {
 	return ctx.GetMappedBufferHandle(*this);
 }
@@ -102,7 +102,7 @@ MappedBufferHandle StagingTexture2D::GetBufferHandle(Context& ctx)
 /// <summary>
 /// Returns and unmaps a previously acquired buffer handle accessed using GetBufferHandle()
 /// </summary>
-void StagingTexture2D::ReturnBufferHandle(Context& ctx, MappedBufferHandle&& handle)
+void StagingTexture2D::ReturnBufferHandle(CtxBase& ctx, MappedBufferHandle&& handle)
 {
 	D3D_CHECK_MSG(GetIsValid(),
 		"Cannot return a null Texture Buffer Handle");
@@ -114,13 +114,13 @@ void StagingTexture2D::ReturnBufferHandle(Context& ctx, MappedBufferHandle&& han
 	ctx.ReturnMappedBufferHandle(std::move(handle));
 }
 
-void StagingTexture2D::WriteToFileWIC(Context& ctx, string_view path)
+void StagingTexture2D::WriteToFileWIC(CtxImm& ctx, string_view path)
 {
 	wstring widePath = GetWideString_UTF8_TO_UTF16LE(path);
 	WriteToFileWIC(ctx, widePath);
 }
 
-void StagingTexture2D::WriteToFileWIC(Context& ctx, wstring_view path)
+void StagingTexture2D::WriteToFileWIC(CtxImm& ctx, wstring_view path)
 {
 	const ivec2 size = GetSize();
 	MappedBufferHandle buffer = GetBufferHandle(ctx);

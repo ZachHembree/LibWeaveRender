@@ -3,7 +3,7 @@
 #include <DirectXTex.h>
 #include "D3D11/InternalD3D11.hpp"
 #include "D3D11/Device.hpp"
-#include "D3D11/Context.hpp"
+#include "D3D11/CtxImm.hpp"
 #include "D3D11/Resources/Texture2D.hpp"
 
 using namespace DirectX;
@@ -98,7 +98,7 @@ ID3D11ShaderResourceView* Texture2D::GetSRV() { return pSRV.Get(); }
 
 ID3D11ShaderResourceView** const Texture2D::GetSRVAddress() { return pSRV.GetAddressOf(); }
 
-void Texture2D::SetTextureWIC(ContextBase& ctx, wstring_view file, ScratchImage& buffer)
+void Texture2D::SetTextureWIC(CtxBase& ctx, wstring_view file, ScratchImage& buffer)
 {
 	LoadImageWIC(file, buffer);
 	const Image& img = *buffer.GetImage(0, 0, 0);
@@ -110,7 +110,7 @@ void Texture2D::SetTextureWIC(ContextBase& ctx, wstring_view file, ScratchImage&
 	SetTextureData(ctx, srcBytes, pixStride, dim);
 }
 
-void Texture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
+void Texture2D::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
 {
 	if (srcDim == GetSize())
 	{

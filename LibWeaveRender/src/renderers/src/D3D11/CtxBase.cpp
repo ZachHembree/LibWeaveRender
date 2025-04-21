@@ -1,7 +1,7 @@
 #include "pch.hpp"
 #include "WeaveEffects/ShaderData.hpp"
 #include "D3D11/ContextUtils.hpp"
-#include "D3D11/ContextBase.hpp"
+#include "D3D11/CtxBase.hpp"
 #include "D3D11/ContextState.hpp"
 #include "D3D11/Viewport.hpp"
 #include "D3D11/Mesh.hpp"
@@ -16,9 +16,9 @@
 using namespace Weave;
 using namespace Weave::D3D11;
 
-ContextBase::ContextBase() = default;
+CtxBase::CtxBase() = default;
 
-ContextBase::ContextBase(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx) :
+CtxBase::CtxBase(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx) :
 	DeviceChild(dev),
 	pCtx(std::move(pCtx)),
 	pState(new ContextState()),
@@ -27,11 +27,11 @@ ContextBase::ContextBase(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx) :
 	pState->Init();
 }
 
-ContextBase::ContextBase(ContextBase&&) noexcept = default;
+CtxBase::CtxBase(CtxBase&&) noexcept = default;
 
-ContextBase& ContextBase::operator=(ContextBase&&) noexcept = default;
+CtxBase& CtxBase::operator=(CtxBase&&) noexcept = default;
 
-void ContextBase::BindDepthStencilBuffer(IDepthStencil& depthStencil) 
+void CtxBase::BindDepthStencilBuffer(IDepthStencil& depthStencil) 
 {
 	if (pState->pDepthStencil != &depthStencil)
 	{
@@ -41,7 +41,7 @@ void ContextBase::BindDepthStencilBuffer(IDepthStencil& depthStencil)
 	}
 }
 
-void ContextBase::UnbindDepthStencilBuffer() 
+void CtxBase::UnbindDepthStencilBuffer() 
 {
 	if (pState->pDepthStencil != nullptr)
 	{
@@ -51,15 +51,15 @@ void ContextBase::UnbindDepthStencilBuffer()
 	}
 }
 
-uint ContextBase::GetRenderTargetCount() const { return pState->rtCount; }
+uint CtxBase::GetRenderTargetCount() const { return pState->rtCount; }
 
-void ContextBase::BindRenderTarget(IRenderTarget& rt, IDepthStencil& ds, sint slot)
+void CtxBase::BindRenderTarget(IRenderTarget& rt, IDepthStencil& ds, sint slot)
 {
 	Span rtSpan(&rt);
 	BindRenderTargets(rtSpan, &ds, slot);
 }
 
-void ContextBase::BindRenderTarget(IRenderTarget& rt, sint slot)
+void CtxBase::BindRenderTarget(IRenderTarget& rt, sint slot)
 {
 	Span rtSpan(&rt);
 	BindRenderTargets(rtSpan, slot);
@@ -123,7 +123,7 @@ static bool TryUpdateViewports(ContextState& state, const IDynamicArray<IRenderT
 	return wasChanged;
 }
 
-void ContextBase::BindRenderTargets(IDynamicArray<IRenderTarget>& rts, sint startSlot)
+void CtxBase::BindRenderTargets(IDynamicArray<IRenderTarget>& rts, sint startSlot)
 {
 	D3D_ASSERT_MSG(rts.GetLength() <= D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
 		"Number of render targets supplied exceeds limit.");
@@ -135,7 +135,7 @@ void ContextBase::BindRenderTargets(IDynamicArray<IRenderTarget>& rts, sint star
 		pCtx->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
 }
 
-void ContextBase::BindRenderTargets(IDynamicArray<IRenderTarget>& rts, IDepthStencil* pDS, sint startSlot)
+void CtxBase::BindRenderTargets(IDynamicArray<IRenderTarget>& rts, IDepthStencil* pDS, sint startSlot)
 {
 	D3D_ASSERT_MSG(rts.GetLength() <= D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
 		"Number of render targets supplied exceeds limit.");
@@ -159,12 +159,12 @@ void ContextBase::BindRenderTargets(IDynamicArray<IRenderTarget>& rts, IDepthSte
 		pCtx->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
 }
 
-void ContextBase::UnbindRenderTarget(sint slot)
+void CtxBase::UnbindRenderTarget(sint slot)
 {
 	UnbindRenderTargets(slot, 1);
 }
 
-void ContextBase::UnbindRenderTargets(sint startSlot, uint count)
+void CtxBase::UnbindRenderTargets(sint startSlot, uint count)
 {
 	if (pState->rtCount == 0 || count == 0)
 		return;
@@ -190,7 +190,7 @@ void ContextBase::UnbindRenderTargets(sint startSlot, uint count)
 		pCtx->OMSetRenderTargets(startSlot, pState->renderTargets.GetData(), pState->GetDepthStencilView());
 }
 
-void ContextBase::SetPrimitiveTopology(PrimTopology topology)
+void CtxBase::SetPrimitiveTopology(PrimTopology topology)
 {
 	if (topology != pState->topology)
 	{
@@ -199,13 +199,13 @@ void ContextBase::SetPrimitiveTopology(PrimTopology topology)
 	}
 }
 
-void ContextBase::BindVertexBuffer(VertexBuffer& vertBuffer, sint slot)
+void CtxBase::BindVertexBuffer(VertexBuffer& vertBuffer, sint slot)
 {
 	Span vbSpan(&vertBuffer);
 	BindVertexBuffers(vbSpan, slot);
 }
 
-void ContextBase::BindVertexBuffers(IDynamicArray<VertexBuffer>& vertBuffers, sint startSlot)
+void CtxBase::BindVertexBuffers(IDynamicArray<VertexBuffer>& vertBuffers, sint startSlot)
 {
 	Span vbState(pState->vertexBuffers.GetData() + startSlot, vertBuffers.GetLength());
 	const uint newCount = (uint)vertBuffers.GetLength();
@@ -238,12 +238,12 @@ void ContextBase::BindVertexBuffers(IDynamicArray<VertexBuffer>& vertBuffers, si
 	}
 }
 
-void ContextBase::UnbindVertexBuffer(sint slot)
+void CtxBase::UnbindVertexBuffer(sint slot)
 {
 	UnbindVertexBuffers(slot, 1);
 }
 
-void ContextBase::UnbindVertexBuffers(sint startSlot, uint count)
+void CtxBase::UnbindVertexBuffers(sint startSlot, uint count)
 {
 	if (pState->vertBufCount == 0 || count == 0)
 		return;
@@ -264,7 +264,7 @@ void ContextBase::UnbindVertexBuffers(sint startSlot, uint count)
 	pCtx->IASetVertexBuffers(startSlot, count, pState->vertexBuffers.GetData(), pState->vbStrides.GetData(), pState->vbOffsets.GetData());
 }
 
-void ContextBase::BindIndexBuffer(IndexBuffer& indexBuffer, uint byteOffset)
+void CtxBase::BindIndexBuffer(IndexBuffer& indexBuffer, uint byteOffset)
 {
 	if (pState->pIndexBuffer != indexBuffer.Get())
 	{
@@ -273,7 +273,7 @@ void ContextBase::BindIndexBuffer(IndexBuffer& indexBuffer, uint byteOffset)
 	}
 }
 
-void ContextBase::UnbindIndexBuffer()
+void CtxBase::UnbindIndexBuffer()
 {
 	if (pState->pIndexBuffer != nullptr)
 	{
@@ -282,18 +282,18 @@ void ContextBase::UnbindIndexBuffer()
 	}
 }
 
-void ContextBase::ClearRenderTarget(IRenderTarget& rt, vec4 color)
+void CtxBase::ClearRenderTarget(IRenderTarget& rt, vec4 color)
 {
 	pCtx->ClearRenderTargetView(rt.GetRTV(), reinterpret_cast<float*>(&color));
 }
 
-bool ContextBase::GetIsBound(const ShaderVariantBase& shader) const
+bool CtxBase::GetIsBound(const ShaderVariantBase& shader) const
 {
 	const ShadeStages stage = shader.GetStage();
 	return pState->GetStage(stage).pShader == &shader;
 }
 
-void ContextBase::BindResources(const ComputeShaderVariant& shader, const ResourceSet& resSrc)
+void CtxBase::BindResources(const ComputeShaderVariant& shader, const ResourceSet& resSrc)
 {
 	if (const uint updateCount = pState->TryUpdateResources(resSrc.GetUAVs(), shader.GetUAVMap()); updateCount > 0)
 	{
@@ -313,7 +313,7 @@ void ContextBase::BindResources(const ComputeShaderVariant& shader, const Resour
 	}
 }
 
-void ContextBase::BindResources(const VertexShaderVariant& shader, const ResourceSet& resSrc)
+void CtxBase::BindResources(const VertexShaderVariant& shader, const ResourceSet& resSrc)
 {
 	ID3D11InputLayout* pLayout = shader.GetInputLayout().Get();
 	
@@ -324,7 +324,7 @@ void ContextBase::BindResources(const VertexShaderVariant& shader, const Resourc
 	}
 }
 
-void ContextBase::BindShader(const ShaderVariantBase& shader, const ResourceSet& resSrc)
+void CtxBase::BindShader(const ShaderVariantBase& shader, const ResourceSet& resSrc)
 {
 	const ShadeStages stage = shader.GetStage();
 	const ContextState::StageState& ss = pState->GetStage(stage);
@@ -374,7 +374,7 @@ void ContextBase::BindShader(const ShaderVariantBase& shader, const ResourceSet&
 		BindResources(static_cast<const VertexShaderVariant&>(shader), resSrc);
 }
 
-void ContextBase::UnbindResources(const ComputeShaderVariant& shader)
+void CtxBase::UnbindResources(const ComputeShaderVariant& shader)
 {
 	// Unbind Unordered Access Views (UAVs)
 	if (shader.GetUAVMap() != nullptr)
@@ -385,13 +385,13 @@ void ContextBase::UnbindResources(const ComputeShaderVariant& shader)
 	}
 }
 
-void ContextBase::UnbindResources(const VertexShaderVariant& shader)
+void CtxBase::UnbindResources(const VertexShaderVariant& shader)
 {
 	pState->pInputLayout = nullptr;
 	pCtx->IASetInputLayout(pState->pInputLayout);
 }
 
-void ContextBase::UnbindShader(const ShaderVariantBase& shader)
+void CtxBase::UnbindShader(const ShaderVariantBase& shader)
 {
 	const ShadeStages stage = shader.GetStage();
 	ContextState::StageState& ss = pState->GetStage(stage);
@@ -403,7 +403,7 @@ void ContextBase::UnbindShader(const ShaderVariantBase& shader)
 	}
 }
 
-void ContextBase::UnbindStage(ShadeStages stage) 
+void CtxBase::UnbindStage(ShadeStages stage) 
 {
 	const ShaderVariantBase* pShader = pState->GetStage(stage).pShader;
 
@@ -411,19 +411,19 @@ void ContextBase::UnbindStage(ShadeStages stage)
 		UnbindShader(*pShader);
 }
 
-void ContextBase::Dispatch(const ComputeShaderVariant& cs, ivec3 groups, const ResourceSet& res) 
+void CtxBase::Dispatch(const ComputeShaderVariant& cs, ivec3 groups, const ResourceSet& res) 
 {
 	BindShader(cs, res);
 	pCtx->Dispatch(groups.x, groups.y, groups.z);
 }
 
-void ContextBase::Draw(Mesh& mesh, Material& mat)
+void CtxBase::Draw(Mesh& mesh, Material& mat)
 {
 	Span meshSpan(&mesh);
 	Draw(meshSpan, mat);
 }
 
-void ContextBase::Draw(IDynamicArray<Mesh>& meshes, Material& mat)
+void CtxBase::Draw(IDynamicArray<Mesh>& meshes, Material& mat)
 {
 	for (Mesh& mesh : meshes)
 	{
@@ -458,7 +458,7 @@ static void WriteBufferMapUnmap(ID3D11DeviceContext& ctx, BufferBase& dst, const
 	ctx.Unmap(dst.Get(), 0u);
 }
 
-void ContextBase::SetBufferData(BufferBase& dst, const IDynamicArray<byte>& src)
+void CtxBase::SetBufferData(BufferBase& dst, const IDynamicArray<byte>& src)
 {
 	if (dst.GetSize() > 0)
 	{
@@ -522,7 +522,7 @@ static void WriteTexMapUnmap(ID3D11DeviceContext& ctx, ID3D11Resource& dst, cons
 	ctx.Unmap(&dst, 0u);
 }
 
-void ContextBase::SetTextureData(ITexture2DBase& dst, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim, uivec2 dstOffset)
+void CtxBase::SetTextureData(ITexture2DBase& dst, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim, uivec2 dstOffset)
 {
 	D3D_CHECK_MSG(dst.GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
 	const uivec2 dstSize = dst.GetSize();
@@ -623,7 +623,7 @@ static void CopySubresource(ID3D11DeviceContext* pCtx, ITexture2DBase& src, ITex
 		pCtx->CopyResource(dst.GetResource(), src.GetResource());
 }
 
-void ContextBase::ReturnMappedBufferHandle(MappedBufferHandle&& handle)
+void CtxBase::ReturnMappedBufferHandle(MappedBufferHandle&& handle)
 {
 	D3D_ASSERT_MSG(handle.GetIsValid(), "Attempted to release an invalid buffer handle.");
 	pCtx->Unmap(handle.GetParent().GetResource(), 0u);
@@ -632,15 +632,15 @@ void ContextBase::ReturnMappedBufferHandle(MappedBufferHandle&& handle)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void ContextBase::Blit(IResizeableTexture2D& src, IRWTexture2D& dst)
+void CtxBase::Blit(IResizeableTexture2D& src, IRWTexture2D& dst)
 {
-	Blit((ITexture2D&)src, dst, ivec4(src.GetRenderSize(), src.GetRenderOffset()));
+	Blit(static_cast<ITexture2D&>(src), dst, ivec4(src.GetRenderSize(), src.GetRenderOffset()));
 }
 
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void ContextBase::Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
+void CtxBase::Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
 {
 	if (srcBox == ivec4(0))
 		srcBox = ivec4(src.GetSize(), 0, 0);
@@ -692,7 +692,7 @@ void ContextBase::Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void ContextBase::Blit(ITexture2D& src, IResizeableTexture2D& dst, ivec4 srcBox)
+void CtxBase::Blit(ITexture2D& src, IResizeableTexture2D& dst, ivec4 srcBox)
 {
 	Blit(
 		src,
@@ -705,7 +705,7 @@ void ContextBase::Blit(ITexture2D& src, IResizeableTexture2D& dst, ivec4 srcBox)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void ContextBase::Blit(IResizeableTexture2D& src, ITexture2D& dst, ivec4 dstBox)
+void CtxBase::Blit(IResizeableTexture2D& src, ITexture2D& dst, ivec4 dstBox)
 {
 	Blit(
 		src,
@@ -718,7 +718,7 @@ void ContextBase::Blit(IResizeableTexture2D& src, ITexture2D& dst, ivec4 dstBox)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void ContextBase::Blit(IResizeableTexture2D& src, IResizeableTexture2D& dst)
+void CtxBase::Blit(IResizeableTexture2D& src, IResizeableTexture2D& dst)
 {
 	Blit(
 		src,
@@ -731,7 +731,7 @@ void ContextBase::Blit(IResizeableTexture2D& src, IResizeableTexture2D& dst)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void ContextBase::Blit(ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox, ivec4 dstBox)
+void CtxBase::Blit(ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox, ivec4 dstBox)
 {
 	D3D_CHECK_MSG(CanDirectCopy(src, dst, srcBox, dstBox), "Failed to copy texture. Destination incompatible with source.");
 	ValidateResourceBounds(src, dst, srcBox, dstBox);
@@ -741,7 +741,7 @@ void ContextBase::Blit(ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox, i
 /// <summary>
 /// Copies the contents of a texture to a render target
 /// </summary>
-void ContextBase::Blit(IResizeableTexture2D& src, IRenderTarget& dst)
+void CtxBase::Blit(IResizeableTexture2D& src, IRenderTarget& dst)
 {
 	Blit(src, dst, ivec4(src.GetRenderSize(), src.GetRenderOffset()));
 }
@@ -749,7 +749,7 @@ void ContextBase::Blit(IResizeableTexture2D& src, IRenderTarget& dst)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void ContextBase::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
+void CtxBase::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 {
 	ivec4 dstBox(dst.GetRenderSize(), dst.GetRenderOffset());
 
@@ -805,18 +805,18 @@ void ContextBase::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 		pCtx->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
 }
 
-void ContextBase::ClearDepthStencil(IDepthStencil& ds, DSClearFlags clearFlags, float depthClear, UINT8 stencilClear)
+void CtxBase::ClearDepthStencil(IDepthStencil& ds, DSClearFlags clearFlags, float depthClear, UINT8 stencilClear)
 {
 	pCtx->ClearDepthStencilView(ds.GetDSV(), (UINT)clearFlags, depthClear, stencilClear);
 }
 
-void ContextBase::ResetShaders() 
+void CtxBase::ResetShaders() 
 {
 	for (int i = 0; i < g_ShadeStageCount; i++)
 		UnbindStage((ShadeStages)i);
 }
 
-void ContextBase::Reset()
+void CtxBase::Reset()
 {
 	ResetShaders();
 	UnbindVertexBuffers();
@@ -826,26 +826,26 @@ void ContextBase::Reset()
 }
 
 
-bool ContextBase::GetIsImmediate() const { return isImmediate; }
+bool CtxBase::GetIsImmediate() const { return isImmediate; }
 
-const uint ContextBase::GetViewportCount() const { return (uint)pState->vpCount; }
+const uint CtxBase::GetViewportCount() const { return (uint)pState->vpCount; }
 
-const Viewport& ContextBase::GetViewport(uint index) const { return pState->viewports[index]; }
+const Viewport& CtxBase::GetViewport(uint index) const { return pState->viewports[index]; }
 
-const Span<Viewport> ContextBase::GetViewports() const { return Span(pState->viewports.GetData(), pState->vpCount); }
+const Span<Viewport> CtxBase::GetViewports() const { return Span(pState->viewports.GetData(), pState->vpCount); }
 
-void ContextBase::BindViewport(sint index, const vec2& size, const vec2& offset, const vec2& depth)
+void CtxBase::BindViewport(sint index, const vec2& size, const vec2& offset, const vec2& depth)
 {
 	Viewport vp = { offset, size, depth };
 	BindViewports(Span(&vp), index);
 }
 
-void ContextBase::BindViewport(sint index, const Viewport& vp)
+void CtxBase::BindViewport(sint index, const Viewport& vp)
 {
 	BindViewports(Span((Viewport*)&vp), index);
 }
 
-void ContextBase::UnbindViewports(sint index, uint count)
+void CtxBase::UnbindViewports(sint index, uint count)
 {
 	if (pState->vpCount == 0 || count == 0)
 		return;
@@ -864,7 +864,7 @@ void ContextBase::UnbindViewports(sint index, uint count)
 	pState->vpCount = index;
 }
 
-void ContextBase::BindViewports(const IDynamicArray<Viewport>& viewports, sint offset)
+void CtxBase::BindViewports(const IDynamicArray<Viewport>& viewports, sint offset)
 {
 	D3D_ASSERT_MSG((offset + viewports.GetLength()) <= D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
 		"Number of viewports supplied exceeds limit.");

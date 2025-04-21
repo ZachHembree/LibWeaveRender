@@ -140,7 +140,7 @@ vec2 ResizeableTexture2D::GetRenderScale() const
 	return renderScale;
 }
 
-void ResizeableTexture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
+void ResizeableTexture2D::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
 {
 	const uivec2 currentSize = GetSize();
 

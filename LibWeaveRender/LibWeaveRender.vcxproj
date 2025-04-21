@@ -313,7 +313,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugVS|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\renderers\src\D3D11\ContextBase.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\CtxBase.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\ContextState.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\ContextUtils.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\MappedBufferHandle.cpp" />
@@ -332,7 +332,7 @@
     <ClCompile Include="src\renderers\src\D3D11\Resources\ConstantGroupMap.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\ConstantBuffer.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\RTHandle.cpp" />
-    <ClCompile Include="src\renderers\src\D3D11\Context.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\CtxImm.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\Sampler.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\Texture2DBase.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\VertexBuffer.cpp" />
@@ -359,7 +359,7 @@
     <ClInclude Include="src\renderers\include\D3D11\ContextState.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ContextUtils.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\DeferredContext.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\ContextBase.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\CtxBase.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\InternalD3D11.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\MappedBufferHandle.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp" />
@@ -379,7 +379,7 @@
     <ClInclude Include="src\renderers\include\D3D11\Resources\BufferBase.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\ConstantBuffer.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\ConstantGroupMap.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\Context.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\CtxImm.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Device.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\DeviceChild.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\Formats.hpp" />

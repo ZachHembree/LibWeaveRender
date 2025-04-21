@@ -49,7 +49,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Clears the texture to the given color
 		/// </summary>
-		void Clear(ContextBase& ctx, vec4 color = vec4(0)) override;
+		void Clear(CtxBase& ctx, vec4 color = vec4(0)) override;
 
 		/// <summary>
 		/// Returns pointer to UAV interface
@@ -75,7 +75,7 @@ namespace Weave::D3D11
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
 		template<typename T>
-		void SetTextureData(ContextBase& ctx, IDynamicArray<T>& src, uivec2 dim)
+		void SetTextureData(CtxBase& ctx, IDynamicArray<T>& src, uivec2 dim)
 		{
 			Span<byte> srcBytes(reinterpret_cast<byte*>(src.GetData()), GetArrSize(src));
 			SetTextureData(ctx, srcBytes, sizeof(T), dim);
@@ -85,7 +85,7 @@ namespace Weave::D3D11
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
-		void SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim) override;
+		void SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim) override;
 
 	private:
 		ComPtr<ID3D11UnorderedAccessView> pUAV;

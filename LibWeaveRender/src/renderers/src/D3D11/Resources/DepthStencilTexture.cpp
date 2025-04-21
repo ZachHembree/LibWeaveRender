@@ -53,7 +53,7 @@ ID3D11DepthStencilView* DepthStencilTexture::GetDSV() { return pDSV.Get(); }
 
 ID3D11DepthStencilView** const DepthStencilTexture::GetDSVAddress() { return pDSV.GetAddressOf(); }
 
-void DepthStencilTexture::Clear(ContextBase& ctx, DSClearFlags clearFlags, float depthClear, UINT8 stencilClear )
+void DepthStencilTexture::Clear(CtxBase& ctx, DSClearFlags clearFlags, float depthClear, UINT8 stencilClear )
 {
 	ctx.ClearDepthStencil(*this, clearFlags, depthClear, stencilClear);
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "WeaveUtils/WinUtils.hpp"
 #include "InternalD3D11.hpp"
-#include "Context.hpp"
+#include "CtxImm.hpp"
 
 namespace Weave::D3D11
 {	
@@ -38,7 +38,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns reference to immediate context
 		/// </summary>
-		Context& GetContext();
+		CtxImm& GetContext();
 
 		void CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11VertexShader>& pVS);
 
@@ -50,6 +50,6 @@ namespace Weave::D3D11
 		Renderer* pRenderer;
 		ComPtr<ID3D11Device1> pDev;
 		ComPtr<ID3D11DeviceContext1> pCtxImm;
-		Context context;
+		CtxImm context;
 	};
 }

@@ -3,7 +3,7 @@
 #include "D3D11/Resources/RTHandle.hpp"
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/Device.hpp"
-#include "D3D11/Context.hpp"
+#include "D3D11/CtxImm.hpp"
 
 using namespace Weave;
 using namespace Weave::D3D11;
@@ -120,7 +120,7 @@ ID3D11RenderTargetView* RTHandle::GetRTV() { return *ppRTV; }
 ID3D11RenderTargetView** const RTHandle::GetAddressRTV() { return ppRTV; }
 
 void RTHandle::Clear(
-	ContextBase& ctx,
+	CtxBase& ctx,
 	vec4 color
 )
 {

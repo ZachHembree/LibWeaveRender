@@ -47,7 +47,7 @@ namespace Weave::D3D11
 	/// <summary>
 	/// Updates any resources needed prior to drawing
 	/// </summary>
-	void Mesh::Setup(ContextBase& ctx)
+	void Mesh::Setup(CtxBase& ctx)
 	{
 		ctx.SetPrimitiveTopology(topology);
 		ctx.BindVertexBuffer(vBuf);
@@ -59,7 +59,7 @@ namespace Weave::D3D11
 	/// <summary>
 	/// Draws the object
 	/// </summary>
-	void Mesh::Draw(ContextBase& ctx, Material& mat)
+	void Mesh::Draw(CtxBase& ctx, Material& mat)
 	{
 		ctx.Draw(*this, mat);
 	}
