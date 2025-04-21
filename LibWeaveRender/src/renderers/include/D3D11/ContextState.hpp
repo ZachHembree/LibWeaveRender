@@ -4,13 +4,13 @@
 #include "Resources/ResourceBase.hpp"
 #include "D3D11/Resources/ResourceMap.hpp"
 #include "D3D11/Resources/ResourceSet.hpp"
+#include "D3D11/Viewport.hpp"
 
 namespace Weave::D3D11
 {
 	using Effects::ShadeStages;
 	using Effects::ShaderTypes;
 
-	struct Viewport;
 	class IDepthStencil;
 
 	enum class PrimTopology;

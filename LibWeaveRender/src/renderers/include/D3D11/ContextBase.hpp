@@ -27,6 +27,8 @@ namespace Weave::D3D11
 	class BufferBase;
 	class IndexBuffer;
 	class VertexBuffer;
+	class MappedBufferHandle;
+
 	class ResourceSet;
 	class ShaderVariantBase;
 	class VertexShaderVariant;
@@ -39,6 +41,11 @@ namespace Weave::D3D11
 	{
 	public:
 		MAKE_NO_COPY(ContextBase);
+
+		/// <summary>
+		/// Returns true if the context is immediate, or false if deferred.
+		/// </summary>
+		bool GetIsImmediate() const;
 
 		/// <summary>
 		/// Returns the number of viewports currently bound
@@ -182,6 +189,51 @@ namespace Weave::D3D11
 		void SetTextureData(ITexture2DBase& dst, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim, uivec2 dstOffset = uivec2(0));
 
 		/// <summary>
+		/// Returns the buffer handle and unmaps it from the CPU.
+		/// </summary>
+		void ReturnMappedBufferHandle(MappedBufferHandle&& handle);
+
+		/// <summary>
+		/// Copies the contents of one texture to another
+		/// </summary>
+		void Blit(IResizeableTexture2D& src, IRWTexture2D& dst);
+
+		/// <summary>
+		/// Copies the contents of one texture to another
+		/// </summary>
+		void Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox = ivec4(0));
+
+		/// <summary>
+		/// Copies the contents of one texture to another
+		/// </summary>
+		void Blit(ITexture2D& src, IResizeableTexture2D& dst, ivec4 srcBox = ivec4(0));
+
+		/// <summary>
+		/// Copies the contents of one texture to another
+		/// </summary>
+		void Blit(IResizeableTexture2D& src, ITexture2D& dst, ivec4 dstBox = ivec4(0));
+
+		/// <summary>
+		/// Copies the contents of one texture to another
+		/// </summary>
+		void Blit(IResizeableTexture2D& src, IResizeableTexture2D& dst);
+
+		/// <summary>
+		/// Copies the contents of one texture to another
+		/// </summary>
+		void Blit(ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox = ivec4(0), ivec4 dstBox = ivec4(0));
+
+		/// <summary>
+		/// Copies the contents of a texture to a render target
+		/// </summary>
+		void Blit(IResizeableTexture2D& src, IRenderTarget& dst);
+
+		/// <summary>
+		/// Copies the contents of a texture to a render target
+		/// </summary>
+		void Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox = ivec4(0));
+
+		/// <summary>
 		/// Clears the depth stencil texture to the given value
 		/// </summary>
 		void ClearDepthStencil(
@@ -209,6 +261,7 @@ namespace Weave::D3D11
 	protected:
 		ComPtr<ID3D11DeviceContext1> pCtx;
 		std::unique_ptr<ContextState> pState;
+		bool isImmediate;
 
 		ContextBase();
 
