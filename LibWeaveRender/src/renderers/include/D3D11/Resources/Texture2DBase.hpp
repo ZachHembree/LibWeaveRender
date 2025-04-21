@@ -13,9 +13,14 @@ namespace Weave::D3D11
 	{
 	public:
 		/// <summary>
+		/// Returns the dimensions of the underlying buffer
+		/// </summary>
+		uivec3 GetDimensions() const override;
+
+		/// <summary>
 		/// Returns the dimensions of the texture
 		/// </summary>
-		ivec2 GetSize() const override;
+		uivec2 GetSize() const override;
 
 		/// <summary>
 		/// Returns combined texel size and dim fp vector.
@@ -26,7 +31,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns the number of bytes per pixel for input/output
 		/// </summary>
-		size_t GetPixelPitch() const { return pixelStride; }
+		uint GetPixelPitch() const;
 
 		/// <summary>
 		/// Returns color format of the texture
@@ -83,7 +88,7 @@ namespace Weave::D3D11
 
 		Texture2DBase(
 			Device& dev,
-			ivec2 dim,
+			uivec2 dim,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			ResourceUsages usage = ResourceUsages::Default,
 			ResourceBindFlags bindFlags = ResourceBindFlags::ShaderResource,

@@ -15,7 +15,7 @@ ResizeableTexture2D::ResizeableTexture2D() :
 
 ResizeableTexture2D::ResizeableTexture2D(
 	Device& dev,
-	ivec2 dim,
+	uivec2 dim,
 	Formats format,
 	ResourceUsages usage,
 	ResourceBindFlags bindFlags,
@@ -40,7 +40,7 @@ ResizeableTexture2D::ResizeableTexture2D(
 
 ResizeableTexture2D::ResizeableTexture2D(
 	Device& dev,
-	ivec2 dim,
+	uivec2 dim,
 	void* data,
 	uint stride,
 	Formats format,
@@ -61,7 +61,7 @@ ResizeableTexture2D::ResizeableTexture2D(
 ResizeableTexture2D::ResizeableTexture2D(
 	Device& dev,
 	Formats format,
-	ivec2 dim,
+	uivec2 dim,
 	uint mipLevels,
 	bool isDynamic
 ) :
@@ -91,12 +91,12 @@ void ResizeableTexture2D::SetRenderOffset(ivec2 offset)
 ivec2 ResizeableTexture2D::GetRenderOffset() const
 {
 	renderOffset = glm::clamp(renderOffset, vec2(0), 1.0f - renderScale);
-	return ivec2(glm::round(renderOffset * vec2(GetSize())));
+	return uivec2(glm::round(renderOffset * vec2(GetSize())));
 }
 
-void ResizeableTexture2D::SetRenderSize(ivec2 renderSize)
+void ResizeableTexture2D::SetRenderSize(uivec2 renderSize)
 {
-	const vec2 size = glm::max(GetSize(), ivec2(1));
+	const vec2 size = glm::max(GetSize(), uivec2(1));
 	vec2 newSize = glm::clamp(vec2(renderSize), vec2(1), size);
 	SetRenderScale(newSize / size);
 }
@@ -104,13 +104,13 @@ void ResizeableTexture2D::SetRenderSize(ivec2 renderSize)
 /// <summary>
 /// Returns the size of the render area in pixels
 /// </summary>
-ivec2 ResizeableTexture2D::GetRenderSize() const
+uivec2 ResizeableTexture2D::GetRenderSize() const
 {
 	renderScale = glm::clamp(renderScale, vec2(0), 1.0f - renderOffset);
 
 	const vec2 size = GetSize();
 	vec2 renderSize = glm::round(renderScale * size);
-	return glm::clamp(ivec2(renderSize), ivec2(1), ivec2(size));
+	return glm::clamp(uivec2(renderSize), uivec2(1), uivec2(size));
 }
 
 /// <summary>
@@ -140,9 +140,9 @@ vec2 ResizeableTexture2D::GetRenderScale() const
 	return renderScale;
 }
 
-void ResizeableTexture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 srcDim)
+void ResizeableTexture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
 {
-	const ivec2 currentSize = GetSize();
+	const uivec2 currentSize = GetSize();
 
 	if (srcDim.x <= currentSize.x && srcDim.y <= currentSize.y)
 	{
@@ -179,7 +179,7 @@ ResizeableTexture2D ResizeableTexture2D::FromImageWIC(Device& dev, wstring_view 
 	const Image& img = *buf.GetImage(0, 0, 0);
 
 	return ResizeableTexture2D(dev,
-		ivec2(img.width, img.height),
+		uivec2(img.width, img.height),
 		img.pixels,
 		4 * sizeof(uint8_t),
 		Formats::R8G8B8A8_UNORM

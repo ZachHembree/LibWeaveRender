@@ -1,5 +1,6 @@
 #pragma once
 #include "ContextBase.hpp"
+#include "Resources/MappedBufferHandle.hpp"
 
 namespace Weave::D3D11
 {
@@ -11,7 +12,7 @@ namespace Weave::D3D11
 	public:
 		Context();
 
-		Context(Device& dev, ComPtr<ID3D11DeviceContext>&& pContext);
+		Context(Device& dev, ComPtr<ID3D11DeviceContext>&& pCtx);
 
 		Context(Context&&) noexcept;
 
@@ -19,15 +20,18 @@ namespace Weave::D3D11
 
 		~Context();
 
+		ID3D11DeviceContext* Get();
+
 		/// <summary>
-		/// Returns reference to context interface
+		/// Returns a handle for reading and or writing the given buffer, based on the 
+		/// buffer's usage type.
 		/// </summary>
-		ID3D11DeviceContext& Get() const;
-		
+		MappedBufferHandle GetMappedBufferHandle(IBuffer& buffer);
+
 		/// <summary>
-		/// Returns reference to context interface
+		/// Returns the buffer handle and unmaps it from the CPU.
 		/// </summary>
-		ID3D11DeviceContext* operator->() const;
+		void ReturnMappedBufferHandle(MappedBufferHandle&& handle);
 
 		/// <summary>
 		/// Copies the contents of one texture to another

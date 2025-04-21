@@ -12,7 +12,7 @@ using namespace Weave::D3D11;
 
 Texture2DBase::Texture2DBase(
 	Device& dev,
-	ivec2 dim,
+	uivec2 dim,
 	Formats format,
 	ResourceUsages usage,
 	ResourceBindFlags bindFlags,
@@ -57,13 +57,17 @@ Texture2DBase::Texture2DBase(
 
 Texture2DBase::Texture2DBase() : desc({}) {}
 
-ivec2 Texture2DBase::GetSize() const { return ivec2(desc.Width, desc.Height); }
+uivec3 Texture2DBase::GetDimensions() const { return ivec3(desc.Width, desc.Height, 1u); }
+
+uivec2 Texture2DBase::GetSize() const { return uivec2(desc.Width, desc.Height); }
 
 vec4 Texture2DBase::GetTexelSize() const
 {
-	ivec2 size = GetSize();
+	uivec2 size = GetSize();
 	return vec4(1.0f / vec2(size), size);
 }
+
+uint Texture2DBase::GetPixelPitch() const { return pixelStride; }
 
 Formats Texture2DBase::GetFormat() const { return (Formats)desc.Format; }
 

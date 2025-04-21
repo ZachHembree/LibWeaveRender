@@ -14,7 +14,7 @@ Texture2D::Texture2D()
 
 Texture2D::Texture2D(
 	Device& dev,
-	ivec2 dim,
+	uivec2 dim,
 	Formats format,
 	ResourceUsages usage,
 	ResourceBindFlags bindFlags,
@@ -48,7 +48,7 @@ Texture2D::Texture2D(
 
 Texture2D::Texture2D(
 	Device& dev,
-	ivec2 dim,
+	uivec2 dim,
 	void* data,
 	uint stride,
 	Formats format,
@@ -70,7 +70,7 @@ Texture2D::Texture2D(
 Texture2D::Texture2D(
 	Device& dev,
 	Formats format,
-	ivec2 dim,
+	uivec2 dim,
 	uint mipLevels,
 	bool isDynamic
 ) :
@@ -103,14 +103,14 @@ void Texture2D::SetTextureWIC(ContextBase& ctx, wstring_view file, ScratchImage&
 	LoadImageWIC(file, buffer);
 	const Image& img = *buffer.GetImage(0, 0, 0);
 	const uint pixStride = 4 * sizeof(byte);
-	const ivec2 dim(img.width, img.height);
+	const uivec2 dim(img.width, img.height);
 	const uint totalBytes = pixStride * dim.x * dim.y;
 	Span srcBytes(img.pixels, totalBytes);
 
 	SetTextureData(ctx, srcBytes, pixStride, dim);
 }
 
-void Texture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 srcDim)
+void Texture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
 {
 	if (srcDim == GetSize())
 	{
@@ -148,7 +148,7 @@ Texture2D Texture2D::FromImageWIC(Device& dev, wstring_view file, bool isReadOnl
 	const Image& img = *buf.GetImage(0, 0, 0);
 
 	return Texture2D(dev,
-		ivec2(img.width, img.height),
+		uivec2(img.width, img.height),
 		img.pixels,
 		4 * sizeof(uint8_t),
 		Formats::R8G8B8A8_UNORM,

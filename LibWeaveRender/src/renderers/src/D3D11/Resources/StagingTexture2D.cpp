@@ -94,42 +94,24 @@ void StagingTexture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte
 /// <summary>
 /// Returns a temporary handle to a mapped buffer backing the texture
 /// </summary>
-Tex2DBufferHandle StagingTexture2D::GetBufferHandle(Context& ctx)
+MappedBufferHandle StagingTexture2D::GetBufferHandle(Context& ctx)
 {
-	D3D11_MAP mapFlags = (D3D11_MAP)0;
-
-	if ((int)(GetAccessFlags() & ResourceAccessFlags::Read))
-		mapFlags = (D3D11_MAP)(mapFlags | D3D11_MAP_READ);
-
-	if ((int)(GetAccessFlags() & ResourceAccessFlags::Write))
-		mapFlags = (D3D11_MAP)(mapFlags | D3D11_MAP_WRITE);
-
-	D3D11_MAPPED_SUBRESOURCE msr;
-	D3D_CHECK_HR(ctx->Map(
-		pRes.Get(),
-		0u,
-		mapFlags,
-		0u,
-		&msr
-	));
-
-	pixelStride = msr.RowPitch / GetSize().x;
-	return Tex2DBufferHandle(this, msr);
+	return ctx.GetMappedBufferHandle(*this);
 }
 
 /// <summary>
 /// Returns and unmaps a previously acquired buffer handle accessed using GetBufferHandle()
 /// </summary>
-void StagingTexture2D::ReturnBufferHandle(Context& ctx, Tex2DBufferHandle&& handle)
+void StagingTexture2D::ReturnBufferHandle(Context& ctx, MappedBufferHandle&& handle)
 {
-	D3D_CHECK_MSG(handle.pParent != nullptr,
+	D3D_CHECK_MSG(GetIsValid(),
 		"Cannot return a null Texture Buffer Handle");
 
-	D3D_CHECK_MSG(handle.pParent == this,
+	D3D_CHECK_MSG(&handle.GetParent() == this,
 		"Cannot return a Texture Buffer Handle to an object"
 		"that is not its parent");
 
-	ctx->Unmap(pRes.Get(), 0u);
+	ctx.ReturnMappedBufferHandle(std::move(handle));
 }
 
 void StagingTexture2D::WriteToFileWIC(Context& ctx, string_view path)
@@ -141,7 +123,7 @@ void StagingTexture2D::WriteToFileWIC(Context& ctx, string_view path)
 void StagingTexture2D::WriteToFileWIC(Context& ctx, wstring_view path)
 {
 	const ivec2 size = GetSize();
-	Tex2DBufferHandle buffer = GetBufferHandle(ctx);
+	MappedBufferHandle buffer = GetBufferHandle(ctx);
 	Image imageData = 
 	{
 		(uint)size.x, (uint)size.y,
@@ -159,34 +141,4 @@ void StagingTexture2D::WriteToFileWIC(Context& ctx, wstring_view path)
 	));
 
 	ReturnBufferHandle(ctx, std::move(buffer));
-}
-
-Tex2DBufferHandle::Tex2DBufferHandle() :
-	DataBufferSpan(),
-	canRead(false),
-	canWrite(false),
-	msr({})
-{ }
-
-Tex2DBufferHandle::Tex2DBufferHandle(StagingTexture2D* pParent, D3D11_MAPPED_SUBRESOURCE msr) :
-	DataBufferSpan(pParent, (byte*)msr.pData, msr.RowPitch* pParent->GetSize().y),
-	canRead((int)(pParent->GetAccessFlags()& ResourceAccessFlags::Read)),
-	canWrite((int)(pParent->GetAccessFlags()& ResourceAccessFlags::Write)),
-	msr(msr)
-{ }
-
-/// <summary>
-/// Returns the number of bytes in a row
-/// </summary>
-size_t Tex2DBufferHandle::GetRowPitch() const
-{
-	return msr.RowPitch;
-}
-
-/// <summary>
-/// Returns the size of the buffer in bytes
-/// </summary>
-size_t Tex2DBufferHandle::GetByteSize() const
-{
-	return msr.RowPitch * pParent->GetSize().y;
 }

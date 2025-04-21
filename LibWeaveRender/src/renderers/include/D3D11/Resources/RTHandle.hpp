@@ -16,15 +16,46 @@ namespace Weave::D3D11
 		RTHandle(
 			Device& dev, 
 			SwapChain* pSwapChain,
+			ID3D11Resource** ppRes,
 			ID3D11RenderTargetView** ppRTV,
-			ivec2 offset = ivec2(0),
+			uivec2 offset = uivec2(0),
 			vec2 scale = vec2(1)
 		);
 
 		/// <summary>
-		/// Returns the size of the underlying buffer
+		/// Returns the dimensions of the underlying buffer
 		/// </summary>
-		ivec2 GetSize() const override;
+		uivec3 GetDimensions() const override;
+
+		/// <summary>
+		/// Specifies buffer usage pattern: dynamic, staging, immutable or default
+		/// </summary>
+		ResourceUsages GetUsage() const override;
+
+		/// <summary>
+		/// Specifies what view types for the buffer are valid
+		/// </summary>
+		ResourceBindFlags GetBindFlags() const override;
+
+		/// <summary>
+		/// Specifies CPU access type for mappable resource, if applicable
+		/// </summary>
+		ResourceAccessFlags GetAccessFlags() const override;
+
+		/// <summary>
+		/// Returns a pointer to the resource interface
+		/// </summary>
+		ID3D11Resource* GetResource() override;
+
+		/// <summary>
+		/// Returns a pointer to the resource field address
+		/// </summary>
+		ID3D11Resource** const GetResAddress() override;
+
+		/// <summary>
+		/// Returns the dimensions of the 2D texture
+		/// </summary>
+		uivec2 GetSize() const override;
 
 		/// <summary>
 		/// Returns combined texel size and dim fp vector.
@@ -51,12 +82,12 @@ namespace Weave::D3D11
 		/// Sets the size of the render area for the render texture.
 		/// Cannot exceed the size of the underlying buffer.
 		/// </summary>
-		void SetRenderSize(ivec2 renderSize);
+		void SetRenderSize(uivec2 renderSize);
 
 		/// <summary>
 		/// Returns the size of the render area in pixels
 		/// </summary>
-		ivec2 GetRenderSize() const override;
+		uivec2 GetRenderSize() const override;
 
 		/// <summary>
 		/// Returns combined scaled (DRS) texel size and dim fp vector.
@@ -93,6 +124,7 @@ namespace Weave::D3D11
 		) override;
 
 	private:
+		ID3D11Resource** ppRes;
 		ID3D11RenderTargetView** ppRTV;
 		SwapChain* pSwapChain;
 		mutable vec2 renderOffset;

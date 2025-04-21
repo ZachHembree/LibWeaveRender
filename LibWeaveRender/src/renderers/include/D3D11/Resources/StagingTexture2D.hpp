@@ -1,10 +1,9 @@
 #pragma once
 #include "Texture2DBase.hpp"
+#include "MappedBufferHandle.hpp"
 
 namespace Weave::D3D11
 {
-	class StagingTexture2D;
-	class Tex2DBufferHandle;
 	class Context;
 
 	/// <summary>
@@ -87,12 +86,12 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns a temporary handle to a mapped buffer backing the texture
 		/// </summary>
-		Tex2DBufferHandle GetBufferHandle(Context& ctx);
+		MappedBufferHandle GetBufferHandle(Context& ctx);
 
 		/// <summary>
 		/// Returns and unmaps a previously acquired buffer handle accessed using GetBufferHandle()
 		/// </summary>
-		void ReturnBufferHandle(Context& ctx, Tex2DBufferHandle&& handle);
+		void ReturnBufferHandle(Context& ctx, MappedBufferHandle&& handle);
 
 		/// <summary>
 		/// Writes the contents of the texture to a PNG in the give file path. Requires
@@ -107,44 +106,6 @@ namespace Weave::D3D11
 		void WriteToFileWIC(Context& ctx, wstring_view file);
 
 	private:
-
-	};
-
-	/// <summary>
-	/// Provides temporary access to a mapped resource buffer. Must be returned to parent
-	/// after use.
-	/// </summary>
-	class Tex2DBufferHandle : public DataBufferSpan<StagingTexture2D, byte>
-	{
-	friend StagingTexture2D;
-
-	public:
-		/// <summary>
-		/// True if the underlying texture buffer supports CPU read access
-		/// </summary>
-		const bool canRead;
-
-		/// <summary>
-		/// True if the underlying texture buffer supports CPU write access
-		/// </summary>
-		const bool canWrite;
-
-		Tex2DBufferHandle();
-
-		/// <summary>
-		/// Returns the number of bytes in a row
-		/// </summary>
-		size_t GetRowPitch() const;
-
-		/// <summary>
-		/// Returns the size of the buffer in bytes
-		/// </summary>
-		size_t GetByteSize() const;
-
-	private:
-		const D3D11_MAPPED_SUBRESOURCE msr;
-
-		Tex2DBufferHandle(StagingTexture2D* pParent, D3D11_MAPPED_SUBRESOURCE msr);
 
 	};
 }

@@ -13,7 +13,7 @@ namespace Weave::D3D11
 		template<typename T>
 		ResizeableTexture2D(
 			Device& dev,
-			ivec2 dim,
+			uivec2 dim,
 			IDynamicArray<T> data,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			uint mipLevels = 1u
@@ -27,7 +27,7 @@ namespace Weave::D3D11
 		/// </summary>
 		ResizeableTexture2D(
 			Device& dev,
-			ivec2 dim,
+			uivec2 dim,
 			void* data,
 			uint stride,
 			Formats format = Formats::R8G8B8A8_UNORM,
@@ -40,7 +40,7 @@ namespace Weave::D3D11
 		ResizeableTexture2D(
 			Device& dev,
 			Formats format = Formats::R8G8B8A8_UNORM,
-			ivec2 dim = ivec2(0),
+			uivec2 dim = uivec2(0),
 			uint mipLevels = 1u,
 			bool isDynamic = false
 		);
@@ -64,12 +64,12 @@ namespace Weave::D3D11
 		/// Sets the size of the render area for the render texture.
 		/// Cannot exceed the size of the underlying buffer.
 		/// </summary>
-		void SetRenderSize(ivec2 renderSize);
+		void SetRenderSize(uivec2 renderSize);
 
 		/// <summary>
 		/// Returns the size of the render area in pixels
 		/// </summary>
-		ivec2 GetRenderSize() const override;
+		uivec2 GetRenderSize() const override;
 
 		/// <summary>
 		/// Returns combined scaled (DRS) texel size and dim fp vector.
@@ -101,7 +101,7 @@ namespace Weave::D3D11
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
 		template<typename T>
-		void SetTextureData(ContextBase& ctx, const IDynamicArray<T>& src, ivec2 dim)
+		void SetTextureData(ContextBase& ctx, const IDynamicArray<T>& src, uivec2 dim)
 		{
 			Span<byte> srcBytes(reinterpret_cast<byte*>(src.GetData()), GetArrSize(src));
 			SetTextureData(ctx, srcBytes, sizeof(T), dim);
@@ -111,7 +111,7 @@ namespace Weave::D3D11
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
-		void SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 dim) override;
+		void SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 dim) override;
 
 	protected:
 		mutable vec2 renderOffset;
@@ -119,7 +119,7 @@ namespace Weave::D3D11
 
 		ResizeableTexture2D(
 			Device& dev,
-			ivec2 dim,
+			uivec2 dim,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			ResourceUsages usage = ResourceUsages::Default,
 			ResourceBindFlags bindFlags = ResourceBindFlags::ShaderResource,

@@ -14,28 +14,42 @@ RTHandle::RTHandle() : ppRTV(nullptr)
 RTHandle::RTHandle(
 	Device& dev,
 	SwapChain* pSwapChain,
+	ID3D11Resource** ppRes,
 	ID3D11RenderTargetView** ppRTV,
-	ivec2 offset,
+	uivec2 offset,
 	vec2 scale
 ) :
 	DeviceChild(dev),
 	pSwapChain(pSwapChain),
+	ppRes(ppRes),
 	ppRTV(ppRTV),
 	renderOffset(offset),
 	renderScale(glm::clamp(scale, vec2(1E-6f), vec2(1)))
 { }
 
-/// <summary>
-/// Returns the size of the underlying buffer
-/// </summary>
-ivec2 RTHandle::GetSize() const
+uivec3 RTHandle::GetDimensions() const
+{
+	return uivec3(pSwapChain->GetSize(), 1u);
+}
+
+ResourceUsages RTHandle::GetUsage() const { return ResourceUsages::Immutable; }
+
+ResourceBindFlags RTHandle::GetBindFlags() const { return ResourceBindFlags::RenderTarget; }
+
+ResourceAccessFlags RTHandle::GetAccessFlags() const { return ResourceAccessFlags::None; }
+
+ID3D11Resource* RTHandle::GetResource() { return *ppRes; }
+
+ID3D11Resource** const RTHandle::GetResAddress() { return ppRes; }
+
+uivec2 RTHandle::GetSize() const
 {
 	return pSwapChain->GetSize();
 }
 
 vec4 RTHandle::GetTexelSize() const
 {
-	ivec2 size = GetSize();
+	uivec2 size = GetSize();
 	return vec4(1.0f / vec2(size), size);
 }
 
@@ -54,12 +68,12 @@ void RTHandle::SetRenderOffset(ivec2 offset)
 /// </summary>
 ivec2 RTHandle::GetRenderOffset() const
 {
-	return ivec2(glm::round(renderOffset * vec2(GetSize())));
+	return uivec2(glm::round(renderOffset * vec2(GetSize())));
 }
 
-void RTHandle::SetRenderSize(ivec2 renderSize)
+void RTHandle::SetRenderSize(uivec2 renderSize)
 {
-	const vec2 size = glm::max(GetSize(), ivec2(1));
+	const vec2 size = glm::max(GetSize(), uivec2(1));
 	vec2 newSize = glm::clamp(vec2(renderSize), vec2(1), size);
 	SetRenderScale(newSize / size);
 }
@@ -67,7 +81,7 @@ void RTHandle::SetRenderSize(ivec2 renderSize)
 /// <summary>
 /// Returns the size of the render area in pixels
 /// </summary>
-ivec2 RTHandle::GetRenderSize() const
+uivec2 RTHandle::GetRenderSize() const
 {
 	const vec2 size = GetSize();
 	vec2 renderSize = glm::round(renderScale * size);

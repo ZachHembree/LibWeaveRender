@@ -11,7 +11,7 @@ namespace Weave::D3D11
 
 		RWTexture2D(
 			Device& dev,
-			ivec2 dim,
+			uivec2 dim,
 			void* data,
 			UINT stride,
 			Formats format = Formats::R8G8B8A8_UNORM,
@@ -21,14 +21,14 @@ namespace Weave::D3D11
 		RWTexture2D(
 			Device& dev,
 			Formats format,
-			ivec2 dim = ivec2(0),
+			uivec2 dim = uivec2(0),
 			UINT mipLevels = 1u
 		);
 
 		template<typename T>
 		RWTexture2D(
 			Device& dev,
-			ivec2 dim,
+			uivec2 dim,
 			IDynamicArray<T> data,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			UINT mipLevels = 1u
@@ -75,7 +75,7 @@ namespace Weave::D3D11
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
 		template<typename T>
-		void SetTextureData(ContextBase& ctx, IDynamicArray<T>& src, ivec2 dim)
+		void SetTextureData(ContextBase& ctx, IDynamicArray<T>& src, uivec2 dim)
 		{
 			Span<byte> srcBytes(reinterpret_cast<byte*>(src.GetData()), GetArrSize(src));
 			SetTextureData(ctx, srcBytes, sizeof(T), dim);
@@ -85,7 +85,7 @@ namespace Weave::D3D11
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>
-		void SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 srcDim) override;
+		void SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim) override;
 
 	private:
 		ComPtr<ID3D11UnorderedAccessView> pUAV;
@@ -95,7 +95,7 @@ namespace Weave::D3D11
 
 		RWTexture2D(
 			Device& dev,
-			ivec2 dim,
+			uivec2 dim,
 			Formats format = Formats::R8G8B8A8_UNORM,
 			ResourceUsages usage = ResourceUsages::Default,
 			ResourceBindFlags bindFlags = ResourceBindFlags::ShaderResource,

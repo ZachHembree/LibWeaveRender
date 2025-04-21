@@ -42,7 +42,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns the dimensions of the chain's buffers
 		/// </summary>
-		ivec2 GetSize() const;
+		uivec2 GetSize() const;
 
 		/// <summary>
 		/// Returns the number of buffers in the chain
@@ -79,7 +79,8 @@ namespace Weave::D3D11
 	private:
 		ComPtr<IDXGISwapChain1> pSwap;
 		DXGI_SWAP_CHAIN_DESC1 desc;
-		ComPtr<ID3D11RenderTargetView> pBackBuf;
+		ComPtr<ID3D11Resource> pBackBuffer;
+		ComPtr<ID3D11RenderTargetView> pBackBufRTV;
 		RTHandle backBufRt;
 
 		void GetBuffers();

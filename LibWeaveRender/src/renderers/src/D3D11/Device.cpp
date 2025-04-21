@@ -9,7 +9,7 @@ using namespace Weave::D3D11;
 
 Device::Device(Renderer& renderer) : pRenderer(&renderer)
 {
-	ComPtr<ID3D11DeviceContext> pContext;
+	ComPtr<ID3D11DeviceContext> pCtx;
 	ComPtr<ID3D11Device> pDevBase;
 	D3D_CHECK_HR(D3D11CreateDevice(
 		nullptr,
@@ -21,11 +21,11 @@ Device::Device(Renderer& renderer) : pRenderer(&renderer)
 		D3D11_SDK_VERSION,
 		&pDevBase,
 		nullptr,
-		&pContext
+		&pCtx
 	));
 
 	D3D_CHECK_HR(pDevBase->QueryInterface(__uuidof(ID3D11Device1), &pDev));
-	context = Context(*this, std::move(pContext));
+	context = Context(*this, std::move(pCtx));
 }
 
 Renderer& Device::GetRenderer() const { D3D_ASSERT_MSG(pRenderer != nullptr, "Renderer cannot be null."); return *pRenderer; }

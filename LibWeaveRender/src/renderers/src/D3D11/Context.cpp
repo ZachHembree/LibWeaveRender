@@ -13,8 +13,8 @@ Context::Context() :
 	ContextBase()
 { }
 
-Context::Context(Device& dev, ComPtr<ID3D11DeviceContext>&& pContext) :
-	ContextBase(dev, std::move(pContext))
+Context::Context(Device& dev, ComPtr<ID3D11DeviceContext>&& pCtx) :
+	ContextBase(dev, std::move(pCtx))
 { }
 
 Context::Context(Context&&) noexcept = default;
@@ -23,15 +23,7 @@ Context& Context::operator=(Context&&) noexcept = default;
 
 Context::~Context() = default;
 
-/// <summary>
-/// Returns reference to context interface
-/// </summary>
-ID3D11DeviceContext& Context::Get() const { return *pContext.Get(); }
-
-/// <summary>
-/// Returns pointer to context interface
-/// </summary>
-ID3D11DeviceContext* Context::operator->() const { return pContext.Get(); }
+ID3D11DeviceContext* Context::Get() { return pCtx.Get(); }
 
 static void ValidateResourceBounds(
 	IColorBuffer2D& src, 
@@ -51,7 +43,7 @@ static void ValidateResourceBounds(
 		if (dstBox == ivec4(0))
 			dstBox = ivec4(dst.GetSize(), ivec2(0));
 
-		 ivec2
+		 uivec2
 			srcSize(srcBox.x, srcBox.y),
 			dstSize(dstBox.x, dstBox.y),
 			srcOffset(srcBox.z, srcBox.w),
@@ -94,7 +86,7 @@ static bool CanDirectCopy(ITexture2DBase& src, ITexture2DBase& dst, const ivec4&
 	}
 }
 
-static void CopySubresource(Context& ctx, ITexture2DBase& src, ITexture2DBase& dst, ivec4& srcBox, ivec4& dstBox)
+static void CopySubresource(ID3D11DeviceContext* pCtx, ITexture2DBase& src, ITexture2DBase& dst, ivec4& srcBox, ivec4& dstBox)
 {
 	if (srcBox != ivec4(0) || dstBox != ivec4(0))
 	{ 
@@ -110,7 +102,7 @@ static void CopySubresource(Context& ctx, ITexture2DBase& src, ITexture2DBase& d
 			.back = 1u
 		};
 
-		ctx->CopySubresourceRegion(
+		pCtx->CopySubresourceRegion(
 			dst.GetResource(), 0u,
 			(uint)dstBox.z, (uint)dstBox.w, 0u, // Dst start bounds
 			src.GetResource(), 0u, 
@@ -118,7 +110,35 @@ static void CopySubresource(Context& ctx, ITexture2DBase& src, ITexture2DBase& d
 		);
 	}
 	else
-		ctx->CopyResource(dst.GetResource(), src.GetResource());
+		pCtx->CopyResource(dst.GetResource(), src.GetResource());
+}
+
+MappedBufferHandle Context::GetMappedBufferHandle(IBuffer& buf)
+{
+	D3D11_MAP mapFlags = (D3D11_MAP)0;
+
+	if ((uint)(buf.GetAccessFlags() & ResourceAccessFlags::Read))
+		mapFlags = (D3D11_MAP)(mapFlags | D3D11_MAP_READ);
+
+	if ((uint)(buf.GetAccessFlags() & ResourceAccessFlags::Write))
+		mapFlags = (D3D11_MAP)(mapFlags | D3D11_MAP_WRITE);
+
+	D3D11_MAPPED_SUBRESOURCE msr;
+	D3D_CHECK_HR(pCtx->Map(
+		buf.GetResource(),
+		0u,
+		mapFlags,
+		0u,
+		&msr
+	));
+
+	return MappedBufferHandle(buf, msr);
+}
+
+void Context::ReturnMappedBufferHandle(MappedBufferHandle&& handle)
+{
+	D3D_ASSERT_MSG(handle.GetIsValid(), "Attempted to release an invalid buffer handle.");
+	pCtx->Unmap(handle.GetParent().GetResource(), 0u);
 }
 
 /// <summary>
@@ -141,7 +161,7 @@ void Context::Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
 
 	if (CanDirectCopy(src, dst, srcBox, dstBox))
 	{
-		CopySubresource(*this, src, dst, srcBox, dstBox);
+		CopySubresource(pCtx.Get(), src, dst, srcBox, dstBox);
 		return;
 	}
 
@@ -227,7 +247,7 @@ void Context::Blit(ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox, ivec4
 {
 	D3D_CHECK_MSG(CanDirectCopy(src, dst, srcBox, dstBox), "Failed to copy texture. Destination incompatible with source.");
 	ValidateResourceBounds(src, dst, srcBox, dstBox);
-	CopySubresource(*this, src, dst, srcBox, dstBox);
+	CopySubresource(pCtx.Get(), src, dst, srcBox, dstBox);
 }
 
 /// <summary>
@@ -265,17 +285,17 @@ void Context::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 	// Manually set render target if it isn't already set
 	if (dst.GetRTV() != pState->renderTargets[0])
 	{
-		pContext->OMSetRenderTargets(1, dst.GetAddressRTV(), nullptr);
+		pCtx->OMSetRenderTargets(1, dst.GetAddressRTV(), nullptr);
 		wasRtvSet = true;
 	}
 	// Manually set VP if it isn't set
 	if (vp != pState->viewports[0])
 	{
-		pContext->RSSetViewports(1, (D3D11_VIEWPORT*)&vp);
+		pCtx->RSSetViewports(1, (D3D11_VIEWPORT*)&vp);
 		wasVpSet = true;
 	}
 
-	const ivec2 srcRenderSize = vec2(srcBox.x, srcBox.y);
+	const uivec2 srcRenderSize = vec2(srcBox.x, srcBox.y);
 	const vec2 scale = vec2(srcRenderSize) / vec2(src.GetSize()),
 		offset = vec2(srcBox.z, srcBox.w) * vec2(src.GetTexelSize());
 
@@ -292,9 +312,9 @@ void Context::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 
 	// Manually restore previous state if changed
 	if (wasRtvSet)
-		pContext->OMSetRenderTargets(pState->rtCount, pState->renderTargets.GetData(), pState->GetDepthStencilView());
+		pCtx->OMSetRenderTargets(pState->rtCount, pState->renderTargets.GetData(), pState->GetDepthStencilView());
 	if (wasVpSet)
-		pContext->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
+		pCtx->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
 }
 
 

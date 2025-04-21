@@ -11,7 +11,7 @@ SwapChain::SwapChain() : desc({})
 
 SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	DeviceChild(dev),
-	backBufRt(dev, this, &pBackBuf)
+	backBufRt(dev, this, &pBackBuffer, &pBackBufRTV)
 {
 	ComPtr<IDXGIFactory2> dxgiFactory;
 	D3D_CHECK_HR(CreateDXGIFactory1(__uuidof(IDXGIFactory2), &dxgiFactory));
@@ -64,7 +64,7 @@ IDXGISwapChain1** const SwapChain::GetAddressOf() { return pSwap.GetAddressOf();
 /// </summary>
 IDXGISwapChain1* SwapChain::operator->() { return pSwap.Get(); }
 
-ivec2 SwapChain::GetSize() const
+uivec2 SwapChain::GetSize() const
 {
 	ivec2 size(desc.Width, desc.Height);
 	return size;
@@ -99,7 +99,8 @@ void SwapChain::ResizeBuffers(ivec2 dim, uint count, Formats format, uint flags)
 	if (flags == 0)
 		flags = desc.Flags;
 
-	pBackBuf.Reset();
+	pBackBuffer.Reset();
+	pBackBufRTV.Reset();
 	pSwap->ResizeBuffers(count, dim.x, dim.y, (DXGI_FORMAT)format, flags);
 	pSwap->GetDesc1(&desc);
 	GetBuffers();
@@ -115,7 +116,6 @@ void SwapChain::Present(UINT syncInterval, UINT flags)
 
 void SwapChain::GetBuffers()
 {
-	ComPtr<ID3D11Resource> pRes;
-	D3D_ASSERT_HR(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&pRes));
-	D3D_ASSERT_HR(GetDevice()->CreateRenderTargetView(pRes.Get(), nullptr, &pBackBuf));
+	D3D_ASSERT_HR(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&pBackBuffer));
+	D3D_ASSERT_HR(GetDevice()->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pBackBufRTV));
 }

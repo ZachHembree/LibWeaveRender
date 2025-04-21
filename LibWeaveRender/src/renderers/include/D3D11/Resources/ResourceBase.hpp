@@ -41,6 +41,31 @@ namespace Weave::D3D11
 		ResourceBase& operator=(ResourceBase&& other) noexcept;
 	};
 
+	class IBuffer : public virtual IResource
+	{
+	public:
+		/// <summary>
+		/// Specifies buffer usage pattern: dynamic, staging, immutable or default
+		/// </summary>
+		virtual ResourceUsages GetUsage() const = 0;
+
+		/// <summary>
+		/// Specifies what view types for the buffer are valid
+		/// </summary>
+		virtual ResourceBindFlags GetBindFlags() const = 0;
+
+		/// <summary>
+		/// Specifies CPU access type for mappable resource, if applicable
+		/// </summary>
+		virtual ResourceAccessFlags GetAccessFlags() const = 0;
+
+		/// <summary>
+		/// Returns the dimensions of the underlying buffer. Non-applicable dimensions are 
+		/// always set to 1. For 1D buffers, Y == 1 and Z == 1.
+		/// </summary>
+		virtual uivec3 GetDimensions() const = 0;
+	};
+
 	/// <summary>
 	/// Interface for types that can be bound as a shader resource
 	/// </summary>
@@ -62,13 +87,13 @@ namespace Weave::D3D11
 	/// Interface for resource types capable of storing color data in a 2D array, but
 	/// without any specific resource views.
 	/// </summary>
-	class IColorBuffer2D
+	class IColorBuffer2D : public IBuffer
 	{
 	public:
 		/// <summary>
-		/// Returns the dimensions of the underlying buffer
+		/// Returns the dimensions of the underlying 2D texture
 		/// </summary>
-		virtual ivec2 GetSize() const = 0;
+		virtual uivec2 GetSize() const = 0;
 
 		/// <summary>
 		/// Returns combined texel size and dim fp vector.
@@ -83,7 +108,7 @@ namespace Weave::D3D11
 	};
 
 	/// <summary>
-	/// Interface for color buffers that whose bounds can be less than that
+	/// Interface for color buffers whose bounds can be less than that
 	/// of their underlying buffers.
 	/// </summary>
 	class IResizableColorBuffer2D : public virtual IColorBuffer2D
@@ -97,7 +122,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns the size of the render area in pixels
 		/// </summary>
-		virtual ivec2 GetRenderSize() const = 0;
+		virtual uivec2 GetRenderSize() const = 0;
 
 		/// <summary>
 		/// Returns combined scaled (DRS) texel size and dim fp vector.
@@ -188,13 +213,7 @@ namespace Weave::D3D11
 	/// Interface for 2D Textures, without resource views
 	/// </summary>
 	class ITexture2DBase : public virtual IResource, public virtual IColorBuffer2D
-	{
-	public:
-		/// <summary>
-		/// Returns resource usage type
-		/// </summary>
-		virtual ResourceUsages GetUsage() const = 0;
-	};
+	{ };
 
 	/// <summary>
 	/// Interface for 2D Textures, with SRVs

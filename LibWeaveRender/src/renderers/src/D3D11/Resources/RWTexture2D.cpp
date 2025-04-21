@@ -16,7 +16,7 @@ RWTexture2D::RWTexture2D() :
 
 RWTexture2D::RWTexture2D(
 	Device& dev,
-	ivec2 dim,
+	uivec2 dim,
 	Formats format,
 	ResourceUsages usage,
 	ResourceBindFlags bindFlags,
@@ -64,7 +64,7 @@ RWTexture2D::RWTexture2D(
 }
 
 RWTexture2D::RWTexture2D(Device& dev,
-	ivec2 dim,
+	uivec2 dim,
 	void* data,
 	UINT stride,
 	Formats format,
@@ -85,7 +85,7 @@ RWTexture2D::RWTexture2D(Device& dev,
 RWTexture2D::RWTexture2D(
 	Device& dev,
 	Formats format,
-	ivec2 dim,
+	uivec2 dim,
 	UINT mipLevels
 ) :
 	RWTexture2D(
@@ -119,7 +119,7 @@ void RWTexture2D::Clear(ContextBase& ctx, vec4 color)
 	ctx.ClearRenderTarget(*this);
 }
 
-void RWTexture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 srcDim)
+void RWTexture2D::SetTextureData(ContextBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
 {
 	if (srcDim == GetSize())
 	{
@@ -148,7 +148,7 @@ RWTexture2D RWTexture2D::FromImageWIC(Device& dev, wstring_view file)
 	const Image& img = *buf.GetImage(0, 0, 0);
 
 	return RWTexture2D(dev,
-		ivec2(img.width, img.height),
+		uivec2(img.width, img.height),
 		img.pixels,
 		4 * sizeof(uint8_t),
 		Formats::R8G8B8A8_UNORM
