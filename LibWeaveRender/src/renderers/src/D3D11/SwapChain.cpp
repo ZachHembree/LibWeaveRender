@@ -38,7 +38,7 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	desc.Flags = 0;
 
 	D3D_CHECK_HR(dxgiFactory->CreateSwapChainForHwnd(
-		&dev.Get(),
+		dev.Get(),
 		wnd.GetWndHandle(),
 		&desc,
 		&fsDesc,

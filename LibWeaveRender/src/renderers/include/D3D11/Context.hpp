@@ -12,15 +12,13 @@ namespace Weave::D3D11
 	public:
 		Context();
 
-		Context(Device& dev, ComPtr<ID3D11DeviceContext>&& pCtx);
+		Context(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx);
 
 		Context(Context&&) noexcept;
 
 		Context& operator=(Context&&) noexcept;
 
 		~Context();
-
-		ID3D11DeviceContext* Get();
 
 		/// <summary>
 		/// Returns a handle for reading and or writing the given buffer, based on the 

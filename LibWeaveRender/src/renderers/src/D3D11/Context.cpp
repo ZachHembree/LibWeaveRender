@@ -13,7 +13,7 @@ Context::Context() :
 	ContextBase()
 { }
 
-Context::Context(Device& dev, ComPtr<ID3D11DeviceContext>&& pCtx) :
+Context::Context(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx) :
 	ContextBase(dev, std::move(pCtx))
 { }
 
@@ -22,8 +22,6 @@ Context::Context(Context&&) noexcept = default;
 Context& Context::operator=(Context&&) noexcept = default;
 
 Context::~Context() = default;
-
-ID3D11DeviceContext* Context::Get() { return pCtx.Get(); }
 
 static void ValidateResourceBounds(
 	IColorBuffer2D& src, 

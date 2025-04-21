@@ -15,7 +15,7 @@ using namespace Weave::D3D11;
 
 ContextBase::ContextBase() = default;
 
-ContextBase::ContextBase(Device& dev, ComPtr<ID3D11DeviceContext>&& pCtx) :
+ContextBase::ContextBase(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx) :
 	DeviceChild(dev),
 	pCtx(std::move(pCtx)),
 	pState(new ContextState())

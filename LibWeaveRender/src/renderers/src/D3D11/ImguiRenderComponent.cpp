@@ -17,7 +17,7 @@ ImguiRenderComponent::ImguiRenderComponent(Renderer& renderer) :
 	enableDemoWindow(false)
 {
 	Device& dev = renderer.GetDevice();
-	ImGui_ImplDX11_Init(&dev.Get(), dev.GetContext().Get());
+	ImGui_ImplDX11_Init(dev.Get(), dev.GetImmediateContext());
 }
 
 ImguiRenderComponent::~ImguiRenderComponent()

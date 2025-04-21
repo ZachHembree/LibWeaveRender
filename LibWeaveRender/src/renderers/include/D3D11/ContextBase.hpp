@@ -207,12 +207,12 @@ namespace Weave::D3D11
 		void Reset();
 
 	protected:
-		ComPtr<ID3D11DeviceContext> pCtx;
+		ComPtr<ID3D11DeviceContext1> pCtx;
 		std::unique_ptr<ContextState> pState;
 
 		ContextBase();
 
-		ContextBase(Device& dev, ComPtr<ID3D11DeviceContext>&& pCtx);
+		ContextBase(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx);
 
 		ContextBase(ContextBase&&) noexcept;
 
