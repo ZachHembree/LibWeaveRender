@@ -10,6 +10,8 @@ namespace Weave
 	class DataBufferSpan : public Span<DataT>
 	{
 	public:
+		MAKE_NO_COPY(DataBufferSpan);
+
 		DataBufferSpan() : pParent(nullptr)
 		{ }
 
@@ -18,7 +20,19 @@ namespace Weave
 			pParent(pParent)
 		{ }
 
+		DataBufferSpan(DataBufferSpan&&) noexcept = default;
+
+		DataBufferSpan& operator=(DataBufferSpan&&) noexcept = default;
+
+		/// <summary>
+		/// Reference to the owner of the buffer
+		/// </summary>
 		HandleT& GetParent() { return *pParent; }
+
+		/// <summary>
+		/// Returns true of the handle is valid and initialized.
+		/// </summary>
+		bool GetIsValid() const { return pParent != nullptr; }
 
 	protected:
 		HandleT* pParent;
