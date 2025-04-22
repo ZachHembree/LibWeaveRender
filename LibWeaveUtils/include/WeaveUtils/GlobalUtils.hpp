@@ -7,6 +7,7 @@
 #define MAKE_NO_COPY(Type) \
     Type(const Type&) = delete; \
     Type& operator=(const Type&) = delete;  
+// Deletes move operations
 #define MAKE_NO_MOVE(Type) \
     Type(Type&&) = delete; \
     Type& operator=(Type&&) = delete;
@@ -14,9 +15,11 @@
 #define MAKE_DEF_COPY(Type) \
     Type(const Type&) = default; \
     Type& operator=(const Type&) = default;  
+// Defaults move operations
 #define MAKE_DEF_MOVE(Type) \
     Type(Type&&) noexcept = default; \
     Type& operator=(Type&&) noexcept = default;
+// Defaults move and copy operators
 #define MAKE_DEF_MOVE_COPY(Type) \
     MAKE_DEF_COPY(Type) \
     MAKE_DEF_MOVE(Type)
@@ -24,10 +27,11 @@
 #define MAKE_MOVE_ONLY(Type) \
     MAKE_NO_COPY(Type) \
     MAKE_DEF_MOVE(Type)
+// Defaults copy operations and deletes move operations
 #define MAKE_COPY_ONLY(Type) \
     MAKE_DEF_COPY(Type)  \
     MAKE_NO_MOVE(Type)
-// Delete copy and move
+// Deletes copy and move operations
 #define MAKE_IMMOVABLE(Type) \
     MAKE_NO_COPY(Type) \
     MAKE_NO_MOVE(Type)
@@ -39,12 +43,30 @@
     MAKE_DEF_MOVE_COPY(Type) \
     USE_DEFAULT_CMP(Type) 
 
-// Creates an alloca stack array
-#define ALLOCA_ARR(ARR_PTR, COUNT, TYPE) TYPE* ARR_PTR = (TYPE*)alloca(COUNT * sizeof(TYPE));
-// Creates an alloca stack array and fills is with nulls
-#define ALLOCA_ARR_NULL(ARR_PTR, COUNT, TYPE) \
-    TYPE* ARR_PTR = (TYPE*)alloca(COUNT * sizeof(TYPE)); \
-    memset( ARR_PTR, 0u, (COUNT * sizeof(TYPE)) );
+/*
+    Allocates temporary stack allocated array with alloca and assigns it to the given pointer.
+
+    Alloca arrays are allocated on the stack frame of the calling function. When that function
+    returns, the array is deallocated.
+*/
+#define ALLOCA_ARR_SET(ARR_PTR, COUNT, TYPE)\
+    do { \
+    ARR_PTR = (TYPE*)alloca(COUNT * sizeof(TYPE)); \
+    } while(0)
+
+/*
+    Allocates temporary stack allocated array with alloca, fills is with nulls, and assigns 
+    it to the given pointer
+
+    Alloca arrays are allocated on the stack frame of the calling function. When that function
+    returns, the array is deallocated.
+*/
+#define ALLOCA_ARR_SET_NULL(ARR_PTR, COUNT, TYPE) \
+    do { \
+    TYPE* ARR_PTR##_INT = (TYPE*)alloca(COUNT * sizeof(TYPE)); \
+    memset( ARR_PTR##_INT, 0u, (COUNT * sizeof(TYPE)) ); \
+    ARR_PTR = ARR_PTR##_INT; \
+    } while(0)
 
 // Concept to constrain templates to enum types
 template <typename T>

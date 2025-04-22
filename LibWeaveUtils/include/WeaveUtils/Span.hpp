@@ -3,14 +3,28 @@
 #include "DynamicCollections.hpp"
 #include <array>
 
-// Allocates temporary stack allocated array with alloca, and wraps it in a span
-#define ALLOCA_SPAN(SPAN, COUNT, TYPE) \
-	ALLOCA_ARR(SPAN##_TMP_PTR, COUNT, TYPE) \
-	Span<TYPE> SPAN(SPAN##_TMP_PTR, COUNT);
-// Allocates temporary stack allocated array with alloca, fills it with nulls, and wraps it in a span
-#define ALLOCA_SPAN_NULL(SPAN, COUNT, TYPE) \
-	ALLOCA_ARR_NULL(SPAN##_TMP_PTR, COUNT, TYPE) \
-	Span<TYPE> SPAN(SPAN##_TMP_PTR, COUNT);
+/*
+	Allocates temporary stack allocated array with alloca and assigns it to an exiting span.
+
+	Alloca arrays are allocated on the stack frame of the calling function. When that function
+	returns, the array is deallocated.
+*/
+#define ALLOCA_SPAN_SET(SPAN, COUNT, TYPE) \
+	do { TYPE* SPAN##_TMP_PTR; ALLOCA_ARR_SET(SPAN##_TMP_PTR, COUNT, TYPE); \
+	SPAN = Span<TYPE>(SPAN##_TMP_PTR, COUNT); } \
+while (0)
+
+/*
+	Allocates temporary stack allocated array with alloca, fils it with nulls, and assigns 
+	it to an exiting span.
+
+	Alloca arrays are allocated on the stack frame of the calling function. When that function
+	returns, the array is deallocated.
+*/
+#define ALLOCA_SPAN_SET_NULL(SPAN, COUNT, TYPE) \
+	do { TYPE* SPAN##_TMP_PTR; ALLOCA_ARR_SET_NULL(SPAN##_TMP_PTR, COUNT, TYPE); \
+	SPAN = Span<TYPE>(SPAN##_TMP_PTR, COUNT); } \
+while (0)
 
 namespace Weave
 { 
