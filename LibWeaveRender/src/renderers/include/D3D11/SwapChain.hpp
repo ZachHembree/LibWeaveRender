@@ -74,7 +74,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Presents rendered image with the given synchronization settings
 		/// </summary>
-		void Present(UINT syncInterval, UINT flags);
+		void Present(uint syncInterval, uint flags);
 
 	private:
 		ComPtr<IDXGISwapChain1> pSwap;

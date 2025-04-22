@@ -255,10 +255,12 @@ void Renderer::Update()
 	DrawLate(ctx);
 
 	// Present frame
-	pSwap->Present(1u, 0);
-	ctx.UnbindRenderTargets();
+	ctx.Present(*pSwap, 1, 0);
 
 	AfterDraw(ctx);
+
+	// ImGUI nulls shaders after draw, leaving the state cache out of sync
+	ctx.ResetShaders();
 }
 
 void Renderer::BeforeDraw(CtxImm& ctx)

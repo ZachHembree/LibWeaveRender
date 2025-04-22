@@ -3,6 +3,7 @@
 #include "D3D11/CtxImm.hpp"
 #include "D3D11/ContextState.hpp"
 #include "D3D11/Resources/MappedBufferHandle.hpp"
+#include "D3D11/SwapChain.hpp"
 
 using namespace glm;
 using namespace Weave;
@@ -44,4 +45,11 @@ MappedBufferHandle CtxImm::GetMappedBufferHandle(IBuffer& buf)
 	));
 
 	return MappedBufferHandle(buf, msr);
+}
+
+void CtxImm::Present(SwapChain& swap, uint syncInterval, uint flags)
+{
+	Span<IRenderTarget*> nullRT;
+	swap->Present(syncInterval, flags);
+	pState->TryUpdateRenderTargets(nullRT, 0);
 }

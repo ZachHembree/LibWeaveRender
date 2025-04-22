@@ -25,5 +25,10 @@ namespace Weave::D3D11
 		/// buffer's usage type.
 		/// </summary>
 		MappedBufferHandle GetMappedBufferHandle(IBuffer& buffer);
+
+		/// <summary>
+		/// Presents rendered image with the given synchronization settings
+		/// </summary>
+		void Present(SwapChain& swap, uint syncInterval, uint flags);
 	};
 }

@@ -755,7 +755,6 @@ void CtxBase::Reset()
 	UnbindViewports();
 }
 
-
 bool CtxBase::GetIsImmediate() const { return isImmediate; }
 
 const uint CtxBase::GetViewportCount() const { return (uint)pState->vpCount; }
