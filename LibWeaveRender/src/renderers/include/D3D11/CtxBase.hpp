@@ -282,16 +282,6 @@ namespace Weave::D3D11
 		void BindResources(const ComputeShaderVariant& shader, const ResourceSet& resSrc);
 
 		/// <summary>
-		/// Unbinds subtype-specific resources to the pipeline
-		/// </summary>
-		void UnbindResources(const VertexShaderVariant& shader);
-
-		/// <summary>
-		/// Unbinds subtype-specific resources to the pipeline
-		/// </summary>
-		void UnbindResources(const ComputeShaderVariant& shader);
-
-		/// <summary>
 		/// Binds the given collection of viewports to the rasterizer stage
 		/// </summary>
 		void BindViewports(const IDynamicArray<Viewport>& viewports, sint offset = 0);
@@ -310,5 +300,11 @@ namespace Weave::D3D11
 		/// Unbinds the given range of viewports. Unbinds all viewports if count == (uint)-1
 		/// </summary>
 		void UnbindViewports(sint index = 0, uint count = (uint)-1);
+
+		/// <summary>
+		/// Resolves conflicts identified by the state cache by appropriately transitioning resource state or 
+		/// raising an error.
+		/// </summary>
+		void HandleConflicts();
 	};
 }

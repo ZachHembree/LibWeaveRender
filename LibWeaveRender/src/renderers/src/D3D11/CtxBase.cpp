@@ -37,7 +37,7 @@ void CtxBase::BindDepthStencilBuffer(IDepthStencil& depthStencil)
 	{
 		pState->pDepthStencil = &depthStencil;
 		pCtx->OMSetDepthStencilState(depthStencil.GetState(), 1u);
-		pCtx->OMSetRenderTargets(pState->rtCount, pState->renderTargets.GetData(), depthStencil.GetDSV());
+		pCtx->OMSetRenderTargets(pState->rtCount, pState->rtvs.GetData(), depthStencil.GetDSV());
 	}
 }
 
@@ -47,7 +47,7 @@ void CtxBase::UnbindDepthStencilBuffer()
 	{
 		pState->pDepthStencil = nullptr;
 		pCtx->OMSetDepthStencilState(nullptr, 1);
-		pCtx->OMSetRenderTargets(pState->rtCount, pState->renderTargets.GetData(), nullptr);
+		pCtx->OMSetRenderTargets(pState->rtCount, pState->rtvs.GetData(), nullptr);
 	}
 }
 
@@ -79,7 +79,7 @@ static bool TryUpdateRTV(ContextState& state, IDynamicArray<IRenderTarget>& rts,
 		wasChanged = true;
 	}
 
-	Span rtvState(&state.renderTargets[offset], newCount);
+	Span rtvState(&state.rtvs[offset], newCount);
 
 	for (uint i = 0; i < newCount; i++)
 	{
@@ -129,7 +129,7 @@ void CtxBase::BindRenderTargets(IDynamicArray<IRenderTarget>& rts, sint startSlo
 		"Number of render targets supplied exceeds limit.");
 
 	if (TryUpdateRTV(*pState, rts, startSlot))
-		pCtx->OMSetRenderTargets(pState->rtCount, pState->renderTargets.GetData(), pState->GetDepthStencilView());
+		pCtx->OMSetRenderTargets(pState->rtCount, pState->rtvs.GetData(), pState->GetDepthStencilView());
 
 	if (TryUpdateViewports(*pState, rts, startSlot))
 		pCtx->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
@@ -153,7 +153,7 @@ void CtxBase::BindRenderTargets(IDynamicArray<IRenderTarget>& rts, IDepthStencil
 	const bool wasRtvChanged = TryUpdateRTV(*pState, rts, startSlot);
 
 	if (wasDsChanged || wasRtvChanged)
-		pCtx->OMSetRenderTargets(pState->rtCount, pState->renderTargets.GetData(), pState->GetDepthStencilView());
+		pCtx->OMSetRenderTargets(pState->rtCount, pState->rtvs.GetData(), pState->GetDepthStencilView());
 		
 	if (TryUpdateViewports(*pState, rts, startSlot))
 		pCtx->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
@@ -175,7 +175,7 @@ void CtxBase::UnbindRenderTargets(sint startSlot, uint count)
 		count = pState->rtCount;
 	}
 
-	SetArrNull(pState->renderTargets, startSlot, count);
+	SetArrNull(pState->rtvs, startSlot, count);
 	
 	if ((startSlot + count) == pState->rtCount)
 		pState->rtCount = startSlot;
@@ -187,7 +187,7 @@ void CtxBase::UnbindRenderTargets(sint startSlot, uint count)
 		pCtx->OMSetRenderTargets(0, nullptr, nullptr);
 	}
 	else
-		pCtx->OMSetRenderTargets(startSlot, pState->renderTargets.GetData(), pState->GetDepthStencilView());
+		pCtx->OMSetRenderTargets(startSlot, pState->rtvs.GetData(), pState->GetDepthStencilView());
 }
 
 void CtxBase::SetPrimitiveTopology(PrimTopology topology)
@@ -293,22 +293,36 @@ bool CtxBase::GetIsBound(const ShaderVariantBase& shader) const
 	return pState->GetStage(stage).pShader == &shader;
 }
 
+void CtxBase::HandleConflicts()
+{
+	const ContextState::ConflictState conflicts = pState->TryResolveConflicts();
+	
+	// This currently allows all conflicts to be set to null without raising an error. For view state 
+	// transitions, this is appropriate. For other cases, it is not.
+	if (!conflicts.IsEmpty())
+	{
+		for (uint i = 0; i < g_ShadeStageCount; i++)
+		{
+			const ShadeStages stage = (ShadeStages)i;
+			const ContextState::StageState& ss = pState->GetStage(stage);
+
+			if (conflicts.srvsExtent[i] > 0)
+				SetShaderResources(pCtx.Get(), stage, 0, conflicts.srvsExtent[i], ss.srvs.GetData());
+		}
+
+		if (conflicts.uavsExtent > 0)
+			CSSetUnorderedAccessViews(pCtx.Get(), 0, conflicts.uavsExtent, pState->uavs.GetData());
+
+		if (conflicts.rtvExtent > 0)
+			pCtx->OMSetRenderTargets(conflicts.rtvExtent, pState->rtvs.GetData(), pState->GetDepthStencilView());
+	}
+}
+
 void CtxBase::BindResources(const ComputeShaderVariant& shader, const ResourceSet& resSrc)
 {
 	if (const uint updateCount = pState->TryUpdateResources(resSrc.GetUAVs(), shader.GetUAVMap()); updateCount > 0)
 	{
-		for (uint i = 0; i < (uint)ShadeStages::Compute; i++) // Clear all potentially conflicting SRVs
-		{
-			ContextState::StageState& ss = pState->GetStage((ShadeStages)i);
-
-			if (ss.srvCount > 0)
-			{
-				SetArrNull(ss.srvs, ss.srvCount);
-				SetShaderResources(pCtx.Get(), ss.stage, 0, ss.srvCount, ss.srvs.GetData());
-				ss.srvCount = 0;
-			}
-		}
-
+		HandleConflicts();
 		CSSetUnorderedAccessViews(pCtx.Get(), 0, updateCount, pState->uavs.GetData());
 	}
 }
@@ -356,14 +370,8 @@ void CtxBase::BindShader(const ShaderVariantBase& shader, const ResourceSet& res
 	// Bind Shader Resource Views (SRVs)
 	if (const uint updateCount = pState->TryUpdateResources(stage, resSrc.GetSRVs(), shader.GetSRVMap()); updateCount > 0)
 	{ 
-		if (pState->uavCount > 0) // Clear all potentially conflicting UAVs
-		{
-			SetArrNull(pState->uavs, pState->uavCount);
-			CSSetUnorderedAccessViews(pCtx.Get(), 0, pState->uavCount, pState->uavs.GetData());
-			pState->uavCount = 0;
-		}
-
-		SetShaderResources(pCtx.Get(), stage, 0, updateCount, ss.srvs.GetData()); 
+		HandleConflicts();
+		SetShaderResources(pCtx.Get(), stage, 0, updateCount, ss.srvs.GetData());
 	}
 
 	// CS specific handling
@@ -372,23 +380,6 @@ void CtxBase::BindShader(const ShaderVariantBase& shader, const ResourceSet& res
 	// VS specific handling
 	else if (stage == ShadeStages::Vertex)
 		BindResources(static_cast<const VertexShaderVariant&>(shader), resSrc);
-}
-
-void CtxBase::UnbindResources(const ComputeShaderVariant& shader)
-{
-	// Unbind Unordered Access Views (UAVs)
-	if (shader.GetUAVMap() != nullptr)
-	{
-		SetArrNull(pState->uavs, pState->uavCount);
-		CSSetUnorderedAccessViews(pCtx.Get(), 0, pState->uavCount, pState->uavs.GetData());
-		pState->uavCount = 0;
-	}
-}
-
-void CtxBase::UnbindResources(const VertexShaderVariant& shader)
-{
-	pState->pInputLayout = nullptr;
-	pCtx->IASetInputLayout(pState->pInputLayout);
 }
 
 void CtxBase::UnbindShader(const ShaderVariantBase& shader)
@@ -771,7 +762,7 @@ void CtxBase::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 	bool wasVpSet = false;
 
 	// Manually set render target if it isn't already set
-	if (dst.GetRTV() != pState->renderTargets[0])
+	if (dst.GetRTV() != pState->rtvs[0])
 	{
 		pCtx->OMSetRenderTargets(1, dst.GetAddressRTV(), nullptr);
 		wasRtvSet = true;
@@ -800,7 +791,7 @@ void CtxBase::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 
 	// Manually restore previous state if changed
 	if (wasRtvSet)
-		pCtx->OMSetRenderTargets(pState->rtCount, pState->renderTargets.GetData(), pState->GetDepthStencilView());
+		pCtx->OMSetRenderTargets(pState->rtCount, pState->rtvs.GetData(), pState->GetDepthStencilView());
 	if (wasVpSet)
 		pCtx->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
 }
