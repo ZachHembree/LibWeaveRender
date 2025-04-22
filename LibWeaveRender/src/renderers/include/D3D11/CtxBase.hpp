@@ -42,6 +42,8 @@ namespace Weave::D3D11
 	public:
 		MAKE_NO_COPY(CtxBase);
 
+		using ActiveShaderSet = std::array<bool, 5>;
+
 		/// <summary>
 		/// Returns true if the context is immediate, or false if deferred.
 		/// </summary>
@@ -162,6 +164,11 @@ namespace Weave::D3D11
 		/// Unbinds the shader and resources in the given shading stage
 		/// </summary>
 		void UnbindStage(ShadeStages stage);
+
+		/// <summary>
+		/// Unbinds stages in the set marked as inactive
+		/// </summary>
+		void UnbindInactiveStages(ActiveShaderSet activeShaders);
 
 		/// <summary>
 		/// Dispatches a compute shader with the given number of thread groups and resources

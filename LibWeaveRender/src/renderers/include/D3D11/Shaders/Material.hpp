@@ -35,11 +35,6 @@ namespace Weave::D3D11
 		/// </summary>
 		void Setup(CtxBase& ctx, int pass);
 
-		/// <summary>
-		/// Cleans up state of the given pass
-		/// </summary>
-		void Reset(CtxBase& ctx, int pass);
-
 	private:
 		mutable const EffectVariant* pEffect;
 

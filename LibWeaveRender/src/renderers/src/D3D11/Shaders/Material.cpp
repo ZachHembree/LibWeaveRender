@@ -26,8 +26,6 @@ uint Material::GetShaderCount(int pass) const { return GetEffect().GetShaderCoun
 
 void Material::Setup(CtxBase& ctx, int pass) { GetEffect().Setup(ctx, pass, *pRes); }
 
-void Material::Reset(CtxBase& ctx, int pass) { GetEffect().Reset(ctx, pass); }
-
 const EffectVariant& Material::GetEffect() const 
 { 
 	D3D_ASSERT_MSG(nameID != -1, "Cannot access null effect");

@@ -304,6 +304,15 @@ void CtxBase::UnbindStage(ShadeStages stage)
 		SetShader(pCtx.Get(), stage, nullptr, nullptr, 0);
 }
 
+void CtxBase::UnbindInactiveStages(ActiveShaderSet activeShaders)
+{
+	for (uint i = 0; i < activeShaders.size(); i++)
+	{		
+		if (!activeShaders[i])
+			UnbindStage((ShadeStages)i);
+	}
+}
+
 void CtxBase::Dispatch(const ComputeShaderVariant& cs, ivec3 groups, const ResourceSet& res) 
 {
 	BindShader(cs, res);
@@ -326,7 +335,6 @@ void CtxBase::Draw(IDynamicArray<Mesh>& meshes, Material& mat)
 		{
 			mat.Setup(*this, pass);
 			pCtx->DrawIndexed(mesh.GetIndexCount(), 0, 0);
-			mat.Reset(*this, pass);
 		}
 	}
 }

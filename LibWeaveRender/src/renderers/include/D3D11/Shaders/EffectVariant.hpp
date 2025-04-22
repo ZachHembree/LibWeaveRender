@@ -40,8 +40,6 @@ namespace Weave::D3D11
 
 		void Setup(CtxBase& ctx, int pass, const ResourceSet& res) const;
 
-		void Reset(CtxBase& ctx, int pass) const;
-
 	private:
 		using PassHandle = UniqueArray<const ShaderVariantBase*>;
 

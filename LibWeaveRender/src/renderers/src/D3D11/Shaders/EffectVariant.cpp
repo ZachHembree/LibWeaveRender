@@ -50,7 +50,6 @@ uint EffectVariant::GetNameID() const { return def.GetNameID(); }
 /// <summary>
 /// Returns the number of passes in the effect
 /// </summary>
-/// <returns></returns>
 uint EffectVariant::GetPassCount() const { return (uint)def.GetPassCount(); }
 
 /// <summary>
@@ -60,18 +59,14 @@ uint EffectVariant::GetShaderCount(const int pass) const { return (uint)def.GetS
 
 void EffectVariant::Setup(CtxBase& ctx, int pass, const ResourceSet& res) const
 {
+	CtxBase::ActiveShaderSet activeStages = {};
+
 	for (int i = 0; i < passes[pass].GetLength(); i++)
 	{
 		const ShaderVariantBase& shader = *passes[pass][i];
 		ctx.BindShader(shader, res);
+		activeStages[(uint)shader.GetStage()] = true;
 	}
-}
 
-void EffectVariant::Reset(CtxBase& ctx, int pass) const
-{
-	for (int i = 0; i < passes[pass].GetLength(); i++)
-	{
-		const ShaderVariantBase& shader = *passes[pass][i];
-		ctx.UnbindShader(shader);
-	}
+	ctx.UnbindInactiveStages(activeStages);
 }
