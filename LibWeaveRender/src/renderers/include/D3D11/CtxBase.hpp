@@ -282,26 +282,6 @@ namespace Weave::D3D11
 		void BindResources(const ComputeShaderVariant& shader, const ResourceSet& resSrc);
 
 		/// <summary>
-		/// Binds the given collection of viewports to the rasterizer stage
-		/// </summary>
-		void BindViewports(const IDynamicArray<Viewport>& viewports, sint offset = 0);
-
-		/// <summary>
-		/// Binds the given viewport to the rasterizer stage
-		/// </summary>
-		void BindViewport(sint index, const vec2& size, const vec2& offset = vec2(0, 0), const vec2& depth = vec2(0, 1));
-
-		/// <summary>
-		/// Binds the given viewport to the rasterizer stage
-		/// </summary>
-		void BindViewport(sint index, const Viewport& vp);
-
-		/// <summary>
-		/// Unbinds the given range of viewports. Unbinds all viewports if count == (uint)-1
-		/// </summary>
-		void UnbindViewports(sint index = 0, uint count = (uint)-1);
-
-		/// <summary>
 		/// Resolves conflicts identified by the state cache by appropriately transitioning resource state or 
 		/// raising an error.
 		/// </summary>

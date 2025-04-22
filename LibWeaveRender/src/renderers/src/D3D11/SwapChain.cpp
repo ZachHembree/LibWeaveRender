@@ -109,9 +109,9 @@ void SwapChain::ResizeBuffers(ivec2 dim, uint count, Formats format, uint flags)
 /// <summary>
 /// Presents rendered image with the given synchronization settings
 /// </summary>
-void SwapChain::Present(uint syncInterval, uint flags)
+void SwapChain::Present(CtxImm& ctx, uint syncInterval, uint flags)
 {
-	D3D_ASSERT_HR(pSwap->Present(syncInterval, flags));
+	ctx.Present(*this, syncInterval, flags);
 }
 
 void SwapChain::GetBuffers()

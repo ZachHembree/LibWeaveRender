@@ -12,6 +12,7 @@ namespace Weave
 namespace Weave::D3D11
 {
 	class RTHandle;
+	class CtxImm;
 
 	class SwapChain : public DeviceChild
 	{
@@ -74,7 +75,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Presents rendered image with the given synchronization settings
 		/// </summary>
-		void Present(uint syncInterval, uint flags);
+		void Present(CtxImm& ctx, uint syncInterval, uint flags);
 
 	private:
 		ComPtr<IDXGISwapChain1> pSwap;

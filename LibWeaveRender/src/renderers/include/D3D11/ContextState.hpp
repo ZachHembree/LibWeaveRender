@@ -29,16 +29,6 @@ namespace Weave::D3D11
 	public:
 		MAKE_NO_COPY(ContextState);
 
-		// Cache array subtype aliases
-		using SamplerList = IDynamicArray<Sampler*>;
-		using CBufList = IDynamicArray<ID3D11Buffer*>;
-		using SRVList = IDynamicArray<IShaderResource*>;
-		using UAVList = IDynamicArray<IUnorderedAccess*>;
-
-		using RenderTargetList = IDynamicArray<ID3D11RenderTargetView*>;
-		using ViewportList = IDynamicArray<Viewport>;
-		using VertexBufList = IDynamicArray<VertexBuffer*>;
-
 		/// <summary>
 		/// Resource type usages tracked for internal conflict detection.
 		/// </summary>
@@ -60,19 +50,26 @@ namespace Weave::D3D11
 		struct StageState
 		{
 			ShadeStages stage;
-
 			const ShaderVariantBase* pShader;
-			UniqueArray<Sampler*> samplers;
-			UniqueArray<ID3D11Buffer*> cbuffers;
-			UniqueArray<IShaderResource*> srvs;
 
+			UniqueArray<Sampler*> samplers;
 			uint sampCount;
+
+			UniqueArray<ID3D11Buffer*> cbuffers;
 			uint cbufCount;
+
+			UniqueArray<IShaderResource*> srvs;
 			uint srvCount;
 
 			StageState();
 
 			void Reset();
+
+			const Span<Sampler*> GetSamplers(sint offset = 0, uint extent = (uint)-1) const;
+
+			const Span<ID3D11Buffer*> GetCBuffers(sint offset = 0, uint extent = (uint)-1) const;
+
+			const Span<IShaderResource*> GetSRVs(sint offset = 0, uint extent = (uint)-1) const;
 		};
 
 		/// <summary>
@@ -103,30 +100,6 @@ namespace Weave::D3D11
 			bool IsEmpty() const;
 		};
 
-		UniqueArray<StageState> stages;
-
-		PrimTopology topology;
-		ID3D11InputLayout* pInputLayout;
-		ID3D11Buffer* pIndexBuffer;
-
-		UniqueArray<ID3D11Buffer*> vertexBuffers;
-		uint vertBufCount;
-		UniqueArray<uint> vbStrides;
-		UniqueArray<uint> vbOffsets;
-
-		IDepthStencil* pDepthStencil;
-		ID3D11BlendState* pBlendState;
-		ID3D11RasterizerState* pRasterState;
-
-		UniqueArray<IUnorderedAccess*> uavs;
-		uint uavCount;
-
-		UniqueArray<IRenderTarget*> rtvs;
-		uint rtCount;
-
-		UniqueArray<Viewport> viewports;
-		uint vpCount;
-
 		ContextState();
 
 		ContextState(ContextState&& other) noexcept;
@@ -155,6 +128,24 @@ namespace Weave::D3D11
 		/// </summary>
 		const StageState& GetStage(ShadeStages stage) const;
 
+		const Span<IRenderTarget*> GetRenderTargets() const;
+
+		IDepthStencil* GetDepthStencil() const;
+
+		const Span<Viewport> GetViewports();
+
+		ID3D11Buffer* GetIndexBuffer() const;
+
+		ID3D11InputLayout* GetInputLayout() const;
+
+		const Span<ID3D11Buffer*> GetVertexBuffers() const;
+
+		const Span<uint> GetVertStrides() const;
+
+		const Span<uint> GetVertOffsets() const;
+
+		const Span<IUnorderedAccess*> CSGetUAVs(sint offset = 0, uint extent = (uint)-1) const;
+
 		/// <summary>
 		/// Returns interface to depth stencil resource view
 		/// </summary>
@@ -169,6 +160,31 @@ namespace Weave::D3D11
 		/// Returns the depth range, e.g. [0, 1] used for depth testing
 		/// </summary>
 		vec2 GetDepthStencilRange() const;
+
+		/// <summary>
+		/// Updates state cache with the given primitive topology. Returns true if a change occured.
+		/// </summary>
+		bool TryUpdateTopology(PrimTopology topology);
+
+		/// <summary>
+		/// Assigns the given vertex buffers to the state cache. Returns the extent of the range changed.
+		/// </summary>
+		uint TryUpdateVertexBuffers(IDynamicArray<VertexBuffer>& vertBuffers, sint startSlot);
+
+		/// <summary>
+		/// Clears the given range of vertex buffers. Returns the extent of the range changed.
+		/// </summary>
+		uint TryResetVertexBuffers(sint startSlot = 0, uint count = (uint)-1);
+
+		/// <summary>
+		/// Updates the state cache with the given index buffer. Returns true if a change occured.
+		/// </summary>
+		bool TryUpdateIndexBuffer(ID3D11Buffer* pIndexBuffer);
+
+		/// <summary>
+		/// Updates the vertex input layout in the state cache. Returns true if a change occured.
+		/// </summary>
+		bool TryUpdateInputLayout(ID3D11InputLayout* pLayout);
 
 		/// <summary>
 		/// Updates the shader for the given stage in the cache and returns true if a change was made.
@@ -194,28 +210,28 @@ namespace Weave::D3D11
 		bool TryUpdateViewports();
 
 		/// <summary>
-		/// Updates resources bound in the state cache and returns the size of the bound resource range
-		/// affected that requires update.
+		/// Updates resources bound in the state cache and returns the resource range affected that 
+		/// requires update.
 		/// </summary>
-		uint TryUpdateResources(ShadeStages stage, IDynamicArray<ConstantBuffer>& cbufs);
+		const Span<ID3D11Buffer*> TryUpdateResources(ShadeStages stage, IDynamicArray<ConstantBuffer>& cbufs);
 
 		/// <summary>
-		/// Updates resources bound in the state cache and returns the size of the bound resource range
-		/// affected that requires update.
+		/// Updates resources bound in the state cache and returns the resource range affected that 
+		/// requires update.
 		/// </summary>
-		uint TryUpdateResources(ShadeStages stage, const ResourceSet::SamplerList& resSrc, const SamplerMap* pMap);
+		const Span<Sampler*> TryUpdateResources(ShadeStages stage, const ResourceSet::SamplerList& resSrc, const SamplerMap* pMap);
 
 		/// <summary>
-		/// Updates resources bound in the state cache and returns the size of the bound resource range
-		/// affected that requires update.
+		/// Updates resources bound in the state cache and returns the resource range affected that 
+		/// requires update.
 		/// </summary>
-		uint TryUpdateResources(ShadeStages stage, const ResourceSet::SRVList& resSrc, const ResourceViewMap* pMap);
+		const Span<IShaderResource*> TryUpdateResources(ShadeStages stage, const ResourceSet::SRVList& resSrc, const ResourceViewMap* pMap);
 
 		/// <summary>
-		/// Updates resources bound in the state cache and returns the size of the bound resource range
-		/// affected that requires update.
+		/// Updates resources bound in the state cache and returns the resource range affected that 
+		/// requires update.
 		/// </summary>
-		uint TryUpdateResources(const ResourceSet::UAVList& resSrc, const UnorderedAccessMap* pMap);
+		const Span<IUnorderedAccess*> TryUpdateResources(const ResourceSet::UAVList& resSrc, const UnorderedAccessMap* pMap);
 
 		/// <summary>
 		/// Attempts to resolve any conflicts in cache by setting them to null. Returns a state object with counters
@@ -289,6 +305,30 @@ namespace Weave::D3D11
 			UsageList uses;
 			SlotList slots;
 		};
+
+		UniqueArray<StageState> stages;
+
+		PrimTopology topology;
+		ID3D11InputLayout* pInputLayout;
+		ID3D11Buffer* pIndexBuffer;
+
+		UniqueArray<ID3D11Buffer*> vertexBuffers;
+		uint vertBufCount;
+		UniqueArray<uint> vbStrides;
+		UniqueArray<uint> vbOffsets;
+
+		IDepthStencil* pDepthStencil;
+		ID3D11BlendState* pBlendState;
+		ID3D11RasterizerState* pRasterState;
+
+		UniqueArray<IUnorderedAccess*> uavs;
+		uint uavCount;
+
+		UniqueArray<IRenderTarget*> rtvs;
+		uint rtCount;
+
+		UniqueArray<Viewport> viewports;
+		uint vpCount;
 
 		std::unordered_map<const IResource*, UsageDesc> resUsageMap;
 		UniqueVector<RWConflictDesc> conflictBuffer;

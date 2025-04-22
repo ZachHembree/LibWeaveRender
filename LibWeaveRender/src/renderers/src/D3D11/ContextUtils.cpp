@@ -30,19 +30,13 @@ namespace Weave::D3D11
 		&ID3D11DeviceContext::CSSetConstantBuffers
 	};
 
-	void SetConstantBuffers(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, uint count, ID3D11Buffer* const* pBufs)
+	void SetConstantBuffers(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<ID3D11Buffer*> buffers)
 	{
-		if (count == 0)
-			return;
-
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
-		D3D_ASSERT_MSG((startSlot + count) <= D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT,
-			"Constant buffer limit exceeded: {}", (startSlot + count));
+		D3D_ASSERT_MSG((startSlot + buffers.GetLength()) <= D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT,
+			"Constant buffer limit exceeded: {}", (startSlot + buffers.GetLength()));
 
-		if (pBufs == nullptr && count > 0)
-			ALLOCA_ARR_SET_NULL(pBufs, count, ID3D11Buffer*);
-
-		(pCtx->*s_ConstBufSetters[(int)stage])(startSlot, count, pBufs);
+		(pCtx->*s_ConstBufSetters[(int)stage])(startSlot, (uint)buffers.GetLength(), buffers.GetData());
 	}
 
 	/*
@@ -59,28 +53,19 @@ namespace Weave::D3D11
 		&ID3D11DeviceContext::CSSetSamplers
 	};
 
-	void SetSamplers(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, uint count, Sampler* const* pRes)
+	void SetSamplers(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<Sampler*> res)
 	{
-		if (count == 0)
-			return;
-
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
-		D3D_ASSERT_MSG((startSlot + count) <= D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, 
-			"Sampler slot limit exceeded: {}", (startSlot + count));
+		D3D_ASSERT_MSG((startSlot + res.GetLength()) <= D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, 
+			"Sampler slot limit exceeded: {}", (startSlot + res.GetLength()));
 
 		Span<ID3D11SamplerState*> views;
+		ALLOCA_SPAN_SET(views, res.GetLength(), ID3D11SamplerState*);
 
-		if (pRes != nullptr)
-		{
-			ALLOCA_SPAN_SET(views, count, ID3D11SamplerState*);
-			
-			for (uint i = 0; i < count; i++)
-				views[i] = pRes[i] != nullptr ? pRes[i]->Get() : nullptr;
-		}
-		else if (count > 0)
-			ALLOCA_SPAN_SET_NULL(views, count, ID3D11SamplerState*);
+		for (uint i = 0; i < res.GetLength(); i++)
+			views[i] = res[i] != nullptr ? res[i]->Get() : nullptr;
 
-		(pCtx->*s_SamplerSetters[(int)stage])(startSlot, count, views.GetData());
+		(pCtx->*s_SamplerSetters[(int)stage])(startSlot, (uint)res.GetLength(), views.GetData());
 	}
 
 	/*
@@ -97,52 +82,34 @@ namespace Weave::D3D11
 		&ID3D11DeviceContext::CSSetShaderResources
 	};
 
-	void SetShaderResources(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, uint count, IShaderResource* const* pRes)
+	void SetShaderResources(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<IShaderResource*> res)
 	{
-		if (count == 0)
-			return;
-
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
-		D3D_ASSERT_MSG((startSlot + count) <= D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, 
-			"Resource view count exceeded: {}", (startSlot + count));
+		D3D_ASSERT_MSG((startSlot + res.GetLength()) <= D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, 
+			"Resource view count exceeded: {}", (startSlot + res.GetLength()));
 
 		Span<ID3D11ShaderResourceView*> views;
+		ALLOCA_SPAN_SET(views, res.GetLength(), ID3D11ShaderResourceView*);
 
-		if (pRes != nullptr)
-		{
-			ALLOCA_SPAN_SET(views, count, ID3D11ShaderResourceView*);
+		for (uint i = 0; i < res.GetLength(); i++)
+			views[i] = res[i] != nullptr ? res[i]->GetSRV() : nullptr;
 
-			for (uint i = 0; i < count; i++)
-				views[i] = pRes[i] != nullptr ? pRes[i]->GetSRV() : nullptr;
-		}
-		else if (count > 0)
-			ALLOCA_SPAN_SET_NULL(views, count, ID3D11ShaderResourceView*);
-
-		(pCtx->*s_ResViewSetters[(int)stage])(startSlot, count, views.GetData());
+		(pCtx->*s_ResViewSetters[(int)stage])(startSlot, (uint)res.GetLength(), views.GetData());
 	}
 
-	void CSSetUnorderedAccessViews(ID3D11DeviceContext* pCtx, uint startSlot, uint count, IUnorderedAccess* const* pRes, const uint* pInitialCounts)
+	void CSSetUnorderedAccessViews(ID3D11DeviceContext* pCtx, uint startSlot, const Span<IUnorderedAccess*> uavs, const uint* pInitialCounts)
 	{
-		if (count == 0)
-			return;
-
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
-		D3D_ASSERT_MSG((startSlot + count) <= D3D11_1_UAV_SLOT_COUNT,
-			"Resource view count exceeded: {}", (startSlot + count));
+		D3D_ASSERT_MSG((startSlot + uavs.GetLength()) <= D3D11_1_UAV_SLOT_COUNT,
+			"Resource view count exceeded: {}", (startSlot + uavs.GetLength()));
 		
 		Span<ID3D11UnorderedAccessView*> views;
+		ALLOCA_SPAN_SET(views, uavs.GetLength(), ID3D11UnorderedAccessView*);
 
-		if (pRes != nullptr)
-		{
-			ALLOCA_SPAN_SET(views, count, ID3D11UnorderedAccessView*);
+		for (uint i = 0; i < uavs.GetLength(); i++)
+			views[i] = uavs[i] != nullptr ? uavs[i]->GetUAV() : nullptr;
 
-			for (uint i = 0; i < count; i++)
-				views[i] = pRes[i] != nullptr ? pRes[i]->GetUAV() : nullptr;
-		}
-		else if (count > 0)
-			ALLOCA_SPAN_SET_NULL(views, count, ID3D11UnorderedAccessView*);
-
-		pCtx->CSSetUnorderedAccessViews(startSlot, count, views.GetData(), pInitialCounts);
+		pCtx->CSSetUnorderedAccessViews(startSlot, (uint)uavs.GetLength(), views.GetData(), pInitialCounts);
 	}
 
 	/*
@@ -205,26 +172,19 @@ namespace Weave::D3D11
 		s_ShaderSetters[(int)stage](pCtx, pShader, ppClassInstances, numClassInstances);
 	}
 
-	void OMSetRenderTargets(ID3D11DeviceContext* pCtx, uint count, IRenderTarget* const* pRTVs, IDepthStencil* pDepthStencil)
+	void OMSetRenderTargets(ID3D11DeviceContext* pCtx, const Span<IRenderTarget*> rtvs, IDepthStencil* pDepthStencil)
 	{
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
-		D3D_ASSERT_MSG((count) <= D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
-			"Render target limit exceeded: {}", (count));
-
-		Span<ID3D11RenderTargetView*> views;
-
-		if (pRTVs != nullptr)
-		{
-			ALLOCA_SPAN_SET(views, count, ID3D11RenderTargetView*);
-
-			for (uint i = 0; i < count; i++)
-				views[i] = pRTVs[i] != nullptr ? pRTVs[i]->GetRTV() : nullptr;
-		}
-		else if (count > 0)
-			ALLOCA_SPAN_SET_NULL(views, count, ID3D11RenderTargetView*);
+		D3D_ASSERT_MSG((rtvs.GetLength()) <= D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+			"Render target limit exceeded: {}", (rtvs.GetLength()));
 
 		ID3D11DepthStencilView* pDSV = pDepthStencil != nullptr ? pDepthStencil->GetDSV() : nullptr;
+		Span<ID3D11RenderTargetView*> views;
+		ALLOCA_SPAN_SET(views, rtvs.GetLength(), ID3D11RenderTargetView*);
 
-		pCtx->OMSetRenderTargets(count, views.GetData(), pDSV);
+		for (uint i = 0; i < rtvs.GetLength(); i++)
+			views[i] = rtvs[i] != nullptr ? rtvs[i]->GetRTV() : nullptr;
+
+		pCtx->OMSetRenderTargets((uint)rtvs.GetLength(), views.GetData(), pDSV);
 	}
 }

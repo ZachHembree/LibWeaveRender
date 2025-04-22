@@ -50,6 +50,6 @@ MappedBufferHandle CtxImm::GetMappedBufferHandle(IBuffer& buf)
 void CtxImm::Present(SwapChain& swap, uint syncInterval, uint flags)
 {
 	Span<IRenderTarget*> nullRT;
-	swap->Present(syncInterval, flags);
+	D3D_ASSERT_HR(swap->Present(syncInterval, flags));
 	pState->TryUpdateRenderTargets(nullRT, 0);
 }

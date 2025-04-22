@@ -37,7 +37,7 @@ void CtxBase::BindDepthStencilBuffer(IDepthStencil& depthStencil)
 	{
 		HandleConflicts();
 		pCtx->OMSetDepthStencilState(pState->GetDepthStencilState(), 1u);
-		OMSetRenderTargets(pCtx.Get(), pState->rtCount, pState->rtvs.GetData(), pState->pDepthStencil);
+		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
 	}
 }
 
@@ -46,11 +46,11 @@ void CtxBase::UnbindDepthStencilBuffer()
 	if (pState->TryUpdateDepthStencil(nullptr))
 	{
 		pCtx->OMSetDepthStencilState(pState->GetDepthStencilState(), 1u);
-		OMSetRenderTargets(pCtx.Get(), pState->rtCount, pState->rtvs.GetData(), pState->pDepthStencil);
+		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
 	}
 }
 
-uint CtxBase::GetRenderTargetCount() const { return pState->rtCount; }
+uint CtxBase::GetRenderTargetCount() const { return (uint)pState->GetRenderTargets().GetLength(); }
 
 void CtxBase::BindRenderTarget(IRenderTarget& rt, IDepthStencil& ds, sint slot)
 {
@@ -74,11 +74,14 @@ void CtxBase::BindRenderTargets(IDynamicArray<IRenderTarget*>& rts, sint startSl
 	if (pState->TryUpdateRenderTargets(rts, startSlot))
 	{
 		HandleConflicts();
-		OMSetRenderTargets(pCtx.Get(), pState->rtCount, pState->rtvs.GetData(), pState->pDepthStencil);
+		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
 	}
 
 	if (pState->TryUpdateViewports())
-		pCtx->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
+	{
+		const Span<Viewport> viewports = pState->GetViewports();
+		pCtx->RSSetViewports((uint)viewports.GetLength(), (D3D11_VIEWPORT*)&viewports[0]);
+	}
 }
 
 void CtxBase::BindRenderTargets(IDynamicArray<IRenderTarget*>& rts, IDepthStencil* pDS, sint startSlot)
@@ -96,11 +99,14 @@ void CtxBase::BindRenderTargets(IDynamicArray<IRenderTarget*>& rts, IDepthStenci
 	if (wasDsChanged || wasRtvChanged)
 	{
 		HandleConflicts();
-		OMSetRenderTargets(pCtx.Get(), pState->rtCount, pState->rtvs.GetData(), pState->pDepthStencil);
+		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
 	}
 		
 	if (pState->TryUpdateViewports())
-		pCtx->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
+	{
+		const Span<Viewport> viewports = pState->GetViewports();
+		pCtx->RSSetViewports((uint)viewports.GetLength(), (D3D11_VIEWPORT*)&viewports[0]);
+	}
 }
 
 void CtxBase::UnbindRenderTarget(sint slot)
@@ -110,37 +116,25 @@ void CtxBase::UnbindRenderTarget(sint slot)
 
 void CtxBase::UnbindRenderTargets(sint startSlot, uint count)
 {
-	if (pState->rtCount == 0 || count == 0)
-		return;
-
 	if (count == (uint)-1)
 	{
 		startSlot = 0;
-		count = pState->rtCount;
+		count = (uint)pState->GetRenderTargets().GetLength();
 	}
 
-	SetArrNull(pState->rtvs, startSlot, count);
+	Span<IRenderTarget*> nullRTs;
 	
-	if ((startSlot + count) == pState->rtCount)
-		pState->rtCount = startSlot;
+	if (count > 0)
+		ALLOCA_SPAN_SET_NULL(nullRTs, count, IRenderTarget*);
 
-	if (pState->rtCount == 0)
-	{
-		pState->pDepthStencil = nullptr;
-		pCtx->OMSetDepthStencilState(nullptr, 1u);
-		pCtx->OMSetRenderTargets(0, nullptr, nullptr);
-	}
-	else
-		OMSetRenderTargets(pCtx.Get(), pState->rtCount, pState->rtvs.GetData(), pState->pDepthStencil);
+	if (pState->TryUpdateRenderTargets(nullRTs, startSlot))
+		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
 }
 
 void CtxBase::SetPrimitiveTopology(PrimTopology topology)
 {
-	if (topology != pState->topology)
-	{
-		pState->topology = topology;
+	if (pState->TryUpdateTopology(topology))
 		pCtx->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)topology);
-	}
 }
 
 void CtxBase::BindVertexBuffer(VertexBuffer& vertBuffer, sint slot)
@@ -151,34 +145,15 @@ void CtxBase::BindVertexBuffer(VertexBuffer& vertBuffer, sint slot)
 
 void CtxBase::BindVertexBuffers(IDynamicArray<VertexBuffer>& vertBuffers, sint startSlot)
 {
-	Span vbState(pState->vertexBuffers.GetData() + startSlot, vertBuffers.GetLength());
-	const uint newCount = (uint)vertBuffers.GetLength();
-	bool wasChanged = false;
-
-	for (uint i = 0; i < newCount; i++)
+	if (const uint extent = pState->TryUpdateVertexBuffers(vertBuffers, startSlot); (sint)extent > startSlot)
 	{
-		ID3D11Buffer* pVB = vertBuffers[i].Get();
-
-		if (pVB != vbState[i])
-		{
-			vbState[i] = pVB;
-			wasChanged = true;
-		}
-	}
-
-	if (wasChanged)
-	{
-		Span strideState(pState->vbStrides.GetData() + startSlot, newCount);
-		Span offsetState(pState->vbOffsets.GetData() + startSlot, newCount);
-		pState->vertBufCount = std::max(pState->vertBufCount, (uint)(startSlot + newCount));
-
-		for (uint i = 0; i < newCount; i++)
-		{
-			strideState[i] = vertBuffers[i].GetStride();
-			offsetState[i] = vertBuffers[i].GetOffset();
-		}
-
-		pCtx->IASetVertexBuffers(startSlot, newCount, vbState.GetData(), strideState.GetData(), offsetState.GetData());
+		const uint count = (extent - startSlot);
+		pCtx->IASetVertexBuffers(
+			startSlot, count,
+			&pState->GetVertexBuffers()[startSlot],
+			&pState->GetVertStrides()[startSlot],
+			&pState->GetVertOffsets()[startSlot]
+		);
 	}
 }
 
@@ -189,39 +164,29 @@ void CtxBase::UnbindVertexBuffer(sint slot)
 
 void CtxBase::UnbindVertexBuffers(sint startSlot, uint count)
 {
-	if (pState->vertBufCount == 0 || count == 0)
-		return;
-
-	if (count == (uint)-1)
+	if (const uint extent = pState->TryResetVertexBuffers(startSlot, count); extent > 0)
 	{
-		startSlot = 0u;
-		count = pState->vertBufCount;
+		pCtx->IASetVertexBuffers(
+			startSlot, count, 
+			&pState->GetVertexBuffers()[startSlot], 
+			&pState->GetVertStrides()[startSlot], 
+			&pState->GetVertOffsets()[startSlot]
+		);
 	}
-
-	SetArrNull(pState->vertexBuffers, startSlot, count);
-	SetArrNull(pState->vbStrides, startSlot, count);
-	SetArrNull(pState->vbOffsets, startSlot, count);
-	
-	if ((startSlot + count) == pState->vertBufCount)
-		pState->vertBufCount = startSlot;
-
-	pCtx->IASetVertexBuffers(startSlot, count, pState->vertexBuffers.GetData(), pState->vbStrides.GetData(), pState->vbOffsets.GetData());
 }
 
 void CtxBase::BindIndexBuffer(IndexBuffer& indexBuffer, uint byteOffset)
 {
-	if (pState->pIndexBuffer != indexBuffer.Get())
+	if (pState->TryUpdateIndexBuffer(indexBuffer.Get()))
 	{
-		pState->pIndexBuffer = indexBuffer.Get();
-		pCtx->IASetIndexBuffer(pState->pIndexBuffer, (DXGI_FORMAT)indexBuffer.GetFormat(), byteOffset);
+		pCtx->IASetIndexBuffer(pState->GetIndexBuffer(), (DXGI_FORMAT)indexBuffer.GetFormat(), byteOffset);
 	}
 }
 
 void CtxBase::UnbindIndexBuffer()
 {
-	if (pState->pIndexBuffer != nullptr)
+	if (pState->TryUpdateIndexBuffer(nullptr))
 	{
-		pState->pIndexBuffer = nullptr;
 		pCtx->IASetIndexBuffer(nullptr, (DXGI_FORMAT)Formats::UNKNOWN, 0);
 	}
 }
@@ -251,23 +216,23 @@ void CtxBase::HandleConflicts()
 			const ContextState::StageState& ss = pState->GetStage(stage);
 
 			if (conflicts.srvsExtent[i] > 0)
-				SetShaderResources(pCtx.Get(), stage, 0, conflicts.srvsExtent[i], ss.srvs.GetData());
+				SetShaderResources(pCtx.Get(), stage, 0, ss.GetSRVs(0, conflicts.srvsExtent[i]));
 		}
 
 		if (conflicts.uavsExtent > 0)
-			CSSetUnorderedAccessViews(pCtx.Get(), 0, conflicts.uavsExtent, pState->uavs.GetData());
+			CSSetUnorderedAccessViews(pCtx.Get(), 0, pState->CSGetUAVs(0, conflicts.uavsExtent), nullptr);
 
 		if (conflicts.rtvExtent > 0)
-			OMSetRenderTargets(pCtx.Get(), pState->rtCount, pState->rtvs.GetData(), pState->pDepthStencil);
+			OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
 	}
 }
 
 void CtxBase::BindResources(const ComputeShaderVariant& shader, const ResourceSet& resSrc)
 {
-	if (const uint updateCount = pState->TryUpdateResources(resSrc.GetUAVs(), shader.GetUAVMap()); updateCount > 0)
+	if (const auto& newUAVs = pState->TryUpdateResources(resSrc.GetUAVs(), shader.GetUAVMap()); !newUAVs.IsEmpty())
 	{
 		HandleConflicts();
-		CSSetUnorderedAccessViews(pCtx.Get(), 0, updateCount, pState->uavs.GetData());
+		CSSetUnorderedAccessViews(pCtx.Get(), 0, newUAVs, nullptr);
 	}
 }
 
@@ -275,17 +240,15 @@ void CtxBase::BindResources(const VertexShaderVariant& shader, const ResourceSet
 {
 	ID3D11InputLayout* pLayout = shader.GetInputLayout().Get();
 	
-	if (pLayout != pState->pInputLayout)
+	if (pState->TryUpdateInputLayout(pLayout))
 	{
-		pState->pInputLayout = pLayout;
-		pCtx->IASetInputLayout(pState->pInputLayout);
+		pCtx->IASetInputLayout(pState->GetInputLayout());
 	}
 }
 
 void CtxBase::BindShader(const ShaderVariantBase& shader, const ResourceSet& resSrc)
 {
 	const ShadeStages stage = shader.GetStage();
-	const ContextState::StageState& ss = pState->GetStage(stage);
 
 	// Bind shader
 	if (pState->TrySetShader(stage, &shader))
@@ -304,18 +267,18 @@ void CtxBase::BindShader(const ShaderVariantBase& shader, const ResourceSet& res
 	}
 
 	// Bind constant buffers
-	if (const uint updateCount = pState->TryUpdateResources(stage, shader.GetConstantBuffers()); updateCount > 0)
-		SetConstantBuffers(pCtx.Get(), stage, 0, updateCount, ss.cbuffers.GetData());
+	if (const auto& newCBufs = pState->TryUpdateResources(stage, shader.GetConstantBuffers()); !newCBufs.IsEmpty())
+		SetConstantBuffers(pCtx.Get(), stage, 0, newCBufs);
 
 	// Bind Samplers
-	if (const uint updateCount = pState->TryUpdateResources(stage, resSrc.GetSamplers(), shader.GetSampMap()); updateCount > 0)
-		SetSamplers(pCtx.Get(), stage, 0, updateCount, ss.samplers.GetData());
+	if (const auto& newSamps = pState->TryUpdateResources(stage, resSrc.GetSamplers(), shader.GetSampMap()); !newSamps.IsEmpty())
+		SetSamplers(pCtx.Get(), stage, 0, newSamps);
 
 	// Bind Shader Resource Views (SRVs)
-	if (const uint updateCount = pState->TryUpdateResources(stage, resSrc.GetSRVs(), shader.GetSRVMap()); updateCount > 0)
+	if (const auto& newSRVs = pState->TryUpdateResources(stage, resSrc.GetSRVs(), shader.GetSRVMap()); !newSRVs.IsEmpty())
 	{ 
 		HandleConflicts();
-		SetShaderResources(pCtx.Get(), stage, 0, updateCount, ss.srvs.GetData());
+		SetShaderResources(pCtx.Get(), stage, 0, newSRVs);
 	}
 
 	// CS specific handling
@@ -701,13 +664,13 @@ void CtxBase::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 	bool wasVpSet = false;
 
 	// Manually set render target if it isn't already set
-	if (&dst != pState->rtvs[0])
+	if (&dst != pState->GetRenderTargets()[0])
 	{
 		pCtx->OMSetRenderTargets(1, dst.GetAddressRTV(), nullptr);
 		wasRtvSet = true;
 	}
 	// Manually set VP if it isn't set
-	if (vp != pState->viewports[0])
+	if (vp != pState->GetViewports()[0])
 	{
 		pCtx->RSSetViewports(1, (D3D11_VIEWPORT*)&vp);
 		wasVpSet = true;
@@ -730,9 +693,13 @@ void CtxBase::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 
 	// Manually restore previous state if changed
 	if (wasRtvSet)
-		OMSetRenderTargets(pCtx.Get(), pState->rtCount, pState->rtvs.GetData(), pState->pDepthStencil);
+		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
+
 	if (wasVpSet)
-		pCtx->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
+	{
+		const Span<Viewport> viewports = pState->GetViewports();
+		pCtx->RSSetViewports((uint)viewports.GetLength(), (D3D11_VIEWPORT*)&viewports[0]);
+	}
 }
 
 void CtxBase::ClearDepthStencil(IDepthStencil& ds, DSClearFlags clearFlags, float depthClear, UINT8 stencilClear)
@@ -752,59 +719,12 @@ void CtxBase::Reset()
 	UnbindVertexBuffers();
 	SetPrimitiveTopology(PrimTopology::UNDEFINED);
 	UnbindRenderTargets();
-	UnbindViewports();
 }
 
 bool CtxBase::GetIsImmediate() const { return isImmediate; }
 
-const uint CtxBase::GetViewportCount() const { return (uint)pState->vpCount; }
+const uint CtxBase::GetViewportCount() const { return (uint)pState->GetViewports().GetLength(); }
 
-const Viewport& CtxBase::GetViewport(uint index) const { return pState->viewports[index]; }
+const Viewport& CtxBase::GetViewport(uint index) const { return pState->GetViewports()[index]; }
 
-const Span<Viewport> CtxBase::GetViewports() const { return Span(pState->viewports.GetData(), pState->vpCount); }
-
-void CtxBase::BindViewport(sint index, const vec2& size, const vec2& offset, const vec2& depth)
-{
-	Viewport vp = { offset, size, depth };
-	BindViewports(Span(&vp), index);
-}
-
-void CtxBase::BindViewport(sint index, const Viewport& vp)
-{
-	BindViewports(Span((Viewport*)&vp), index);
-}
-
-void CtxBase::UnbindViewports(sint index, uint count)
-{
-	if (pState->vpCount == 0 || count == 0)
-		return;
-
-	if (count == -1)
-	{
-		index = 0;
-		count = pState->vpCount;
-	}
-
-	D3D_ASSERT_MSG((index + count) <= D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
-		"Viewport range specified out of range.");
-
-	SetArrNull(pState->viewports, index, count);
-	pCtx->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
-	pState->vpCount = index;
-}
-
-void CtxBase::BindViewports(const IDynamicArray<Viewport>& viewports, sint offset)
-{
-	D3D_ASSERT_MSG((offset + viewports.GetLength()) <= D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE,
-		"Number of viewports supplied exceeds limit.");
-
-	const uint newCount = (uint)viewports.GetLength();
-	Span dstSpan(&pState->viewports[offset], newCount);
-
-	if (dstSpan != viewports)
-	{
-		memcpy(dstSpan.GetData(), viewports.GetData(), GetArrSize(viewports));
-		pState->vpCount = std::max(pState->vpCount, (uint)(offset + newCount));
-		pCtx->RSSetViewports(pState->vpCount, (D3D11_VIEWPORT*)pState->viewports.GetData());
-	}
-}
+const Span<Viewport> CtxBase::GetViewports() const { return pState->GetViewports(); }
