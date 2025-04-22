@@ -90,12 +90,12 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Binds the given buffers as render targets. Doesn't unbind previously set depth-stencil buffers.
 		/// </summary>
-		void BindRenderTargets(IDynamicArray<IRenderTarget>& rts, sint startSlot = 0);
+		void BindRenderTargets(IDynamicArray<IRenderTarget*>& rts, sint startSlot = 0);
 
 		/// <summary>
 		/// Binds the given buffers as render targets.
 		/// </summary>
-		void BindRenderTargets(IDynamicArray<IRenderTarget>& rts, IDepthStencil* pDS, sint startSlot = 0);
+		void BindRenderTargets(IDynamicArray<IRenderTarget*>& rts, IDepthStencil* pDS, sint startSlot = 0);
 
 		/// <summary>
 		/// Unbinds the render target at the specified slot.

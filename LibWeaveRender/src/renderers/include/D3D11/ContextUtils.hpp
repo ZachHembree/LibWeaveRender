@@ -7,6 +7,8 @@ namespace Weave::D3D11
 	class Sampler;
 	class IShaderResource;
 	class IUnorderedAccess;
+	class IRenderTarget;
+	class IDepthStencil;
 
 	/// <summary>
 	/// Binds one or more constant buffers to a specific shader stage in the Direct3D 11 pipeline.
@@ -44,4 +46,9 @@ namespace Weave::D3D11
 	/// </summary>
 	void SetShader(ID3D11DeviceContext* pCtx, ShadeStages stage, 
 		ID3D11DeviceChild* pShader, ID3D11ClassInstance* const* ppClassInstances, UINT numClassInstances);
+
+	/// <summary>
+	/// Binds one or more render targets with or without a depth stencil using the given context.
+	/// </summary>
+	void OMSetRenderTargets(ID3D11DeviceContext* pCtx, uint count, IRenderTarget* const* pRTVs, IDepthStencil* pDepthStencil);
 }

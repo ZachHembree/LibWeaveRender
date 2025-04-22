@@ -175,7 +175,19 @@ namespace Weave::D3D11
 		virtual ID3D11UnorderedAccessView** const GetAddressUAV() = 0;
 	};
 
-	class IDepthStencil
+	/// <summary>
+	/// Interface for 2D Textures, without resource views
+	/// </summary>
+	class ITexture2DBase : public virtual IResource, public virtual IColorBuffer2D
+	{ };
+
+	/// <summary>
+	/// Interface for 2D Textures, with SRVs
+	/// </summary>
+	class ITexture2D : public virtual ITexture2DBase, public IShaderResource
+	{ };
+
+	class IDepthStencil : public ITexture2DBase
 	{
 	public:
 		/// <summary>
@@ -208,18 +220,6 @@ namespace Weave::D3D11
 			UINT8 stencilClear = 0
 		) = 0;
 	};
-
-	/// <summary>
-	/// Interface for 2D Textures, without resource views
-	/// </summary>
-	class ITexture2DBase : public virtual IResource, public virtual IColorBuffer2D
-	{ };
-
-	/// <summary>
-	/// Interface for 2D Textures, with SRVs
-	/// </summary>
-	class ITexture2D : public virtual ITexture2DBase, public IShaderResource
-	{ };
 
 	/// <summary>
 	/// Interface for resizeable 2D Textures

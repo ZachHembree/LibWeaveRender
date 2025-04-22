@@ -55,7 +55,7 @@ void ContextState::StageState::Reset()
 
 void ContextState::Init()
 {
-	rtvs = UniqueArray<ID3D11RenderTargetView*>(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, nullptr);
+	rtvs = UniqueArray<IRenderTarget*>(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, nullptr);
 	viewports = UniqueArray<Viewport>(D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE);
 	vertexBuffers = UniqueArray<ID3D11Buffer*>(D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, nullptr);
 	vbStrides = UniqueArray<uint>(D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, 0);
@@ -102,7 +102,7 @@ void ContextState::Reset()
 
 bool ContextState::GetIsValid() const { return isInitialized; }
 
-ContextState::StageState& ContextState::GetStage(ShadeStages stage) { return stages[(int)stage]; }
+const ContextState::StageState& ContextState::GetStage(ShadeStages stage) const { return stages[(int)stage]; }
 
 ID3D11DepthStencilView* ContextState::GetDepthStencilView() const { return pDepthStencil != nullptr ? pDepthStencil->GetDSV() : nullptr; }
 
@@ -110,16 +110,73 @@ ID3D11DepthStencilState* ContextState::GetDepthStencilState() const { return pDe
 
 vec2 ContextState::GetDepthStencilRange() const { return pDepthStencil != nullptr ? pDepthStencil->GetRange() : vec2(0); }
 
+bool ContextState::TrySetShader(ShadeStages stage, const ShaderVariantBase* pShader)
+{
+	ContextState::StageState& ss = stages[(uint)stage];
+
+	if (pShader != ss.pShader)
+	{
+		ss.pShader = pShader;
+		return true;
+	}
+	else
+		return false;
+}
+
+template<RWResourceUsages UsageT, typename ResT>
+void ContextState::UpdateUsageMap(ShadeStages stage, const Span<ResT*> stateRes, const IDynamicArray<ResT*>& newRes)
+{
+	// Reset usage on changed slots
+	for (uint slot = 0; slot < stateRes.GetLength(); slot++)
+	{
+		const ResT* pNext = (slot < newRes.GetLength()) ? newRes[slot] : nullptr;
+
+		if (stateRes[slot] != nullptr && stateRes[slot] != pNext)
+		{
+			const auto it = resUsageMap.find(stateRes[slot]);
+
+			if (it != resUsageMap.end())
+			{
+				// Clear last usage to avoid erroneous conflicts with incoming resources
+				UsageDesc& desc = it->second;
+				desc.ResetUsage(stage);
+
+				if (desc.IsEmpty())
+					resUsageMap.erase(stateRes[slot]);
+			}
+		}
+	}
+
+	// Set usage on new range
+	for (uint slot = 0; slot < newRes.GetLength(); slot++)
+	{
+		if (newRes[slot] != nullptr)
+		{
+			const auto it = resUsageMap.find(newRes[slot]);
+
+			// Add usage to existing description and buffer any resulting conflicts
+			if (it != resUsageMap.end())
+			{
+				UsageDesc& desc = it->second;
+				desc.SetUsage(stage, UsageT, slot, conflictBuffer);
+			}
+			else
+				resUsageMap.emplace(newRes[slot], UsageDesc(stage, UsageT, slot));
+		}
+	}
+}
+
 template<typename ResT>
-uint UpdateResources(IDynamicArray<ResT*>& stateRes, uint& stateCount, const IDynamicArray<ResT*>& newRes)
+static uint UpdateResources(IDynamicArray<ResT*>& stateRes, uint& stateCount, const IDynamicArray<ResT*>& newRes, sint startSlot = 0)
 {
 	const uint oldCount = stateCount;
-	const uint newCount = (uint)newRes.GetLength();
+	const uint newCount = (uint)newRes.GetLength() + startSlot;
 	const uint updateExtent = std::max(oldCount, newCount);
 	stateCount = newCount;
 
 	// Write new resources to state cache
-	ArrMemCopy(stateRes, newRes);
+	Span dstSpan(&stateRes[startSlot], newRes.GetLength());
+	ArrMemCopy(dstSpan, newRes);
 
 	// Set extra range to null
 	if (oldCount > newCount)
@@ -128,9 +185,61 @@ uint UpdateResources(IDynamicArray<ResT*>& stateRes, uint& stateCount, const IDy
 	return updateExtent;
 }
 
+bool ContextState::TryUpdateRenderTargets(IDynamicArray<IRenderTarget*>& newRes, uint startSlot)
+{
+	if (startSlot == 0 && Span<IRenderTarget*>(rtvs.GetData(), rtCount) == newRes)
+		return false;
+
+	// Update and track usage
+	UpdateUsageMap<RWResourceUsages::RenderTargetView>(ShadeStages::Pixel, Span(&rtvs[startSlot], newRes.GetLength()), newRes);
+
+	return (UpdateResources(rtvs, rtCount, newRes, startSlot) > 0);
+}
+
+bool ContextState::TryUpdateViewports()
+{
+	const vec2 depthRange = GetDepthStencilRange();
+	bool wasChanged = false;
+
+	for (uint i = 0; i < rtCount; i++)
+	{
+		if (rtvs[i] == nullptr)
+			continue;
+
+		const IRenderTarget& rt = *rtvs[i];
+		Viewport vp
+		{
+			.offset = rt.GetRenderOffset(),
+			.size = rt.GetRenderSize(),
+			.zDepth = depthRange
+		};
+
+		if (vp != viewports[i])
+		{
+			viewports[i] = vp;
+			wasChanged = true;
+		}
+	}
+
+	vpCount = rtCount;
+	return wasChanged;
+}
+
+bool ContextState::TryUpdateDepthStencil(IDepthStencil* pDepthStencil)
+{
+	if (this->pDepthStencil == pDepthStencil)
+		return false;
+
+	// Update and track usage
+	UpdateUsageMap<RWResourceUsages::DepthStencilView>(ShadeStages::Pixel, Span(&this->pDepthStencil), Span(&pDepthStencil));
+
+	this->pDepthStencil = pDepthStencil;
+	return true;
+}
+
 uint ContextState::TryUpdateResources(ShadeStages stage, IDynamicArray<ConstantBuffer>& cbufs)
 {
-	ContextState::StageState& ss = GetStage(stage);
+	ContextState::StageState& ss = stages[(uint)stage];
 	Span<ID3D11Buffer*> newCbufs;
 
 	if (cbufs.GetLength() > 0)
@@ -147,7 +256,7 @@ uint ContextState::TryUpdateResources(ShadeStages stage, IDynamicArray<ConstantB
 
 uint ContextState::TryUpdateResources(ShadeStages stage, const ResourceSet::SamplerList& resSrc, const SamplerMap* pResMap)
 {
-	ContextState::StageState& ss = GetStage(stage);
+	ContextState::StageState& ss = stages[(uint)stage];
 	Span<Sampler*> newRes;
 
 	if (pResMap != nullptr && pResMap->GetCount() > 0)
@@ -163,7 +272,7 @@ uint ContextState::TryUpdateResources(ShadeStages stage, const ResourceSet::Samp
 
 uint ContextState::TryUpdateResources(ShadeStages stage, const ResourceSet::SRVList& resSrc, const ResourceViewMap* pResMap)
 {
-	ContextState::StageState& ss = GetStage(stage);
+	ContextState::StageState& ss = stages[(uint)stage];
 	Span<IShaderResource*> newRes;
 
 	if (pResMap != nullptr && pResMap->GetCount() > 0)
@@ -231,7 +340,7 @@ ContextState::ConflictState ContextState::TryResolveConflicts()
 			{
 			case RWResourceUsages::ShaderResourceView:
 			{
-				StageState& ss = GetStage(conflict.stage);
+				StageState& ss = stages[(uint)conflict.stage];
 				ss.srvs[conflict.slot] = nullptr;
 				state.srvsExtent[(uint)conflict.stage] = (byte)ss.srvCount;
 				break;
@@ -270,49 +379,6 @@ ContextState::ConflictState ContextState::TryResolveConflicts()
 	// Return counters and reset
 	conflictBuffer.Clear();
 	return state;
-}
-
-template<RWResourceUsages UsageT, typename ResT>
-void ContextState::UpdateUsageMap(ShadeStages stage, const Span<ResT*> stateRes, const IDynamicArray<ResT*>& newRes)
-{
-	// Reset usage on changed slots
-	for (uint slot = 0; slot < stateRes.GetLength(); slot++)
-	{
-		const ResT* pNext = (slot < newRes.GetLength()) ? newRes[slot] : nullptr;
-
-		if (stateRes[slot] != nullptr && stateRes[slot] != pNext)
-		{
-			const auto it = resUsageMap.find(stateRes[slot]);
-
-			if (it != resUsageMap.end())
-			{
-				// Clear last usage to avoid erroneous conflicts with incoming resources
-				UsageDesc& desc = it->second;
-				desc.ResetUsage(stage);
-
-				if (desc.IsEmpty())
-					resUsageMap.erase(stateRes[slot]);
-			}
-		}
-	}
-
-	// Set usage on new range
-	for (uint slot = 0; slot < newRes.GetLength(); slot++)
-	{
-		if (newRes[slot] != nullptr)
-		{
-			const auto it = resUsageMap.find(newRes[slot]);
-
-			// Add usage to existing description and buffer any resulting conflicts
-			if (it != resUsageMap.end())
-			{
-				UsageDesc& desc = it->second;
-				desc.SetUsage(stage, UsageT, slot, conflictBuffer);
-			}
-			else
-				resUsageMap.emplace(newRes[slot], UsageDesc(stage, UsageT, slot));
-		}
-	}
 }
 
 ContextState::UsageDesc::UsageDesc() :

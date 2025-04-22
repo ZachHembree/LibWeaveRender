@@ -12,8 +12,6 @@ namespace Weave::D3D11
 	using Effects::ShadeStages;
 	using Effects::ShaderTypes;
 
-	class IDepthStencil;
-
 	enum class PrimTopology;
 	class InputLayout;
 	class VertexBuffer;
@@ -123,7 +121,7 @@ namespace Weave::D3D11
 		UniqueArray<IUnorderedAccess*> uavs;
 		uint uavCount;
 
-		UniqueArray<ID3D11RenderTargetView*> rtvs;
+		UniqueArray<IRenderTarget*> rtvs;
 		uint rtCount;
 
 		UniqueArray<Viewport> viewports;
@@ -155,7 +153,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns state information for the given stage
 		/// </summary>
-		StageState& GetStage(ShadeStages stage);
+		const StageState& GetStage(ShadeStages stage) const;
 
 		/// <summary>
 		/// Returns interface to depth stencil resource view
@@ -171,6 +169,29 @@ namespace Weave::D3D11
 		/// Returns the depth range, e.g. [0, 1] used for depth testing
 		/// </summary>
 		vec2 GetDepthStencilRange() const;
+
+		/// <summary>
+		/// Updates the shader for the given stage in the cache and returns true if a change was made.
+		/// </summary>
+		bool TrySetShader(ShadeStages stage, const ShaderVariantBase* pShader);
+
+		/// <summary>
+		/// Updates the cached depth stencil and returns true if any changes were made that need to
+		/// be applied by the context.
+		/// </summary>
+		bool TryUpdateDepthStencil(IDepthStencil* pDepthStencil);
+
+		/// <summary>
+		/// Updates RTV state cache and returns true if any changes were made that need to
+		/// be applied by the context.
+		/// </summary>
+		bool TryUpdateRenderTargets(IDynamicArray<IRenderTarget*>& newRTVs, uint startSlot);
+
+		/// <summary>
+		/// Automatically updates viewports to align with DRS area specified by Weave RT objects and 
+		/// returns true if changes were made
+		/// </summary>
+		bool TryUpdateViewports();
 
 		/// <summary>
 		/// Updates resources bound in the state cache and returns the size of the bound resource range

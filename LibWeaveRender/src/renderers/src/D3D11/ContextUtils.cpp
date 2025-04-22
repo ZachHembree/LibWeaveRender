@@ -204,4 +204,27 @@ namespace Weave::D3D11
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
 		s_ShaderSetters[(int)stage](pCtx, pShader, ppClassInstances, numClassInstances);
 	}
+
+	void OMSetRenderTargets(ID3D11DeviceContext* pCtx, uint count, IRenderTarget* const* pRTVs, IDepthStencil* pDepthStencil)
+	{
+		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
+		D3D_ASSERT_MSG((count) <= D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+			"Render target limit exceeded: {}", (count));
+
+		Span<ID3D11RenderTargetView*> views;
+
+		if (pRTVs != nullptr)
+		{
+			ALLOCA_SPAN_SET(views, count, ID3D11RenderTargetView*);
+
+			for (uint i = 0; i < count; i++)
+				views[i] = pRTVs[i] != nullptr ? pRTVs[i]->GetRTV() : nullptr;
+		}
+		else if (count > 0)
+			ALLOCA_SPAN_SET_NULL(views, count, ID3D11RenderTargetView*);
+
+		ID3D11DepthStencilView* pDSV = pDepthStencil != nullptr ? pDepthStencil->GetDSV() : nullptr;
+
+		pCtx->OMSetRenderTargets(count, views.GetData(), pDSV);
+	}
 }
