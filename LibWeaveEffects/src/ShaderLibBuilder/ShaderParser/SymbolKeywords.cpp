@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include <array>
 #include <unordered_map>
 #include "WeaveEffects/ShaderLibBuilder/ShaderParser/SymbolEnums.hpp"
 
@@ -87,6 +88,26 @@ namespace Weave::Effects
         }
         else
             return false;
+    }
+
+    constexpr std::array<string_view, (uint)ShadeStages::ShadeStageCount> s_StageNameList
+    {
+        "Vertex",
+        "Hull",
+        "Domain",
+        "Geometry",
+        "Pixel",
+        "Compute"
+    };
+
+    string_view GetStageName(ShadeStages stage)
+    {
+        const uint index = (uint)stage;
+
+        if (index >= 0 && index < s_StageNameList.size())
+            return s_StageNameList[index];
+        else
+            return "Unknown";
     }
 
     constexpr static int GetFirstSetPos(ulong value)

@@ -206,4 +206,9 @@ namespace Weave::Effects
     /// Attempts to map the given shader stage name to its corresponding enum
     /// </summary>
     bool TryGetShadeStage(string_view name, ShadeStages& stage);
+
+    /// <summary>
+    /// Returns the name of the given stage enum
+    /// </summary>
+    string_view GetStageName(ShadeStages stage);
 }
