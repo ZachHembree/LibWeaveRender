@@ -34,6 +34,8 @@ Renderer::Renderer(MinWindow& window) :
 	defaultSamplers["LinearClamp"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::CLAMP);
 	defaultSamplers["LinearMirror"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::MIRROR);
 	defaultSamplers["LinearBorder"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::BORDER);
+
+	LOG_INFO() << "Renderer Initialized";
 }
 
 Renderer::~Renderer() = default;

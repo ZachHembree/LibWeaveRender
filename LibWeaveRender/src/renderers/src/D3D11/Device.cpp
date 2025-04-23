@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include <iomanip>
 #include "D3D11/InternalD3D11.hpp"
 #include "WeaveRender/D3D11.hpp"
 #include "D3D11/Device.hpp"
@@ -9,6 +10,8 @@ using namespace Weave::D3D11;
 
 Device::Device(Renderer& renderer) : pRenderer(&renderer)
 {
+	LOG_INFO() << "Device Init";
+
 	ComPtr<ID3D11DeviceContext> pCtxBase;
 	ComPtr<ID3D11Device> pDevBase;
 	D3D_CHECK_HR(D3D11CreateDevice(
@@ -24,11 +27,35 @@ Device::Device(Renderer& renderer) : pRenderer(&renderer)
 		&pCtxBase
 	));
 
-	D3D_CHECK_HR(pDevBase->QueryInterface(__uuidof(ID3D11Device1), &pDev));
-	D3D_CHECK_HR(pCtxBase->QueryInterface(__uuidof(ID3D11DeviceContext1), &pCtxImm));
+	D3D_CHECK_HR(pDevBase.As(&pDev));
+	D3D_CHECK_HR(pCtxBase.As(&pCtxImm));
 
 	ComPtr<ID3D11DeviceContext1> pCtxCpy = pCtxImm;
 	context = CtxImm(*this, std::move(pCtxCpy));
+
+	// Get device info
+	ComPtr<IDXGIDevice1> pDxgiDev;
+	ComPtr<IDXGIAdapter> pAdapter;
+	ComPtr<IDXGIAdapter1> pAdapter1;
+	D3D_CHECK_HR(pDev.As(&pDxgiDev));
+	D3D_CHECK_HR(pDxgiDev->GetAdapter(&pAdapter));
+	D3D_CHECK_HR(pAdapter.As(&pAdapter1));
+
+	DXGI_ADAPTER_DESC1 adapterDesc;
+	D3D_CHECK_HR(pAdapter1->GetDesc1(&adapterDesc));
+
+	LOG_INFO() << 
+		"D3D Device Information" <<
+		"\nFeature Level: " << GetFeatureLevelName(pDev->GetFeatureLevel()) <<
+		"\nDebug: " << ((g_DeviceFlags == D3D11_CREATE_DEVICE_DEBUG) ? "TRUE" : "FALSE") <<
+		"\nAdapter: " << GetMultiByteString_UTF16LE_TO_UTF8(adapterDesc.Description).data() <<
+		"\nVendor ID: 0x" << std::hex << adapterDesc.VendorId << std::dec <<
+		"\nDevice ID: 0x" << std::hex << adapterDesc.DeviceId << std::dec <<
+		"\nSubSys ID: 0x" << std::hex << adapterDesc.SubSysId << std::dec <<
+		"\nRevision: " << adapterDesc.Revision <<
+		"\nDedicated Video Memory: " << (adapterDesc.DedicatedVideoMemory / (1024 * 1024)) << " MB" <<
+		"\nDedicated System Memory: " << (adapterDesc.DedicatedSystemMemory / (1024 * 1024)) << " MB" <<
+		"\nShared System Memory: " << (adapterDesc.SharedSystemMemory / (1024 * 1024)) << " MB";
 }
 
 Renderer& Device::GetRenderer() const { D3D_ASSERT_MSG(pRenderer != nullptr, "Renderer cannot be null."); return *pRenderer; }

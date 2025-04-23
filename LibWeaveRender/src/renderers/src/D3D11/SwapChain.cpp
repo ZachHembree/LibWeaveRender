@@ -13,6 +13,8 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	DeviceChild(dev),
 	backBufRt(dev, this, &pBackBuffer, &pBackBufRTV)
 {
+	LOG_INFO() << "Swap Chain Init";
+
 	ComPtr<IDXGIFactory2> dxgiFactory;
 	D3D_CHECK_HR(CreateDXGIFactory1(__uuidof(IDXGIFactory2), &dxgiFactory));
 
@@ -35,7 +37,7 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED; // No blending
 	desc.Scaling = DXGI_SCALING_NONE; // Native output, no scaling needed
 	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-	desc.Flags = 0;
+	desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
 	D3D_CHECK_HR(dxgiFactory->CreateSwapChainForHwnd(
 		dev.Get(),
@@ -47,6 +49,16 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	));
 
 	GetBuffers();
+
+	LOG_INFO() 
+		<< "Swap Chain Configuration" <<
+		"\nWindowed Mode: " << (fsDesc.Windowed ? "TRUE" : "FALSE") <<
+		"\nWindow Size: " << wnd.GetBodySize().x << " x " << wnd.GetBodySize().y <<
+		"\nBuffer Size: " << monRes.x << " x " << monRes.y <<
+		"\nFormat: " << GetFormatName((Formats)desc.Format) <<
+		"\nAlpha Mode: " << GetAlphaModeName(desc.AlphaMode) <<
+		"\nScaling: " << GetScalingModeName(desc.Scaling) << 
+		"\nFlags: " << GetSwapChainFlagName((DXGI_SWAP_CHAIN_FLAG)desc.Flags);
 }
 
 /// <summary>
