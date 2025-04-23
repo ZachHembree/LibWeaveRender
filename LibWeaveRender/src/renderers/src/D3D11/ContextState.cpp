@@ -5,6 +5,7 @@
 #include "D3D11/Viewport.hpp"
 #include "D3D11/Resources/Sampler.hpp"
 #include "D3D11/Resources/ConstantBuffer.hpp"
+#include "D3D11/Shaders/ShaderVariantBase.hpp"
 
 using namespace Weave::D3D11;
 
@@ -13,6 +14,13 @@ using RWResourceUsages = ContextState::RWResourceUsages;
 
 static constexpr std::array<RWResourceUsages, g_ShadeStageCount> s_NullUsage = {};
 static constexpr ConflictState s_NullConflict = {};
+static constexpr std::array<string_view, 4> s_RWUsageNames
+{
+	"ShaderResourceView",
+	"UnorderedAccessView",
+	"RenderTargetView",
+	"DepthStencilView"
+};
 
 template<typename T>
 const Span<T> GetConstSpan(const T* pStart, size_t length)
@@ -32,6 +40,19 @@ const Span<T> GetVariableSpan(const IDynamicArray<T>& src, uint maxLen, sint off
 	return GetConstSpan(&src[offset], extent - offset);
 }
 
+string_view ContextState::GetUsageName(RWResourceUsages usage)
+{
+	for (uint i = 0; i < 4; i++)
+	{
+		const uint flag = 1u << (i + 3);
+
+		if (((uint)usage & flag) == flag)
+			return s_RWUsageNames[i];
+	}
+
+	return "Unknown";
+}
+
 ContextState::ContextState() :
 	topology(PrimTopology::UNDEFINED),
 	pInputLayout(nullptr),
@@ -43,7 +64,8 @@ ContextState::ContextState() :
 	vpCount(0),
 	vertBufCount(0),
 	uavCount(0),
-	isInitialized(false)
+	isInitialized(false),
+	drawCount(0)
 {}
 
 ContextState::ContextState(ContextState&& other) noexcept = default;
@@ -60,7 +82,8 @@ ContextState::StageState::StageState() :
 	srvs(D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, nullptr),
 	sampCount(0),
 	cbufCount(0),
-	srvCount(0)
+	srvCount(0),
+	drawCount(0)
 {}
 
 void ContextState::StageState::Reset()
@@ -119,6 +142,10 @@ void ContextState::Reset()
 }
 
 bool ContextState::GetIsValid() const { return isInitialized; }
+
+ulong ContextState::GetDrawCount() const { return drawCount; }
+
+void ContextState::IncrementDraw() { drawCount++; }
 
 const ContextState::StageState& ContextState::GetStage(ShadeStages stage) const { return stages[(int)stage]; }
 
@@ -254,6 +281,7 @@ vec2 ContextState::GetDepthStencilRange() const { return pDepthStencil != nullpt
 bool ContextState::TrySetShader(ShadeStages stage, const ShaderVariantBase* pShader)
 {
 	ContextState::StageState& ss = stages[(uint)stage];
+	ss.drawCount = drawCount;
 
 	if (pShader != ss.pShader)
 	{
@@ -459,7 +487,7 @@ const Span<IUnorderedAccess*> ContextState::TryUpdateResources(const ResourceSet
 }
 
 template<typename T>
-uint GetLastNonNull(const IDynamicArray<T*>& arr, uint start)
+static uint GetLastNonNull(const IDynamicArray<T*>& arr, uint start)
 {
 	for (int i = start; i >= 0; i--)
 	{
@@ -472,6 +500,30 @@ uint GetLastNonNull(const IDynamicArray<T*>& arr, uint start)
 	return 0;
 }
 
+void ContextState::LogInvalidStateTransitions(RWConflictDesc conflict)
+{
+	StageState& conflictState = stages[(uint)conflict.lastStage];
+	const bool isWriting = (conflict.nextUsage & RWResourceUsages::Write) == RWResourceUsages::Write;
+	// Conflict occured within same setup phase 
+	const bool intraStageSetupErr = (conflict.nextStage != conflict.lastStage && conflictState.drawCount == drawCount);
+	// Conflict occured within the same stage
+	const bool stageSetupErr = (conflict.nextStage == conflict.lastStage && isWriting);
+
+	if (intraStageSetupErr || stageSetupErr)
+	{
+		ShaderDefHandle lastShader = conflictState.pShader->GetDefinition();
+		ShaderDefHandle nextShader = GetStage(conflict.nextStage).pShader->GetDefinition();
+		string_view lastName = lastShader.GetStringMap().GetString(lastShader.GetNameID());
+		string_view nextName = nextShader.GetStringMap().GetString(nextShader.GetNameID());
+
+		LOG_DEBUG() << "A conflicting resource usage was specified during the setup phase.\n"
+			<< GetUsageName(conflict.lastUsage) << " (slot: " << conflict.slot << ")"
+			<< " in " << lastName << " stage: " << GetStageName(conflict.lastStage)
+			<< " conflicts with " << GetUsageName(conflict.nextUsage)
+			<< " in " << nextName << " stage: " << GetStageName(conflict.nextStage);
+	}
+}
+
 ContextState::ConflictState ContextState::TryResolveConflicts()
 {
 	ConflictState state = {};
@@ -481,13 +533,17 @@ ContextState::ConflictState ContextState::TryResolveConflicts()
 		// Set cached conflicts to null in preparation for context update
 		for (const RWConflictDesc& conflict : conflictBuffer)
 		{
-			switch (conflict.usage)
+			// Log errors
+			LogInvalidStateTransitions(conflict);
+
+			// Correct internal state
+			switch (conflict.lastUsage)
 			{
 			case RWResourceUsages::ShaderResourceView:
-			{
-				StageState& ss = stages[(uint)conflict.stage];
+			{			
+				StageState& ss = stages[(uint)conflict.lastStage];
 				ss.srvs[conflict.slot] = nullptr;
-				state.srvsExtent[(uint)conflict.stage] = (byte)ss.srvCount;
+				state.srvsExtent[(uint)conflict.lastStage] = (byte)ss.srvCount;
 				break;
 			}
 			case RWResourceUsages::UnorderedAccessView:
@@ -564,8 +620,10 @@ uint ContextState::UsageDesc::SetUsage(ShadeStages stage, RWResourceUsages usage
 		{
 			conflictBuffer.emplace_back(RWConflictDesc
 			{
-				.stage = lastStage,
-				.usage = lastUsage,
+				.nextStage = stage,
+				.nextUsage = usage,
+				.lastStage = lastStage,
+				.lastUsage = lastUsage,
 				.slot = lastSlot
 			});
 

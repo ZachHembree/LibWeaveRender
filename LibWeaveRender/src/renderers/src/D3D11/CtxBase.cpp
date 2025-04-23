@@ -304,7 +304,7 @@ void CtxBase::UnbindStage(ShadeStages stage)
 		SetShader(pCtx.Get(), stage, nullptr, nullptr, 0);
 }
 
-void CtxBase::UnbindInactiveStages(ActiveShaderSet activeShaders)
+void CtxBase::SetActiveStages(ActiveShaderMask activeShaders)
 {
 	for (uint i = 0; i < activeShaders.size(); i++)
 	{		
@@ -333,6 +333,7 @@ void CtxBase::Draw(IDynamicArray<Mesh>& meshes, Material& mat)
 
 		for (uint pass = 0; pass < mat.GetPassCount(); pass++)
 		{
+			pState->IncrementDraw();
 			mat.Setup(*this, pass);
 			pCtx->DrawIndexed(mesh.GetIndexCount(), 0, 0);
 		}

@@ -1,5 +1,6 @@
 #pragma once
 #include "WeaveEffects/ShaderDataHandles.hpp"
+#include "../CtxBase.hpp"
 #include "../Resources/ResourceBase.hpp"
 #include "../Resources/ResourceSet.hpp"
 
@@ -41,9 +42,13 @@ namespace Weave::D3D11
 		void Setup(CtxBase& ctx, int pass, const ResourceSet& res) const;
 
 	private:
-		using PassHandle = UniqueArray<const ShaderVariantBase*>;
+		struct EffectPass
+		{
+			UniqueArray<const ShaderVariantBase*> shaders;
+			CtxBase::ActiveShaderMask activeStages;
+		};
 
 		EffectDefHandle def;
-		UniqueArray<PassHandle> passes;
+		UniqueArray<EffectPass> passes;
 	};
 }

@@ -44,6 +44,8 @@ namespace Weave::D3D11
 			DepthStencilView = 1u << 6u | Write
 		};
 
+		static string_view GetUsageName(RWResourceUsages usage);
+
 		/// <summary>
 		/// Tracks the state of an individual shading stage's resources
 		/// </summary>
@@ -51,6 +53,7 @@ namespace Weave::D3D11
 		{
 			ShadeStages stage;
 			const ShaderVariantBase* pShader;
+			ulong drawCount;
 
 			UniqueArray<Sampler*> samplers;
 			uint sampCount;
@@ -122,6 +125,10 @@ namespace Weave::D3D11
 		/// Returns true if the state has been initialized
 		/// </summary>
 		bool GetIsValid() const;
+
+		ulong GetDrawCount() const;
+
+		void IncrementDraw();
 
 		/// <summary>
 		/// Returns state information for the given stage
@@ -256,8 +263,10 @@ namespace Weave::D3D11
 		/// </summary>
 		struct RWConflictDesc
 		{
-			ShadeStages stage;
-			RWResourceUsages usage;
+			ShadeStages nextStage;
+			RWResourceUsages nextUsage;
+			ShadeStages lastStage;
+			RWResourceUsages lastUsage;
 			uint slot;
 		};
 
@@ -306,6 +315,7 @@ namespace Weave::D3D11
 			SlotList slots;
 		};
 
+		ulong drawCount;
 		UniqueArray<StageState> stages;
 
 		PrimTopology topology;
@@ -336,5 +346,7 @@ namespace Weave::D3D11
 
 		template<RWResourceUsages UsageT, typename ResT>
 		void UpdateUsageMap(ShadeStages stage, const Span<ResT*> stateRes, const IDynamicArray<ResT*>& newRes);
+
+		void LogInvalidStateTransitions(RWConflictDesc conflict);
 	};
 }

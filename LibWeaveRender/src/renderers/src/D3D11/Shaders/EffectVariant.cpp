@@ -13,26 +13,31 @@ EffectVariant::EffectVariant(ShaderVariantManager& lib, EffectDefHandle effectDe
 	def(effectDef),
 	passes(effectDef.GetPassCount())
 { 
-	for (uint i = 0; i < def.GetPassCount(); i++)
+	for (uint passDef = 0; passDef < def.GetPassCount(); passDef++)
 	{
-		const IDynamicArray<uint>& pass = def.GetPass(i);
-		passes[i] = PassHandle(pass.GetLength());
+		const IDynamicArray<uint>& pass = def.GetPass(passDef);
+		passes[passDef].shaders = DynamicArray<const ShaderVariantBase*>(pass.GetLength());
+		passes[passDef].activeStages = {};
 
-		for (int j = 0; j < pass.GetLength(); j++)
+		for (uint shader = 0; shader < pass.GetLength(); shader++)
 		{
-			const ShaderDefHandle shaderDef = effectDef.GetShader(i, j);
-			const uint shaderID = pass[j];
+			const ShaderDefHandle shaderDef = effectDef.GetShader(passDef, shader);
+			const uint shaderID = pass[shader];
+			const ShadeStages stage = shaderDef.GetStage();
 
 			switch (shaderDef.GetStage())
 			{
 				case ShadeStages::Vertex:
-					passes[i][j] = &lib.GetShader<VertexShaderVariant>(shaderID);
+					passes[passDef].shaders[shader] = &lib.GetShader<VertexShaderVariant>(shaderID);
+					passes[passDef].activeStages[(uint)stage] = true;
 					break;
 				case ShadeStages::Pixel:
-					passes[i][j] = &lib.GetShader<PixelShaderVariant>(shaderID);
+					passes[passDef].shaders[shader] = &lib.GetShader<PixelShaderVariant>(shaderID);
+					passes[passDef].activeStages[(uint)stage] = true;
 					break;
 				case ShadeStages::Compute:
-					passes[i][j] = &lib.GetShader<ComputeShaderVariant>(shaderID);
+					passes[passDef].shaders[shader] = &lib.GetShader<ComputeShaderVariant>(shaderID);
+					passes[passDef].activeStages[(uint)stage] = true;
 					break;
 				default:
 					D3D_ASSERT_MSG("Unsupported effect shader specified");
@@ -59,14 +64,10 @@ uint EffectVariant::GetShaderCount(const int pass) const { return (uint)def.GetS
 
 void EffectVariant::Setup(CtxBase& ctx, int pass, const ResourceSet& res) const
 {
-	CtxBase::ActiveShaderSet activeStages = {};
+	ctx.SetActiveStages(passes[pass].activeStages);
 
-	for (int i = 0; i < passes[pass].GetLength(); i++)
+	for (const ShaderVariantBase* pShader : passes[pass].shaders)
 	{
-		const ShaderVariantBase& shader = *passes[pass][i];
-		ctx.BindShader(shader, res);
-		activeStages[(uint)shader.GetStage()] = true;
+		ctx.BindShader(*pShader, res);
 	}
-
-	ctx.UnbindInactiveStages(activeStages);
 }
