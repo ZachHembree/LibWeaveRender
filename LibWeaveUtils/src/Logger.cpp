@@ -209,6 +209,27 @@ namespace Weave
         }
     }
 
+    Logger::Message& Logger::Message::operator<<(wstring_view value)
+    {
+        if (level != Level::Discard)
+        {
+            GetMultiByteString_UTF16LE_TO_UTF8(value, instance.utf8ConvBuffer);
+            *pMsgBuf << instance.utf8ConvBuffer.data();
+        }
+
+        return *this;
+    }
+
+    Logger::Message& Logger::Message::operator<<(wchar_t* pValue)
+    {
+        return operator<<(wstring_view(pValue));
+    }
+
+    Logger::Message& Logger::Message::operator<<(const wstring& value)
+    {
+        return operator<<(wstring_view(value));
+    }
+
     string_view Logger::GetLevelName(Level level)
     {
         switch (level)

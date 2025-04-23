@@ -10,7 +10,7 @@ using namespace Weave::D3D11;
 
 Device::Device(Renderer& renderer) : pRenderer(&renderer)
 {
-	LOG_INFO() << "Device Init";
+	WV_LOG_INFO() << "Device Init";
 
 	ComPtr<ID3D11DeviceContext> pCtxBase;
 	ComPtr<ID3D11Device> pDevBase;
@@ -44,7 +44,7 @@ Device::Device(Renderer& renderer) : pRenderer(&renderer)
 	DXGI_ADAPTER_DESC1 adapterDesc;
 	D3D_CHECK_HR(pAdapter->GetDesc1(&adapterDesc));
 	
-	LOG_INFO() << 
+	WV_LOG_INFO() << 
 		"D3D Device Information" <<
 		"\nFeature Level: " << GetFeatureLevelName(pDev->GetFeatureLevel()) <<
 		"\nDebug: " << ((pDev->GetCreationFlags() & D3D11_CREATE_DEVICE_DEBUG) ? "TRUE" : "FALSE") <<

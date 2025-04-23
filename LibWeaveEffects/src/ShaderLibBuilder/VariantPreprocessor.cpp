@@ -118,7 +118,7 @@ namespace Weave::Effects
 				if (!err.is_recoverable())
 					FXSYNTAX_THROW("{}\nFile: {}\nLine: {}", err.description(), err.file_name(), err.line_no());
 				else
-					LOG_WARN() << err.description() << "\nFile: " << err.file_name() << "\nLine: " << err.line_no();
+					WV_LOG_WARN() << err.description() << "\nFile: " << err.file_name() << "\nLine: " << err.line_no();
 			}
 
 			++it;

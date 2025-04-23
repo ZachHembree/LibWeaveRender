@@ -79,7 +79,7 @@ void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_vie
 			GetEffectDefs(lib.variants[configID].effects, vID);
 
 			if (resCount == pShaderRegistry->GetUniqueResCount())
-				LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Not skipped.";
+				WV_LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Not skipped.";
 
 			libBufIndex++;
 			libBufIndex %= std::size(libBufs);
@@ -95,7 +95,7 @@ void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_vie
 			for (EffectVariantDef& effect : lib.variants[configID].effects)
 				effect.variantID = configID;
 
-			LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Skipped.";
+			WV_LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Skipped.";
 		}
 
 		ClearVariant();
@@ -135,7 +135,7 @@ void ShaderLibBuilder::InitVariants(VariantRepoDef& lib)
 
 	lib.variants = DynamicArray<VariantDef>(pVariantGen->GetVariantCount());
 
-	LOG_INFO() << "Variants declared: " << lib.variants.GetLength();
+	WV_LOG_INFO() << "Variants declared: " << lib.variants.GetLength();
 	FX_CHECK_MSG(lib.variants.GetLength() != 0, "No shaders found.");
 }
 

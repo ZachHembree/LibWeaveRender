@@ -13,7 +13,7 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	DeviceChild(dev),
 	backBufRt(dev, this, &pBackBuffer, &pBackBufRTV)
 {
-	LOG_INFO() << "Swap Chain Init";
+	WV_LOG_INFO() << "Swap Chain Init";
 
 	ComPtr<IDXGIFactory2> dxgiFactory;
 	D3D_CHECK_HR(CreateDXGIFactory1(__uuidof(IDXGIFactory2), &dxgiFactory));
@@ -50,7 +50,7 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 
 	GetBuffers();
 
-	LOG_INFO() << 
+	WV_LOG_INFO() << 
 		"Swap Chain Configuration" <<
 		"\nWindowed Mode: " << (fsDesc.Windowed ? "TRUE" : "FALSE") <<
 		"\nWindow Size: " << wnd.GetBodySize().x << " x " << wnd.GetBodySize().y <<

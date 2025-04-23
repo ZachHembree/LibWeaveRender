@@ -26,27 +26,27 @@
 #define WV_LOG_DEBUG_LEVEL 4
 
 #if WV_LOG_LEVEL >= WV_LOG_ERROR_LEVEL
-#define LOG_ERROR() Weave::Logger::Log(Weave::Logger::Level::Error)
+#define WV_LOG_ERROR() Weave::Logger::Log(Weave::Logger::Level::Error)
 #else
-#define LOG_ERROR() Weave::Logger::GetNullMessage()
+#define WV_LOG_ERROR() Weave::Logger::GetNullMessage()
 #endif
 
 #if WV_LOG_LEVEL >= WV_LOG_WARN_LEVEL
-#define LOG_WARN() Weave::Logger::Log(Weave::Logger::Level::Warning)
+#define WV_LOG_WARN() Weave::Logger::Log(Weave::Logger::Level::Warning)
 #else
-#define LOG_WARN() Weave::Logger::GetNullMessage()
+#define WV_LOG_WARN() Weave::Logger::GetNullMessage()
 #endif
 
 #if WV_LOG_LEVEL >= WV_LOG_INFO_LEVEL
-#define LOG_INFO() Weave::Logger::Log(Weave::Logger::Level::Info)
+#define WV_LOG_INFO() Weave::Logger::Log(Weave::Logger::Level::Info)
 #else
-#define LOG_INFO() Weave::Logger::GetNullMessage()
+#define WV_LOG_INFO() Weave::Logger::GetNullMessage()
 #endif
 
 #if WV_LOG_LEVEL >= WV_LOG_DEBUG_LEVEL
-#define LOG_DEBUG() Weave::Logger::Log(Weave::Logger::Level::Debug)
+#define WV_LOG_DEBUG() Weave::Logger::Log(Weave::Logger::Level::Debug)
 #else
-#define LOG_DEBUG() Weave::Logger::GetNullMessage()
+#define WV_LOG_DEBUG() Weave::Logger::GetNullMessage()
 #endif
 
 namespace Weave
@@ -76,21 +76,11 @@ namespace Weave
           
             ~Message();
 
-            Message& operator<<(wstring_view value)
-            {
-                if (level != Level::Discard)
-                {
-                    GetMultiByteString_UTF16LE_TO_UTF8(value, instance.utf8ConvBuffer);
-                    *pMsgBuf << instance.utf8ConvBuffer.data();
-                }
+            Message& operator<<(wstring_view value);
 
-                return *this;
-            }
+            Message& operator<<(wchar_t* pValue);
 
-            Message& operator<<(wchar_t* pValue)
-            {
-                return operator<<(wstring_view(pValue));
-            }
+            Message& operator<<(const wstring& value);
 
             template <typename T>
             Message& operator<<(const T& value)
@@ -176,6 +166,8 @@ namespace Weave
         static void SetLogLevel(Logger::Level level);
 
     private:
+        MAKE_MOVE_ONLY(Logger)
+
         static Logger instance;
         static const NullMessage nullMsg;
         static std::mutex mutex;
@@ -197,8 +189,6 @@ namespace Weave
         ObjectPool<MessageBuffer> sstreamPool;
         bool isInitialized;
         uint logLevel;
-
-        MAKE_MOVE_ONLY(Logger)
 
         Logger();
 

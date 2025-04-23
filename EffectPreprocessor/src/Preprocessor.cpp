@@ -44,7 +44,7 @@ static void GetFilesByExtension(const fs::path& dir, string_view ext, std::unord
     // Ensure the directory exists before iterating
     if (!fs::exists(dir) || !fs::is_directory(dir)) 
     {
-        LOG_WARN() << "Directory not found or is not a directory: " << dir;
+        WV_LOG_WARN() << "Directory not found or is not a directory: " << dir;
         return;
     }
 
@@ -239,14 +239,14 @@ static void ValidateOutputDir(const fs::path& outputPath)
     // Check if the parent path is non-empty and doesn't exist
     if (!parentDir.empty() && !fs::exists(parentDir))
     {
-        LOG_INFO() << "Attempting to create output directories: " << parentDir;
+        WV_LOG_INFO() << "Attempting to create output directories: " << parentDir;
 
         try 
         {
             if (fs::create_directories(parentDir))
-                LOG_INFO() << "Created output directories: " << parentDir;
+                WV_LOG_INFO() << "Created output directories: " << parentDir;
             else
-                LOG_WARN() << "Could not create output directories (or they already existed): " << parentDir;
+                WV_LOG_WARN() << "Could not create output directories (or they already existed): " << parentDir;
         }
         catch (const fs::filesystem_error& e) 
         {
@@ -304,21 +304,21 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
     WriteBinary(output, streamBuf);
 
     // Log success and statistics
-    LOG_INFO() << "Successfully wrote library to: " << output;
-    LOG_INFO() << "  Library Stats:";
-    LOG_INFO() << "    Shaders:   " << (shaderLib.regHandle.pShaders ? shaderLib.regHandle.pShaders->GetLength() : 0);
-    LOG_INFO() << "    Effects:   " << (shaderLib.regHandle.pEffects ? shaderLib.regHandle.pEffects->GetLength() : 0);
-    LOG_INFO() << "    Constants: " << (shaderLib.regHandle.pConstants ? shaderLib.regHandle.pConstants->GetLength() : 0);
-    LOG_INFO() << "    Resources: " << (shaderLib.regHandle.pResources ? shaderLib.regHandle.pResources->GetLength() : 0);
+    WV_LOG_INFO() << "Successfully wrote library to: " << output;
+    WV_LOG_INFO() << "  Library Stats:";
+    WV_LOG_INFO() << "    Shaders:   " << (shaderLib.regHandle.pShaders ? shaderLib.regHandle.pShaders->GetLength() : 0);
+    WV_LOG_INFO() << "    Effects:   " << (shaderLib.regHandle.pEffects ? shaderLib.regHandle.pEffects->GetLength() : 0);
+    WV_LOG_INFO() << "    Constants: " << (shaderLib.regHandle.pConstants ? shaderLib.regHandle.pConstants->GetLength() : 0);
+    WV_LOG_INFO() << "    Resources: " << (shaderLib.regHandle.pResources ? shaderLib.regHandle.pResources->GetLength() : 0);
 
     if (shaderLib.pPlatform) 
     {
-        LOG_INFO() << "  Platform Info:";
-        LOG_INFO() << "    Compiler:     " << shaderLib.pPlatform->compilerVersion;
-        LOG_INFO() << "    Feature Level:" << shaderLib.pPlatform->featureLevel;
+        WV_LOG_INFO() << "  Platform Info:";
+        WV_LOG_INFO() << "    Compiler:     " << shaderLib.pPlatform->compilerVersion;
+        WV_LOG_INFO() << "    Feature Level:" << shaderLib.pPlatform->featureLevel;
     }
     else
-        LOG_WARN() << "  Platform info not available in ShaderLibDef.";
+        WV_LOG_WARN() << "  Platform info not available in ShaderLibDef.";
 
     libBuilder.Clear();
 }
@@ -337,7 +337,7 @@ static void CreateLibrary()
     if (featureLevel.empty()) 
     {
         featureLevel = "5_0";
-        LOG_INFO() << "Using default feature level: " << featureLevel;
+        WV_LOG_INFO() << "Using default feature level: " << featureLevel;
     }
 
     // Configure the library builder
@@ -378,7 +378,7 @@ static void CreateLibrary()
     for (const string& inputFileStr : inputFiles)
     {
         fs::path inFile(inputFileStr);
-        LOG_INFO() << "Processing input file: " << inFile;
+        WV_LOG_INFO() << "Processing input file: " << inFile;
 
         // Read input file content into the buffer
         GetInput(inFile, streamBuf);
@@ -420,7 +420,7 @@ static void CreateLibrary()
             else
                 currentOutFile.replace_extension(".bin");
            
-            LOG_INFO() << "Output path for this file: " << currentOutFile;
+            WV_LOG_INFO() << "Output path for this file: " << currentOutFile;
             WriteLibrary(baseName, libBuilder, streamBuf, currentOutFile);
         }
     }
@@ -438,12 +438,12 @@ static void CreateLibrary()
             outPath.replace_extension(".bin");
 
         string mergedName = outPath.stem().string(); // Use output filename stem for name
-        LOG_INFO() << "Writing merged library: " << outPath;
+        WV_LOG_INFO() << "Writing merged library: " << outPath;
         WriteLibrary(mergedName, libBuilder, streamBuf, outPath);
     }
 
     timer.Stop();
-    LOG_INFO() << "Total processing time: " << timer.GetElapsedMS() << " ms";
+    WV_LOG_INFO() << "Total processing time: " << timer.GetElapsedMS() << " ms";
 }
 
 /**
@@ -576,21 +576,21 @@ static int RunCLI(const IDynamicArray<string_view>& args)
         // Preprocess shaders
         const GenericMainT<const IDynamicArray<string_view>&> LibFunc = [](const IDynamicArray<string_view>& args)
         {
-            LOG_INFO() << "WFX Preprocessor Initializing...";
-            LOG_INFO() << "Working Directory: " << fs::current_path().string();
+            WV_LOG_INFO() << "WFX Preprocessor Initializing...";
+            WV_LOG_INFO() << "Working Directory: " << fs::current_path().string();
 
             {
                 // Log the command line used to invoke the program
-                auto cmdLine = LOG_INFO();
+                auto cmdLine = WV_LOG_INFO();
                 cmdLine << "Command Line: ";
                 for (string_view arg : args) { cmdLine << arg << " "; }
             }
 
             CreateLibrary();
-            LOG_INFO() << "Processing completed successfully.";
+            WV_LOG_INFO() << "Processing completed successfully.";
         };
 
-        auto logErr = LOG_ERROR();
+        auto logErr = WV_LOG_ERROR();
         exitCode = GenericMain(logErr, LibFunc, args);
     }
 
