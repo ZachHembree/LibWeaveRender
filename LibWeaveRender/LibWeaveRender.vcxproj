@@ -316,6 +316,8 @@
     <ClCompile Include="src\renderers\src\D3D11\CtxBase.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\ContextState.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\ContextUtils.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\InternalD3D11.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\Formats.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\MappedBufferHandle.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\ResizeableTexture2D.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\ResourceBase.cpp" />
