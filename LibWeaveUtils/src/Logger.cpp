@@ -7,21 +7,32 @@ namespace Weave
     const Logger::NullMessage Logger::nullMsg = {};
     std::mutex Logger ::mutex;
 
-    Logger::Logger() : isInitialized(false), logLevel(WV_LOG_LEVEL)
+    Logger::Logger() : 
+        isInitialized(false), 
+        logLevel(WV_LOG_LEVEL),
+        msgHistory(10),
+        historyIndex(0)
     { }
 
-    Logger::~Logger() = default;
+    Logger::~Logger()
+    {
+        FlushLogBuffer();
+    }
 
     void Logger::Reset() { instance = Logger(); }
 
     bool Logger::GetIsInitialized() { return instance.isInitialized; }
 
-    void Logger::Init(std::ostream& logOut)
+    void Logger::Init(std::ostream& logOut, bool fast)
     {
         std::lock_guard<std::mutex> lock(mutex);
         WV_CHECK_MSG(!instance.isInitialized, "Tried to initialize logger twice.");
 
-        instance.logStreams.Add(&logOut);
+        if (fast)
+            instance.logStreamsFast.Add(&logOut);
+        else
+            instance.logStreams.Add(&logOut);
+
         instance.isInitialized = true;
     }
 
@@ -33,13 +44,47 @@ namespace Weave
         Init(instance.logFile);
     }
 
-    void Logger::AddStream(std::ostream& stream)
+    void Logger::AddStream(std::ostream& stream, bool fast)
     {
         std::lock_guard<std::mutex> lock(mutex);
+
         if (!instance.isInitialized)
             Init(stream);
         else
-            instance.logStreams.Add(&stream);
+        {
+            if (fast)
+                instance.logStreamsFast.Add(&stream);
+            else
+                instance.logStreams.Add(&stream);
+        }
+    }
+
+    void Logger::WriteToLog(Level level, string_view message)
+    {
+        if (!message.empty() && level != Level::Discard)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+
+            if (instance.TryBufferLog(message))
+            {
+                instance.msgBuffer.clear();
+                instance.msgBuffer.str({});
+
+                AddTimestamp(instance.msgBuffer);
+                instance.msgBuffer << std::format("[{}] ", GetLevelName(level)) << message << std::endl;
+
+                for (std::ostream* pOut : instance.logStreamsFast)
+                {
+                    if (pOut->rdstate() == std::ios::goodbit)
+                        *pOut << instance.msgBuffer.view();
+                }
+
+                instance.logBuffer << instance.msgBuffer.view();
+
+                if (instance.flushTimer.GetElapsedS() > WV_LOG_TIME_S)
+                    instance.FlushLogBuffer();
+            }
+        }
     }
 
     Logger::MessageBuffer Logger::GetStrBuf()
@@ -60,6 +105,50 @@ namespace Weave
     {
         std::lock_guard<std::mutex> lock(mutex);
         instance.sstreamPool.Return(std::move(buf));
+    }
+
+    bool Logger::TryBufferLog(string_view message)
+    {
+        bool isNew = true;
+
+        for (uint i = 0; i < (uint)msgHistory.GetLength(); i++)
+        {
+            if (msgHistory[i].view() == message)
+            {
+                isNew = false;
+                break;
+            }
+        }
+
+        if (isNew)
+        {
+            std::stringstream& hist = msgHistory[historyIndex];
+            hist.clear();
+            hist.str({});
+            hist << message;
+            historyIndex = (historyIndex + 1) % msgHistory.GetLength();
+        }
+
+        return isNew;
+    }
+
+    void Logger::FlushLogBuffer()
+    {
+        if (!isInitialized)
+            throw std::runtime_error("Tried to write to uninitialized log.");
+
+        if (logBuffer.view().empty())
+            return;
+
+        for (std::ostream* pOut : logStreams)
+        {
+            if (pOut->rdstate() == std::ios::goodbit)
+                *pOut << logBuffer.view() << std::flush;
+        }
+
+        logBuffer.clear();
+        logBuffer.str({});
+        flushTimer.Restart();
     }
 
     Logger::Message Logger::Log(Level level)
@@ -114,13 +203,13 @@ namespace Weave
         if (pMsgBuf.get() != nullptr)
         {
             if (!pMsgBuf->view().empty())
-                Logger::WriteLine(pMsgBuf->view());
+                Logger::WriteToLog(level, pMsgBuf->view());
 
             Logger::ReturnStrBuf(std::move(pMsgBuf));
         }
     }
 
-    const char* Logger::Message::GetLevelName(Level level)
+    string_view Logger::GetLevelName(Level level)
     {
         switch (level)
         {

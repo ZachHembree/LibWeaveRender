@@ -564,7 +564,7 @@ static int RunCLI(const IDynamicArray<string_view>& args)
         {
             // Initialize logging to file and console
             Logger::InitToFile(logPath);
-            Logger::AddStream(std::cout);
+            Logger::AddStream(std::cout, true);
         };
 
         const fs::path logPath = (fs::current_path() / "wfxc.log");

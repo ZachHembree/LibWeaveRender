@@ -15,6 +15,11 @@
 #endif // !NDEBUG
 #endif 
 
+#ifndef WV_LOG_TIME_S
+// Defines the minimum time between log file writes
+#define WV_LOG_TIME_S 10.0
+#endif // !WV_LOG_TIME_S
+
 #define WV_LOG_ERROR_LEVEL 1
 #define WV_LOG_WARN_LEVEL 2
 #define WV_LOG_INFO_LEVEL 3
@@ -78,15 +83,7 @@ namespace Weave
             Message& operator<<(const T& value)
             {
                 if (level != Level::Discard)
-                {
-                    if (pMsgBuf->view().empty())
-                    {
-                        AddTimestamp(*pMsgBuf);
-                        *pMsgBuf << std::format("[{}] ", GetLevelName(level));
-                    }
-
                     *pMsgBuf << value;
-                }
 
                 return *this;
             }
@@ -94,8 +91,6 @@ namespace Weave
         private:
             Level level;
             MessageBuffer pMsgBuf;
-
-            static const char* GetLevelName(Level level);
         };
 
         /// <summary>
@@ -115,7 +110,7 @@ namespace Weave
         /// <summary>
         /// Initializes the log to the given output stream. Caller is responsible for stream lifetime.
         /// </summary>
-        static void Init(std::ostream& logOut);
+        static void Init(std::ostream& logOut, bool fast = false);
 
         /// <summary>
         /// Creates a new log file at the given path and sets it as the output for the logger.
@@ -123,9 +118,20 @@ namespace Weave
         static void InitToFile(const std::filesystem::path& logPath);
 
         /// <summary>
-        /// Adds an output stream to the logger. Caller is responsible for stream lifetime.
+        /// Adds an output stream to the logger. Caller is responsible for stream lifetime. 
+        /// If fast == true, then the stream output will not be buffered.
         /// </summary>
-        static void AddStream(std::ostream& logOut);
+        static void AddStream(std::ostream& logOut, bool fast = false);
+
+        /// <summary>
+        /// Writes a time stamped string to the log
+        /// </summary>
+        static void WriteToLog(Level level, string_view message);
+
+        /// <summary>
+        /// Returns the name of the give log level
+        /// </summary>
+        static string_view GetLevelName(Level level);
 
         /// <summary>
         /// Resets the logger to its default state.
@@ -153,6 +159,27 @@ namespace Weave
         static void SetLogLevel(Logger::Level level);
 
     private:
+        static Logger instance;
+        static const NullMessage nullMsg;
+        static std::mutex mutex;
+
+        std::stringstream logBuffer;
+        std::stringstream msgBuffer;
+
+        DynamicArray<std::stringstream> msgHistory;
+        uint historyIndex;
+        Stopwatch flushTimer;
+
+        // Main logging file
+        std::fstream logFile;
+        Vector<std::ostream*> logStreams;
+        // Fast log streams, unbuffered. Suitable for consoles.
+        Vector<std::ostream*> logStreamsFast;
+
+        ObjectPool<MessageBuffer> sstreamPool;
+        bool isInitialized;
+        uint logLevel;
+
         MAKE_MOVE_ONLY(Logger)
 
         Logger();
@@ -161,35 +188,12 @@ namespace Weave
 
         static void AddTimestamp(std::ostream& stream);
 
-        template <typename T>
-        static void WriteLine(const T& value)
-        {
-            std::lock_guard<std::mutex> lock(mutex);
-
-            if (!instance.isInitialized)
-                throw std::runtime_error("Tried to write to uninitialized log.");
-
-            for (std::ostream* pOut : instance.logStreams)
-            {
-                if (pOut->rdstate() == std::ios::goodbit)
-                    *pOut << value << std::endl;
-                else
-                    throw std::runtime_error("Failed to write to log stream.");
-            }
-        }
-
         static MessageBuffer GetStrBuf();
 
         static void ReturnStrBuf(MessageBuffer&&);
 
-        static Logger instance;
-        static const NullMessage nullMsg;
-        static std::mutex mutex;
+        bool TryBufferLog(string_view message);
 
-        std::fstream logFile;
-        Vector<std::ostream*> logStreams;
-        ObjectPool<MessageBuffer> sstreamPool;
-        bool isInitialized;
-        uint logLevel;
+        void FlushLogBuffer();
     };
 }
