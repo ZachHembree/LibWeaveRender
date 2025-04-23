@@ -33,7 +33,7 @@
 #define NOTAPE                   // Tape APIs
 #define NOKERNEL
 
-#include <wrl.h> 
+#include <wrl/client.h>
 #include "WeaveUtils/Math.hpp"
 #include "WeaveUtils/Utils.hpp"
 
