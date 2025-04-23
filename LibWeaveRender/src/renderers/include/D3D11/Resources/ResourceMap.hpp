@@ -76,13 +76,13 @@ namespace Weave::D3D11
 		using ResourceMap<Sampler, ShaderTypes::Sampler>::ResourceMap;
 	};
 
-	class ResourceViewMap : public ResourceMap<IShaderResource, ShaderTypes::Texture>
+	class ResourceViewMap : public ResourceMap<IShaderResource, ShaderTypes::ReadOnlyTexture>
 	{ 
-		using ResourceMap<IShaderResource, ShaderTypes::Texture>::ResourceMap;
+		using ResourceMap<IShaderResource, ShaderTypes::ReadOnlyTexture>::ResourceMap;
 	};
 
-	class UnorderedAccessMap : public ResourceMap<IUnorderedAccess, ShaderTypes::RandomWrite>
+	class UnorderedAccessMap : public ResourceMap<IUnorderedAccess, ShaderTypes::RandomRW>
 	{
-		using ResourceMap<IUnorderedAccess, ShaderTypes::RandomWrite>::ResourceMap;
+		using ResourceMap<IUnorderedAccess, ShaderTypes::RandomRW>::ResourceMap;
 	};
 }

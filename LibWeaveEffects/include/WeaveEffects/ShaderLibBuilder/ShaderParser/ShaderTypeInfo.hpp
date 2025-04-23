@@ -31,43 +31,46 @@ namespace Weave::Effects
         Min10 = 1 << 17,
         Min16 = 1 << 18,
 
-        RandomWrite = 1 << 19,
-        Structured = 1 << 20,
+        ReadOnly = 1 << 19,
+        RandomRW = 1 << 20,
+        Structured = 1 << 21,
 
-        Dim1 = 1 << 22,
-        Dim2 = 1 << 23,
-        Dim3 = 1 << 24,
-        Dim4 = 1 << 25,
+        Dim1 = 1 << 23,
+        Dim2 = 1 << 24,
+        Dim3 = 1 << 25,
+        Dim4 = 1 << 26,
 
-        DimAx1 = 1 << 26,
-        DimAx2 = 1 << 27,
-        DimAx3 = 1 << 28,
-        DimAx4 = 1 << 29,
+        DimAx1 = 1 << 27,
+        DimAx2 = 1 << 28,
+        DimAx3 = 1 << 29,
+        DimAx4 = 1 << 30,
 
-        UserType = 1ull << 30,
-        Template = 1ull << 31,
+        UserType = 1ull << 31,
+        Template = 1ull << 32,
 
         Texture1D = Texture | Dim1,
         Texture2D = Texture | Dim2,
         Texture3D = Texture | Dim3,
 
-        RwTexture = RandomWrite | Texture,
-        RWTexture1D = RandomWrite | Texture1D,
-        RWTexture2D = RandomWrite | Texture2D,
-        RWTexture3D = RandomWrite | Texture3D,
+        ReadOnlyTexture = ReadOnly | Texture,
+        RwTexture = RandomRW | Texture,
+
+        RWTexture1D = RandomRW | Texture1D,
+        RWTexture2D = RandomRW | Texture2D,
+        RWTexture3D = RandomRW | Texture3D,
 
         Texture1DArray = Texture1D | Array,
         Texture2DArray = Texture2D | Array,
 
-        RwTexture1DArray = RandomWrite | RWTexture1D,
-        RwTexture2DArray = RandomWrite | RWTexture2D,
+        RwTexture1DArray = RandomRW | RWTexture1D,
+        RwTexture2DArray = RandomRW | RWTexture2D,
 
         TextureCube = Texture | Cube,
         TextureCubeArray = TextureCube | Array,
 
-        RwBuffer = RandomWrite | Buffer,
+        RwBuffer = RandomRW | Buffer,
         StructuredBuffer = Structured | Buffer,
-        RwStructuredBuffer = RandomWrite | StructuredBuffer,
+        RwStructuredBuffer = RandomRW | StructuredBuffer,
 
         HalfFloat = Half | Float,
         Min10Float = Min10 | Float,
