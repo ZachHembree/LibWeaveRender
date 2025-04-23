@@ -71,13 +71,26 @@ namespace Weave
         /// </summary>
         struct Message
         {
+            friend Logger;
             MAKE_MOVE_ONLY(Message)
-
-            Message();
-
-            Message(Level level, MessageBuffer&& msgBuf);
-
+          
             ~Message();
+
+            Message& operator<<(wstring_view value)
+            {
+                if (level != Level::Discard)
+                {
+                    GetMultiByteString_UTF16LE_TO_UTF8(value, instance.utf8ConvBuffer);
+                    *pMsgBuf << instance.utf8ConvBuffer.data();
+                }
+
+                return *this;
+            }
+
+            Message& operator<<(wchar_t* pValue)
+            {
+                return operator<<(wstring_view(pValue));
+            }
 
             template <typename T>
             Message& operator<<(const T& value)
@@ -91,6 +104,10 @@ namespace Weave
         private:
             Level level;
             MessageBuffer pMsgBuf;
+
+            Message();
+
+            Message(Level level, MessageBuffer&& msgBuf);
         };
 
         /// <summary>
@@ -165,6 +182,7 @@ namespace Weave
 
         std::stringstream logBuffer;
         std::stringstream msgBuffer;
+        string utf8ConvBuffer;
 
         DynamicArray<std::stringstream> msgHistory;
         uint historyIndex;

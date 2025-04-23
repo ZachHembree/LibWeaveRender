@@ -50,8 +50,8 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 
 	GetBuffers();
 
-	LOG_INFO() 
-		<< "Swap Chain Configuration" <<
+	LOG_INFO() << 
+		"Swap Chain Configuration" <<
 		"\nWindowed Mode: " << (fsDesc.Windowed ? "TRUE" : "FALSE") <<
 		"\nWindow Size: " << wnd.GetBodySize().x << " x " << wnd.GetBodySize().y <<
 		"\nBuffer Size: " << monRes.x << " x " << monRes.y <<

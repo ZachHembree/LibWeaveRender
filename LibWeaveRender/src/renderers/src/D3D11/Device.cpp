@@ -35,20 +35,20 @@ Device::Device(Renderer& renderer) : pRenderer(&renderer)
 
 	// Get device info
 	ComPtr<IDXGIDevice1> pDxgiDev;
-	ComPtr<IDXGIAdapter> pAdapter;
-	ComPtr<IDXGIAdapter1> pAdapter1;
+	ComPtr<IDXGIAdapter> pAdapterBase;
+	ComPtr<IDXGIAdapter1> pAdapter;
 	D3D_CHECK_HR(pDev.As(&pDxgiDev));
-	D3D_CHECK_HR(pDxgiDev->GetAdapter(&pAdapter));
-	D3D_CHECK_HR(pAdapter.As(&pAdapter1));
-
+	D3D_CHECK_HR(pDxgiDev->GetAdapter(&pAdapterBase));
+	D3D_CHECK_HR(pAdapterBase.As(&pAdapter));
+	
 	DXGI_ADAPTER_DESC1 adapterDesc;
-	D3D_CHECK_HR(pAdapter1->GetDesc1(&adapterDesc));
-
+	D3D_CHECK_HR(pAdapter->GetDesc1(&adapterDesc));
+	
 	LOG_INFO() << 
 		"D3D Device Information" <<
 		"\nFeature Level: " << GetFeatureLevelName(pDev->GetFeatureLevel()) <<
-		"\nDebug: " << ((g_DeviceFlags == D3D11_CREATE_DEVICE_DEBUG) ? "TRUE" : "FALSE") <<
-		"\nAdapter: " << GetMultiByteString_UTF16LE_TO_UTF8(adapterDesc.Description).data() <<
+		"\nDebug: " << ((pDev->GetCreationFlags() & D3D11_CREATE_DEVICE_DEBUG) ? "TRUE" : "FALSE") <<
+		"\nAdapter: " << adapterDesc.Description <<
 		"\nVendor ID: 0x" << std::hex << adapterDesc.VendorId << std::dec <<
 		"\nDevice ID: 0x" << std::hex << adapterDesc.DeviceId << std::dec <<
 		"\nSubSys ID: 0x" << std::hex << adapterDesc.SubSysId << std::dec <<

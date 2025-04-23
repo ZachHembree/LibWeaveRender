@@ -31,10 +31,11 @@ namespace Weave
 		return (size_t)size;
 	}
 
-	string GetMultiByteString_UTF16LE_TO_UTF8(wstring_view src)
+	void GetMultiByteString_UTF16LE_TO_UTF8(wstring_view src, string& dst)
 	{
 		size_t dstSize = GetMultiByteSize_UTF16LE_TO_UTF8(src);
-		string dst(dstSize + 1, '\0');
+		dst.clear();
+		dst.resize(dstSize, '\0');
 
 		WIN_CHECK_NZ_LAST(WideCharToMultiByte(
 			CP_UTF8,  // Code page
@@ -43,14 +44,20 @@ namespace Weave
 			&dst[0], (int)dst.size(), // Narrow dst
 			NULL, NULL // Default/fallback chars, invalid for UTF8
 		));
+	}
 
+	string GetMultiByteString_UTF16LE_TO_UTF8(wstring_view src)
+	{
+		string dst;
+		GetMultiByteString_UTF16LE_TO_UTF8(src, dst);
 		return dst;
 	}
 
-	wstring GetWideString_UTF8_TO_UTF16LE(string_view src)
+	void GetWideString_UTF8_TO_UTF16LE(string_view src, wstring& dst)
 	{
 		size_t dstSize = GetWideSize_UTF8_TO_UTF16LE(src);
-		wstring dst(dstSize + 1, '\0');
+		dst.clear();
+		dst.resize(dstSize, '\0');
 
 		WIN_CHECK_NZ_LAST(MultiByteToWideChar(
 			CP_UTF8, // Code page
@@ -58,7 +65,12 @@ namespace Weave
 			&src[0], (int)src.size(), // Narrow src	
 			&dst[0], (int)dst.size() // Wide dst
 		));
+	}
 
+	wstring GetWideString_UTF8_TO_UTF16LE(string_view src)
+	{
+		wstring dst;
+		GetWideString_UTF8_TO_UTF16LE(src, dst);
 		return dst;
 	}
 }

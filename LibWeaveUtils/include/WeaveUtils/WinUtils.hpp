@@ -47,14 +47,4 @@ namespace Weave
 
 	template <typename T>
 	using ComPtr = Microsoft::WRL::ComPtr<T>;
-
-	/// <summary>
-	/// Returns a copy of a given wide UTF-16LE string as a narrow UTF-8 string.
-	/// </summary>
-	string GetMultiByteString_UTF16LE_TO_UTF8(wstring_view src);
-
-	/// <summary>
-	/// Returns a copy of a given narrow UTF-8 string as a UTF-16LE string.
-	/// </summary>
-	wstring GetWideString_UTF8_TO_UTF16LE(string_view src);
 }
