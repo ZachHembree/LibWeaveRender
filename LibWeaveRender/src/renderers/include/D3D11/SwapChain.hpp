@@ -1,5 +1,4 @@
 #pragma once
-#include <dxgi1_2.h>
 #include "Device.hpp"
 #include "Resources/Texture2D.hpp"
 #include "Resources/RTHandle.hpp"
@@ -12,7 +11,6 @@ namespace Weave
 namespace Weave::D3D11
 {
 	class RTHandle;
-	class CtxImm;
 
 	class SwapChain : public DeviceChild
 	{

@@ -1,6 +1,6 @@
 #pragma once
 #include "ResourceBase.hpp"
-#include "Formats.hpp"
+#include "ResourceEnums.hpp"
 
 namespace DirectX
 {

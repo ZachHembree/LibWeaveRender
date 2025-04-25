@@ -1,4 +1,5 @@
 #pragma once
+#include "../InternalD3D11.hpp"
 #include "WeaveUtils/DataBufferHandle.hpp"
 #include "ResourceBase.hpp"
 

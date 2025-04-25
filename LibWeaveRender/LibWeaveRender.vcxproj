@@ -222,7 +222,7 @@
     <ClCompile Include="src\renderers\src\D3D11\ContextState.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\ContextUtils.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\InternalD3D11.cpp" />
-    <ClCompile Include="src\renderers\src\D3D11\Resources\Formats.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\Resources\ResourceEnums.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\MappedBufferHandle.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\ResizeableTexture2D.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\ResourceBase.cpp" />
@@ -279,7 +279,6 @@
     <ClInclude Include="src\renderers\include\D3D11\Resources\Texture2D.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ShaderLibrary.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\DepthStencilTexture.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\Resources\TextureEnums.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ImguiHandler.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ImguiRenderComponent.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\RenderComponent.hpp" />
@@ -289,7 +288,6 @@
     <ClInclude Include="src\renderers\include\D3D11\CtxImm.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Device.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\DeviceChild.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\Resources\Formats.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\InputLayout.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\IAsset.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\ResourceBase.hpp" />

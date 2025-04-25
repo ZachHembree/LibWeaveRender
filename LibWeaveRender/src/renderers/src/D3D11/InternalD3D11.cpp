@@ -3,17 +3,6 @@
 
 namespace Weave::D3D11
 {
-	template<typename EnumT>
-	static string_view GetEnumName(EnumT value, const std::unordered_map<EnumT, string_view>& nameMap)
-	{
-		const auto& it = nameMap.find(value);
-
-		if (it != nameMap.end())
-			return it->second;
-		else
-			return "Unknown Enum";
-	}
-
 	static const std::unordered_map<DXGI_MODE_SCALING, string_view> s_ScalingModeNames
 	{
 		{ DXGI_MODE_SCALING_UNSPECIFIED, "MODE_SCALING_UNSPECIFIED" },

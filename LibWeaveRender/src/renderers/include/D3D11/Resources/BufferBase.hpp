@@ -1,4 +1,5 @@
 #pragma once
+#include "../InternalD3D11.hpp"
 #include "ResourceBase.hpp"
 
 namespace Weave::D3D11

@@ -1,7 +1,7 @@
 #ifndef WV_WIND_H
 #define WV_WIND_H
 
-#include "WeaveUtils/Win32.hpp"
+#include "WeaveUtils/WinUtils.hpp"
 
 #pragma comment(lib, "Shcore.lib")
 

@@ -1,7 +1,6 @@
-#pragma once
 #include "pch.hpp"
 #include <unordered_map>
-#include "D3D11/Resources/Formats.hpp"
+#include "D3D11/Resources/ResourceEnums.hpp"
 
 namespace Weave::D3D11
 {
@@ -134,18 +133,74 @@ namespace Weave::D3D11
 		{ Formats::V408, "V408" }
 	};
 
-	template<typename EnumT>
-	static string_view GetEnumName(EnumT value, const std::unordered_map<EnumT, string_view>& nameMap)
-	{
-		const auto& it = nameMap.find(value);
-
-		if (it != nameMap.end())
-			return it->second;
-		else
-			return "Unknown Enum";
-	}
-
 	string_view GetInputClassName(InputClass inputClass) { return GetEnumName(inputClass, s_InputClassNames); }
 
 	string_view GetFormatName(Formats format) { return GetEnumName(format, s_FormatNames); }
+
+	std::unordered_map<TexFilterMode, string_view> s_FilterModeNames
+	{
+		{ TexFilterMode::POINT, "POINT" },
+		{ TexFilterMode::MIN_MAG_POINT_MIP_LINEAR, "MIN_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterMode::MIN_POINT_MAG_LINEAR_MIP_POINT, "MIN_POINT_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterMode::MIN_POINT_MAG_MIP_LINEAR, "MIN_POINT_MAG_MIP_LINEAR" },
+		{ TexFilterMode::MIN_LINEAR_MAG_MIP_POINT, "MIN_LINEAR_MAG_MIP_POINT" },
+		{ TexFilterMode::MIN_LINEAR_MAG_POINT_MIP_LINEAR, "MIN_LINEAR_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterMode::MIN_MAG_LINEAR_MIP_POINT, "MIN_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterMode::LINEAR, "LINEAR" },
+		{ TexFilterMode::ANISOTROPIC, "ANISOTROPIC" },
+		{ TexFilterMode::COMPARISON_POINT, "COMPARISON_POINT" },
+		{ TexFilterMode::COMPARISON_MIN_MAG_POINT_MIP_LINEAR, "COMPARISON_MIN_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterMode::COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT, "COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterMode::COMPARISON_MIN_POINT_MAG_MIP_LINEAR, "COMPARISON_MIN_POINT_MAG_MIP_LINEAR" },
+		{ TexFilterMode::COMPARISON_MIN_LINEAR_MAG_MIP_POINT, "COMPARISON_MIN_LINEAR_MAG_MIP_POINT" },
+		{ TexFilterMode::COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR, "COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterMode::COMPARISON_MIN_MAG_LINEAR_MIP_POINT, "COMPARISON_MIN_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterMode::COMPARISON_LINEAR, "COMPARISON_LINEAR" },
+		{ TexFilterMode::COMPARISON_ANISOTROPIC, "COMPARISON_ANISOTROPIC" },
+		{ TexFilterMode::MINIMUM_POINT, "MINIMUM_POINT" },
+		{ TexFilterMode::MINIMUM_MIN_MAG_POINT_MIP_LINEAR, "MINIMUM_MIN_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterMode::MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT, "MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterMode::MINIMUM_MIN_POINT_MAG_MIP_LINEAR, "MINIMUM_MIN_POINT_MAG_MIP_LINEAR" },
+		{ TexFilterMode::MINIMUM_MIN_LINEAR_MAG_MIP_POINT, "MINIMUM_MIN_LINEAR_MAG_MIP_POINT" },
+		{ TexFilterMode::MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR, "MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterMode::MINIMUM_MIN_MAG_LINEAR_MIP_POINT, "MINIMUM_MIN_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterMode::MINIMUM_LINEAR, "MINIMUM_LINEAR" },
+		{ TexFilterMode::MINIMUM_ANISOTROPIC, "MINIMUM_ANISOTROPIC" },
+		{ TexFilterMode::MAXIMUM_POINT, "MAXIMUM_POINT" },
+		{ TexFilterMode::MAXIMUM_MIN_MAG_POINT_MIP_LINEAR, "MAXIMUM_MIN_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterMode::MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT, "MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterMode::MAXIMUM_MIN_POINT_MAG_MIP_LINEAR, "MAXIMUM_MIN_POINT_MAG_MIP_LINEAR" },
+		{ TexFilterMode::MAXIMUM_MIN_LINEAR_MAG_MIP_POINT, "MAXIMUM_MIN_LINEAR_MAG_MIP_POINT" },
+		{ TexFilterMode::MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR, "MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterMode::MAXIMUM_MIN_MAG_LINEAR_MIP_POINT, "MAXIMUM_MIN_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterMode::MAXIMUM_LINEAR, "MAXIMUM_LINEAR" },
+		{ TexFilterMode::MAXIMUM_ANISOTROPIC, "MAXIMUM_ANISOTROPIC" }
+	};
+
+	string_view GetFilterModeName(TexFilterMode mode) { return GetEnumName(mode, s_FilterModeNames); }
+
+	static const std::unordered_map<TexClampMode, string_view> s_ClampModeNames
+	{
+		{ TexClampMode::WRAP, "WRAP" },
+		{ TexClampMode::MIRROR, "MIRROR" },
+		{ TexClampMode::CLAMP, "CLAMP" },
+		{ TexClampMode::BORDER, "BORDER" },
+		{ TexClampMode::MIRROR_ONCE, "MIRROR_ONCE" }
+	};
+
+	string_view GetTexClampModeName(TexClampMode mode) { return GetEnumName(mode, s_ClampModeNames); }
+
+	static const std::unordered_map<TexCmpFunc, string_view> s_CmpFuncNames
+	{
+		{ TexCmpFunc::NEVER, "NEVER" },
+		{ TexCmpFunc::LESS, "LESS" },
+		{ TexCmpFunc::EQUAL, "EQUAL" },
+		{ TexCmpFunc::LESS_EQUAL, "LESS_EQUAL" },
+		{ TexCmpFunc::GREATER, "GREATER" },
+		{ TexCmpFunc::NOT_EQUAL, "NOT_EQUAL" },
+		{ TexCmpFunc::GREATER_EQUAL, "GREATER_EQUAL" },
+		{ TexCmpFunc::ALWAYS, "ALWAYS" }
+	};
+
+	string_view GetTexCmpFuncName(TexCmpFunc func) { return GetEnumName(func, s_CmpFuncNames); }
 }

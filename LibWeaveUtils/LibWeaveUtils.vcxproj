@@ -33,7 +33,6 @@
     <ClInclude Include="include\WeaveUtils\DynamicCollections.hpp" />
     <ClInclude Include="include\WeaveUtils\MinWindow.hpp" />
     <ClInclude Include="include\WeaveUtils\WeaveException.hpp" />
-    <ClInclude Include="include\WeaveUtils\LeanWin.hpp" />
     <ClInclude Include="include\WeaveUtils\Int.hpp" />
     <ClInclude Include="include\WeaveUtils\WeaveWinException.hpp" />
     <ClInclude Include="include\WeaveUtils\Span.hpp" />

@@ -1,6 +1,8 @@
 #pragma once
 #include "DeviceChild.hpp"
-#include "TextureEnums.hpp"
+#include "ResourceEnums.hpp"
+
+struct ID3D11SamplerState;
 
 namespace Weave::D3D11
 {

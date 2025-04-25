@@ -2,10 +2,16 @@
 #pragma warning(disable: 4250)
 
 #include "WeaveUtils/Math.hpp"
-#include "../InternalD3D11.hpp"
 #include "DeviceChild.hpp"
 #include "ResourceEnums.hpp"
-#include "Formats.hpp"
+#include "ResourceEnums.hpp"
+
+struct ID3D11Resource;
+struct ID3D11ShaderResourceView;
+struct ID3D11RenderTargetView;
+struct ID3D11UnorderedAccessView;
+struct ID3D11DepthStencilState;
+struct ID3D11DepthStencilView;
 
 namespace Weave::D3D11
 {

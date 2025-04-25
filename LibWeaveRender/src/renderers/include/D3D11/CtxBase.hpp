@@ -1,11 +1,10 @@
 #pragma once
 #include "WeaveEffects/ShaderData.hpp"
 #include "WeaveUtils/Span.hpp"
-#include "WeaveUtils/WinUtils.hpp"
 #include "Resources/DeviceChild.hpp"
 #include "Resources/ResourceBase.hpp"
 
-struct ID3D11DeviceContext;
+struct ID3D11DeviceContext1;
 
 namespace Weave::D3D11
 {

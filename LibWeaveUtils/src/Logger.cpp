@@ -362,6 +362,7 @@ namespace Weave
         if (level != Level::Discard && pMsgBuf)
         {
             static thread_local string utf8ConvBuffer;
+            utf8ConvBuffer.clear();
             GetMultiByteString_UTF16LE_TO_UTF8(value, utf8ConvBuffer);
             *pMsgBuf << utf8ConvBuffer.data();
         }

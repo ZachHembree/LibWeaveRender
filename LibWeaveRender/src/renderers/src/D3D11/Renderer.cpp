@@ -5,6 +5,7 @@
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/Renderer.hpp"
 #include "D3D11/Resources/Sampler.hpp"
+#include "D3D11/Resources/DepthStencilTexture.hpp"
 #include "D3D11/Shaders/BuiltInShaders.hpp"
 #include "D3D11/Mesh.hpp"
 #include "D3D11/Primitives.hpp"
@@ -40,16 +41,10 @@ Renderer::Renderer(MinWindow& window) :
 
 Renderer::~Renderer() = default;
 
-/// <summary>
-/// Returns the interface to the *pDev the renderer is running on
-/// </summary>
 Device& Renderer::GetDevice() { return *pDev; }
 
 IRenderTarget& Renderer::GetBackBuffer() { return pSwap->GetBackBuf(); }
 
-/// <summary>
-/// Returns reference to the swap chain interface
-/// </summary>
 SwapChain& Renderer::GetSwapChain() { return *pSwap; }
 
 ShaderLibrary Renderer::CreateShaderLibrary(const ShaderLibDef& def) { return ShaderLibrary(*this, def); }

@@ -1,6 +1,6 @@
 #include "pch.hpp"
+#include "WeaveUtils/WinUtils.hpp"
 #include "WeaveUtils/WeaveWinException.hpp"
-#include <winnls.h>
 
 using namespace std;
 using namespace Weave;

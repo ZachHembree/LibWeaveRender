@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "WeaveEffects/ShaderData.hpp"
+#include "D3D11/InternalD3D11.hpp"
 #include "D3D11/ContextUtils.hpp"
 #include "D3D11/CtxBase.hpp"
 #include "D3D11/ContextState.hpp"

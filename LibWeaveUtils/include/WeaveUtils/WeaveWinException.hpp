@@ -1,7 +1,6 @@
 #pragma once
 #pragma warning(disable: 26444)
-
-#include "WeaveUtils/LeanWin.hpp"
+#include "WinUtils.hpp"
 #include "WeaveUtils/WeaveException.hpp"
 
 #ifndef NDEBUG

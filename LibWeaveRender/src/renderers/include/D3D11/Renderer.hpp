@@ -3,7 +3,6 @@
 #include "WeaveUtils/Utils.hpp"
 #include "WeaveUtils/WindowComponentBase.hpp"
 #include "Viewport.hpp"
-#include "Resources/DepthStencilTexture.hpp"
 #include "ShaderLibrary.hpp"
 
 #pragma comment(lib, "d3d11.lib")
@@ -14,16 +13,19 @@
 namespace Weave::D3D11
 { 
 	class Device;
+	class SwapChain;
+
 	class BufferBase;
 	class VertexBuffer;
 	class IndexBuffer;
 	class ConstantBuffer;
-	class SwapChain;
-	class Sampler;
-	class Mesh;
 
+	class Mesh;
 	class Material;
 	class ComputeInstance;
+	class Sampler;
+	class DepthStencilTexture;
+
 	class ShaderLibrary;
 	class RenderComponentBase;
 
@@ -40,7 +42,7 @@ namespace Weave::D3D11
 		Device& GetDevice();
 
 		/// <summary>
-		/// Returns handle to the swap chain's back buffer
+		/// Returns a handle to the swap chain's back buffer
 		/// </summary>
 		IRenderTarget& GetBackBuffer();
 

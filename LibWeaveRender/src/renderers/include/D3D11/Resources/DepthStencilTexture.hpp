@@ -1,6 +1,6 @@
 #pragma once
 #include "Texture2D.hpp"
-#include "TextureEnums.hpp"
+#include "ResourceEnums.hpp"
 
 namespace Weave::D3D11
 {
