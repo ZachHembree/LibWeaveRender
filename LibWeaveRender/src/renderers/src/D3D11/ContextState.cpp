@@ -503,6 +503,11 @@ static uint GetLastNonNull(const IDynamicArray<T*>& arr, uint start)
 void ContextState::LogInvalidStateTransitions(RWConflictDesc conflict)
 {
 	StageState& conflictState = stages[(uint)conflict.lastStage];
+
+	// No shader bound, conflict irrelevant
+	if (conflictState.pShader == nullptr)
+		return;
+
 	const bool isWriting = (conflict.nextUsage & RWResourceUsages::Write) == RWResourceUsages::Write;
 	// Conflict occured within same setup phase 
 	const bool intraStageSetupErr = (conflict.nextStage != conflict.lastStage && conflictState.drawCount == drawCount);
