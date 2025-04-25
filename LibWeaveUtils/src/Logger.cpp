@@ -1,12 +1,19 @@
 #include "pch.hpp"
+#include <condition_variable>
 #include "WeaveUtils/Logger.hpp"
 
 namespace Weave
 {
-    // --- Static Member Definitions ---
-    Logger Logger::instance;
-    const Logger::NullMessage Logger::nullMsg = {};
-    std::mutex Logger::mutex;
+    Logger Logger::s_Instance;
+
+    static const Logger::NullMessage s_NullMsg = {};
+    static std::atomic<bool> s_IsLogInitialized(false);
+    static std::atomic<bool> s_CanPoll(false);
+    static std::atomic<uint> s_LogLevel(WV_LOG_LEVEL);
+    static std::condition_variable s_IsBufferWritePending;
+
+    static std::mutex s_MsgPoolMutex;
+    static std::mutex s_WriteMutex;
 
     /// <summary>
     /// Private constructor: Initializes logger state.
@@ -14,8 +21,6 @@ namespace Weave
     /// Initializes the message history buffer.
     /// </summary>
     Logger::Logger() :
-        isInitialized(false),
-        logLevel(WV_LOG_LEVEL),
         msgHistory(10),
         historyIndex(0),
         sstreamPool() 
@@ -26,86 +31,124 @@ namespace Weave
     /// </summary>
     Logger::~Logger()
     {
-        if (isInitialized && !logBuffer.view().empty())
+        s_IsLogInitialized = false;
+        s_CanPoll = false;
+
+        if (!logBuffer.view().empty())
         {
-            try {
+            try 
+            {
                 FlushLogBuffer();
             }
-            catch (const std::exception& e) {
+            catch (const std::exception& e) 
+            {
                 std::cerr << "Error flushing log buffer during Logger destruction: " << e.what() << std::endl;
             }
-            catch (...) {
+            catch (...) 
+            {
                 std::cerr << "Unknown error flushing log buffer during Logger destruction." << std::endl;
             }
         }
     }
 
-    /// <summary>
-    /// Returns whether the logger has been initialized. Thread-safe.
-    /// </summary>
-    bool Logger::GetIsInitialized()
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        return instance.isInitialized;
-    }
+    Logger::Logger(Logger&& other) noexcept = default;
+
+    Logger& Logger::operator=(Logger&&) noexcept = default;
 
     /// <summary>
-    /// Initializes the logger with a stream. Thread-safe.
+    /// Returns whether the logger has been initialized.
     /// </summary>
-    void Logger::Init(std::ostream& logOut, bool fast)
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        WV_CHECK_MSG(!instance.isInitialized, "Tried to initialize logger twice.");
-
-        if (fast)
-            instance.logStreamsFast.Add(&logOut);
-        else
-            instance.bufferedLogStreams.Add(&logOut);
-
-        instance.isInitialized = true;
-        instance.flushTimer.Restart(); // Start the flush timer
-    }
+    bool Logger::GetIsInitialized() { return s_IsLogInitialized; }
 
     /// <summary>
     /// Initializes the logger to output to a file. Thread-safe.
     /// </summary>
     void Logger::InitToFile(const std::filesystem::path& logPath)
     {
-        std::lock_guard<std::mutex> lock(mutex);
-        WV_CHECK_MSG(!instance.isInitialized, "Tried to initialize logger twice.");
+        WV_CHECK_MSG(!s_IsLogInitialized, "Tried to initialize logger twice.");
 
-        instance.logFile.open(logPath, std::ios::out | std::ios::trunc);
-        WV_CHECK_MSG(instance.logFile.is_open(), "Failed to open log file: {}", logPath.string());
+        AddStream([](string_view str)
+        {
+            std::fstream& log = s_Instance.logFile;
 
-        instance.bufferedLogStreams.Add(&instance.logFile);
-        instance.isInitialized = true;
-        instance.flushTimer.Restart(); // Start the flush timer
+            if (log.rdstate() == std::ios::goodbit)
+            {
+                log << str;
+                log.flush();
+            }
+        });
+
+        s_Instance.logFile.open(logPath, std::ios::out | std::ios::trunc);
+        WV_CHECK_MSG(s_Instance.logFile.is_open(), "Failed to open log file: {}", logPath.string());
     }
 
     /// <summary>
-    /// Adds an additional output stream. Thread-safe.
+    /// Adds the given callback and initializes the logger if not yet initialized. Thread-safe.
     /// </summary>
-    void Logger::AddStream(std::ostream& stream, bool fast)
+    void Logger::AddStream(LogWriteCallback logOutFunc, bool fast)
     {
-        std::lock_guard<std::mutex> lock(mutex);
+        std::lock_guard<std::mutex> lock(s_WriteMutex);
 
-        if (!instance.isInitialized)
-        {
-            if (fast)
-                instance.logStreamsFast.Add(&stream);
-            else
-                instance.bufferedLogStreams.Add(&stream);
-
-            instance.isInitialized = true;
-            instance.flushTimer.Restart();
-        }
+        if (fast)
+            s_Instance.logWriteFast.Add(logOutFunc);
         else
+            s_Instance.logWriteDeferred.Add(logOutFunc);
+
+        s_IsLogInitialized = true;
+
+        if (!s_Instance.logWriteDeferred.IsEmpty() && !s_CanPoll)
+            StartPolling();
+    }
+
+    void Logger::StartPolling()
+    {
+        if (s_IsLogInitialized && !s_CanPoll)
         {
-            if (fast)
-                instance.logStreamsFast.Add(&stream);
-            else
-                instance.bufferedLogStreams.Add(&stream);
+            s_CanPoll = true;
+            s_Instance.pollThread = std::jthread([]
+            {
+                while (s_CanPoll)
+                {
+                    std::unique_lock<std::mutex> lock(s_WriteMutex);
+                    // Block polling until a write is pending and the minimum time has elapsed
+                    s_IsBufferWritePending.wait_for(lock, std::chrono::milliseconds(WV_LOG_TIME_MS));
+                    // s_WriteMutex lock reacquired
+                    // Flush buffered logs
+                    s_Instance.FlushLogBuffer();
+                }
+            });
         }
+    }
+
+    /// <summary>
+    /// Writes contents of the log buffer to deferred write callbacks and clears the buffer.
+    /// Not thread safe. s_WriteMutex must be acquired externally before calling.
+    /// </summary>
+    void Logger::FlushLogBuffer()
+    {
+        std::string_view bufferView = logBuffer.view();
+
+        if (bufferView.empty())
+            return;
+
+        for (LogWriteCallback WriteFunc : logWriteDeferred)
+        {
+            try 
+            {
+                WriteFunc(bufferView);
+            }
+            catch (const std::exception& e) 
+            {
+                std::cerr << "Logger: Exception in deferred LogWriteCallback: " << e.what() << std::endl;
+            }
+            catch (...) 
+            {
+                std::cerr << "Logger: Unknown exception in deferred LogWriteCallback." << std::endl;
+            }
+        }
+
+        logBuffer.str({});
+        logBuffer.clear();
     }
 
     /// <summary>
@@ -114,39 +157,34 @@ namespace Weave
     /// </summary>
     void Logger::WriteToLog(Level level, std::string_view message)
     {
-        if (message.empty() || level == Level::Discard)
-            return;
+        WV_ASSERT_MSG(s_IsLogInitialized, "Cannote write to an uninitialized logger.");
 
-        std::lock_guard<std::mutex> lock(mutex);
+        if (message.empty() || level == Level::Discard)
+            return;        
 
         // Check for duplicates only if the message is considered "new"
-        if (instance.TryBufferLog(message))
+        if (s_Instance.TryBufferLog(message))
         {
-            // Clear and reuse the temporary message buffer
-            instance.msgBuffer.str({});
-            instance.msgBuffer.clear();
+            std::lock_guard<std::mutex> lock(s_WriteMutex);
+            s_Instance.msgBuffer.str({});
+            s_Instance.msgBuffer.clear();
 
             // Add timestamp and level prefix
-            AddTimestamp(instance.msgBuffer);
-            instance.msgBuffer << '[' << GetLevelName(level) << "] " << message << std::endl;
+            AddTimestamp(s_Instance.msgBuffer);
+            s_Instance.msgBuffer << '[' << GetLevelName(level) << "] " << message << std::endl;
 
             // Write immediately to fast streams
-            std::string_view formattedMessage = instance.msgBuffer.view();
+            std::string_view formattedMessage = s_Instance.msgBuffer.view();
 
-            for (std::ostream* pOut : instance.logStreamsFast)
+            for (LogWriteCallback WriteFunc : s_Instance.logWriteFast)
+                WriteFunc(formattedMessage);
+
+            // Write to buffer for slow streams
+            if (!s_Instance.logWriteDeferred.IsEmpty())
             {
-                if (pOut && pOut->good()) // Check stream pointer and state
-                {
-                    (*pOut) << formattedMessage << std::flush;
-                }
-                // TODO: Consider handling bad streams (e.g., remove them?)
+                s_Instance.logBuffer << formattedMessage;
+                s_IsBufferWritePending.notify_one();
             }
-
-            // Append to the main log buffer for buffered streams
-            instance.logBuffer << formattedMessage;
-
-            if (instance.flushTimer.GetElapsedS() >= WV_LOG_TIME_S)
-                instance.FlushLogBuffer(); // FlushLogBuffer already handles locking and timer reset
         }
     }
 
@@ -155,13 +193,14 @@ namespace Weave
     /// </summary>
     Logger::MessageBuffer Logger::GetStrBuf()
     {
-        std::lock_guard<std::mutex> lock(mutex);
-        MessageBuffer pBuf = instance.sstreamPool.Get();
+        MessageBuffer pBuf;
+        {
+            std::lock_guard<std::mutex> lock(s_MsgPoolMutex);
+            pBuf = s_Instance.sstreamPool.Get();
+        }
 
         if (!pBuf)
-        {
             pBuf = std::make_unique<std::stringstream>();
-        }
         else 
         {
             pBuf->str({});
@@ -177,22 +216,24 @@ namespace Weave
     void Logger::ReturnStrBuf(MessageBuffer&& buf)
     {
         if (!buf) return;
-        std::lock_guard<std::mutex> lock(mutex);
-        instance.sstreamPool.Return(std::move(buf));
+        std::lock_guard<std::mutex> lock(s_MsgPoolMutex);
+        s_Instance.sstreamPool.Return(std::move(buf));
     }
 
-
     /// <summary>
-    /// Checks the message history for duplicates. Adds new messages. Not thread-safe itself, requires external locking.
+    /// Checks the message history for duplicates. Adds new messages. Thread-safe.
     /// </summary>
     bool Logger::TryBufferLog(std::string_view message)
     {
+        static std::mutex bufferMutex;
+        std::lock_guard<std::mutex> lock(bufferMutex);
+
         bool isNew = true;
         size_t historyLen = msgHistory.GetLength();
 
         for (size_t i = 0; i < historyLen; ++i)
         {
-            if (msgHistory[i].view() == message)
+            if (msgHistory[i] == message)
             {
                 isNew = false;
                 break;
@@ -201,11 +242,9 @@ namespace Weave
 
         if (isNew && historyLen > 0)
         {
-            std::stringstream& hist = msgHistory[historyIndex];
-            hist.str({});
+            string& hist = msgHistory[historyIndex];
             hist.clear();
-            hist << message;
-
+            hist.append(message);
             historyIndex = (historyIndex + 1) % historyLen;
         }
         
@@ -213,72 +252,37 @@ namespace Weave
     }
 
     /// <summary>
-    /// Flushes the main log buffer to buffered streams. Not thread-safe itself, requires external locking.
-    /// </summary>
-    void Logger::FlushLogBuffer()
-    {
-        std::string_view bufferView = logBuffer.view();
-
-        if (bufferView.empty())
-            return;
-
-        for (std::ostream* pOut : bufferedLogStreams)
-        {
-            if (pOut && pOut->good())
-            {
-                (*pOut) << bufferView << std::flush;
-            }
-            // TODO: Consider handling bad streams (e.g., remove them?)
-        }
-
-        logBuffer.str({});
-        logBuffer.clear();
-        flushTimer.Restart();
-    }
-
-
-    /// <summary>
     /// Factory method for creating Log::Message objects. Thread-safe.
     /// </summary>
     Logger::Message Logger::Log(Level level)
     {
-        // GetIsLevelEnabled handles locking for reading runtime level
-        if (GetIsLevelEnabled(level))
-        {
-            // GetStrBuf handles locking for pool access
+        if (GetIsLevelEnabled(level) || !s_IsLogInitialized)
             return Message(level, GetStrBuf());
-        }
         else
-        {
-            // Return a default (discard) message - no buffer needed.
             return Message();
-        }
     }
 
     /// <summary>
-    /// Returns the shared NullMessage instance. Thread-safe (returns const ref to static).
+    /// Returns the shared NullMessage s_Instance.
     /// </summary>
-    const Logger::NullMessage& Logger::GetNullMessage()
-    {
-        return nullMsg;
-    }
+    const Logger::NullMessage& Logger::GetNullMessage() { return s_NullMsg; }
 
     /// <summary>
     /// Checks if a log level is enabled (compile-time and runtime). Thread-safe.
     /// </summary>
-    constexpr bool Logger::GetIsLevelEnabled(Logger::Level level)
+    bool Logger::GetIsLevelEnabled(Logger::Level level)
     {
-        const uint currentRuntimeLevel = instance.logLevel;
+        const uint currentRuntimeLevel = s_LogLevel;
         return (static_cast<uint>(level) <= WV_LOG_LEVEL) && (static_cast<uint>(level) <= currentRuntimeLevel);
     }
 
     /// <summary>
     /// Sets the runtime log level filter. Thread-safe.
     /// </summary>
-    void Logger::SetLogLevel(Logger::Level level) { instance.logLevel = static_cast<uint>(level); }
+    void Logger::SetLogLevel(Logger::Level level) { s_LogLevel = static_cast<uint>(level); }
 
     /// <summary>
-    /// Adds a timestamp to the stream. Not thread-safe itself, requires external locking if stream is shared.
+    /// Adds a timestamp to the stream.
     /// </summary>
     void Logger::AddTimestamp(std::ostream& stream)
     {
@@ -351,32 +355,21 @@ namespace Weave
     }
 
     /// <summary>
-    /// Streams wide string view, converting to UTF-8. Requires external lock if utf8ConvBuffer is contended.
+    /// Streams wide string view, converting to UTF-8
     /// </summary>
     Logger::Message& Logger::Message::operator<<(std::wstring_view value)
     {
         if (level != Level::Discard && pMsgBuf)
         {
-            std::lock_guard<std::mutex> lock(Logger::mutex);
-            GetMultiByteString_UTF16LE_TO_UTF8(value, instance.utf8ConvBuffer);
-            *pMsgBuf << instance.utf8ConvBuffer.data();
+            static thread_local string utf8ConvBuffer;
+            GetMultiByteString_UTF16LE_TO_UTF8(value, utf8ConvBuffer);
+            *pMsgBuf << utf8ConvBuffer.data();
         }
+
         return *this;
     }
 
-    /// <summary>
-    /// Streams wide C-string via the wstring_view overload.
-    /// </summary>
-    Logger::Message& Logger::Message::operator<<(wchar_t* pValue)
-    {
-        return operator<<(std::wstring_view(pValue));
-    }
+    Logger::Message& Logger::Message::operator<<(wchar_t* pValue) { return operator<<(std::wstring_view(pValue)); }
 
-    /// <summary>
-    /// Streams wide string via the wstring_view overload.
-    /// </summary>
-    Logger::Message& Logger::Message::operator<<(const std::wstring& value)
-    {
-        return operator<<(std::wstring_view(value));
-    }
+    Logger::Message& Logger::Message::operator<<(const std::wstring& value) { return operator<<(std::wstring_view(value)); }
 }

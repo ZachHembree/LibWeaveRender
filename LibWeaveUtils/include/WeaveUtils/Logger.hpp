@@ -1,10 +1,10 @@
 #pragma once
-#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <mutex>
 #include <atomic>
+#include <thread>
 #include "WeaveUtils/Utils.hpp"
 #include "ObjectPool.hpp"
 
@@ -30,14 +30,13 @@
 #endif // !NDEBUG
 #endif // !WV_LOG_LEVEL
 
-#ifndef WV_LOG_TIME_S
+#ifndef WV_LOG_TIME_MS
 // 
-/// Defines the minimum time in seconds between automatic flushes of the log buffer
-/// for buffered streams (like files). A smaller value means more frequent writes.
-/// Defaults to 10.0 seconds.
+/// Defines the minimum time in milliseconds between automatic flushes of the log buffer
+/// for buffered writes. A smaller value means more frequent writes.
 /// 
-#define WV_LOG_TIME_S 10.0
-#endif // !WV_LOG_TIME_S
+#define WV_LOG_TIME_MS 500
+#endif // !WV_LOG_TIME_MS
 
 // --- Log Level Definitions ---
 
@@ -87,13 +86,18 @@
 namespace Weave
 {
     /// <summary>
-    /// Provides a thread-safe, singleton logging facility with multiple output streams,
-    /// configurable compile-time and runtime log levels, message buffering,
-    /// and basic duplicate message suppression.
+    /// Provides a thread-safe, singleton logging facility with multiple output streams, 
+    /// configurable compile-time and runtime log levels, message buffering, and basic 
+    /// duplicate message suppression.
     /// </summary>
     class Logger
     {
     public:
+        /// <summary>
+        /// Logger callback function for writing to external streams. Must be thread safe.
+        /// </summary>
+        typedef void (*LogWriteCallback)(string_view);
+
         using MessageBuffer = std::unique_ptr<std::stringstream>;
 
         /// <summary>
@@ -110,10 +114,9 @@ namespace Weave
         };
 
         /// <summary>
-        /// Represents a log message being built.
-        /// RAII: Acquires a stringstream buffer on creation and writes the
-        /// formatted log entry to the Logger's output streams upon destruction.
-        /// This object is move-only.
+        /// Represents a log message being built. RAII: Acquires a stringstream buffer 
+        /// on creation and writes the formatted log entry to the Logger's output 
+        /// streams upon destruction.
         /// </summary>
         struct Message
         {
@@ -121,9 +124,9 @@ namespace Weave
             MAKE_MOVE_ONLY(Message)
 
             /// <summary>
-            /// Destructor. If the message is not discarded and has content,
-            /// it triggers the write operation to the configured log outputs
-            /// and returns the internal buffer to the pool.
+            /// Destructor. If the message is not discarded and has content, it triggers 
+            /// the write operation to the configured log outputs and returns the internal 
+            /// buffer to the pool.
             /// </summary>
             ~Message();
 
@@ -150,8 +153,8 @@ namespace Weave
             }
 
         private:
-            Level level;            ///< The logging level of this message.
-            MessageBuffer pMsgBuf;  ///< Unique pointer to the stringstream buffer holding the message content.
+            Level level;
+            MessageBuffer pMsgBuf;
 
             /// <summary>Private default constructor for creating a discarded message.</summary>
             Message();
@@ -173,52 +176,26 @@ namespace Weave
         };
 
         /// <summary>
-        /// Checks if the logger has been initialized via Init() or InitToFile().
+        /// Checks if the logger has been initialized via AddStream() or InitToFile().
         /// </summary>
         /// <returns>True if the logger is initialized, false otherwise.</returns>
         static bool GetIsInitialized();
 
         /// <summary>
-        /// Initializes the logger with a primary output stream.
-        /// This should be called only once. Subsequent calls to AddStream can add more outputs.
-        /// </summary>
-        /// <param name="logOut">The output stream to write logs to. The caller is responsible for the stream's lifetime.</param>
-        /// <param name="fast">If true, writes to this stream are unbuffered and immediate. Suitable for console output.
-        /// If false (default), writes are buffered and flushed periodically or on logger destruction. Suitable for files.</param>
-        /// <remarks>Throws an exception if the logger is already initialized.</remarks>
-        static void Init(std::ostream& logOut, bool fast = false);
-
-        /// <summary>
         /// Initializes the logger to write to a specified file path.
-        /// Creates/truncates the file. This implicitly calls Init with the file stream.
+        /// Creates/truncates the file. This implicitly calls AddStream with the file stream.
         /// </summary>
         /// <param name="logPath">The path to the log file.</param>
         /// <remarks>Throws an exception if the file cannot be opened or if the logger is already initialized.</remarks>
         static void InitToFile(const std::filesystem::path& logPath);
 
         /// <summary>
-        /// Adds an additional output stream to the logger.
-        /// If the logger hasn't been initialized, this call will initialize it with the given stream.
+        /// Adds an additional output stream callback to the logger.
+        /// If the logger hasn't been initialized, this call will initialize it with the given callback.
         /// </summary>
-        /// <param name="logOut">The output stream to add. The caller is responsible for the stream's lifetime.</param>
-        /// <param name="fast">If true, writes to this stream are unbuffered and immediate. If false, writes are buffered.</param>
-        static void AddStream(std::ostream& logOut, bool fast = false);
-
-        /// <summary>
-        /// Writes a pre-formatted message string directly to the log outputs.
-        /// This is primarily used internally by the Message destructor.
-        /// It adds timestamps, level names, handles buffering, and duplicate suppression.
-        /// </summary>
-        /// <param name="level">The level of the message.</param>
-        /// <param name="message">The message content (without timestamp or level prefix).</param>
-        static void WriteToLog(Level level, std::string_view message);
-
-        /// <summary>
-        /// Gets the string representation of a log level enum.
-        /// </summary>
-        /// <param name="level">The log level.</param>
-        /// <returns>A string view representing the level (e.g., "INFO", "ERROR").</returns>
-        static std::string_view GetLevelName(Level level);
+        /// <param name="logOutFunc">The thread safe write callback to add.</param>
+        /// <param name="fast">If true, writes to this callback are unbuffered and immediate. If false, writes are buffered.</param>
+        static void AddStream(LogWriteCallback logOutFunc, bool fast = false);
 
         /// <summary>
         /// Creates a log Message object for the specified level.
@@ -242,7 +219,7 @@ namespace Weave
         /// </summary>
         /// <param name="level">The log level to check.</param>
         /// <returns>True if the level is enabled, false otherwise.</returns>
-        static constexpr bool GetIsLevelEnabled(Logger::Level level);
+        static bool GetIsLevelEnabled(Logger::Level level);
 
         /// <summary>
         /// Sets the maximum log level that will be processed at runtime.
@@ -253,32 +230,46 @@ namespace Weave
         static void SetLogLevel(Logger::Level level);
 
     private:
-        MAKE_MOVE_ONLY(Logger)
+        MAKE_NO_COPY(Logger)
 
-        static Logger instance;
-        static const NullMessage nullMsg;
-        static std::mutex mutex;
+        static Logger s_Instance;
+        std::jthread pollThread;
 
         std::stringstream logBuffer;
         std::stringstream msgBuffer;
-        std::string utf8ConvBuffer;
 
         /// Circular buffer for duplicate detection.
-        DynamicArray<std::stringstream> msgHistory; 
+        DynamicArray<string> msgHistory; 
         uint historyIndex;
-        Stopwatch flushTimer;
 
         std::fstream logFile;
-        UniqueVector<std::ostream*> bufferedLogStreams;
-        UniqueVector<std::ostream*> logStreamsFast;
+        UniqueVector<LogWriteCallback> logWriteDeferred;
+        UniqueVector<LogWriteCallback> logWriteFast;
 
         ObjectPool<MessageBuffer> sstreamPool;
-        std::atomic<bool> isInitialized;
-        std::atomic<uint> logLevel; 
 
         Logger();
 
         ~Logger();
+
+        Logger(Logger&&) noexcept;
+
+        Logger& operator=(Logger&&) noexcept;
+
+        /// <summary>
+        /// Writes a pre-formatted message string directly to the log outputs.
+        /// It adds timestamps, level names, handles buffering, and duplicate suppression.
+        /// </summary>
+        /// <param name="level">The level of the message.</param>
+        /// <param name="message">The message content (without timestamp or level prefix).</param>
+        static void WriteToLog(Level level, std::string_view message);
+
+        /// <summary>
+        /// Gets the string representation of a log level enum.
+        /// </summary>
+        /// <param name="level">The log level.</param>
+        /// <returns>A string view representing the level (e.g., "INFO", "ERROR").</returns>
+        static std::string_view GetLevelName(Level level);
 
         /// <summary>Adds a formatted timestamp "[YYYY-MM-DD][HH:MM:SS]" to the given stream.</summary>
         /// <param name="stream">The output stream to write the timestamp to.</param>
@@ -301,10 +292,13 @@ namespace Weave
         bool TryBufferLog(std::string_view message);
 
         /// <summary>
-        /// Writes the content of the internal logBuffer to all non-fast output streams
-        /// and clears the buffer. Resets the flush timer.
+        /// Writes out buffered logs to default callbacks
         /// </summary>
-        /// <remarks>Throws exception if called when logger is not initialized.</remarks>
         void FlushLogBuffer();
+
+        /// <summary>
+        /// Initializes deferred log polling
+        /// </summary>
+        static void StartPolling();
     };
 } 
