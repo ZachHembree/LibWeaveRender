@@ -282,7 +282,15 @@ void MinWindow::SetActiveMonitor(HMONITOR newMon)
 	MONITORINFO info = GetMonInfo(newMon);
 	RECT rect = info.rcMonitor;
 	ivec2 pos(rect.left, rect.top);
+	const bool wasFullscreen = isFullscreen;
+
+	if (wasFullscreen)
+		SetFullScreen(false);
+
 	SetPos(pos);
+
+	if (wasFullscreen)
+		SetFullScreen(true);
 }
 
 HMONITOR MinWindow::GetActiveMonitor() const { return MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST); }
