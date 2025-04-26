@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include "WeaveUtils/Utils.hpp"
+#include "WeaveUtils/Stopwatch.hpp"
 #include "WeaveUtils/WindowComponentBase.hpp"
 #include "Viewport.hpp"
 #include "ShaderLibrary.hpp"
@@ -52,6 +53,16 @@ namespace Weave::D3D11
 		SwapChain& GetSwapChain();
 
 		/// <summary>
+		/// Returns the last frame time in milliseconds
+		/// </summary>
+		double GetFrameTimeMS() const;
+
+		/// <summary>
+		/// Returns the current frame number
+		/// </summary>
+		ulong GetFrameNumber() const;
+
+		/// <summary>
 		/// Returns the viewport used with the back buffer
 		/// </summary>
 		Viewport GetMainViewport() const;
@@ -72,21 +83,36 @@ namespace Weave::D3D11
 		void SetOutputResolution(ivec2 res);
 
 		/// <summary>
-		/// Returns true if the render resolution is set to match
-		/// that of the window body being rendered to.
+		/// Returns true if the render resolution is set to match that of the window body being 
+		/// rendered to. Only applicable if exclusive full screen is disabled.
 		/// </summary>
 		bool GetIsFitToWindow() const;
 
 		/// <summary>
-		/// Set to true if the renderer should automatically match the
-		/// window resolution.
+		/// Set to true if the renderer resolution should match the resolution of the window body.
+		/// Combining this mode with the borderless full screen mode of the parent Window will enable
+		/// borderless full screen rendering at the desktop resolution. Superceeded by exclusive full
+		/// screen.
 		/// </summary>
-		void SetIsFitToWindow(bool value);
+		void SetFitToWindow(bool value);
+
+		/// <summary>
+		/// Returns true if exclusive full screen mode has been enabled
+		/// </summary>
+		bool GetIsFullscreen() const;
+
+		/// <summary>
+		/// Enables or disables full screen mode. Disabling full screen mode automatically transitions 
+		/// to windowed mode and vice versa. Borderless fullscreen window mode requires disabling this,
+		/// enabling fit to window in the renderer, and setting the Window style itself to borderless 
+		/// full screen mode.
+		/// </summary>
+		void SetFullscreen(bool value);
 
 		/// <summary>
 		/// Returns true if the default depth stencil buffer is enabled
 		/// </summary>
-		bool GetIsDepthStencilEnabled();
+		bool GetIsDepthStencilEnabled() const;
 
 		/// <summary>
 		/// Enable/disable default depth-stencil buffer
@@ -156,8 +182,15 @@ namespace Weave::D3D11
 		std::unique_ptr<ShaderLibrary> pDefaultShaders;
 		UniqueVector<RenderComponentBase*> pComponents;
 
-		bool fitToWindow;
 		bool useDefaultDS;
+		bool fitToWindow;
+		bool isFullscreen;
+
+		bool canRender;
+		bool isFullscreenAllowed;
+
+		ulong frameCount;
+		Stopwatch frameTimer;
 
 		void BeforeDraw(CtxImm& ctx);
 

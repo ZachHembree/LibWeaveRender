@@ -23,7 +23,11 @@ Renderer::Renderer(MinWindow& window) :
 	pDefaultDS(new DepthStencilTexture(*pDev, pSwap->GetSize())),
 	useDefaultDS(true),
 	fitToWindow(true),
-	pDefaultShaders(new ShaderLibrary(*this, GetBuiltInShaders()))
+	pDefaultShaders(new ShaderLibrary(*this, GetBuiltInShaders())),
+	frameCount(0),
+	canRender(true),
+	isFullscreen(false),
+	isFullscreenAllowed(true)
 { 
 	MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
 	defaultMeshes["FSQuad"] = Mesh(*pDev, quadDef);
@@ -43,89 +47,28 @@ Renderer::~Renderer() = default;
 
 Device& Renderer::GetDevice() { return *pDev; }
 
+/*
+	General purpose public utilities
+*/
+
 IRenderTarget& Renderer::GetBackBuffer() { return pSwap->GetBackBuf(); }
 
 SwapChain& Renderer::GetSwapChain() { return *pSwap; }
+
+double Renderer::GetFrameTimeMS() const { return frameTimer.GetElapsedMS(); }
+
+ulong Renderer::GetFrameNumber() const { return frameCount; }
 
 ShaderLibrary Renderer::CreateShaderLibrary(const ShaderLibDef& def) { return ShaderLibrary(*this, def); }
 
 ShaderLibrary Renderer::CreateShaderLibrary(ShaderLibDef&& def) { return ShaderLibrary(*this, std::move(def)); }
 
-/// <summary>
-/// Returns the viewport used with the back buffer
-/// </summary>
-Viewport Renderer::GetMainViewport() const
+/*
+	Default resources used for internal functions and generalized samplers
+*/
+
+Material& Renderer::GetDefaultMaterial(string_view name) const
 {
-	return
-	{
-		pSwap->GetBackBuf().GetRenderOffset(), 
-		pSwap->GetBackBuf().GetSize(),
-		pDefaultDS->GetRange() 
-	};
-}
-
-/// <summary>
-/// Sets the viewport used with the back buffer
-/// </summary>
-void Renderer::SetMainViewport(Viewport& vp)
-{
-	SetOutputResolution(vp.size);
-	pSwap->GetBackBuf().SetRenderOffset(vp.offset);
-	pDefaultDS->SetRange(vp.zDepth);
-}
-
-/// <summary>
-/// Returns the rendering resolution used by the renderer
-/// </summary>
-ivec2 Renderer::GetOutputResolution() const 
-{
-	return pSwap->GetBackBuf().GetRenderSize();
-}
-
-/// <summary>
-/// Sets the render resolution to the given value
-/// </summary>
-void Renderer::SetOutputResolution(ivec2 res)
-{
-	const ivec2 lastBackSize = pSwap->GetSize(),
-		stencilSize = pDefaultDS->GetSize();
-
-	if (res.x > lastBackSize.x || res.y > lastBackSize.y)
-		pSwap->ResizeBuffers(res);
-
-	if (res.x > stencilSize.x || res.y > stencilSize.y)
-		*pDefaultDS = DepthStencilTexture(*pDev, res);
-
-	pSwap->GetBackBuf().SetRenderSize(res);
-}
-
-/// <summary>
-/// Returns true if the render resolution is set to match
-/// that of the window body being rendered to.
-/// </summary>
-bool Renderer::GetIsFitToWindow() const { return fitToWindow; }
-
-/// <summary>
-/// Set to true if the renderer should automatically match the
-/// window resolution.
-/// </summary>
-void Renderer::SetIsFitToWindow(bool value) { fitToWindow = value; }
-
-/// <summary>
-/// Returns true if the default depth stencil buffer is enabled
-/// </summary>
-bool Renderer::GetIsDepthStencilEnabled() { return useDefaultDS; }
-
-/// <summary>
-/// Enable/disable default depth-stencil buffer
-/// </summary>
-void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
-
-/// <summary>
-/// Returns reference to a default material
-/// </summary>
-Material& Renderer::GetDefaultMaterial(string_view name) const 
-{ 
 	const StringIDMap& stringMap = pDefaultShaders->GetStringMap();
 	uint stringID;
 
@@ -145,10 +88,7 @@ Material& Renderer::GetDefaultMaterial(string_view name) const
 	}
 }
 
-/// <summary>
-/// Returns reference to a default compute shader
-/// </summary>
-ComputeInstance& Renderer::GetDefaultCompute(string_view name) const 
+ComputeInstance& Renderer::GetDefaultCompute(string_view name) const
 {
 	const StringIDMap& stringMap = pDefaultShaders->GetStringMap();
 	uint stringID;
@@ -165,24 +105,152 @@ ComputeInstance& Renderer::GetDefaultCompute(string_view name) const
 	}
 }
 
-/// <summary>
-/// Retursn a reference to a default mesh
-/// </summary>
 Mesh& Renderer::GetDefaultMesh(string_view name) const { return const_cast<Mesh&>(defaultMeshes.at(name)); }
 
-/// <summary>
-/// Retursn a reference to a default texture sampler
-/// </summary>
 Sampler& Renderer::GetDefaultSampler(string_view name) const { return const_cast<Sampler&>(defaultSamplers.at(name)); }
+
+/*
+	Core rendering functions
+*/
+
+Viewport Renderer::GetMainViewport() const
+{
+	return
+	{
+		pSwap->GetBackBuf().GetRenderOffset(), 
+		pSwap->GetBackBuf().GetSize(),
+		pDefaultDS->GetRange() 
+	};
+}
+
+void Renderer::SetMainViewport(Viewport& vp)
+{
+	SetOutputResolution(vp.size);
+	pSwap->GetBackBuf().SetRenderOffset(vp.offset);
+	pDefaultDS->SetRange(vp.zDepth);
+}
+
+ivec2 Renderer::GetOutputResolution() const 
+{
+	return pSwap->GetBackBuf().GetRenderSize();
+}
+
+void Renderer::SetOutputResolution(ivec2 res)
+{
+	const ivec2 lastBackSize = pSwap->GetSize(),
+		stencilSize = pDefaultDS->GetSize();
+
+	if (res.x > lastBackSize.x || res.y > lastBackSize.y)
+		pSwap->ResizeBuffers(res);
+
+	if (res.x > stencilSize.x || res.y > stencilSize.y)
+		*pDefaultDS = DepthStencilTexture(*pDev, res);
+
+	pSwap->GetBackBuf().SetRenderSize(res);
+}
+
+bool Renderer::GetIsFitToWindow() const { return fitToWindow; }
+
+void Renderer::SetFitToWindow(bool value) { fitToWindow = value; }
+
+bool Renderer::GetIsFullscreen() const { return isFullscreen; }
+
+void Renderer::SetFullscreen(bool value) { isFullscreen = value; }
+
+bool Renderer::GetIsDepthStencilEnabled() const { return useDefaultDS; }
+
+void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
 
 bool Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 { 
+	switch (msg)
+	{
+	// Monitor Win32 events for occlusion, minimization or resizing that would force 
+	// the renderer out of exclusive full screen
+	case WM_ACTIVATE:
+	{
+		const bool isActivating = (wParam != WA_INACTIVE);
+		isFullscreenAllowed = isActivating;
+		break;
+	}
+	case WM_ACTIVATEAPP:
+	{
+		const bool isActivating = (wParam == TRUE);
+		isFullscreenAllowed = isActivating;
+		break;
+	}
+	case WM_SIZE:
+		if (isFullscreenAllowed && wParam == SIZE_MINIMIZED)
+		{
+			isFullscreenAllowed = false;
+			canRender = false;
+		}
+		break;
+	}
+
 	return true;
 }
 
-/// <summary>
-/// Registers a new render component. Returns false if the component is already registered.
-/// </summary>
+void Renderer::Update()
+{
+	// Reset binds
+	CtxImm& ctx = pDev->GetContext();
+	const ivec2 bodySize = GetWindow().GetBodySize();
+
+	// Full screen mode validation and transitioning
+	const bool wasFullscreen = isFullscreen && pSwap->GetIsFullscreen();
+	// True if was in exclusive full screen and just occluded
+	const bool wasOccludedFS = isFullscreen && wasFullscreen && !isFullscreenAllowed;
+
+	if (!isFullscreen || wasOccludedFS)
+		pSwap->SetFullscreen(false, wasOccludedFS);	
+	else if (isFullscreen && !wasFullscreen && isFullscreenAllowed)
+		pSwap->SetFullscreen(true, false);
+
+	canRender = !isFullscreen || isFullscreenAllowed;
+
+	// If rendering is explicitly disabled or resolution invalid, skip everything else
+	if (!canRender || bodySize.x == 0 || bodySize.y == 0)
+		return;
+
+	// Windowed mode automatic resizing
+	if (!isFullscreen && fitToWindow)
+		SetOutputResolution(bodySize);
+
+	// Clear back buffer
+	pSwap->GetBackBuf().Clear(ctx);
+	
+	if (useDefaultDS)
+		pDefaultDS->Clear(ctx);
+
+	// Bind back buffer as render target
+	if (useDefaultDS)
+		ctx.BindRenderTarget(pSwap->GetBackBuf(), *pDefaultDS);
+	else
+		ctx.BindRenderTarget(pSwap->GetBackBuf());
+
+	BeforeDraw(ctx);
+
+	DrawEarly(ctx);
+	Draw(ctx);
+	DrawLate(ctx);
+
+	// Present frame
+	ctx.Present(*pSwap, 1, 0);
+
+	AfterDraw(ctx);
+
+	// ImGUI nulls shaders after draw, leaving the state cache out of sync
+	ctx.ResetShaders();
+
+	frameCount++;
+	frameTimer.Restart();
+}
+
+/*
+	Render component utilities
+*/
+
 bool Renderer::RegisterComponent(RenderComponentBase& component)
 {
 	if (!component.GetIsRegistered())
@@ -196,9 +264,6 @@ bool Renderer::RegisterComponent(RenderComponentBase& component)
 		return false;
 }
 
-/// <summary>
-/// Unregisters the given component from the renderer. Returns false on fail.
-/// </summary>
 bool Renderer::UnregisterComponent(RenderComponentBase& component)
 {
 	int index = -1;
@@ -221,43 +286,6 @@ bool Renderer::UnregisterComponent(RenderComponentBase& component)
 	}
 	else
 		return false;
-}
-
-void Renderer::Update()
-{
-	// Reset binds
-	CtxImm& ctx = pDev->GetContext();
-	const ivec2 bodySize = GetWindow().GetBodySize();
-
-	// Clear back buffer
-	pSwap->GetBackBuf().Clear(ctx);
-
-	if (useDefaultDS)
-		pDefaultDS->Clear(ctx);
-
-	// Set viewport bounds
-	if (fitToWindow)
-		SetOutputResolution(bodySize);
-
-	// Bind back buffer as render target
-	if (useDefaultDS)
-		ctx.BindRenderTarget(pSwap->GetBackBuf(), *pDefaultDS);
-	else
-		ctx.BindRenderTarget(pSwap->GetBackBuf());
-
-	BeforeDraw(ctx);
-
-	DrawEarly(ctx);
-	Draw(ctx);
-	DrawLate(ctx);
-
-	// Present frame
-	ctx.Present(*pSwap, 1, 0);
-
-	AfterDraw(ctx);
-
-	// ImGUI nulls shaders after draw, leaving the state cache out of sync
-	ctx.ResetShaders();
 }
 
 void Renderer::BeforeDraw(CtxImm& ctx)

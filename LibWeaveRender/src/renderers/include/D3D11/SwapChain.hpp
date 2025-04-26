@@ -46,7 +46,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns the number of buffers in the chain
 		/// </summary>
-		int GetBufferCount() const;
+		uint GetBufferCount() const;
 
 		/// <summary>
 		/// Returns the texture format of the swap chain's buffers
@@ -64,11 +64,22 @@ namespace Weave::D3D11
 		/// count is less than previous, existing RTHandles may become invalid.
 		/// </summary>
 		void ResizeBuffers(
-			ivec2 dim,
+			uivec2 dim,
 			uint count = 0,
 			Formats format = Formats::UNKNOWN,
 			uint flags = 0
 		);
+
+		/// <summary>
+		/// Returns true if exclusive full screen is enabled
+		/// </summary>
+		bool GetIsFullscreen() const;
+
+		/// <summary>
+		/// Enables or disables exclusive full screen mode. isOccluded should be set when transitioning 
+		/// out of exclusive full screen mode into a minimized or occluded state.
+		/// </summary>
+		void SetFullscreen(bool isFullscreen, bool isOccluded);
 
 		/// <summary>
 		/// Presents rendered image with the given synchronization settings

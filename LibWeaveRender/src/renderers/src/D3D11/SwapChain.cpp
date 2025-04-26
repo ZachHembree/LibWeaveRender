@@ -2,6 +2,7 @@
 #include "WeaveUtils/Win32.hpp"
 #include "D3D11/InternalD3D11.hpp"
 #include "D3D11/SwapChain.hpp"
+#include "D3D11/Renderer.hpp"
 
 using namespace Weave;
 using namespace Weave::D3D11;
@@ -36,7 +37,7 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	desc.BufferCount = 2; // Triple buffered
 	desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED; // No blending
 	desc.Scaling = DXGI_SCALING_NONE; // Native output, no scaling needed
-	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
 	D3D_CHECK_HR(dxgiFactory->CreateSwapChainForHwnd(
@@ -49,7 +50,7 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	));
 
 	GetBuffers();
-
+	
 	WV_LOG_INFO() << 
 		"Swap Chain Configuration" <<
 		"\nWindowed Mode: " << (fsDesc.Windowed ? "TRUE" : "FALSE") <<
@@ -82,9 +83,9 @@ uivec2 SwapChain::GetSize() const
 	return size;
 }
 
-int SwapChain::GetBufferCount() const
+uint SwapChain::GetBufferCount() const
 {
-	return desc.BufferCount + 1;
+	return desc.BufferCount;
 }
 
 Formats SwapChain::GetBufferFormat() const
@@ -100,27 +101,54 @@ RTHandle& SwapChain::GetBackBuf()
 	return backBufRt;
 }
 
-void SwapChain::ResizeBuffers(ivec2 dim, uint count, Formats format, uint flags)
+void SwapChain::ResizeBuffers(uivec2 dim, uint count, Formats format, uint flags)
 {
-	if (count == 0)
-		count = GetBufferCount();
-
-	if (format == Formats::UNKNOWN)
-		format = GetBufferFormat();
+	pBackBuffer.Reset();
+	pBackBufRTV.Reset();
 
 	if (flags == 0)
 		flags = desc.Flags;
 
-	pBackBuffer.Reset();
-	pBackBufRTV.Reset();
-	pSwap->ResizeBuffers(count, dim.x, dim.y, (DXGI_FORMAT)format, flags);
-	pSwap->GetDesc1(&desc);
+	if (dim.x == 0 || dim.y == 0) // Transition swap chain to occluded state
+	{	
+		pSwap->ResizeBuffers(0, 0, 0, (DXGI_FORMAT)Formats::UNKNOWN, flags);
+	}
+	else // General purpose resie/disocclude
+	{ 
+		if (count == 0)
+			count = GetBufferCount();
+
+		if (format == Formats::UNKNOWN)
+			format = GetBufferFormat();
+
+		pSwap->ResizeBuffers(count, dim.x, dim.y, (DXGI_FORMAT)format, flags);
+		pSwap->GetDesc1(&desc);
+	}
+
 	GetBuffers();
 }
 
-/// <summary>
-/// Presents rendered image with the given synchronization settings
-/// </summary>
+bool SwapChain::GetIsFullscreen() const 
+{
+	BOOL isFullscreen;
+	D3D_ASSERT_HR(pSwap->GetFullscreenState(&isFullscreen, nullptr));
+	return isFullscreen > 0;
+}
+
+void SwapChain::SetFullscreen(bool isFullscreen, bool isOccluded)
+{
+	if (isFullscreen == GetIsFullscreen())
+		return;
+
+	D3D_ASSERT_HR(pSwap->SetFullscreenState(isFullscreen, nullptr));
+
+	// Handle occlusion/focus loss in exclusive full screen
+	if (isFullscreen && isOccluded)
+		ResizeBuffers(uivec2(0));
+	else // Call resize on mode change with current size
+		ResizeBuffers(GetSize());
+}
+
 void SwapChain::Present(CtxImm& ctx, uint syncInterval, uint flags)
 {
 	ctx.Present(*this, syncInterval, flags);
