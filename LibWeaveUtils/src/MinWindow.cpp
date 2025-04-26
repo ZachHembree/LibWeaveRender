@@ -265,6 +265,26 @@ void MinWindow::DisableStyleFlags(WndStyle flags)
 	SetStyle(style);
 }
 
+static MONITORINFO GetMonInfo(HMONITOR mon)
+{
+	MONITORINFO info;
+	info.cbSize = sizeof(MONITORINFO);
+
+	WIN_CHECK_NZ_LAST(GetMonitorInfo(mon, &info));
+	return info;
+}
+
+void MinWindow::SetActiveMonitor(HMONITOR newMon)
+{
+	if (newMon == GetActiveMonitor())
+		return;
+
+	MONITORINFO info = GetMonInfo(newMon);
+	RECT rect = info.rcMonitor;
+	ivec2 pos(rect.left, rect.top);
+	SetPos(pos);
+}
+
 HMONITOR MinWindow::GetActiveMonitor() const { return MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST); }
 
 ivec2 MinWindow::GetMonitorDPI() const
@@ -285,24 +305,18 @@ vec2 MinWindow::GetNormMonitorDPI() const
 ivec2 MinWindow::GetMonitorPosition() const
 {
 	HMONITOR mon = GetActiveMonitor();
-	MONITORINFO info;
-	info.cbSize = sizeof(MONITORINFO);
-
-	WIN_CHECK_NZ_LAST(GetMonitorInfo(mon, &info));
-
+	MONITORINFO info = GetMonInfo(mon);
 	RECT rect = info.rcMonitor;
+
 	return ivec2(rect.left, rect. top);
 }
 
 ivec2 MinWindow::GetMonitorResolution() const
 {
 	HMONITOR mon = GetActiveMonitor();
-	MONITORINFO info;
-	info.cbSize = sizeof(MONITORINFO);
-
-	WIN_CHECK_NZ_LAST(GetMonitorInfo(mon, &info));
-
+	MONITORINFO info = GetMonInfo(mon);
 	RECT rect = info.rcMonitor;
+
 	return ivec2(rect.right - rect.left, rect.bottom - rect.top);
 }
 

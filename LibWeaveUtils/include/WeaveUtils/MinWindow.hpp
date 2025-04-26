@@ -147,6 +147,11 @@ namespace Weave
 			void SetCanSystemSleep(bool value);
 
 			/// <summary>
+			/// Moves the window to the given monitor
+			/// </summary>
+			void SetActiveMonitor(HMONITOR newMon);
+
+			/// <summary>
 			/// Returns handle to the monitor the window is occupying
 			/// </summary>
 			HMONITOR GetActiveMonitor() const;
