@@ -265,9 +265,11 @@ void MinWindow::DisableStyleFlags(WndStyle flags)
 	SetStyle(style);
 }
 
+HMONITOR MinWindow::GetActiveMonitor() const { return MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST); }
+
 ivec2 MinWindow::GetMonitorDPI() const
 {
-	HMONITOR mon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+	HMONITOR mon = GetActiveMonitor();
 	uivec2 dpi;
 	WIN_CHECK_HR(GetDpiForMonitor(mon, MDT_EFFECTIVE_DPI, &dpi.x, &dpi.y));
 
@@ -282,7 +284,7 @@ vec2 MinWindow::GetNormMonitorDPI() const
 
 ivec2 MinWindow::GetMonitorPosition() const
 {
-	HMONITOR mon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+	HMONITOR mon = GetActiveMonitor();
 	MONITORINFO info;
 	info.cbSize = sizeof(MONITORINFO);
 
@@ -294,7 +296,7 @@ ivec2 MinWindow::GetMonitorPosition() const
 
 ivec2 MinWindow::GetMonitorResolution() const
 {
-	HMONITOR mon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+	HMONITOR mon = GetActiveMonitor();
 	MONITORINFO info;
 	info.cbSize = sizeof(MONITORINFO);
 

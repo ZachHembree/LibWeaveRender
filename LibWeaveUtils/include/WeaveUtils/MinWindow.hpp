@@ -147,6 +147,11 @@ namespace Weave
 			void SetCanSystemSleep(bool value);
 
 			/// <summary>
+			/// Returns handle to the monitor the window is occupying
+			/// </summary>
+			HMONITOR GetActiveMonitor() const;
+
+			/// <summary>
 			/// Returns fractional, floating-point, DPI normalized to 96 DPI
 			/// </summary>
 			vec2 GetNormMonitorDPI() const;
