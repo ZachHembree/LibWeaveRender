@@ -19,8 +19,8 @@ using namespace Weave::Effects;
 Renderer::Renderer(MinWindow& window) :
 	WindowComponentBase(window),
 	pDev(new Device(*this)), // Create *pDev and context
-	pSwap(new SwapChain(window, *pDev)), // Create swap chain for window
-	pDefaultDS(new DepthStencilTexture(*pDev, pSwap->GetSize())),
+	pSwap(new SwapChain(*pDev)), // Create swap chain for window
+	pDefaultDS(new DepthStencilTexture()),
 	useDefaultDS(true),
 	fitToWindow(true),
 	pDefaultShaders(new ShaderLibrary(*this, GetBuiltInShaders())),
@@ -41,6 +41,8 @@ Renderer::Renderer(MinWindow& window) :
 	defaultSamplers["LinearBorder"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::BORDER);
 
 	pSwap->SetBufferFormat(Formats::R8G8B8A8_UNORM);
+	pSwap->ResizeBuffers(window.GetMonitorResolution());
+
 	WV_LOG_INFO() << "Renderer Init";
 }
 
@@ -131,24 +133,9 @@ void Renderer::SetMainViewport(Viewport& vp)
 	pDefaultDS->SetRange(vp.zDepth);
 }
 
-ivec2 Renderer::GetOutputResolution() const 
-{
-	return pSwap->GetBackBuf().GetRenderSize();
-}
+ivec2 Renderer::GetOutputResolution() const { return outputRes; }
 
-void Renderer::SetOutputResolution(ivec2 res)
-{
-	const ivec2 lastBackSize = pSwap->GetSize(),
-		stencilSize = pDefaultDS->GetSize();
-
-	if (res.x > lastBackSize.x || res.y > lastBackSize.y)
-		pSwap->ResizeBuffers(res);
-
-	if (res.x > stencilSize.x || res.y > stencilSize.y)
-		*pDefaultDS = DepthStencilTexture(*pDev, res);
-
-	pSwap->GetBackBuf().SetRenderSize(res);
-}
+void Renderer::SetOutputResolution(ivec2 res) { outputRes = res; }
 
 bool Renderer::GetIsFitToWindow() const { return fitToWindow; }
 
@@ -157,6 +144,10 @@ void Renderer::SetFitToWindow(bool value) { fitToWindow = value; }
 bool Renderer::GetIsFullscreen() const { return isFullscreen; }
 
 void Renderer::SetFullscreen(bool value) { isFullscreen = value; }
+
+uint Renderer::GetActiveDisplay() const { return pSwap->GetDisplayOutput(); }
+
+void Renderer::SetActiveDisplay(uint index) { pSwap->SetDisplayOutput(index); }
 
 const IDynamicArray<DisplayOutput>& Renderer::GetDisplays() const
 {
@@ -206,9 +197,9 @@ bool Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void Renderer::Update()
 {
-	// Reset binds
 	CtxImm& ctx = pDev->GetContext();
 	const ivec2 bodySize = GetWindow().GetBodySize();
+	const uivec2 lastBackSize = pSwap->GetSize();
 
 	// Full screen mode validation and transitioning
 	const bool wasFullscreen = isFullscreen && pSwap->GetIsFullscreen();
@@ -218,7 +209,19 @@ void Renderer::Update()
 	if (!isFullscreen || wasOccludedFS)
 		pSwap->SetFullscreen(false, wasOccludedFS);	
 	else if (isFullscreen && !wasFullscreen && isFullscreenAllowed)
+	{
 		pSwap->SetFullscreen(true, false);
+		SetOutputResolution(pSwap->GetSize());
+	}
+
+	// Update DRS scaling
+	if (!isFullscreen && fitToWindow)
+		SetOutputResolution(bodySize);
+
+	if (outputRes.x > lastBackSize.x || outputRes.y > lastBackSize.y)
+		pSwap->ResizeBuffers(outputRes);
+
+	pSwap->GetBackBuf().SetRenderSize(outputRes);
 
 	// Deferred swap chain init
 	if (!pSwap->GetIsInitialized())
@@ -230,9 +233,14 @@ void Renderer::Update()
 	if (!canRender || bodySize.x == 0 || bodySize.y == 0)
 		return;
 
-	// Windowed mode automatic resizing
-	if (!isFullscreen && fitToWindow)
-		SetOutputResolution(bodySize);
+	// Update depth stencil if not overriden
+	if (useDefaultDS)
+	{
+		if (pSwap->GetSize() != pDefaultDS->GetSize())
+			*pDefaultDS = DepthStencilTexture(*pDev, pSwap->GetSize());
+	}
+
+	BeforeDraw(ctx);
 
 	// Clear back buffer
 	pSwap->GetBackBuf().Clear(ctx);
@@ -245,8 +253,6 @@ void Renderer::Update()
 		ctx.BindRenderTarget(pSwap->GetBackBuf(), *pDefaultDS);
 	else
 		ctx.BindRenderTarget(pSwap->GetBackBuf());
-
-	BeforeDraw(ctx);
 
 	DrawEarly(ctx);
 	Draw(ctx);

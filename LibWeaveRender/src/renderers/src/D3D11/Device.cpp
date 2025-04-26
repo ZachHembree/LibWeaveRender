@@ -30,8 +30,7 @@ Device::Device(Renderer& renderer) : pRenderer(&renderer)
 	D3D_CHECK_HR(pDevBase.As(&pDev));
 	D3D_CHECK_HR(pCtxBase.As(&pCtxImm));
 
-	ComPtr<ID3D11DeviceContext1> pCtxCpy = pCtxImm;
-	context = CtxImm(*this, std::move(pCtxCpy));
+	context = CtxImm(*this, ComPtr<ID3D11DeviceContext1>(pCtxImm));
 
 	// Get device info
 	ComPtr<IDXGIDevice1> pDxgiDev;

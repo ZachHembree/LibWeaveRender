@@ -7,10 +7,10 @@
 using namespace Weave;
 using namespace Weave::D3D11;
 
-SwapChain::SwapChain() : desc({}), isInitialized(false)
+SwapChain::SwapChain() : desc({}), fsDesc({}), isInitialized(false)
 { }
 
-SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
+SwapChain::SwapChain(Device& dev) :
 	DeviceChild(dev),
 	backBufRt(dev, this, &pBackBuffer, &pBackBufRTV),
 	isInitialized(false)
@@ -26,9 +26,8 @@ SwapChain::SwapChain(const MinWindow& wnd, Device& dev) :
 	fsDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED; // No interlacing
 	fsDesc.Windowed = TRUE;
 
-	const ivec2 monRes = wnd.GetMonitorResolution();
-	desc.Width = monRes.x; // Initialize chain to active monitor resolution
-	desc.Height = monRes.y;
+	desc.Width = 0;
+	desc.Height = 0;
 	desc.Format = (DXGI_FORMAT)Formats::UNKNOWN;
 	desc.Stereo = FALSE;
 	desc.SampleDesc.Count = 1; // No MSAA
@@ -60,15 +59,10 @@ void SwapChain::Init()
 
 	GetBuffers();
 
-	// Find active output
-	HMONITOR monHandle = wnd.GetActiveMonitor();
 	const DisplayOutput* pActive = nullptr;
-
-	for (DisplayOutput& disp : dev.GetDisplays())
-	{
-		if (disp.GetHandle() == monHandle)
-			pActive = &disp;
-	}
+	
+	if (const uint activeIndex = GetDisplayOutput(); activeIndex != (uint)-1)
+		pActive = &GetDevice().GetDisplays()[activeIndex];
 
 	if (pActive != nullptr)
 		WV_LOG_INFO() << "Active Monitor: " << pActive->GetName();
@@ -146,6 +140,46 @@ void SwapChain::ResizeBuffers(uivec2 dim, uint count)
 	}
 }
 
+uint SwapChain::GetDisplayOutput() const
+{
+	// Find active output
+	HMONITOR monHandle = GetRenderer().GetWindow().GetActiveMonitor();
+	const IDynamicArray<DisplayOutput>& displays = GetDevice().GetDisplays();
+	const DisplayOutput* pActive = nullptr;
+
+	for (uint i = 0; i < displays.GetLength(); i++)
+	{
+		if (displays[i].GetHandle() == monHandle)
+			return i;
+	}
+
+	return (uint)-1;
+}
+
+void SwapChain::SetDisplayOutput(uint index)
+{
+	const uint currentOutput = GetDisplayOutput();
+
+	if (index != currentOutput)
+	{
+		MinWindow& wnd = GetRenderer().GetWindow();
+		const IDynamicArray<DisplayOutput>& displays = GetDevice().GetDisplays();
+		const DisplayOutput& newDisp = displays[index];
+
+		if (GetIsFullscreen())
+		{
+			SetFullscreen(false, false);
+			wnd.SetActiveMonitor(newDisp.GetHandle());
+			ResizeBuffers(GetRenderer().GetOutputResolution());
+			SetFullscreen(true, false);
+		}
+		else
+		{
+			wnd.SetActiveMonitor(newDisp.GetHandle());
+		}
+	}
+}
+
 bool SwapChain::GetIsFullscreen() const { return !fsDesc.Windowed; }
 
 void SwapChain::SetFullscreen(bool isFullscreen, bool isOccluded)
@@ -163,7 +197,7 @@ void SwapChain::SetFullscreen(bool isFullscreen, bool isOccluded)
 		if (isFullscreen && isOccluded)
 			ResizeBuffers(uivec2(0));
 		else // Call resize on mode change with current size
-			ResizeBuffers(GetSize());
+			ResizeBuffers(GetRenderer().GetWindow().GetMonitorResolution());
 	}
 }
 

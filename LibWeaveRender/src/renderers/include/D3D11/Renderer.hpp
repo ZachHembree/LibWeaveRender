@@ -111,6 +111,16 @@ namespace Weave::D3D11
 		void SetFullscreen(bool value);
 
 		/// <summary>
+		/// Returns the index of the DisplayOutput currently being used as the output
+		/// </summary>
+		uint GetActiveDisplay() const;
+
+		/// <summary>
+		/// Sets the DisplayOutput corresponding to the given index as the render output
+		/// </summary>
+		void SetActiveDisplay(uint index);
+
+		/// <summary>
 		/// Returns a list of available displays. Display modes availble depends on the output format set.
 		/// </summary>
 		const IDynamicArray<DisplayOutput>& GetDisplays() const;
@@ -195,6 +205,7 @@ namespace Weave::D3D11
 		std::unique_ptr<Device> pDev;
 		mutable std::unique_ptr<SwapChain> pSwap;
 		std::unique_ptr<DepthStencilTexture> pDefaultDS;
+		uivec2 outputRes;
 
 		std::unique_ptr<ShaderLibrary> pDefaultShaders;
 		UniqueVector<RenderComponentBase*> pComponents;

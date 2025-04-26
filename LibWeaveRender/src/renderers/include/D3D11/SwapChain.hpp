@@ -17,7 +17,7 @@ namespace Weave::D3D11
 	public:
 		SwapChain();
 
-		SwapChain(const MinWindow& wnd, Device& dev);
+		SwapChain(Device& dev);
 
 		SwapChain(SwapChain&&) = default;
 
@@ -79,6 +79,16 @@ namespace Weave::D3D11
 		/// count is less than previous, existing RTHandles may become invalid.
 		/// </summary>
 		void ResizeBuffers( uivec2 dim, uint count = 0);
+
+		/// <summary>
+		/// Returns the index of the DisplayOutput currently being rendered to by the swap chain.
+		/// </summary>
+		uint GetDisplayOutput() const;
+
+		/// <summary>
+		/// Sets the swap chain output to the display corresponding to the given index
+		/// </summary>
+		void SetDisplayOutput(uint index);
 
 		/// <summary>
 		/// Returns true if exclusive full screen is enabled
