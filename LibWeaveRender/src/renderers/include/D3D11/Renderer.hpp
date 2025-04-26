@@ -5,6 +5,7 @@
 #include "WeaveUtils/WindowComponentBase.hpp"
 #include "Viewport.hpp"
 #include "ShaderLibrary.hpp"
+#include "Resources/DisplayOutput.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -108,6 +109,22 @@ namespace Weave::D3D11
 		/// full screen mode.
 		/// </summary>
 		void SetFullscreen(bool value);
+
+		/// <summary>
+		/// Returns a list of available displays. Display modes availble depends on the output format set.
+		/// </summary>
+		const IDynamicArray<DisplayOutput>& GetDisplays() const;
+
+		/// <summary>
+		/// Returns the rendering format used by the swap chain
+		/// </summary>
+		Formats GetOutputFormat() const;
+
+		/// <summary>
+		/// Sets the rendering format used by the swap chain. Changing this will change the display modes 
+		/// available.
+		/// </summary>
+		void SetOutputFormat(Formats format);
 
 		/// <summary>
 		/// Returns true if the default depth stencil buffer is enabled

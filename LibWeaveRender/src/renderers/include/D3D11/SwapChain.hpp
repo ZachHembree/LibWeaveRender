@@ -24,6 +24,16 @@ namespace Weave::D3D11
 		SwapChain& operator=(SwapChain&&) = default;
 
 		/// <summary>
+		/// Initializes swap chain after initial renderer config
+		/// </summary>
+		void Init();
+
+		/// <summary>
+		/// Returns true if the swap chain has been configured and initialzed
+		/// </summary>
+		bool GetIsInitialized() const;
+
+		/// <summary>
 		/// Returns pointer to swap chain interface
 		/// </summary>
 		IDXGISwapChain1& Get();
@@ -49,6 +59,11 @@ namespace Weave::D3D11
 		uint GetBufferCount() const;
 
 		/// <summary>
+		/// Sets the buffer format used for the swap chain and updates available display modes
+		/// </summary>
+		void SetBufferFormat(Formats format);
+
+		/// <summary>
 		/// Returns the texture format of the swap chain's buffers
 		/// </summary>
 		Formats GetBufferFormat() const;
@@ -63,12 +78,7 @@ namespace Weave::D3D11
 		/// left to default, the last set values will be used instead. If new buffer
 		/// count is less than previous, existing RTHandles may become invalid.
 		/// </summary>
-		void ResizeBuffers(
-			uivec2 dim,
-			uint count = 0,
-			Formats format = Formats::UNKNOWN,
-			uint flags = 0
-		);
+		void ResizeBuffers( uivec2 dim, uint count = 0);
 
 		/// <summary>
 		/// Returns true if exclusive full screen is enabled
@@ -87,11 +97,14 @@ namespace Weave::D3D11
 		void Present(CtxImm& ctx, uint syncInterval, uint flags);
 
 	private:
+		ComPtr<IDXGIFactory2> dxgiFactory;
 		ComPtr<IDXGISwapChain1> pSwap;
+		DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsDesc;
 		DXGI_SWAP_CHAIN_DESC1 desc;
 		ComPtr<ID3D11Resource> pBackBuffer;
 		ComPtr<ID3D11RenderTargetView> pBackBufRTV;
 		RTHandle backBufRt;
+		bool isInitialized;
 
 		void GetBuffers();
 	};

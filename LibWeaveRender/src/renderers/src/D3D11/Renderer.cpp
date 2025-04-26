@@ -40,7 +40,8 @@ Renderer::Renderer(MinWindow& window) :
 	defaultSamplers["LinearMirror"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::MIRROR);
 	defaultSamplers["LinearBorder"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::BORDER);
 
-	WV_LOG_INFO() << "Renderer Initialized";
+	pSwap->SetBufferFormat(Formats::R8G8B8A8_UNORM);
+	WV_LOG_INFO() << "Renderer Init";
 }
 
 Renderer::~Renderer() = default;
@@ -157,6 +158,18 @@ bool Renderer::GetIsFullscreen() const { return isFullscreen; }
 
 void Renderer::SetFullscreen(bool value) { isFullscreen = value; }
 
+const IDynamicArray<DisplayOutput>& Renderer::GetDisplays() const
+{
+	if (!pSwap->GetIsInitialized())
+		pSwap->Init();
+
+	return pDev->GetDisplays();
+}
+
+Formats Renderer::GetOutputFormat() const { return pSwap->GetBufferFormat(); }
+
+void Renderer::SetOutputFormat(Formats format) { pSwap->SetBufferFormat(format); }
+
 bool Renderer::GetIsDepthStencilEnabled() const { return useDefaultDS; }
 
 void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
@@ -206,6 +219,10 @@ void Renderer::Update()
 		pSwap->SetFullscreen(false, wasOccludedFS);	
 	else if (isFullscreen && !wasFullscreen && isFullscreenAllowed)
 		pSwap->SetFullscreen(true, false);
+
+	// Deferred swap chain init
+	if (!pSwap->GetIsInitialized())
+		pSwap->Init();
 
 	canRender = !isFullscreen || isFullscreenAllowed;
 

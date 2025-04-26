@@ -1,5 +1,6 @@
 #pragma once
 #include "CtxImm.hpp"
+#include "Resources/DisplayOutput.hpp"
 
 struct ID3D11Device1;
 struct ID3D11DeviceContext1;
@@ -44,10 +45,34 @@ namespace Weave::D3D11
 		/// </summary>
 		CtxImm& GetContext();
 
+		/// <summary>
+		/// Returns the name of the active graphics adapter
+		/// </summary>
+		string_view GetAdapterName() const;
+
+		/// <summary>
+		/// Returns an array of active displays
+		/// </summary>
+		IDynamicArray<DisplayOutput>& GetDisplays();
+
+		/// <summary>
+		/// Returns an array of active displays
+		/// </summary>
+		const IDynamicArray<DisplayOutput>& GetDisplays() const;
+
+		/// <summary>
+		/// Creates and compiles a new vertex shader
+		/// </summary>
 		void CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11VertexShader>& pVS);
 
+		/// <summary>
+		/// Creates and compiles a new pixel shader
+		/// </summary>
 		void CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11PixelShader>& pPS);
 
+		/// <summary>
+		/// Creates and compiles a new compute shader
+		/// </summary>
 		void CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11ComputeShader>& pCS);
 
 	private:
@@ -55,5 +80,7 @@ namespace Weave::D3D11
 		ComPtr<ID3D11Device1> pDev;
 		ComPtr<ID3D11DeviceContext1> pCtxImm;
 		CtxImm context;
+		string name;
+		UniqueVector<DisplayOutput> displays;
 	};
 }
