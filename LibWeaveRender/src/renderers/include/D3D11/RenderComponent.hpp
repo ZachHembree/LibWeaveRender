@@ -56,6 +56,21 @@ namespace Weave::D3D11
 		MinWindow& GetWindow();
 
 		/// <summary>
+		/// Returns reference to the renderer this component is attached to
+		/// </summary>
+		const Renderer& GetRenderer() const;
+
+		/// <summary>
+		/// Returns device interface to the renderer
+		/// </summary>
+		const Device& GetDevice() const;
+
+		/// <summary>
+		/// Returns interface reference to window being rendered to
+		/// </summary>
+		const MinWindow& GetWindow() const;
+
+		/// <summary>
 		/// Returns true if the component has been registered to a renderer
 		/// </summary>
 		bool GetIsRegistered();

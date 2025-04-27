@@ -8,7 +8,13 @@ Renderer& RenderComponentBase::GetRenderer() { return *pRenderer; }
 
 Device& RenderComponentBase::GetDevice() { return pRenderer->GetDevice(); }
 
-MinWindow& RenderComponentBase::GetWindow() { return GetRenderer().GetWindow(); }
+MinWindow& RenderComponentBase::GetWindow() { return pRenderer->GetWindow(); }
+
+const Renderer& RenderComponentBase::GetRenderer() const { return *pRenderer; }
+
+const Device& RenderComponentBase::GetDevice() const { return pRenderer->GetDevice(); }
+
+const MinWindow& RenderComponentBase::GetWindow() const { return pRenderer->GetWindow(); }
 
 bool RenderComponentBase::GetIsRegistered() { return isRegistered; }
 

@@ -1,11 +1,12 @@
 #pragma once
 #include "WeaveUtils/WindowComponentBase.hpp"
+#include "../Input.hpp"
 
 namespace Weave::D3D11
 {
 	class ImguiRenderComponent;
 	class Renderer;
-
+	
 	/// <summary>
 	/// Manages initialization and cleanup of Imgui
 	/// </summary>
@@ -14,17 +15,18 @@ namespace Weave::D3D11
 	public:
 		static bool enableDemoWindow;
 
-		ImguiHandler();
-
 		ImguiHandler(MinWindow& window, Renderer& renderer);
 
 		~ImguiHandler();
+
+		InputHandler& GetInput();
 
 		void UpdateUI();
 
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 	private:
+		InputHandler input;
 		ImguiRenderComponent* pRenderComponent;
 	};
 }

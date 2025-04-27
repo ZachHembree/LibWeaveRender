@@ -1,6 +1,5 @@
 #include "pch.hpp"
 #include "WeaveUtils/Win32.hpp"
-#include "WeaveRender/Imgui.hpp"
 #include "D3D11/InternalD3D11.hpp"
 #include "D3D11/ImguiHandler.hpp"
 #include "D3D11/ImguiRenderComponent.hpp"
@@ -12,21 +11,21 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+using namespace Weave;
 using namespace Weave::D3D11;
 
 bool ImguiHandler::enableDemoWindow = false;
 
-ImguiHandler::ImguiHandler() : pRenderComponent(nullptr) { }
-
 ImguiHandler::ImguiHandler(MinWindow& window, Renderer& renderer) :
-	WindowComponentBase(window)
+	WindowComponentBase(window),
+	input(window)
 { 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplWin32_Init(window.GetWndHandle());
-	pRenderComponent = new ImguiRenderComponent(renderer);
+	pRenderComponent = new ImguiRenderComponent(renderer, input);
 	UpdateUI();
 
 	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -38,6 +37,8 @@ ImguiHandler::~ImguiHandler()
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 }
+
+InputHandler& ImguiHandler::GetInput() { return input; }
 
 void ImguiHandler::UpdateUI()
 {
@@ -56,7 +57,6 @@ bool ImguiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 {
 	if (ImGui::GetCurrentContext() != nullptr)
 	{ 
-		ImGuiIO& io = ImGui::GetIO();
 		ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 
 		switch (msg)
@@ -79,7 +79,6 @@ bool ImguiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		case WM_SYSKEYUP:
 		case WM_SYSKEYDOWN:
 			UpdateUI();
-			return !(io.WantCaptureKeyboard || io.WantCaptureMouse);
 		}
 	}
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "RenderComponent.hpp"
+#include "Input.hpp"
 
 namespace Weave::D3D11
 {
@@ -13,7 +14,7 @@ namespace Weave::D3D11
 
 		ImguiRenderComponent();
 
-		ImguiRenderComponent(Renderer& renderer);
+		ImguiRenderComponent(Renderer& renderer, InputHandler& input);
 
 		~ImguiRenderComponent();
 
@@ -22,6 +23,6 @@ namespace Weave::D3D11
 		void DrawLate(CtxImm& ctx) override;
 
 	private:
-		
+		InputHandler* pInput;
 	};
 }
