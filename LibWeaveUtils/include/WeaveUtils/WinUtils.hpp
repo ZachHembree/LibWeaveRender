@@ -3,8 +3,13 @@
 // Essential defines
 #define WIN32_LEAN_AND_MEAN      // Exclude rarely-used stuff from Windows headers
 #define NOMINMAX                 // Exclude min/max macros
-// Exclude GDI + related defines
-#define NOGDI
+
+#define NOGDICAPMASKS
+#define NORASTEROPS  
+#define NOCOLOR      
+#define NODRAWTEXT   
+#define NOTEXTMETRIC 
+#define NOMETAFILE   
 #define NOBITMAP
 // Exclude User32 components
 #define NOSYSMETRICS             // System metrics

@@ -10,6 +10,33 @@ namespace Weave
 	class WindowComponentBase;
 
 	/// <summary>
+	/// Describes the configuration of a given monitor as reported by Win32
+	/// </summary>
+	struct WinMonConfig
+	{	
+		/// <summary>
+		/// Current resolution of the monitor. 
+		/// X == width - Y == height
+		/// </summary>
+		uivec2 res;
+
+		/// <summary>
+		/// Position of the monitor's upper left corner
+		/// </summary>
+		ivec2 pos;
+
+		/// <summary>
+		/// Rounded or truncated monitor refresh rate in Hz
+		/// </summary>
+		uint refreshHz;
+
+		/// <summary>
+		/// Bits used for each pixel
+		/// </summary>
+		uint bitsPerPixel;
+	};
+
+	/// <summary>
 	/// Minimal wrapper class for Win32 Window
 	/// </summary>
 	class MinWindow
@@ -155,6 +182,18 @@ namespace Weave
 			/// Returns handle to the monitor the window is occupying
 			/// </summary>
 			HMONITOR GetActiveMonitor() const;
+
+			/// <summary>
+			/// Returns configuration details for the active monitor including resolution, position,
+			/// refresh rate and bits per pixel.
+			/// </summary>
+			WinMonConfig GetActiveMonitorConfig() const;
+
+			/// <summary>
+			/// Returns configuration details for the given monitor including resolution, position,
+			/// refresh rate and bits per pixel.
+			/// </summary>
+			static WinMonConfig GetMonitorConfig(HMONITOR mon);
 
 			/// <summary>
 			/// Returns fractional, floating-point, DPI normalized to 96 DPI

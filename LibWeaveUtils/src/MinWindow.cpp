@@ -45,7 +45,7 @@ MinWindow::MinWindow(
 
 	// Register window class
 	WIN_ASSERT_NZ_LAST(RegisterClassEx(&wc));
-
+	
 	RECT wr;
 	wr.left = 50;
 	wr.right = bodySize.x + wr.left;
@@ -265,12 +265,12 @@ void MinWindow::DisableStyleFlags(WndStyle flags)
 	SetStyle(style);
 }
 
-static MONITORINFO GetMonInfo(HMONITOR mon)
+static MONITORINFOEXW GetMonInfo(HMONITOR mon)
 {
-	MONITORINFO info;
-	info.cbSize = sizeof(MONITORINFO);
+	MONITORINFOEXW info;
+	info.cbSize = sizeof(MONITORINFOEXW);
 
-	WIN_CHECK_NZ_LAST(GetMonitorInfo(mon, &info));
+	WIN_CHECK_NZ_LAST(GetMonitorInfoW(mon, &info));
 	return info;
 }
 
@@ -279,7 +279,7 @@ void MinWindow::SetActiveMonitor(HMONITOR newMon)
 	if (newMon == GetActiveMonitor())
 		return;
 
-	MONITORINFO info = GetMonInfo(newMon);
+	MONITORINFOEXW info = GetMonInfo(newMon);
 	RECT rect = info.rcMonitor;
 	ivec2 pos(rect.left, rect.top);
 	const bool wasFullscreen = isFullscreen;
@@ -294,6 +294,25 @@ void MinWindow::SetActiveMonitor(HMONITOR newMon)
 }
 
 HMONITOR MinWindow::GetActiveMonitor() const { return MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST); }
+
+WinMonConfig MinWindow::GetMonitorConfig(HMONITOR mon)
+{
+	MONITORINFOEXW info = GetMonInfo(mon);
+	DEVMODEW mode = {};
+	mode.dmSize = sizeof(DEVMODEW);
+
+	WIN_CHECK_NZ_LAST(EnumDisplaySettingsExW(info.szDevice, ENUM_CURRENT_SETTINGS, &mode, 0));
+
+	WinMonConfig cfg = {};
+	cfg.res = uivec2(mode.dmPelsWidth, mode.dmPelsHeight);
+	cfg.pos = ivec2(mode.dmPosition.x, mode.dmPosition.y);
+	cfg.refreshHz = mode.dmDisplayFrequency;
+	cfg.bitsPerPixel = mode.dmBitsPerPel;
+
+	return cfg;
+}
+
+WinMonConfig MinWindow::GetActiveMonitorConfig() const { return GetMonitorConfig(GetActiveMonitor()); }
 
 ivec2 MinWindow::GetMonitorDPI() const
 {
@@ -313,7 +332,7 @@ vec2 MinWindow::GetNormMonitorDPI() const
 ivec2 MinWindow::GetMonitorPosition() const
 {
 	HMONITOR mon = GetActiveMonitor();
-	MONITORINFO info = GetMonInfo(mon);
+	MONITORINFOEXW info = GetMonInfo(mon);
 	RECT rect = info.rcMonitor;
 
 	return ivec2(rect.left, rect. top);
@@ -322,7 +341,7 @@ ivec2 MinWindow::GetMonitorPosition() const
 ivec2 MinWindow::GetMonitorResolution() const
 {
 	HMONITOR mon = GetActiveMonitor();
-	MONITORINFO info = GetMonInfo(mon);
+	MONITORINFOEXW info = GetMonInfo(mon);
 	RECT rect = info.rcMonitor;
 
 	return ivec2(rect.right - rect.left, rect.bottom - rect.top);
