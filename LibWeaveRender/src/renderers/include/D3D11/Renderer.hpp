@@ -51,7 +51,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns reference to the swap chain interface
 		/// </summary>
-		SwapChain& GetSwapChain();
+		const SwapChain& GetSwapChain() const;
 
 		/// <summary>
 		/// Returns the last frame time in milliseconds
@@ -137,6 +137,18 @@ namespace Weave::D3D11
 		void SetOutputFormat(Formats format);
 
 		/// <summary>
+		/// Returns the ID for the display mode used by the renderer. Results may not be accurate for 
+		/// windowed modes. X = DisplayMode index - Y = Refresh rate index
+		/// </summary>
+		uivec2 GetDisplayMode() const;
+
+		/// <summary>
+		/// Sets the display mode corresponding to the given identifier. Only valid in exclusive full screen 
+		/// mode.
+		/// </summary>
+		void SetDisplayMode(uivec2 modeID);
+
+		/// <summary>
 		/// Returns true if the default depth stencil buffer is enabled
 		/// </summary>
 		bool GetIsDepthStencilEnabled() const;
@@ -203,19 +215,20 @@ namespace Weave::D3D11
 		std::unordered_map<string_view, Sampler> defaultSamplers;
 
 		std::unique_ptr<Device> pDev;
-		mutable std::unique_ptr<SwapChain> pSwap;
 		std::unique_ptr<DepthStencilTexture> pDefaultDS;
+
+		std::unique_ptr<SwapChain> pSwap;
 		uivec2 outputRes;
+		uivec2 lastDispMode;
+		bool fitToWindow;
+		bool isFsReq;
 
 		std::unique_ptr<ShaderLibrary> pDefaultShaders;
 		UniqueVector<RenderComponentBase*> pComponents;
 
 		bool useDefaultDS;
-		bool fitToWindow;
-		bool isFullscreen;
-
 		bool canRender;
-		bool isFullscreenAllowed;
+		bool isFsAllowed;
 
 		ulong frameCount;
 		Stopwatch frameTimer;

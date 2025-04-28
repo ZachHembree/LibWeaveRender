@@ -54,6 +54,11 @@ namespace Weave::D3D11
 		uivec2 GetSize() const;
 
 		/// <summary>
+		/// Returns the current refresh as a rational value.
+		/// </summary>
+		uivec2 GetRefresh() const;
+
+		/// <summary>
 		/// Returns the number of buffers in the chain
 		/// </summary>
 		uint GetBufferCount() const;
@@ -78,7 +83,7 @@ namespace Weave::D3D11
 		/// left to default, the last set values will be used instead. If new buffer
 		/// count is less than previous, existing RTHandles may become invalid.
 		/// </summary>
-		void ResizeBuffers( uivec2 dim, uint count = 0);
+		void ResizeBuffers(uivec2 dim, uint count = 0);
 
 		/// <summary>
 		/// Returns the index of the DisplayOutput currently being rendered to by the swap chain.
@@ -89,6 +94,18 @@ namespace Weave::D3D11
 		/// Sets the swap chain output to the display corresponding to the given index
 		/// </summary>
 		void SetDisplayOutput(uint index);
+
+		/// <summary>
+		/// Sets the display mode corresponding to the given identifier. In exclusive full screen, this 
+		/// will set refresh rate and resolution. In windowed modes, this only resizes buffers.
+		/// </summary>
+		void SetDisplayMode(uivec2 modeID);
+
+		/// <summary>
+		/// Returns the display mode identifier that most closely aligns with the current resolution and 
+		/// refresh rate.
+		/// </summary>
+		uivec2 GetDisplayMode();
 
 		/// <summary>
 		/// Returns true if exclusive full screen is enabled
@@ -111,10 +128,11 @@ namespace Weave::D3D11
 		ComPtr<IDXGISwapChain1> pSwap;
 		DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsDesc;
 		DXGI_SWAP_CHAIN_DESC1 desc;
+		bool isInitialized;
+
 		ComPtr<ID3D11Resource> pBackBuffer;
 		ComPtr<ID3D11RenderTargetView> pBackBufRTV;
 		RTHandle backBufRt;
-		bool isInitialized;
 
 		void GetBuffers();
 	};

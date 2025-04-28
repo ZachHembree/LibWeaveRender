@@ -72,7 +72,6 @@ void SwapChain::Init()
 	WV_LOG_INFO() <<
 		"Swap Chain Configuration" <<
 		"\nWindowed Mode: " << (fsDesc.Windowed ? "TRUE" : "FALSE") <<
-		"\nOutput Size: " << wnd.GetBodySize().x << " x " << wnd.GetBodySize().y <<
 		"\nBuffer Size: " << desc.Width << " x " << desc.Height <<
 		"\nFormat: " << GetFormatName((Formats)desc.Format) <<
 		"\nAlpha Mode: " << GetAlphaModeName(desc.AlphaMode) <<
@@ -92,6 +91,19 @@ IDXGISwapChain1* SwapChain::operator->() { return pSwap.Get(); }
 
 uivec2 SwapChain::GetSize() const { return uivec2(desc.Width, desc.Height); }
 
+uivec2 SwapChain::GetRefresh() const 
+{
+	if (GetIsFullscreen())
+	{
+		return uivec2(fsDesc.RefreshRate.Numerator, fsDesc.RefreshRate.Denominator);
+	}
+	else
+	{
+		WinMonConfig monCfg = GetRenderer().GetWindow().GetActiveMonitorConfig();
+		return uivec2(monCfg.refreshHz, 1u);
+	}
+}
+
 uint SwapChain::GetBufferCount() const { return desc.BufferCount; }
 
 void SwapChain::SetBufferFormat(Formats format)
@@ -105,7 +117,7 @@ void SwapChain::SetBufferFormat(Formats format)
 	desc.Format = (DXGI_FORMAT)format;
 
 	if (isInitialized)
-		pSwap->ResizeBuffers(desc.BufferCount, desc.Width, desc.Height, desc.Format, desc.Flags);
+		D3D_ASSERT_HR(pSwap->ResizeBuffers(desc.BufferCount, desc.Width, desc.Height, desc.Format, desc.Flags));
 }
 
 Formats SwapChain::GetBufferFormat() const { return (Formats)desc.Format; }
@@ -119,7 +131,7 @@ void SwapChain::ResizeBuffers(uivec2 dim, uint count)
 
 	if (dim.x == 0 || dim.y == 0) // Transition swap chain to occluded state
 	{	
-		pSwap->ResizeBuffers(0, 0, 0, (DXGI_FORMAT)Formats::UNKNOWN, desc.Flags);
+		D3D_ASSERT_HR(pSwap->ResizeBuffers(0, 0, 0, (DXGI_FORMAT)Formats::UNKNOWN, desc.Flags));
 		GetBuffers();
 	}
 	else // General purpose resize/disocclude
@@ -133,7 +145,7 @@ void SwapChain::ResizeBuffers(uivec2 dim, uint count)
 
 		if (isInitialized)
 		{
-			pSwap->ResizeBuffers(desc.BufferCount, desc.Width, desc.Height, desc.Format, desc.Flags);
+			D3D_ASSERT_HR(pSwap->ResizeBuffers(desc.BufferCount, desc.Width, desc.Height, desc.Format, desc.Flags));
 			pSwap->GetDesc1(&desc);
 			GetBuffers();
 		}
@@ -168,9 +180,8 @@ void SwapChain::SetDisplayOutput(uint index)
 
 		if (GetIsFullscreen())
 		{
-			SetFullscreen(false, false);
+			SetFullscreen(false, true);
 			wnd.SetActiveMonitor(newDisp.GetHandle());
-			ResizeBuffers(GetRenderer().GetOutputResolution());
 			SetFullscreen(true, false);
 		}
 		else
@@ -180,23 +191,78 @@ void SwapChain::SetDisplayOutput(uint index)
 	}
 }
 
+void SwapChain::SetDisplayMode(uivec2 modeID)
+{
+	const uint dispID = GetDisplayOutput();
+	const DisplayOutput& disp = GetDevice().GetDisplays()[dispID];
+	const DisplayMode& mode = disp.GetModes()[modeID.x];
+
+	if (GetIsFullscreen())
+	{
+		const uivec2 refresh = (modeID.y != (uint)-1) ? mode.refreshRates[modeID.y] : uivec2(0);
+		desc.Width = mode.resolution.x;
+		desc.Height = mode.resolution.y;
+		fsDesc.RefreshRate =
+		{
+			.Numerator = refresh.x,
+			.Denominator = refresh.y
+		};
+
+		if (isInitialized)
+		{
+			DXGI_MODE_DESC newDesc =
+			{
+				.Width = desc.Width,
+				.Height = desc.Height,
+				.RefreshRate = fsDesc.RefreshRate,
+				.ScanlineOrdering = fsDesc.ScanlineOrdering,
+				.Scaling = fsDesc.Scaling
+			};
+
+			// Set new display mode
+			D3D_ASSERT_HR(pSwap->ResizeTarget(&newDesc));
+
+			// Resize buffers
+			pBackBuffer.Reset();
+			pBackBufRTV.Reset();
+
+			D3D_ASSERT_HR(pSwap->ResizeBuffers(desc.BufferCount, desc.Width, desc.Height, desc.Format, desc.Flags));
+			pSwap->GetDesc1(&desc);
+			GetBuffers();
+		}
+	}
+	else
+	{
+		ResizeBuffers(mode.resolution);
+	}
+}
+
+uivec2 SwapChain::GetDisplayMode()
+{
+	const uint dispID = GetDisplayOutput();
+	const DisplayOutput& disp = GetDevice().GetDisplays()[dispID];
+	return disp.GetClosestMatch(GetSize(), GetRefresh());
+}
+
 bool SwapChain::GetIsFullscreen() const { return !fsDesc.Windowed; }
 
 void SwapChain::SetFullscreen(bool isFullscreen, bool isOccluded)
 {
-	if (isFullscreen == GetIsFullscreen())
-		return;
-
 	fsDesc.Windowed = !isFullscreen;
 
 	if (isInitialized)
 	{
+		// Enable/disable exclusive full screen mode
 		D3D_ASSERT_HR(pSwap->SetFullscreenState(isFullscreen, nullptr));
 
-		// Handle occlusion/focus loss in exclusive full screen
-		if (isFullscreen && isOccluded)
+		// Update buffers
+		if (isOccluded)
+			// Handle occlusion/focus loss in exclusive full screen
 			ResizeBuffers(uivec2(0));
-		else // Call resize on mode change with current size
+		else if (isFullscreen)
+			// Use explicit display modes for exclusive full screen
+			SetDisplayMode(GetDisplayMode());
+		else // Use current monitor resolution for windowed modes
 			ResizeBuffers(GetRenderer().GetWindow().GetMonitorResolution());
 	}
 }

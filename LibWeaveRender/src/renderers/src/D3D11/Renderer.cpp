@@ -26,8 +26,9 @@ Renderer::Renderer(MinWindow& window) :
 	pDefaultShaders(new ShaderLibrary(*this, GetBuiltInShaders())),
 	frameCount(0),
 	canRender(true),
-	isFullscreen(false),
-	isFullscreenAllowed(true)
+	isFsReq(false),
+	isFsAllowed(true),
+	lastDispMode(-1)
 { 
 	MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
 	defaultMeshes["FSQuad"] = Mesh(*pDev, quadDef);
@@ -41,7 +42,7 @@ Renderer::Renderer(MinWindow& window) :
 	defaultSamplers["LinearBorder"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::BORDER);
 
 	pSwap->SetBufferFormat(Formats::R8G8B8A8_UNORM);
-	pSwap->ResizeBuffers(window.GetMonitorResolution());
+	pSwap->ResizeBuffers(GetWindow().GetMonitorResolution());
 
 	WV_LOG_INFO() << "Renderer Init";
 }
@@ -56,7 +57,7 @@ Device& Renderer::GetDevice() { return *pDev; }
 
 IRenderTarget& Renderer::GetBackBuffer() { return pSwap->GetBackBuf(); }
 
-SwapChain& Renderer::GetSwapChain() { return *pSwap; }
+const SwapChain& Renderer::GetSwapChain() const { return *pSwap; }
 
 double Renderer::GetFrameTimeMS() const { return frameTimer.GetElapsedMS(); }
 
@@ -65,6 +66,69 @@ ulong Renderer::GetFrameNumber() const { return frameCount; }
 ShaderLibrary Renderer::CreateShaderLibrary(const ShaderLibDef& def) { return ShaderLibrary(*this, def); }
 
 ShaderLibrary Renderer::CreateShaderLibrary(ShaderLibDef&& def) { return ShaderLibrary(*this, std::move(def)); }
+
+ivec2 Renderer::GetOutputResolution() const { return outputRes; }
+
+void Renderer::SetOutputResolution(ivec2 res) 
+{ 
+	if (!isFsReq)
+		outputRes = res; 
+}
+
+bool Renderer::GetIsFitToWindow() const { return fitToWindow; }
+
+void Renderer::SetFitToWindow(bool value) { fitToWindow = value; }
+
+bool Renderer::GetIsFullscreen() const { return isFsReq; }
+
+void Renderer::SetFullscreen(bool value) { isFsReq = value; }
+
+uint Renderer::GetActiveDisplay() const { return pSwap->GetDisplayOutput(); }
+
+void Renderer::SetActiveDisplay(uint index) 
+{ 
+	pSwap->SetDisplayOutput(index); 
+	outputRes = pSwap->GetSize();
+}
+
+const IDynamicArray<DisplayOutput>& Renderer::GetDisplays() const { return pDev->GetDisplays(); }
+
+Formats Renderer::GetOutputFormat() const { return pSwap->GetBufferFormat(); }
+
+void Renderer::SetOutputFormat(Formats format) { pSwap->SetBufferFormat(format); }
+
+uivec2 Renderer::GetDisplayMode() const { return pSwap->GetDisplayMode(); }
+
+void Renderer::SetDisplayMode(uivec2 newMode) 
+{ 
+	if (isFsReq && newMode != lastDispMode)
+	{
+		pSwap->SetDisplayMode(newMode);
+		lastDispMode = newMode;
+		outputRes = pSwap->GetSize();
+	}
+}
+
+Viewport Renderer::GetMainViewport() const
+{
+	return
+	{
+		pSwap->GetBackBuf().GetRenderOffset(),
+		pSwap->GetBackBuf().GetSize(),
+		pDefaultDS->GetRange()
+	};
+}
+
+void Renderer::SetMainViewport(Viewport& vp)
+{
+	SetOutputResolution(vp.size);
+	pSwap->GetBackBuf().SetRenderOffset(vp.offset);
+	pDefaultDS->SetRange(vp.zDepth);
+}
+
+bool Renderer::GetIsDepthStencilEnabled() const { return useDefaultDS; }
+
+void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
 
 /*
 	Default resources used for internal functions and generalized samplers
@@ -116,55 +180,6 @@ Sampler& Renderer::GetDefaultSampler(string_view name) const { return const_cast
 	Core rendering functions
 */
 
-Viewport Renderer::GetMainViewport() const
-{
-	return
-	{
-		pSwap->GetBackBuf().GetRenderOffset(), 
-		pSwap->GetBackBuf().GetSize(),
-		pDefaultDS->GetRange() 
-	};
-}
-
-void Renderer::SetMainViewport(Viewport& vp)
-{
-	SetOutputResolution(vp.size);
-	pSwap->GetBackBuf().SetRenderOffset(vp.offset);
-	pDefaultDS->SetRange(vp.zDepth);
-}
-
-ivec2 Renderer::GetOutputResolution() const { return outputRes; }
-
-void Renderer::SetOutputResolution(ivec2 res) { outputRes = res; }
-
-bool Renderer::GetIsFitToWindow() const { return fitToWindow; }
-
-void Renderer::SetFitToWindow(bool value) { fitToWindow = value; }
-
-bool Renderer::GetIsFullscreen() const { return isFullscreen; }
-
-void Renderer::SetFullscreen(bool value) { isFullscreen = value; }
-
-uint Renderer::GetActiveDisplay() const { return pSwap->GetDisplayOutput(); }
-
-void Renderer::SetActiveDisplay(uint index) { pSwap->SetDisplayOutput(index); }
-
-const IDynamicArray<DisplayOutput>& Renderer::GetDisplays() const
-{
-	if (!pSwap->GetIsInitialized())
-		pSwap->Init();
-
-	return pDev->GetDisplays();
-}
-
-Formats Renderer::GetOutputFormat() const { return pSwap->GetBufferFormat(); }
-
-void Renderer::SetOutputFormat(Formats format) { pSwap->SetBufferFormat(format); }
-
-bool Renderer::GetIsDepthStencilEnabled() const { return useDefaultDS; }
-
-void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
-
 bool Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 { 
 	switch (msg)
@@ -174,19 +189,19 @@ bool Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_ACTIVATE:
 	{
 		const bool isActivating = (wParam != WA_INACTIVE);
-		isFullscreenAllowed = isActivating;
+		isFsAllowed = isActivating;
 		break;
 	}
 	case WM_ACTIVATEAPP:
 	{
 		const bool isActivating = (wParam == TRUE);
-		isFullscreenAllowed = isActivating;
+		isFsAllowed = isActivating;
 		break;
 	}
 	case WM_SIZE:
-		if (isFullscreenAllowed && wParam == SIZE_MINIMIZED)
+		if (isFsAllowed && wParam == SIZE_MINIMIZED)
 		{
-			isFullscreenAllowed = false;
+			isFsAllowed = false;
 			canRender = false;
 		}
 		break;
@@ -199,39 +214,48 @@ void Renderer::Update()
 {
 	CtxImm& ctx = pDev->GetContext();
 	const ivec2 bodySize = GetWindow().GetBodySize();
-	const uivec2 lastBackSize = pSwap->GetSize();
 
 	// Full screen mode validation and transitioning
-	const bool wasFullscreen = isFullscreen && pSwap->GetIsFullscreen();
+	const bool isFsEnabled = pSwap->GetIsFullscreen();
 	// True if was in exclusive full screen and just occluded
-	const bool wasOccludedFS = isFullscreen && wasFullscreen && !isFullscreenAllowed;
+	const bool wasOccludedFS = isFsEnabled && !isFsAllowed;
 
-	if (!isFullscreen || wasOccludedFS)
-		pSwap->SetFullscreen(false, wasOccludedFS);	
-	else if (isFullscreen && !wasFullscreen && isFullscreenAllowed)
+	if ((isFsReq != pSwap->GetIsFullscreen()) || wasOccludedFS)
 	{
-		pSwap->SetFullscreen(true, false);
-		SetOutputResolution(pSwap->GetSize());
+		if (!isFsReq || wasOccludedFS) // Disable for occlusion or manual disable	
+			pSwap->SetFullscreen(false, wasOccludedFS);
+		else if (isFsReq && isFsAllowed)
+		{
+			pSwap->SetFullscreen(true, false);
+			outputRes = pSwap->GetSize();
+			lastDispMode = pSwap->GetDisplayMode();
+		}
 	}
 
-	// Update DRS scaling
-	if (!isFullscreen && fitToWindow)
-		SetOutputResolution(bodySize);
+	// Update window scaling
+	if (!isFsReq)
+	{
+		const uivec2 lastBackSize = pSwap->GetSize();
 
-	if (outputRes.x > lastBackSize.x || outputRes.y > lastBackSize.y)
-		pSwap->ResizeBuffers(outputRes);
+		if (fitToWindow)
+			outputRes = bodySize;
 
-	pSwap->GetBackBuf().SetRenderSize(outputRes);
+		if (outputRes.x > lastBackSize.x || outputRes.y > lastBackSize.y)
+			pSwap->ResizeBuffers(outputRes);
+	}
 
 	// Deferred swap chain init
 	if (!pSwap->GetIsInitialized())
 		pSwap->Init();
 
-	canRender = !isFullscreen || isFullscreenAllowed;
+	pSwap->GetBackBuf().SetRenderSize(outputRes);
+	canRender = !isFsReq || isFsAllowed;
 
 	// If rendering is explicitly disabled or resolution invalid, skip everything else
 	if (!canRender || bodySize.x == 0 || bodySize.y == 0)
 		return;
+
+	BeforeDraw(ctx);
 
 	// Update depth stencil if not overriden
 	if (useDefaultDS)
@@ -239,8 +263,6 @@ void Renderer::Update()
 		if (pSwap->GetSize() != pDefaultDS->GetSize())
 			*pDefaultDS = DepthStencilTexture(*pDev, pSwap->GetSize());
 	}
-
-	BeforeDraw(ctx);
 
 	// Clear back buffer
 	pSwap->GetBackBuf().Clear(ctx);
