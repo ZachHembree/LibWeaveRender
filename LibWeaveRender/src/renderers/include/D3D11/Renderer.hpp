@@ -6,6 +6,7 @@
 #include "Viewport.hpp"
 #include "ShaderLibrary.hpp"
 #include "Resources/DisplayOutput.hpp"
+#include "RenderModes.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -84,31 +85,15 @@ namespace Weave::D3D11
 		void SetOutputResolution(ivec2 res);
 
 		/// <summary>
-		/// Returns true if the render resolution is set to match that of the window body being 
-		/// rendered to. Only applicable if exclusive full screen is disabled.
+		/// Returns an enum indciating whether the renderer is in windowed, borderless or exclusive full
+		/// screen mode.
 		/// </summary>
-		bool GetIsFitToWindow() const;
+		WindowRenderModes GetWindowRenderMode() const;
 
 		/// <summary>
-		/// Set to true if the renderer resolution should match the resolution of the window body.
-		/// Combining this mode with the borderless full screen mode of the parent Window will enable
-		/// borderless full screen rendering at the desktop resolution. Superceeded by exclusive full
-		/// screen.
+		/// Sets windowed, borderless or exclusive full screen mode
 		/// </summary>
-		void SetFitToWindow(bool value);
-
-		/// <summary>
-		/// Returns true if exclusive full screen mode has been enabled
-		/// </summary>
-		bool GetIsFullscreen() const;
-
-		/// <summary>
-		/// Enables or disables full screen mode. Disabling full screen mode automatically transitions 
-		/// to windowed mode and vice versa. Borderless fullscreen window mode requires disabling this,
-		/// enabling fit to window in the renderer, and setting the Window style itself to borderless 
-		/// full screen mode.
-		/// </summary>
-		void SetFullscreen(bool value);
+		void SetWindowRenderMode(WindowRenderModes mode);
 
 		/// <summary>
 		/// Returns the index of the DisplayOutput currently being used as the output
@@ -179,7 +164,7 @@ namespace Weave::D3D11
 		ComputeInstance& GetDefaultCompute(string_view name) const;
 
 		/// <summary>
-		/// Retursn a reference to a default mesh
+		/// Returns a reference to a default mesh
 		/// </summary>
 		Mesh& GetDefaultMesh(string_view name) const;
 
@@ -215,13 +200,11 @@ namespace Weave::D3D11
 		std::unordered_map<string_view, Sampler> defaultSamplers;
 
 		std::unique_ptr<Device> pDev;
-		std::unique_ptr<DepthStencilTexture> pDefaultDS;
-
 		std::unique_ptr<SwapChain> pSwap;
+		std::unique_ptr<DepthStencilTexture> pDefaultDS;
+		WindowRenderModes fsMode;
 		uivec2 outputRes;
 		uivec2 lastDispMode;
-		bool fitToWindow;
-		bool isFsReq;
 
 		std::unique_ptr<ShaderLibrary> pDefaultShaders;
 		UniqueVector<RenderComponentBase*> pComponents;
@@ -232,6 +215,8 @@ namespace Weave::D3D11
 
 		ulong frameCount;
 		Stopwatch frameTimer;
+
+		void UpdateSwap();
 
 		void BeforeDraw(CtxImm& ctx);
 

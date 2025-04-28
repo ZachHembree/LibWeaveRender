@@ -36,16 +36,6 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns pointer to swap chain interface
 		/// </summary>
-		IDXGISwapChain1& Get();
-
-		/// <summary>
-		/// Returns read-only pointer to pointer for swap chain interface
-		/// </summary>
-		IDXGISwapChain1** const GetAddressOf();
-
-		/// <summary>
-		/// Returns pointer to swap chain interface
-		/// </summary>
 		IDXGISwapChain1* operator->();
 
 		/// <summary>

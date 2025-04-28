@@ -83,10 +83,6 @@ void SwapChain::Init()
 
 bool SwapChain::GetIsInitialized() const { return isInitialized; }
 
-IDXGISwapChain1& SwapChain::Get() { return *pSwap.Get(); }
-
-IDXGISwapChain1** const SwapChain::GetAddressOf() { return pSwap.GetAddressOf(); }
-
 IDXGISwapChain1* SwapChain::operator->() { return pSwap.Get(); }
 
 uivec2 SwapChain::GetSize() const { return uivec2(desc.Width, desc.Height); }

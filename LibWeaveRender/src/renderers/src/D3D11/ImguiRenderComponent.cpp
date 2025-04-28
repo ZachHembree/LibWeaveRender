@@ -31,14 +31,17 @@ void ImguiRenderComponent::Setup(CtxImm& ctx)
 	if (ImGui::GetCurrentContext() != nullptr)
 	{ 
 		ImGuiIO& io = ImGui::GetIO();
-		const vec2 newSize = GetRenderer().GetOutputResolution();
 
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		
-		const vec2 newPos = pInput->GetNormMousePos() * newSize;
-		io.DisplaySize = ImVec2(newSize.x, newSize.y);
-		io.AddMousePosEvent(newPos.x, newPos.y);
+		if (GetRenderer().GetWindowRenderMode() == WindowRenderModes::ExclusiveFS)
+		{ 
+			const vec2 newSize = GetRenderer().GetOutputResolution();
+			const vec2 newPos = pInput->GetNormMousePos() * newSize;
+			io.DisplaySize = ImVec2(newSize.x, newSize.y);
+			io.AddMousePosEvent(newPos.x, newPos.y);
+		}
 
 		ImGui::NewFrame();	
 

@@ -268,6 +268,7 @@
     <ClInclude Include="src\renderers\include\D3D11\ContextUtils.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\DeferredContext.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\CtxBase.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\RenderModes.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\DisplayOutput.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\InternalD3D11.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\MappedBufferHandle.hpp" />

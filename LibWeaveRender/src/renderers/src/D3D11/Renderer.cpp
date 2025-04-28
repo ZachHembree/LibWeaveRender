@@ -22,12 +22,12 @@ Renderer::Renderer(MinWindow& window) :
 	pSwap(new SwapChain(*pDev)), // Create swap chain for window
 	pDefaultDS(new DepthStencilTexture()),
 	useDefaultDS(true),
-	fitToWindow(true),
+	fsMode(WindowRenderModes::Windowed),
 	pDefaultShaders(new ShaderLibrary(*this, GetBuiltInShaders())),
 	frameCount(0),
 	canRender(true),
-	isFsReq(false),
 	isFsAllowed(true),
+	outputRes(GetWindow().GetMonitorResolution()),
 	lastDispMode(-1)
 { 
 	MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
@@ -42,7 +42,7 @@ Renderer::Renderer(MinWindow& window) :
 	defaultSamplers["LinearBorder"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::BORDER);
 
 	pSwap->SetBufferFormat(Formats::R8G8B8A8_UNORM);
-	pSwap->ResizeBuffers(GetWindow().GetMonitorResolution());
+	pSwap->ResizeBuffers(outputRes);
 
 	WV_LOG_INFO() << "Renderer Init";
 }
@@ -71,17 +71,13 @@ ivec2 Renderer::GetOutputResolution() const { return outputRes; }
 
 void Renderer::SetOutputResolution(ivec2 res) 
 { 
-	if (!isFsReq)
+	if (fsMode != WindowRenderModes::ExclusiveFS)
 		outputRes = res; 
 }
 
-bool Renderer::GetIsFitToWindow() const { return fitToWindow; }
+WindowRenderModes Renderer::GetWindowRenderMode() const { return fsMode; }
 
-void Renderer::SetFitToWindow(bool value) { fitToWindow = value; }
-
-bool Renderer::GetIsFullscreen() const { return isFsReq; }
-
-void Renderer::SetFullscreen(bool value) { isFsReq = value; }
+void Renderer::SetWindowRenderMode(WindowRenderModes mode) { fsMode = mode; }
 
 uint Renderer::GetActiveDisplay() const { return pSwap->GetDisplayOutput(); }
 
@@ -101,7 +97,7 @@ uivec2 Renderer::GetDisplayMode() const { return pSwap->GetDisplayMode(); }
 
 void Renderer::SetDisplayMode(uivec2 newMode) 
 { 
-	if (isFsReq && newMode != lastDispMode)
+	if (newMode != lastDispMode)
 	{
 		pSwap->SetDisplayMode(newMode);
 		lastDispMode = newMode;
@@ -210,21 +206,22 @@ bool Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return true;
 }
 
-void Renderer::Update()
+void Renderer::UpdateSwap()
 {
-	CtxImm& ctx = pDev->GetContext();
-	const ivec2 bodySize = GetWindow().GetBodySize();
+	const bool isBorderless = fsMode == WindowRenderModes::BorderlessFS;
+	const bool isExclusiveSet = fsMode == WindowRenderModes::ExclusiveFS;
+	const bool isFitToWindow = fsMode == WindowRenderModes::Windowed || isBorderless;
 
 	// Full screen mode validation and transitioning
 	const bool isFsEnabled = pSwap->GetIsFullscreen();
 	// True if was in exclusive full screen and just occluded
 	const bool wasOccludedFS = isFsEnabled && !isFsAllowed;
 
-	if ((isFsReq != pSwap->GetIsFullscreen()) || wasOccludedFS)
+	if ((isExclusiveSet != pSwap->GetIsFullscreen()) || wasOccludedFS)
 	{
-		if (!isFsReq || wasOccludedFS) // Disable for occlusion or manual disable	
+		if (!isExclusiveSet || wasOccludedFS) // Disable for occlusion or manual disable	
 			pSwap->SetFullscreen(false, wasOccludedFS);
-		else if (isFsReq && isFsAllowed)
+		else if (isExclusiveSet && isFsAllowed)
 		{
 			pSwap->SetFullscreen(true, false);
 			outputRes = pSwap->GetSize();
@@ -233,12 +230,15 @@ void Renderer::Update()
 	}
 
 	// Update window scaling
-	if (!isFsReq)
+	if (!isExclusiveSet)
 	{
+		// Update window style and size for borderless mode
+		GetWindow().SetFullScreen(isBorderless);
+
 		const uivec2 lastBackSize = pSwap->GetSize();
 
-		if (fitToWindow)
-			outputRes = bodySize;
+		if (isFitToWindow)
+			outputRes = GetWindow().GetBodySize();
 
 		if (outputRes.x > lastBackSize.x || outputRes.y > lastBackSize.y)
 			pSwap->ResizeBuffers(outputRes);
@@ -249,12 +249,20 @@ void Renderer::Update()
 		pSwap->Init();
 
 	pSwap->GetBackBuf().SetRenderSize(outputRes);
-	canRender = !isFsReq || isFsAllowed;
+	canRender = (!isExclusiveSet || isFsAllowed) && (outputRes.x > 0 && outputRes.y > 0);
+}
 
-	// If rendering is explicitly disabled or resolution invalid, skip everything else
-	if (!canRender || bodySize.x == 0 || bodySize.y == 0)
+void Renderer::Update()
+{
+	UpdateSwap();
+
+	// If rendering is explicitly disabled, skip everything else
+	if (!canRender)
 		return;
 
+	CtxImm& ctx = pDev->GetContext();
+
+	// Custom setup
 	BeforeDraw(ctx);
 
 	// Update depth stencil if not overriden
