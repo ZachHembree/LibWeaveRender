@@ -57,8 +57,6 @@ Device& Renderer::GetDevice() { return *pDev; }
 
 IRenderTarget& Renderer::GetBackBuffer() { return pSwap->GetBackBuf(); }
 
-const SwapChain& Renderer::GetSwapChain() const { return *pSwap; }
-
 double Renderer::GetFrameTimeMS() const { return frameTimer.GetElapsedMS(); }
 
 ulong Renderer::GetFrameNumber() const { return frameCount; }
@@ -104,6 +102,12 @@ void Renderer::SetDisplayMode(uivec2 newMode)
 		outputRes = pSwap->GetSize();
 	}
 }
+
+bool Renderer::GetIsSyncModeSupported(VSyncRenderModes mode) const { return pSwap->GetIsSyncModeSupported(mode); }
+
+VSyncRenderModes Renderer::GetSyncMode() const { return pSwap->GetSyncMode(); }
+
+bool Renderer::TrySetSyncMode(VSyncRenderModes mode) { return pSwap->TrySetSyncMode(mode); }
 
 Viewport Renderer::GetMainViewport() const
 {
@@ -289,12 +293,10 @@ void Renderer::Update()
 	DrawLate(ctx);
 
 	// Present frame
-	ctx.Present(*pSwap, 1, 0);
+	pSwap->Present();
+	ctx.EndFrame();
 
 	AfterDraw(ctx);
-
-	// ImGUI nulls shaders after draw, leaving the state cache out of sync
-	ctx.ResetShaders();
 
 	frameCount++;
 	frameTimer.Restart();

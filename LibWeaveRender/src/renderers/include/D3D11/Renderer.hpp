@@ -50,11 +50,6 @@ namespace Weave::D3D11
 		IRenderTarget& GetBackBuffer();
 
 		/// <summary>
-		/// Returns reference to the swap chain interface
-		/// </summary>
-		const SwapChain& GetSwapChain() const;
-
-		/// <summary>
 		/// Returns the last frame time in milliseconds
 		/// </summary>
 		double GetFrameTimeMS() const;
@@ -132,6 +127,21 @@ namespace Weave::D3D11
 		/// mode.
 		/// </summary>
 		void SetDisplayMode(uivec2 modeID);
+
+		/// <summary>
+		/// Returns true if the given sync mode can be set in the current configuration
+		/// </summary>
+		bool GetIsSyncModeSupported(VSyncRenderModes mode) const;
+
+		/// <summary>
+		/// Returns the current vsync mode
+		/// </summary>
+		VSyncRenderModes GetSyncMode() const;
+
+		/// <summary>
+		/// Attempts to configure the given sync mode and returns true on success
+		/// </summary>
+		bool TrySetSyncMode(VSyncRenderModes mode);
 
 		/// <summary>
 		/// Returns true if the default depth stencil buffer is enabled

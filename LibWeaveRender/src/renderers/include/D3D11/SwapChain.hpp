@@ -2,6 +2,7 @@
 #include "Device.hpp"
 #include "Resources/Texture2D.hpp"
 #include "Resources/RTHandle.hpp"
+#include "RenderModes.hpp"
 
 namespace Weave
 {
@@ -15,8 +16,6 @@ namespace Weave::D3D11
 	class SwapChain : public DeviceChild
 	{
 	public:
-		SwapChain();
-
 		SwapChain(Device& dev);
 
 		SwapChain(SwapChain&&) = default;
@@ -32,11 +31,6 @@ namespace Weave::D3D11
 		/// Returns true if the swap chain has been configured and initialzed
 		/// </summary>
 		bool GetIsInitialized() const;
-
-		/// <summary>
-		/// Returns pointer to swap chain interface
-		/// </summary>
-		IDXGISwapChain1* operator->();
 
 		/// <summary>
 		/// Returns the dimensions of the chain's buffers
@@ -69,11 +63,24 @@ namespace Weave::D3D11
 		RTHandle& GetBackBuf();
 
 		/// <summary>
-		/// Resizes the swap chain to the given resolution. If optional fields are
-		/// left to default, the last set values will be used instead. If new buffer
-		/// count is less than previous, existing RTHandles may become invalid.
+		/// Returns true if the given sync mode can be set in the current configuration
 		/// </summary>
-		void ResizeBuffers(uivec2 dim, uint count = 0);
+		bool GetIsSyncModeSupported(VSyncRenderModes mode) const;
+
+		/// <summary>
+		/// Returns the current vsync mode
+		/// </summary>
+		VSyncRenderModes GetSyncMode() const;
+
+		/// <summary>
+		/// Attempts to configure the given sync mode and returns true on success
+		/// </summary>
+		bool TrySetSyncMode(VSyncRenderModes mode);
+
+		/// <summary>
+		/// Resizes the swap chain to the given resolution.
+		/// </summary>
+		void ResizeBuffers(uivec2 dim);
 
 		/// <summary>
 		/// Returns the index of the DisplayOutput currently being rendered to by the swap chain.
@@ -111,19 +118,21 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Presents rendered image with the given synchronization settings
 		/// </summary>
-		void Present(CtxImm& ctx, uint syncInterval, uint flags);
+		void Present();
 
 	private:
-		ComPtr<IDXGIFactory2> dxgiFactory;
-		ComPtr<IDXGISwapChain1> pSwap;
+		ComPtr<IDXGIFactory5> pFactory;
+		ComPtr<IDXGISwapChain4> pSwap;
 		DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsDesc;
 		DXGI_SWAP_CHAIN_DESC1 desc;
 		bool isInitialized;
+		bool isTearingSupported;
 
 		ComPtr<ID3D11Resource> pBackBuffer;
 		ComPtr<ID3D11RenderTargetView> pBackBufRTV;
 		RTHandle backBufRt;
+		VSyncRenderModes syncMode;
 
-		void GetBuffers();
+		void ApplyDesc();
 	};
 }

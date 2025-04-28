@@ -1,7 +1,7 @@
 #pragma once
 #include "WeaveUtils/WinUtils.hpp"
 #include "WeaveUtils/Math.hpp"
-#include <d3d11_1.h>
+#include <d3d11_4.h>
 #include "Resources/ResourceEnums.hpp"
 #include "../src/renderers/include/D3DException.hpp"
 

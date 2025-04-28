@@ -28,7 +28,7 @@ namespace Weave::D3D11
 	};
 
 	/// <summary>
-	/// An array of WindowRenderMode-Name pairs
+	/// A constexpr array of WindowRenderMode-Name pairs with null-termination
 	/// </summary>
 	static constexpr std::array<std::pair<WindowRenderModes, string_view>, 4> g_WindowRenderModeNamePairs
 	{
@@ -44,5 +44,41 @@ namespace Weave::D3D11
 	inline static constexpr string_view GetWindowRenderModeName(WindowRenderModes mode)
 	{
 		return g_WindowRenderModeNamePairs[(uint)mode].second;
+	}
+
+	enum class VSyncRenderModes : byte
+	{
+		/// <summary>
+		/// No vertical sync. Requires ExclusiveFS mode or tearing support with BorderlessFS
+		/// </summary>
+		Disabled = 0,
+
+		/// <summary>
+		/// Triple buffered vsync
+		/// </summary>
+		TripleBuffered = 1,
+
+		/// <summary>
+		/// Variable rate refresh. Requires tearing support and full screen optimizations.
+		/// </summary>
+		VariableRefresh = 2
+	};
+
+	/// <summary>
+	/// A constexpr array of VSyncRenderMode-Name pairs with null termination
+	/// </summary>
+	static constexpr std::array<std::pair<VSyncRenderModes, string_view>, 3> g_VSyncRenderModeNamePairs
+	{
+		std::pair(VSyncRenderModes::Disabled, "Disabled"),
+		std::pair(VSyncRenderModes::TripleBuffered, "Triple Buffered"),
+		std::pair(VSyncRenderModes::VariableRefresh, "Variable Rate Refresh")
+	};
+
+	/// <summary>
+	/// Returns a null-terminated string_view representing the name of the given VSync enum
+	/// </summary>
+	inline static constexpr string_view GetVSyncRenderModeName(VSyncRenderModes mode)
+	{
+		return g_VSyncRenderModeNamePairs[(uint)mode].second;
 	}
 }

@@ -47,9 +47,11 @@ MappedBufferHandle CtxImm::GetMappedBufferHandle(IBuffer& buf)
 	return MappedBufferHandle(buf, msr);
 }
 
-void CtxImm::Present(SwapChain& swap, uint syncInterval, uint flags)
+void CtxImm::EndFrame()
 {
 	Span<IRenderTarget*> nullRT;
-	D3D_ASSERT_HR(swap->Present(syncInterval, flags));
 	pState->TryUpdateRenderTargets(nullRT, 0);
+
+	for (int i = 0; i < g_ShadeStageCount; i++)
+		pState->TrySetShader((ShadeStages)i, nullptr);
 }
