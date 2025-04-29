@@ -238,8 +238,10 @@ namespace Weave
         std::stringstream logBuffer;
         std::stringstream msgBuffer;
 
-        /// Circular buffer for duplicate detection.
+        /// Circular buffers for duplicate detection.
         DynamicArray<string> msgHistory; 
+        DynamicArray<double> msgTimes;
+        DynamicArray<uint> msgCounts;
         uint historyIndex;
 
         std::fstream logFile;

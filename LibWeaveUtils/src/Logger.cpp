@@ -1,6 +1,7 @@
 #include "pch.hpp"
 #include <condition_variable>
 #include "WeaveUtils/Logger.hpp"
+#include "WeaveUtils/Stopwatch.hpp"
 
 namespace Weave
 {
@@ -15,13 +16,19 @@ namespace Weave
     static std::mutex s_MsgPoolMutex;
     static std::mutex s_WriteMutex;
 
+    static constexpr double g_MinLogDeltaTimeMS = 100.0;
+    static constexpr uint g_DedupeBufSize = 10;
+    static constexpr uint g_DupeCountLimit = 10;
+
     /// <summary>
     /// Private constructor: Initializes logger state.
     /// Sets the initial runtime log level based on the compile-time WV_LOG_LEVEL.
     /// Initializes the message history buffer.
     /// </summary>
     Logger::Logger() :
-        msgHistory(10),
+        msgHistory(g_DedupeBufSize),
+        msgTimes(g_DedupeBufSize),
+        msgCounts(g_DedupeBufSize),
         historyIndex(0),
         sstreamPool() 
     { }
@@ -220,6 +227,11 @@ namespace Weave
         s_Instance.sstreamPool.Return(std::move(buf));
     }
 
+    static double GetNowMS()
+    {
+        return (double)(std::chrono::steady_clock::now().time_since_epoch().count()) / 1E6;
+    }
+
     /// <summary>
     /// Checks the message history for duplicates. Adds new messages. Thread-safe.
     /// </summary>
@@ -235,6 +247,14 @@ namespace Weave
         {
             if (msgHistory[i] == message)
             {
+                msgCounts[i]++;
+
+                if (msgCounts[i] < g_DupeCountLimit || (GetNowMS() - msgTimes[i]) > g_MinLogDeltaTimeMS)
+                {
+                    msgTimes[i] = GetNowMS();
+                    return true;
+                }
+
                 isNew = false;
                 break;
             }
@@ -242,7 +262,10 @@ namespace Weave
 
         if (isNew && historyLen > 0)
         {
+            msgTimes[historyIndex] = GetNowMS();
+            msgCounts[historyIndex] = 0;
             string& hist = msgHistory[historyIndex];
+
             hist.clear();
             hist.append(message);
             historyIndex = (historyIndex + 1) % historyLen;
