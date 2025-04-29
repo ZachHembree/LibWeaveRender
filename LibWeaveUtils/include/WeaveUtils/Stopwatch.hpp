@@ -9,11 +9,11 @@ namespace Weave
 	/// </summary>
 	class Stopwatch
 	{
+	public:
 		using Clock = std::chrono::high_resolution_clock;
 		using Duration = std::chrono::duration<slong, std::nano>;
-		using TimePoint = std::chrono::high_resolution_clock::time_point;
+		using TimePoint = Clock::time_point;
 
-	public:
 		Stopwatch();
 
 		/// <summary>

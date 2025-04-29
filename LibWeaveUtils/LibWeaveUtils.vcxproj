@@ -23,6 +23,7 @@
     <ClInclude Include="include\WeaveUtils\Logger.hpp" />
     <ClInclude Include="include\WeaveUtils\ObjectPool.hpp" />
     <ClInclude Include="include\WeaveUtils\GlobalUtils.hpp" />
+    <ClInclude Include="include\WeaveUtils\StatsRecorder.hpp" />
     <ClInclude Include="include\WeaveUtils\StringIDBuilder.hpp" />
     <ClInclude Include="include\WeaveUtils\StringSpan.hpp" />
     <ClInclude Include="include\WeaveUtils\VectorSpan.hpp" />
