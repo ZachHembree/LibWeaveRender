@@ -94,9 +94,9 @@ bool Texture2D::GetIsReadOnly() const
 	return GetUsage() == ResourceUsages::Immutable;
 }
 
-ID3D11ShaderResourceView* Texture2D::GetSRV() { return pSRV.Get(); }
+ID3D11ShaderResourceView* Texture2D::GetSRV() const { return pSRV.Get(); }
 
-ID3D11ShaderResourceView** const Texture2D::GetSRVAddress() { return pSRV.GetAddressOf(); }
+ID3D11ShaderResourceView* const* const Texture2D::GetSRVAddress() const { return pSRV.GetAddressOf(); }
 
 void Texture2D::SetTextureWIC(CtxBase& ctx, wstring_view file, ScratchImage& buffer)
 {
