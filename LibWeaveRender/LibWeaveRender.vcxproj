@@ -258,6 +258,7 @@
     <ClCompile Include="src\renderers\src\D3D11\Shaders\EffectVariant.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Shaders\Material.cpp" />
     <ClCompile Include="src\renderers\src\D3DException.cpp" />
+    <ClCompile Include="src\renderers\src\FrameTimer.cpp" />
     <ClCompile Include="src\renderers\src\Input.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -315,6 +316,7 @@
     <ClInclude Include="src\renderers\include\D3D11\Resources\VertexBuffer.hpp" />
     <ClCompile Include="src\renderers\src\D3D11\Shaders\ShaderInstanceBase.cpp" />
     <ClInclude Include="src\renderers\include\D3DException.hpp" />
+    <ClInclude Include="src\renderers\include\FrameTimer.hpp" />
     <ClInclude Include="src\renderers\include\Input.hpp" />
   </ItemGroup>
   <ItemGroup>

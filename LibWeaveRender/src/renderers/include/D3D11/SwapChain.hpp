@@ -118,7 +118,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Presents rendered image with the given synchronization settings
 		/// </summary>
-		void Present();
+		void Present(uint syncInterval);
 
 	private:
 		ComPtr<IDXGIFactory5> pFactory;

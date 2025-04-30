@@ -212,17 +212,6 @@ void SwapChain::ApplyDesc()
 
 	D3D_ASSERT_HR(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&pBackBuffer));
 	D3D_ASSERT_HR(GetDevice()->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pBackBufRTV));
-
-	WV_LOG_DEBUG() <<
-		"Swap Chain Reconfigured" <<
-		"\nWindowed Mode: " << (fsDesc.Windowed ? "TRUE" : "FALSE") <<
-		"\nBuffer Size: " << desc.Width << " x " << desc.Height <<
-		"\nFormat: " << GetFormatName((Formats)desc.Format) <<
-		"\nAlpha Mode: " << GetAlphaModeName(desc.AlphaMode) <<
-		"\nScaling: " << GetScalingModeName(desc.Scaling) <<
-		"\nFlags: " << GetSwapChainFlagName((DXGI_SWAP_CHAIN_FLAG)desc.Flags) <<
-		"\nTearing Support: " << (isTearingSupported ? "TRUE" : "FALSE") <<
-		"\nVSync Mode: " << GetVSyncRenderModeName(syncMode);
 }
 
 uint SwapChain::GetDisplayOutput() const
@@ -335,7 +324,7 @@ void SwapChain::SetFullscreen(bool isFullscreen, bool isOccluded)
 	}
 }
 
-void SwapChain::Present()
+void SwapChain::Present(uint syncInterval)
 {
 	D3D_ASSERT_MSG(isInitialized, "Cannot call present on uninitialized swap chain.");
 	
@@ -346,8 +335,8 @@ void SwapChain::Present()
 		else if (syncMode == VSyncRenderModes::Disabled)
 			pSwap->Present(0, (isTearingSupported && !GetIsFullscreen()) ? DXGI_PRESENT_ALLOW_TEARING : 0);
 		else
-			pSwap->Present(1, 0);
+			pSwap->Present(syncInterval, 0);
 	}
 	else
-		pSwap->Present(1, 0);
+		pSwap->Present(syncInterval, 0);
 }

@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "WeaveUtils/Win32.hpp"
+#include "FrameTimer.hpp"
 #include "D3D11/InternalD3D11.hpp"
 #include "D3D11/Device.hpp"
 #include "D3D11/SwapChain.hpp"
@@ -21,14 +22,15 @@ Renderer::Renderer(MinWindow& window) :
 	pDev(new Device(*this)), // Create *pDev and context
 	pSwap(new SwapChain(*pDev)), // Create swap chain for window
 	pDefaultDS(new DepthStencilTexture()),
-	useDefaultDS(true),
 	fsMode(WindowRenderModes::Windowed),
+	outputRes(GetWindow().GetMonitorResolution()),
+	lastDispMode(-1),
 	pDefaultShaders(new ShaderLibrary(*this, GetBuiltInShaders())),
-	frameCount(0),
+	useDefaultDS(true),
 	canRender(true),
 	isFsAllowed(true),
-	outputRes(GetWindow().GetMonitorResolution()),
-	lastDispMode(-1)
+	pFrameTimer(new FrameTimer()),
+	targetFPS(0)
 { 
 	MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
 	defaultMeshes["FSQuad"] = Mesh(*pDev, quadDef);
@@ -44,6 +46,8 @@ Renderer::Renderer(MinWindow& window) :
 	pSwap->SetBufferFormat(Formats::R8G8B8A8_UNORM);
 	pSwap->ResizeBuffers(outputRes);
 
+	pFrameTimer->SetTargetFrameTimeNS(GetTimeHZtoNS(180));
+
 	WV_LOG_INFO() << "Renderer Init";
 }
 
@@ -57,9 +61,7 @@ Device& Renderer::GetDevice() { return *pDev; }
 
 IRenderTarget& Renderer::GetBackBuffer() { return pSwap->GetBackBuf(); }
 
-double Renderer::GetFrameTimeMS() const { return frameTimer.GetElapsedMS(); }
-
-ulong Renderer::GetFrameNumber() const { return frameCount; }
+ulong Renderer::GetFrameNumber() const { return pFrameTimer->GetFrameCount(); }
 
 ShaderLibrary Renderer::CreateShaderLibrary(const ShaderLibDef& def) { return ShaderLibrary(*this, def); }
 
@@ -108,6 +110,12 @@ bool Renderer::GetIsSyncModeSupported(VSyncRenderModes mode) const { return pSwa
 VSyncRenderModes Renderer::GetSyncMode() const { return pSwap->GetSyncMode(); }
 
 bool Renderer::TrySetSyncMode(VSyncRenderModes mode) { return pSwap->TrySetSyncMode(mode); }
+
+double Renderer::GetFrameRateAvgFPS() const { return GetTimeNStoHZ(pFrameTimer->GetAverageFrameTimeNS()); }
+
+double Renderer::GetTargetFrameRateFPS() const { return targetFPS; }
+
+void Renderer::SetTargetFrameRateFPS(double fps) { targetFPS = fps; }
 
 Viewport Renderer::GetMainViewport() const
 {
@@ -254,10 +262,28 @@ void Renderer::UpdateSwap()
 
 	pSwap->GetBackBuf().SetRenderSize(outputRes);
 	canRender = (!isExclusiveSet || isFsAllowed) && (outputRes.x > 0 && outputRes.y > 0);
+
+	// Update refresh cycle time for frame limiter
+	const uivec2 refreshRate = pSwap->GetRefresh();
+	const double refreshHz = (double)refreshRate.x / (double)refreshRate.y;
+	pFrameTimer->SetNativeRefreshCycleNS(GetTimeHZtoNS(refreshHz));
+
+	if (pSwap->GetSyncMode() == VSyncRenderModes::VariableRefresh)
+	{
+		if (targetFPS > 1.0 && targetFPS < refreshHz)
+			pFrameTimer->SetTargetFrameTimeNS(GetTimeHZtoNS(targetFPS));
+		else
+			pFrameTimer->SetTargetFrameTimeNS(GetTimeHZtoNS(refreshHz - 2.0));
+	}
+	else
+		pFrameTimer->SetTargetFrameTimeNS(GetTimeHZtoNS(targetFPS));
 }
 
 void Renderer::Update()
 {
+	// Mark frame start
+	pFrameTimer->BeginPresent();
+
 	UpdateSwap();
 
 	// If rendering is explicitly disabled, skip everything else
@@ -278,7 +304,7 @@ void Renderer::Update()
 
 	// Clear back buffer
 	pSwap->GetBackBuf().Clear(ctx);
-	
+
 	if (useDefaultDS)
 		pDefaultDS->Clear(ctx);
 
@@ -293,13 +319,14 @@ void Renderer::Update()
 	DrawLate(ctx);
 
 	// Present frame
-	pSwap->Present();
+	const bool canSync = pSwap->GetSyncMode() == VSyncRenderModes::TripleBuffered;
+	pSwap->Present(pFrameTimer->WaitPresent(canSync));
 	ctx.EndFrame();
 
 	AfterDraw(ctx);
-
-	frameCount++;
-	frameTimer.Restart();
+	
+	// Mark frame end
+	pFrameTimer->EndPresent();
 }
 
 /*

@@ -1,7 +1,6 @@
 #pragma once
 #include <unordered_map>
 #include "WeaveUtils/Utils.hpp"
-#include "WeaveUtils/Stopwatch.hpp"
 #include "WeaveUtils/WindowComponentBase.hpp"
 #include "Viewport.hpp"
 #include "ShaderLibrary.hpp"
@@ -12,6 +11,11 @@
 #pragma comment(lib, "D3DCompiler.lib")
 #pragma comment(lib, "Dxgi.lib")
 #pragma comment(lib, "runtimeobject.lib")
+
+namespace Weave
+{
+	class FrameTimer;
+}
 
 namespace Weave::D3D11
 { 
@@ -48,11 +52,6 @@ namespace Weave::D3D11
 		/// Returns a handle to the swap chain's back buffer
 		/// </summary>
 		IRenderTarget& GetBackBuffer();
-
-		/// <summary>
-		/// Returns the last frame time in milliseconds
-		/// </summary>
-		double GetFrameTimeMS() const;
 
 		/// <summary>
 		/// Returns the current frame number
@@ -144,6 +143,31 @@ namespace Weave::D3D11
 		bool TrySetSyncMode(VSyncRenderModes mode);
 
 		/// <summary>
+		/// Returns the average frame rate in frames per second
+		/// </summary>
+		double GetFrameRateAvgFPS() const;
+
+		/// <summary>
+		/// Returns the frame rate limit in frames per second. If less this value is less than 1, the limit 
+		/// is disabled.
+		/// If VSync is enabled, it will apply if the target frame rate is an integer multiple of the
+		/// refresh rate.
+		/// If variable refresh is enabled, the maximum refresh rate will be used as the limit unless a lower
+		/// value is specified here.
+		/// </summary>
+		double GetTargetFrameRateFPS() const;
+
+		/// <summary>
+		/// Sets the target frame rate limit in frames per second. If less this value is less than 1, the limit 
+		/// is disabled.
+		/// If VSync is enabled, it will apply if the target frame rate is an integer multiple of the
+		/// refresh rate.
+		/// If variable refresh is enabled, the maximum refresh rate will be used as the limit unless a lower
+		/// value is specified here.
+		/// </summary>
+		void SetTargetFrameRateFPS(double fps);
+
+		/// <summary>
 		/// Returns true if the default depth stencil buffer is enabled
 		/// </summary>
 		bool GetIsDepthStencilEnabled() const;
@@ -219,12 +243,12 @@ namespace Weave::D3D11
 		std::unique_ptr<ShaderLibrary> pDefaultShaders;
 		UniqueVector<RenderComponentBase*> pComponents;
 
+		double targetFPS;
 		bool useDefaultDS;
 		bool canRender;
 		bool isFsAllowed;
 
-		ulong frameCount;
-		Stopwatch frameTimer;
+		std::unique_ptr<FrameTimer> pFrameTimer;
 
 		void UpdateSwap();
 
