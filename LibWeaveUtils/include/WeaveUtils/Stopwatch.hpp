@@ -5,6 +5,36 @@
 namespace Weave
 {
 	/// <summary>
+	/// Converts time in nanoseconds to time in milliseconds
+	/// </summary>
+	inline static constexpr double GetTimeNStoMS(slong timeNS) { return (double)timeNS * 1E-6; }
+
+	/// <summary>
+	/// Converts time in nanoseconds to seconds
+	/// </summary>
+	inline static constexpr double GetTimeNStoS(slong timeNS) { return (double)timeNS * 1E-9; }
+
+	/// <summary>
+	/// Converts a time period in nanoseconds to oscillations per second or Hz
+	/// </summary>
+	inline static constexpr double GetTimeNStoHZ(slong timeNS) { return (timeNS > 0) ? 1.0 / GetTimeNStoS(timeNS) : 0; }
+
+	/// <summary>
+	/// Converts time in milliseconds to nanoseconds
+	/// </summary>
+	inline static constexpr slong GetTimeMStoNS(double timeMS) { return (slong)(timeMS * 1E6); }
+
+	/// <summary>
+	/// Converts time in seconds to nanoseconds
+	/// </summary>
+	inline static constexpr slong GetTimeStoNS(double timeS) { return (slong)(timeS * 1E9); }
+
+	/// <summary>
+	/// Converts a period frequency in Hz to nanoseconds
+	/// </summary>
+	inline static constexpr slong GetTimeHZtoNS(double freqHz) { return (freqHz > 0) ? GetTimeStoNS(1.0 / freqHz) : 0; }
+
+	/// <summary>
 	/// Simple high-resolution timer class
 	/// </summary>
 	class Stopwatch
