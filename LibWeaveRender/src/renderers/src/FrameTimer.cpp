@@ -8,6 +8,29 @@
 
 using namespace Weave;
 
+static slong GetEMA(slong value, slong avgValue)
+{
+	return static_cast<slong>(0.9 * avgValue + 0.1 * value);
+}
+
+static slong GetClampedEMA(slong value, slong avgValue)
+{
+	if (avgValue > 0)
+		value = std::clamp(value, avgValue / 3, 3 * avgValue);
+
+	return static_cast<slong>(0.9 * avgValue + 0.1 * value);
+}
+
+static slong GetSignedClampedEMA(slong value, slong avgValue)
+{
+	const slong absErrRange = std::min(3ll * std::abs(avgValue), slong(1E6));
+
+	if (absErrRange > 0)
+		value = std::clamp(value, -3 * absErrRange, 3 * absErrRange);
+
+	return static_cast<slong>(0.9 * avgValue + 0.1 * value);
+}
+
 FrameTimer::FrameTimer() :
 	targetPresentNS(0),
 	nativeRefreshCycleNS(0),
@@ -95,16 +118,13 @@ uint FrameTimer::WaitPresent(bool canSync, bool canSpin, bool canSleep)
 			const slong spinStartNS = frameTimer.GetElapsedNS();
 			waitNS = std::max(targetPresentNS - frameTimer.GetElapsedNS(), 0ll);
 
-			while (waitNS > 0)
+			while (waitNS > slong(1E5))
 			{
 				_mm_pause();
 				waitNS = std::max(targetPresentNS - frameTimer.GetElapsedNS(), 0ll);
 			}
 
-			const slong absErrRange = std::min(3 * std::abs(avgSpinErrorNS), slong(1E6));
-			const slong spinErrorNS = std::clamp(frameTimer.GetElapsedNS() - spinStartNS, -absErrRange, absErrRange);
-
-			avgSpinErrorNS = static_cast<slong>(0.9 * avgSpinErrorNS + 0.1 * spinErrorNS);
+			avgSpinErrorNS = GetSignedClampedEMA(frameTimer.GetElapsedNS() - spinStartNS, avgSpinErrorNS);
 		}
 
 		return 0;
@@ -113,16 +133,12 @@ uint FrameTimer::WaitPresent(bool canSync, bool canSpin, bool canSleep)
 
 void FrameTimer::EndPresent()
 {
-	frameCount++;
-
 	const slong presentTimeNS = frameTimer.GetElapsedNS();
-	const slong frameDeltaNS = std::clamp(presentTimeNS - lastPresentNS, (avgFrameDeltaNS / 3), (3 * avgFrameDeltaNS));
 
-	const slong absErrRange = std::min(3 * std::abs(avgPresentErrorNS), slong(1E6));
+	avgFrameDeltaNS = GetClampedEMA(presentTimeNS - lastPresentNS, avgFrameDeltaNS);
 	// Positive if present took longer than expected, negative if too fast
-	const slong presentErrorNS = std::clamp(presentTimeNS - targetPresentNS, -absErrRange, absErrRange);
-
+	avgPresentErrorNS = GetSignedClampedEMA(presentTimeNS - targetPresentNS, avgPresentErrorNS);
 	lastPresentNS = presentTimeNS;
-	avgFrameDeltaNS = static_cast<slong>(0.9 * avgFrameDeltaNS + 0.1 * frameDeltaNS);
-	avgPresentErrorNS = static_cast<slong>(0.9 * avgPresentErrorNS + 0.1 * presentErrorNS);
+
+	frameCount++;
 }
