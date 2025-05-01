@@ -13,9 +13,9 @@ FrameTimer::FrameTimer() :
 	nativeRefreshCycleNS(0),
 	targetFrameTimeNS(0),
 	canHighResSleep(false),
-	avgPresentErrorNS(0),
-	avgSpinErrorNS(0),
-	avgFrameDeltaNS(0),
+	avgPresentErrorNS(slong(1E6)),
+	avgSpinErrorNS(slong(1E6)),
+	avgFrameDeltaNS(slong(1E6)),
 	lastPresentNS(0),
 	frameCount(0)
 {
@@ -26,8 +26,9 @@ FrameTimer::FrameTimer() :
 	if (timeGetDevCaps(&tc, sizeof(TIMECAPS)) == TIMERR_NOERROR)
 	{
 		sysInterruptTickMS = std::min(std::max(tc.wPeriodMin, desiredResolutionMS), tc.wPeriodMax);
-		timeBeginPeriod(sysInterruptTickMS);
-		canHighResSleep = true;
+
+		if (timeBeginPeriod(sysInterruptTickMS) == TIMERR_NOERROR)
+			canHighResSleep = true;
 	}
 	else
 		sysInterruptTickMS = 10;
@@ -67,7 +68,6 @@ uint FrameTimer::WaitPresent(bool canSync, bool canSpin, bool canSleep)
 	{
 		const slong presentDeltaNS = std::max(targetFrameTimeNS, nativeRefreshCycleNS);
 		const slong presentRatio = (presentDeltaNS + nativeRefreshCycleNS / 2) / nativeRefreshCycleNS;
-
 		return std::clamp((uint)presentRatio, 1u, 4u);
 	}
 	// No VSync
@@ -101,7 +101,9 @@ uint FrameTimer::WaitPresent(bool canSync, bool canSpin, bool canSleep)
 				waitNS = std::max(targetPresentNS - frameTimer.GetElapsedNS(), 0ll);
 			}
 
-			const slong spinErrorNS = frameTimer.GetElapsedNS() - spinStartNS;
+			const slong absErrRange = std::min(3 * std::abs(avgSpinErrorNS), slong(1E6));
+			const slong spinErrorNS = std::clamp(frameTimer.GetElapsedNS() - spinStartNS, -absErrRange, absErrRange);
+
 			avgSpinErrorNS = static_cast<slong>(0.9 * avgSpinErrorNS + 0.1 * spinErrorNS);
 		}
 
@@ -114,15 +116,11 @@ void FrameTimer::EndPresent()
 	frameCount++;
 
 	const slong presentTimeNS = frameTimer.GetElapsedNS();
-	slong frameDeltaNS = presentTimeNS - lastPresentNS;
+	const slong frameDeltaNS = std::clamp(presentTimeNS - lastPresentNS, (avgFrameDeltaNS / 3), (3 * avgFrameDeltaNS));
+
+	const slong absErrRange = std::min(3 * std::abs(avgPresentErrorNS), slong(1E6));
 	// Positive if present took longer than expected, negative if too fast
-	slong presentErrorNS = presentTimeNS - targetPresentNS;
-
-	if (avgFrameDeltaNS > 0)
-		frameDeltaNS = std::clamp(frameDeltaNS, (avgFrameDeltaNS / 3), (3 * avgFrameDeltaNS));
-
-	if (avgPresentErrorNS > 0)
-		presentErrorNS = std::clamp(presentErrorNS, (avgPresentErrorNS / 3), (3 * avgPresentErrorNS));
+	const slong presentErrorNS = std::clamp(presentTimeNS - targetPresentNS, -absErrRange, absErrRange);
 
 	lastPresentNS = presentTimeNS;
 	avgFrameDeltaNS = static_cast<slong>(0.9 * avgFrameDeltaNS + 0.1 * frameDeltaNS);
