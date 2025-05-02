@@ -7,3 +7,6 @@
 [submodule "libs/cereal"]
 	path = libs/cereal
 	url = git@github.com:USCiLab/cereal.git
+[submodule "libs/imgui/ImGuiFileDialog"]
+	path = libs/imgui/ImGuiFileDialog
+	url = https://github.com/aiekick/ImGuiFileDialog.git
