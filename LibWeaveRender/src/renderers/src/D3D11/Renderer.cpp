@@ -67,7 +67,7 @@ ShaderLibrary Renderer::CreateShaderLibrary(const ShaderLibDef& def) { return Sh
 
 ShaderLibrary Renderer::CreateShaderLibrary(ShaderLibDef&& def) { return ShaderLibrary(*this, std::move(def)); }
 
-ivec2 Renderer::GetOutputResolution() const { return outputRes; }
+uivec2 Renderer::GetOutputResolution() const { return outputRes; }
 
 void Renderer::SetOutputResolution(ivec2 res) 
 { 

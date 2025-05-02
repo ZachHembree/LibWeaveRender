@@ -12,10 +12,11 @@ using namespace Weave::D3D11;
 ImguiRenderComponent::ImguiRenderComponent() : enableDemoWindow(false)
 { }
 
-ImguiRenderComponent::ImguiRenderComponent(Renderer& renderer, InputHandler& input) :
+ImguiRenderComponent::ImguiRenderComponent(Renderer& renderer) :
 	RenderComponentBase(renderer),
 	enableDemoWindow(false),
-	pInput(&input)
+	mousePos(0),
+	dispSize(0)
 {
 	Device& dev = renderer.GetDevice();
 	ImGui_ImplDX11_Init(dev.Get(), dev.GetImmediateContext());
@@ -26,6 +27,14 @@ ImguiRenderComponent::~ImguiRenderComponent()
 	ImGui_ImplDX11_Shutdown();
 }
 
+vec2 ImguiRenderComponent::GetMousePos() const { return mousePos; }
+
+uivec2 ImguiRenderComponent::GetDispSize() const { return dispSize; }
+
+void ImguiRenderComponent::SetMousePos(vec2 mousePos) { this->mousePos = mousePos; }
+
+void ImguiRenderComponent::SetDispSize(uivec2 dispSize) { this->dispSize = dispSize; }
+
 void ImguiRenderComponent::Setup(CtxImm& ctx)
 {
 	if (ImGui::GetCurrentContext() != nullptr)
@@ -34,14 +43,12 @@ void ImguiRenderComponent::Setup(CtxImm& ctx)
 
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
-		
-		if (GetRenderer().GetWindowRenderMode() == WindowRenderModes::ExclusiveFS)
-		{ 
-			const vec2 newSize = GetRenderer().GetOutputResolution();
-			const vec2 newPos = pInput->GetNormMousePos() * newSize;
-			io.DisplaySize = ImVec2(newSize.x, newSize.y);
-			io.AddMousePosEvent(newPos.x, newPos.y);
-		}
+
+		if (dispSize != uivec2(0))
+			io.DisplaySize = ImVec2((float)dispSize.x, (float)dispSize.y);
+			
+		if (mousePos != vec2(0))
+			io.AddMousePosEvent(mousePos.x, mousePos.y);
 
 		ImGui::NewFrame();	
 

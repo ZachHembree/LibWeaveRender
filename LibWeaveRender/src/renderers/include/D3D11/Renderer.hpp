@@ -21,6 +21,8 @@ namespace Weave::D3D11
 { 
 	class Device;
 	class SwapChain;
+	class CtxImm;
+	class CtxBase;
 
 	class BufferBase;
 	class VertexBuffer;
@@ -71,7 +73,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns the resolution of the back buffer
 		/// </summary>
-		ivec2 GetOutputResolution() const;
+		uivec2 GetOutputResolution() const;
 
 		/// <summary>
 		/// Sets the output resolution to the given value

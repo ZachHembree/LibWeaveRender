@@ -1,13 +1,17 @@
 #include "pch.hpp"
 #include "WeaveUtils/Win32.hpp"
+#include "D3D11/Renderer.hpp"
 #include "D3D11/InternalD3D11.hpp"
 #include "D3D11/ImguiHandler.hpp"
 #include "D3D11/ImguiRenderComponent.hpp"
+#include "InputHandler.hpp"
 
 #include <imgui.h>
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 #include <math.h>
+
+using Mouse = DirectX::Mouse;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -18,15 +22,15 @@ bool ImguiHandler::enableDemoWindow = false;
 
 ImguiHandler::ImguiHandler(MinWindow& window, Renderer& renderer) :
 	WindowComponentBase(window),
-	input(window)
+	pRenderer(&renderer)
 { 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplWin32_Init(window.GetWndHandle());
-	pRenderComponent = new ImguiRenderComponent(renderer, input);
-	UpdateUI();
+	pRenderComponent = new ImguiRenderComponent(renderer);	
+	InputHandler::Init(window);
 
 	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
@@ -38,19 +42,28 @@ ImguiHandler::~ImguiHandler()
 	ImGui::DestroyContext();
 }
 
-InputHandler& ImguiHandler::GetInput() { return input; }
-
 void ImguiHandler::UpdateUI()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiStyle& style = ImGui::GetStyle();
 	vec2 scale = GetWindow().GetNormMonitorDPI();
 	float scaleDelta = (float)(scale.y / (double)io.FontGlobalScale);
-
+	
 	style.ScaleAllSizes(scaleDelta);
 	io.FontGlobalScale = scale.y;
 
 	pRenderComponent->enableDemoWindow = enableDemoWindow;
+
+	// Manually update UI size and cursor position
+	InputHandler::SetIsEnabled(true);
+	const uivec2 newSize = pRenderer->GetOutputResolution();
+	const vec2 normPos = InputHandler::GetNormMousePos();
+
+	// Disable input when ImGui wants to capture	
+	InputHandler::SetIsEnabled(!(io.WantCaptureKeyboard || io.WantCaptureMouse));
+
+	pRenderComponent->SetDispSize(newSize);
+	pRenderComponent->SetMousePos(normPos * vec2(newSize));
 }
 
 bool ImguiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

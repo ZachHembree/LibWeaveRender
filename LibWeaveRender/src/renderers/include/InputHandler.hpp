@@ -1,5 +1,4 @@
 #pragma once
-#include <glm/glm.hpp>
 #include "WeaveUtils/WindowComponentBase.hpp"
 #include "Keyboard.h"
 #include "Mouse.h"
@@ -19,80 +18,100 @@ enum class MouseKey : unsigned int
 
 namespace Weave
 {
+	/// <summary>
+	/// Singleton wrapper for DirectXTK Keyboard and Mouse
+	/// </summary>
 	class InputHandler : public WindowComponentBase
 	{
-	using Mouse = DirectX::Mouse;
-	using Keyboard = DirectX::Keyboard;
-	using KbTracker = Keyboard::KeyboardStateTracker;
-	using MouseState = Mouse::State;
-	using KbState = Keyboard::State;
-
-	using ivec2 = glm::ivec2;
-	using vec2 = glm::vec2;
-
 	public:
-		InputHandler(MinWindow& window);
+		using Mouse = DirectX::Mouse;
+		using Keyboard = DirectX::Keyboard;
+		using KbTracker = Keyboard::KeyboardStateTracker;
+		using MouseState = Mouse::State;
+		using KbState = Keyboard::State;
+
+		~InputHandler();
+
+		static void Init(MinWindow& wnd);
+
+		static InputHandler& GetInstance();
 
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 		/// <summary>
+		/// Returns true if input is enabled
+		/// </summary>
+		static bool GetIsEnabled();
+
+		/// <summary>
+		/// Enables or disables input
+		/// </summary>
+		static void SetIsEnabled(bool value);
+
+		/// <summary>
 		/// Returns pressed mouse keys as a set of enum flags
 		/// </summary>
-		MouseKey GetPresssedMouseKeys() const;
+		static MouseKey GetPresssedMouseKeys();
 
 		/// <summary>
 		/// Returns previously pressed mouse keys
 		/// </summary>
-		MouseKey GetLastPressedMouseKeys() const;
+		static MouseKey GetLastPressedMouseKeys();
 
 		/// <summary>
 		/// Returns true if the given key was only just pressed
 		/// </summary>
-		bool GetIsNewKeyPressed(MouseKey key) const;
+		static bool GetIsNewKeyPressed(MouseKey key);
 
 		/// <summary>
 		/// Returns true if the given key was previously pressed
 		/// </summary>
-		bool GetWasKeyPressed(MouseKey key) const;
+		static bool GetWasKeyPressed(MouseKey key);
 
 		/// <summary>
 		/// Returns true if a given mouse key is pressed
 		/// </summary>
-		bool GetIsKeyPressed(MouseKey key) const;
+		static bool GetIsKeyPressed(MouseKey key);
 
 		/// <summary>
 		/// Returns true if the given key was only just pressed
 		/// </summary>
-		bool GetIsNewKeyPressed(KbKey key) const;
+		static bool GetIsNewKeyPressed(KbKey key);
 
 		/// <summary>
 		/// Returns true if the given key was previously pressed
 		/// </summary>
-		bool GetWasKeyPressed(KbKey key) const;
+		static bool GetWasKeyPressed(KbKey key);
 
 		/// <summary>
 		/// Returns true if a given keyboard key is pressed
 		/// </summary>
-		bool GetIsKeyPressed(KbKey key) const;
+		static bool GetIsKeyPressed(KbKey key);
 
 		/// <summary>
 		/// Returns raw, pixel-value, mouse position relative to the upper left corner
 		/// of the window
 		/// </summary>
-		ivec2 GetMousePos() const;
+		static ivec2 GetMousePos();
 		
 		/// <summary>
 		/// Returns normalized, [0, 1] mouse position relative to the upper left corner
 		/// of the window
 		/// </summary>
-		vec2 GetNormMousePos() const;
+		static vec2 GetNormMousePos();
 
 	private:
-		Keyboard keyboard;
-		Mouse mouse;
+		bool isEnabled;
+		ivec2 lastMousePos;
 
 		KbTracker kbTracker;
 		MouseKey currentMousePresses,
 			lastMousePresses;
+
+		Keyboard keyboard;
+		Mouse mouse;
+
+		InputHandler(MinWindow& window);
+
 	};
 }

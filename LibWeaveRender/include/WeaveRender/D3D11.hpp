@@ -10,7 +10,7 @@
 #include "../src/renderers/include/D3D11/Device.hpp"
 #include "../src/renderers/include/D3D11/Renderer.hpp"
 #include "../src/renderers/include/D3D11/RenderComponent.hpp"
-#include "../src/renderers/include/Input.hpp"
+#include "../src/renderers/include/InputHandler.hpp"
 
 #include "../src/renderers/include/D3D11/Viewport.hpp"
 #include "../src/renderers/include/D3D11/Primitives.hpp"

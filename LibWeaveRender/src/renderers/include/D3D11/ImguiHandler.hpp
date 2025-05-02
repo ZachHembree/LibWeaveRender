@@ -1,6 +1,5 @@
 #pragma once
 #include "WeaveUtils/WindowComponentBase.hpp"
-#include "../Input.hpp"
 
 namespace Weave::D3D11
 {
@@ -19,14 +18,12 @@ namespace Weave::D3D11
 
 		~ImguiHandler();
 
-		InputHandler& GetInput();
-
 		void UpdateUI();
 
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 	private:
-		InputHandler input;
+		Renderer* pRenderer;
 		ImguiRenderComponent* pRenderComponent;
 	};
 }
