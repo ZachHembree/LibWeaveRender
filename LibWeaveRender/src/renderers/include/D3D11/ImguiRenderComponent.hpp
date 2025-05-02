@@ -1,5 +1,7 @@
 #pragma once
 #include "RenderComponent.hpp"
+#include "WeaveUtils/TextUtils.hpp"
+#include "WeaveUtils/ObjectPool.hpp"
 
 namespace Weave::D3D11
 {
@@ -16,6 +18,8 @@ namespace Weave::D3D11
 		ImguiRenderComponent(Renderer& renderer);
 
 		~ImguiRenderComponent();
+
+		string& GetTempString();
 
 		/// <summary>
 		/// Returns overridden mouse position. Zero if disabled.
@@ -44,5 +48,8 @@ namespace Weave::D3D11
 	private:
 		vec2 mousePos;
 		uivec2 dispSize;
+
+		ObjectPool<string> stringPool;
+		UniqueVector<string> activeText;
 	};
 }

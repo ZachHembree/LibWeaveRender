@@ -27,6 +27,8 @@ ImguiRenderComponent::~ImguiRenderComponent()
 	ImGui_ImplDX11_Shutdown();
 }
 
+string& ImguiRenderComponent::GetTempString() { return activeText.EmplaceBack(stringPool.Get()); }
+
 vec2 ImguiRenderComponent::GetMousePos() const { return mousePos; }
 
 uivec2 ImguiRenderComponent::GetDispSize() const { return dispSize; }
@@ -51,6 +53,15 @@ void ImguiRenderComponent::Setup(CtxImm& ctx)
 			io.AddMousePosEvent(mousePos.x, mousePos.y);
 
 		ImGui::NewFrame();	
+
+		// Reset pool
+		for (string& str : activeText)
+		{
+			str.clear();
+			stringPool.Return(std::move(str));
+		}
+
+		activeText.Clear();
 
 		if (enableDemoWindow)
 			ImGui::ShowDemoWindow();

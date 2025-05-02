@@ -11,38 +11,50 @@
 #include <imgui_impl_dx11.h>
 #include <math.h>
 
-using Mouse = DirectX::Mouse;
-
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 using namespace Weave;
 using namespace Weave::D3D11;
 
-bool ImguiHandler::enableDemoWindow = false;
+std::unique_ptr<ImGuiHandler> pInstance;
 
-ImguiHandler::ImguiHandler(MinWindow& window, Renderer& renderer) :
-	WindowComponentBase(window),
+bool ImGuiHandler::enableDemoWindow = false;
+
+ImGuiHandler::ImGuiHandler(Renderer& renderer) :
+	WindowComponentBase(renderer.GetWindow()),
 	pRenderer(&renderer)
 { 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 
-	ImGui_ImplWin32_Init(window.GetWndHandle());
+	ImGui_ImplWin32_Init(GetWindow().GetWndHandle());
 	pRenderComponent = new ImguiRenderComponent(renderer);	
-	InputHandler::Init(window);
+	InputHandler::Init(GetWindow());
 
 	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
 
-ImguiHandler::~ImguiHandler()
+void ImGuiHandler::Init(Renderer& renderer)
+{
+	if (pInstance.get() == nullptr)
+		pInstance.reset(new ImGuiHandler(renderer));
+}
+
+void ImGuiHandler::Reset() { pInstance.reset(); }
+
+ImGuiHandler& ImGuiHandler::GetInstance() { D3D_ASSERT_MSG(pInstance.get(), "ImGuiHandler is null"); return *pInstance; }
+
+ImGuiHandler::~ImGuiHandler()
 {
 	delete pRenderComponent;
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 }
 
-void ImguiHandler::UpdateUI()
+string& ImGuiHandler::GetTempString() { return pRenderComponent->GetTempString(); }
+
+void ImGuiHandler::UpdateUI()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -66,7 +78,7 @@ void ImguiHandler::UpdateUI()
 	pRenderComponent->SetMousePos(normPos * vec2(newSize));
 }
 
-bool ImguiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+bool ImGuiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (ImGui::GetCurrentContext() != nullptr)
 	{ 
