@@ -15,7 +15,6 @@
 #define NOSYSMETRICS             // System metrics
 #define NOMENUS                  // Menus
 #define NOICONS                  // Icons
-#define NOSYSCOMMANDS            // System commands (minimize, maximize, close)
 #define NOCLIPBOARD              // Clipboard APIs
 #define NOCTLMGR                 // Control manager routines
 #define NOSCROLL                 // Scroll bar routines

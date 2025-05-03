@@ -1,9 +1,5 @@
-#ifndef WV_WIND_H
-#define WV_WIND_H
-
+#pragma once
 #include "WeaveUtils/WinUtils.hpp"
-
-#pragma comment(lib, "Shcore.lib")
 
 namespace Weave
 {
@@ -55,6 +51,16 @@ namespace Weave
 			~MinWindow();
 
 			/// <summary>
+			/// Returns the contents of the titlebar
+			/// </summary>
+			wstring GetWindowTitle() const;
+
+			/// <summary>
+			/// Writes the given text to the titlebar
+			/// </summary>
+			void SetWindowTitle(wstring_view text);
+
+			/// <summary>
 			/// Registers component object to the window.
 			/// </summary>
 			virtual void RegisterComponent(WindowComponentBase& component);
@@ -78,16 +84,6 @@ namespace Weave
 			/// Returns handle for window object provided by the Win32 API
 			/// </summary>
 			HWND GetWndHandle() const noexcept;
-
-			/// <summary>
-			/// Returns true if the window is in borderless fullscreen mode
-			/// </summary>
-			bool GetIsFullScreen() const;
-
-			/// <summary>
-			/// Enable/disable borderless full screen
-			/// </summary>
-			void SetFullScreen(bool value);
 
 			/// <summary>
 			/// Returns the size of the window in pixels.
@@ -120,34 +116,29 @@ namespace Weave
 			void SetPos(ivec2 pos);
 
 			/// <summary>
-			/// Returns the contents of the titlebar
+			/// Returns the position of the upper left corner of the body in the window
 			/// </summary>
-			wstring GetWindowTitle() const;
+			ivec2 GetBodyPos() const;
 
 			/// <summary>
-			/// Writes the given text to the titlebar
+			/// Returns true if the mouse is inside the bounds of the window's client area
 			/// </summary>
-			void SetWindowTitle(wstring_view text);
+			bool GetIsMousedOver() const;
 
 			/// <summary>
-			/// Returns style and extended style as a vector
+			/// Returns global cursor position
 			/// </summary>
-			WndStyle GetStyle() const;
+			ivec2 GetGlobalCursorPos() const;
 
 			/// <summary>
-			/// Sets the style of the window. Ex-style optional.
+			/// Returns true if the cursor can be drawn inside the client region
 			/// </summary>
-			void SetStyle(WndStyle style);
+			bool GetIsCursorVisible() const;
 
 			/// <summary>
-			/// Adds the given style flags to the window
+			/// Enables/disables the cursor inside the window's client region
 			/// </summary>
-			void EnableStyleFlags(WndStyle flags);
-
-			/// <summary>
-			/// Removes the given style flags from the current style
-			/// </summary>
-			void DisableStyleFlags(WndStyle flags);
+			void SetIsCursorVisible(bool value);
 
 			/// <summary>
 			/// Returns true if the application should allow the display to turn off
@@ -216,35 +207,98 @@ namespace Weave
 			ivec2 GetMonitorResolution() const;
 
 			/// <summary>
-			/// Returns true if the mouse is inside the bounds of the window's client area
+			/// Returns style and extended style as a vector
 			/// </summary>
-			bool GetIsMousedOver() const;
+			WndStyle GetStyle() const;
 
 			/// <summary>
-			/// Returns true if the cursor can be drawn inside the client region
+			/// Sets the style of the window. Ex-style optional.
 			/// </summary>
-			bool GetIsCursorVisible() const;
+			void SetStyle(WndStyle style);
 
 			/// <summary>
-			/// Enables/disables the cursor inside the window's client region
+			/// Adds the given style flags to the window
 			/// </summary>
-			void SetIsCursorVisible(bool value);
+			void EnableStyleFlags(WndStyle flags);
+
+			/// <summary>
+			/// Removes the given style flags from the current style
+			/// </summary>
+			void DisableStyleFlags(WndStyle flags);
+
+			/// <summary>
+			/// Returns the custom border padding for non-client area overrides.
+			/// </summary>
+			ivec2 GetOverridePadding() const;
+
+			/// <summary>
+			/// Sets the custom border padding for non-client area overrides.
+			/// </summary>
+			void SetOverridePadding(ivec2 padding);
+			
+			/// <summary>
+			/// Returns true if the non client area is overridden
+			/// </summary>
+			bool GetIsNonClientCustom() const;
+
+			/// <summary>
+			/// Enables or disables the non client area override
+			/// </summary>
+			void SetIsNonClientCustom(bool value);
+
+			/// <summary>
+			/// Set to true to signal when a custom header is moused over
+			/// </summary>
+			void HoverHeader(bool isHovered);
+
+			/// <summary>
+			/// Minimizes the window as if the user had pressed the button
+			/// </summary>
+			void Minimize();
+
+			/// <summary>
+			/// Maximizes the window as if the user had pressed the button
+			/// </summary>
+			void Maximize();
+
+			/// <summary>
+			/// Closes the window and exits the application
+			/// </summary>
+			void CloseWindow();
+
+			/// <summary>
+			/// Returns true if the window is in borderless fullscreen mode
+			/// </summary>
+			bool GetIsFullScreen() const;
+
+			/// <summary>
+			/// Enable/disable borderless full screen
+			/// </summary>
+			void SetFullScreen(bool value);
 
 		protected:	
 			const wstring_view name;
 			HINSTANCE hInst;
+			WndStyle initStyle;
+
 			HWND hWnd;
 			MSG wndMsg;
 			ivec2 bodySize, wndSize;
+
 			TRACKMOUSEEVENT tme;
 			bool isInitialized;
 			bool isMousedOver;
-			bool canSysSleep;
-			bool canDispSleep;
 
 			bool isFullscreen;
 			ivec2 lastPos, lastSize;
-			WndStyle initStyle;
+
+			// Non-client override
+			ivec2 paddingOverride;
+			bool isHeaderHovered;
+			bool isNcCustom;
+
+			bool canSysSleep;
+			bool canDispSleep;
 
 			/// <summary>
 			/// Component objects associated with the window
@@ -262,7 +316,7 @@ namespace Weave
 			/// </summary>
 			LRESULT OnWndMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
 
-			void OnResize();
+			void UpdateSize();
 
 			/// <summary>
 			/// Handles messaging setup on creation of new windows
@@ -275,5 +329,3 @@ namespace Weave
 			static LRESULT CALLBACK WindowMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	};
 }
-
-#endif
