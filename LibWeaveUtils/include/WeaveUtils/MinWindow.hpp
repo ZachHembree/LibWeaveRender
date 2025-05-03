@@ -231,8 +231,6 @@ namespace Weave
 			void SetIsCursorVisible(bool value);
 
 		protected:	
-			static MinWindow* pLastInit;
-
 			const wstring_view name;
 			HINSTANCE hInst;
 			HWND hWnd;

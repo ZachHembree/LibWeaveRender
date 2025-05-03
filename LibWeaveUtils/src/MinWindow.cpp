@@ -5,8 +5,6 @@
 using namespace glm;
 using namespace Weave;
 
-MinWindow* MinWindow::pLastInit;
-
 MinWindow::MinWindow(
 	wstring_view initName, 
 	ivec2 initSize, 
@@ -54,10 +52,9 @@ MinWindow::MinWindow(
 
 	// Resize body
 	WIN_ASSERT_NZ_LAST(AdjustWindowRect(&wr, initStyle.x, FALSE));
-	pLastInit = this;
 
 	// Create window instance
-	hWnd = CreateWindowEx(
+	hWnd = CreateWindowExW(
 		initStyle.y,
 		initName.data(),
 		initName.data(),
@@ -76,7 +73,8 @@ MinWindow::MinWindow(
 	WIN_CHECK_LAST(hWnd != NULL);
 
 	// Make the window visible
-	ShowWindow(hWnd, SW_SHOW);
+	WIN_ASSERT_NZ_LAST(ShowWindow(hWnd, SW_SHOW));
+	OnResize();
 
 	// Setup mouse tracker
 	tme.cbSize = sizeof(tme);
@@ -480,22 +478,20 @@ void MinWindow::OnResize()
 {
 	RECT clientBox, wndBox;
 
-	GetClientRect(hWnd, &clientBox);
-	GetWindowRect(hWnd, &wndBox);
+	if (GetClientRect(hWnd, &clientBox) != 0)
+		bodySize = ivec2(clientBox.right - clientBox.left, clientBox.bottom - clientBox.top);
 
-	bodySize = ivec2(clientBox.right - clientBox.left, clientBox.bottom - clientBox.top);
-	wndSize = ivec2(wndBox.right - wndBox.left, wndBox.bottom - wndBox.top);
+	if (GetWindowRect(hWnd, &wndBox) != 0)
+		wndSize = ivec2(wndBox.right - wndBox.left, wndBox.bottom - wndBox.top);
 }
 
 LRESULT CALLBACK MinWindow::HandleWindowSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (WM_CREATE)
+	if (msg == WM_CREATE)
 	{
-		// **BROKEN**
 		// Retrieve custom window pointer from create data
 		const CREATESTRUCTW* const pData = reinterpret_cast<CREATESTRUCTW*>(lParam);
-		MinWindow* wndPtr = pLastInit;//static_cast<MinWindow*>(pData->lpCreateParams);
-		pLastInit = nullptr;
+		MinWindow* wndPtr = static_cast<MinWindow*>(pData->lpCreateParams);
 
 		// Add pointer to user data field
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(wndPtr));
