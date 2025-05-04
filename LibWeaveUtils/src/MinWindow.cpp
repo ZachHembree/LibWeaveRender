@@ -30,7 +30,8 @@ MinWindow::MinWindow(
 	canSysSleep(true),
 	canDispSleep(true),
 	isHeaderHovered(false),
-	isNcCustom(false)
+	isNcCustom(false),
+	isCompSortingStale(false)
 {
 	// Setup window descriptor
 	WNDCLASSEX wc = { 0 };
@@ -251,16 +252,60 @@ void MinWindow::SetBodySize(ivec2 size)
 
 void MinWindow::RegisterComponent(WindowComponentBase& component)
 {
-	if (!component.isRegistered && component.pParent == this)
+	if (!component.GetIsRegistered(this))
 	{
+		component.id = (uint)components.GetLength();
 		components.Add(&component);
-		component.isRegistered = true;
+		isCompSortingStale = true;
+	}
+}
+
+void MinWindow::MoveComponent(WindowComponentBase& lhs, WindowComponentBase&& rhs)
+{
+	WV_CHECK_MSG(!lhs.GetIsRegistered(),
+		"Cannot transfer Window component registration to a component that is already in use.");
+	WV_CHECK_MSG(rhs.GetIsRegistered(this),
+		"Attempted to remove a Window component that did not belong to the window");
+	WV_ASSERT_MSG(rhs.id != uint(-1) && rhs.id < components.GetLength(), "Window component ID invalid.");
+
+	components[rhs.id] = &lhs;
+	lhs.pParent = this;
+	lhs.id = rhs.id;
+	rhs.id = uint(-1);
+}
+
+void MinWindow::UnregisterComponent(WindowComponentBase& component)
+{
+	WV_CHECK_MSG(component.GetIsRegistered(this), 
+		"Attempted to remove a Window component that did not belong to the window");
+	WV_ASSERT_MSG(component.id != uint(-1) && component.id < components.GetLength(), "Window component ID invalid.");
+
+	if (components[component.id] == &component)
+	{
+		for (slong i = component.id + 1; components.GetLength(); i++)
+			components[i]->id = (uint)(i - 1);
+
+		components.RemoveAt(component.id);
+		component.id = uint(-1);
 	}
 }
 
 MSG MinWindow::RunMessageLoop()
 {
 	isInitialized = true;
+
+	if (isCompSortingStale)
+	{
+		std::sort(components.begin(), components.end(), [](const WindowComponentBase* pLeft, const WindowComponentBase* pRight) 
+		{
+			return pLeft->priority > pRight->priority;
+		});
+
+		for (ulong i = 0; i < components.GetLength(); i++)
+			components[i]->id = (uint)i;
+
+		isCompSortingStale = false;
+	}
 
 	while (PollWindowMessages())
 	{
@@ -425,6 +470,14 @@ void MinWindow::SetFullScreen(bool value)
 			SetSize(lastSize);
 			SetPos(lastPos);
 		}
+
+		WIN_CHECK_NZ_LAST(ShowWindow(hWnd, SW_SHOW));
+		WIN_CHECK_NZ_LAST(SetWindowPos(
+			hWnd,
+			HWND_TOPMOST,
+			0, 0, 0, 0,
+			SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
+		));
 	}
 }
 
@@ -583,7 +636,7 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		{
 			for (WindowComponentBase* component : components)
 			{
-				// Allow components to intercept messages from later components
+				// Allow earlier components to intercept messages from later components
 				if (!component->OnWndMessage(hWnd, msg, wParam, lParam))
 					break;
 			}

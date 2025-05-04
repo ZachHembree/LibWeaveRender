@@ -61,11 +61,6 @@ namespace Weave
 			void SetWindowTitle(wstring_view text);
 
 			/// <summary>
-			/// Registers component object to the window.
-			/// </summary>
-			virtual void RegisterComponent(WindowComponentBase& component);
-
-			/// <summary>
 			/// Updates window message loop until the window is closed
 			/// </summary>
 			virtual MSG RunMessageLoop();
@@ -277,6 +272,8 @@ namespace Weave
 			void SetFullScreen(bool value);
 
 		protected:	
+			friend WindowComponentBase;
+
 			const wstring_view name;
 			HINSTANCE hInst;
 			WndStyle initStyle;
@@ -300,10 +297,23 @@ namespace Weave
 			bool canSysSleep;
 			bool canDispSleep;
 
-			/// <summary>
-			/// Component objects associated with the window
-			/// </summary>
 			UniqueVector<WindowComponentBase*> components;
+			bool isCompSortingStale;
+
+			/// <summary>
+			/// Registers component object to the window.
+			/// </summary>
+			void RegisterComponent(WindowComponentBase& component);
+
+			/// <summary>
+			/// Transfers component registration from the right component to the left
+			/// </summary>
+			void MoveComponent(WindowComponentBase& lhs, WindowComponentBase&& rhs);
+
+			/// <summary>
+			/// Unregisters the component from the window
+			/// </summary>
+			void UnregisterComponent(WindowComponentBase& component);
 
 			/// <summary>
 			/// Processes next window message without removing it from the queue.
