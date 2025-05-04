@@ -51,6 +51,10 @@ Renderer::Renderer(MinWindow& window) :
 	WV_LOG_INFO() << "Renderer Init";
 }
 
+Renderer::Renderer(Renderer&&) noexcept = default;
+
+Renderer& Renderer::operator=(Renderer&&) noexcept = default;
+
 Renderer::~Renderer() = default;
 
 Device& Renderer::GetDevice() { return *pDev; }

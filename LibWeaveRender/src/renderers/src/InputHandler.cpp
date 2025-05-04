@@ -25,34 +25,9 @@ InputHandler::InputHandler(MinWindow& window) :
 	mouse(new Mouse())
 { }
 
-InputHandler::InputHandler(InputHandler&& other) noexcept :
-	WindowComponentBase(std::move(other)),
-	kbTracker(std::move(other.kbTracker)),
-	currentMousePresses(other.currentMousePresses),
-	lastMousePresses(other.lastMousePresses),
-	keyboard(std::move(other.keyboard)),
-	mouse(std::move(other.mouse)),
-	lastMousePos(other.lastMousePos),
-	isInitialized(other.isInitialized)
-{ 
-	other.isInitialized = false;
-}
+InputHandler::InputHandler(InputHandler&& other) noexcept = default;
 
-InputHandler& InputHandler::operator=(InputHandler&& other) noexcept
-{
-	WindowComponentBase::operator=(std::move(other));
-
-	kbTracker = std::move(other.kbTracker);
-	currentMousePresses = other.currentMousePresses;
-	lastMousePresses = other.lastMousePresses;
-	keyboard = std::move(other.keyboard);
-	mouse = std::move(other.mouse);
-	lastMousePos = other.lastMousePos;
-	isInitialized = other.isInitialized;
-
-	other.isInitialized = false;
-	return *this;
-}
+InputHandler& InputHandler::operator=(InputHandler&& other) noexcept = default;
 
 InputHandler::~InputHandler() = default;
 
