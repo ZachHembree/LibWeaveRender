@@ -271,6 +271,7 @@ void MinWindow::MoveComponent(WindowComponentBase& lhs, WindowComponentBase&& rh
 	components[rhs.id] = &lhs;
 	lhs.pParent = this;
 	lhs.id = rhs.id;
+	lhs.priority = rhs.priority;
 	rhs.id = uint(-1);
 }
 
@@ -293,19 +294,6 @@ void MinWindow::UnregisterComponent(WindowComponentBase& component)
 MSG MinWindow::RunMessageLoop()
 {
 	isInitialized = true;
-
-	if (isCompSortingStale)
-	{
-		std::sort(components.begin(), components.end(), [](const WindowComponentBase* pLeft, const WindowComponentBase* pRight) 
-		{
-			return pLeft->priority > pRight->priority;
-		});
-
-		for (ulong i = 0; i < components.GetLength(); i++)
-			components[i]->id = (uint)i;
-
-		isCompSortingStale = false;
-	}
 
 	while (PollWindowMessages())
 	{
@@ -330,6 +318,19 @@ MSG MinWindow::RunMessageLoop()
 
 bool MinWindow::PollWindowMessages()
 {
+	if (isCompSortingStale)
+	{
+		std::sort(components.begin(), components.end(), [](const WindowComponentBase* pLeft, const WindowComponentBase* pRight)
+		{
+			return pLeft->priority < pRight->priority;
+		});
+
+		for (ulong i = 0; i < components.GetLength(); i++)
+			components[i]->id = (uint)i;
+
+		isCompSortingStale = false;
+	}
+
 	// Process windows events
 	if (PeekMessage(&wndMsg, nullptr, 0, 0, PM_REMOVE))
 	{

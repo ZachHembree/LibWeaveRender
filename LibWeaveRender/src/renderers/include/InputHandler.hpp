@@ -24,17 +24,15 @@ namespace Weave
 	class InputHandler : public WindowComponentBase
 	{
 	public:
+		MAKE_NO_COPY(InputHandler);
+
 		using Mouse = DirectX::Mouse;
 		using Keyboard = DirectX::Keyboard;
 		using KbTracker = Keyboard::KeyboardStateTracker;
 		using MouseState = Mouse::State;
 		using KbState = Keyboard::State;
 
-		~InputHandler();
-
 		static void Init(MinWindow& wnd);
-
-		static InputHandler& GetInstance();
 
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
@@ -101,17 +99,26 @@ namespace Weave
 		static vec2 GetNormMousePos();
 
 	private:
-		bool isEnabled;
-		ivec2 lastMousePos;
+		static InputHandler s_Handler;
+		static bool s_IsEnabled;
 
 		KbTracker kbTracker;
 		MouseKey currentMousePresses,
 			lastMousePresses;
 
-		Keyboard keyboard;
-		Mouse mouse;
+		std::unique_ptr<Keyboard> keyboard;
+		std::unique_ptr <Mouse> mouse;
+		ivec2 lastMousePos;
+		bool isInitialized;
+
+		InputHandler();
 
 		InputHandler(MinWindow& window);
 
+		InputHandler(InputHandler&&) noexcept;
+
+		InputHandler& operator=(InputHandler&&) noexcept;
+
+		~InputHandler();
 	};
 }
