@@ -38,7 +38,9 @@ namespace Weave
 	class MinWindow
 	{
 		public:
-			MAKE_MOVE_ONLY(MinWindow)
+			MAKE_MOVE_ONLY(MinWindow);
+
+			MinWindow();
 
 			MinWindow(
 				wstring_view name, 
@@ -51,9 +53,14 @@ namespace Weave
 			~MinWindow();
 
 			/// <summary>
+			/// Updates window message loop until the window is closed
+			/// </summary>
+			MSG RunMessageLoop();
+
+			/// <summary>
 			/// Returns the contents of the titlebar
 			/// </summary>
-			wstring GetWindowTitle() const;
+			wstring_view GetWindowTitle() const;
 
 			/// <summary>
 			/// Writes the given text to the titlebar
@@ -61,24 +68,34 @@ namespace Weave
 			void SetWindowTitle(wstring_view text);
 
 			/// <summary>
-			/// Updates window message loop until the window is closed
-			/// </summary>
-			virtual MSG RunMessageLoop();
-
-			/// <summary>
 			/// Returns the name of the window
 			/// </summary>
-			const wstring_view GetName() const noexcept;
+			const wstring_view GetName() const;
 
 			/// <summary>
 			/// Returns handle to executable process associated with the window
 			/// </summary>
-			HINSTANCE GetProcHandle() const noexcept;
+			HINSTANCE GetProcHandle() const;
 
 			/// <summary>
 			/// Returns handle for window object provided by the Win32 API
 			/// </summary>
-			HWND GetWndHandle() const noexcept;
+			HWND GetWndHandle() const;
+
+			/// <summary>
+			/// Returns style and extended style as a vector
+			/// </summary>
+			WndStyle GetStyle() const;
+
+			/// <summary>
+			/// Returns true if the window is in borderless fullscreen mode
+			/// </summary>
+			bool GetIsFullScreen() const;
+
+			/// <summary>
+			/// Enable/disable borderless full screen
+			/// </summary>
+			void SetFullScreen(bool value);
 
 			/// <summary>
 			/// Returns the size of the window in pixels.
@@ -160,14 +177,14 @@ namespace Weave
 			void SetCanSystemSleep(bool value);
 
 			/// <summary>
-			/// Moves the window to the given monitor
-			/// </summary>
-			void SetActiveMonitor(HMONITOR newMon);
-
-			/// <summary>
 			/// Returns handle to the monitor the window is occupying
 			/// </summary>
 			HMONITOR GetActiveMonitor() const;
+
+			/// <summary>
+			/// Moves the window to the given monitor
+			/// </summary>
+			void SetActiveMonitor(HMONITOR newMon);
 
 			/// <summary>
 			/// Returns configuration details for the active monitor including resolution, position,
@@ -202,24 +219,14 @@ namespace Weave
 			ivec2 GetMonitorResolution() const;
 
 			/// <summary>
-			/// Returns style and extended style as a vector
+			/// Returns true if the non client area is overridden
 			/// </summary>
-			WndStyle GetStyle() const;
+			bool GetIsNonClientCustom() const;
 
 			/// <summary>
-			/// Sets the style of the window. Ex-style optional.
+			/// Enables or disables the non client area override
 			/// </summary>
-			void SetStyle(WndStyle style);
-
-			/// <summary>
-			/// Adds the given style flags to the window
-			/// </summary>
-			void EnableStyleFlags(WndStyle flags);
-
-			/// <summary>
-			/// Removes the given style flags from the current style
-			/// </summary>
-			void DisableStyleFlags(WndStyle flags);
+			void SetIsNonClientCustom(bool value);
 
 			/// <summary>
 			/// Returns the custom border padding for non-client area overrides.
@@ -230,16 +237,6 @@ namespace Weave
 			/// Sets the custom border padding for non-client area overrides.
 			/// </summary>
 			void SetOverridePadding(ivec2 padding);
-			
-			/// <summary>
-			/// Returns true if the non client area is overridden
-			/// </summary>
-			bool GetIsNonClientCustom() const;
-
-			/// <summary>
-			/// Enables or disables the non client area override
-			/// </summary>
-			void SetIsNonClientCustom(bool value);
 
 			/// <summary>
 			/// Set to true to signal when a custom header is moused over
@@ -261,44 +258,47 @@ namespace Weave
 			/// </summary>
 			void CloseWindow();
 
-			/// <summary>
-			/// Returns true if the window is in borderless fullscreen mode
-			/// </summary>
-			bool GetIsFullScreen() const;
-
-			/// <summary>
-			/// Enable/disable borderless full screen
-			/// </summary>
-			void SetFullScreen(bool value);
-
 		protected:	
 			friend WindowComponentBase;
 
-			const wstring_view name;
+			wstring_view name;
 			HINSTANCE hInst;
-			WndStyle initStyle;
+			bool isInitialized;
 
 			HWND hWnd;
 			MSG wndMsg;
+
+			// Styling
+			WndStyle style;
 			ivec2 bodySize, wndSize;
-
-			TRACKMOUSEEVENT tme;
-			bool isInitialized;
-			bool isMousedOver;
-
 			bool isFullscreen;
 			ivec2 lastPos, lastSize;
+
+			// Components
+			UniqueVector<WindowComponentBase*> components;
+			bool isCompSortingStale;
+			bool areCompIDsStale;
+
+			// Mouse tracking
+			TRACKMOUSEEVENT tme;
+			bool isMousedOver;
+			bool canSysSleep;
+			bool canDispSleep;
 
 			// Non-client override
 			ivec2 paddingOverride;
 			bool isHeaderHovered;
 			bool isNcCustom;
 
-			bool canSysSleep;
-			bool canDispSleep;
+			/// <summary>
+			/// Sets the style of the window. Ex-style optional.
+			/// </summary>
+			void SetStyle(WndStyle style);
 
-			UniqueVector<WindowComponentBase*> components;
-			bool isCompSortingStale;
+			/// <summary>
+			/// Manually triggers an update and repaint of the window
+			/// </summary>
+			void RepaintWindow();
 
 			/// <summary>
 			/// Registers component object to the window.
@@ -326,7 +326,20 @@ namespace Weave
 			/// </summary>
 			LRESULT OnWndMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
 
+			/// <summary>
+			/// Overrides non-client area styling Win32 messages if enabled
+			/// </summary>
+			std::optional<slong> TryHandleOverrideNC(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
+
+			/// <summary>
+			/// Updates window and body size
+			/// </summary>
 			void UpdateSize();
+
+			/// <summary>
+			/// Updates component IDs and update ordering
+			/// </summary>
+			void UpdateComponentIDs();
 
 			/// <summary>
 			/// Handles messaging setup on creation of new windows
