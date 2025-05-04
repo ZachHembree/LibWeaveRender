@@ -128,6 +128,9 @@ bool ImGuiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 		activeText.Clear();
 
+		// Intercept input messages when requested
+		bool isInterrupting = false;
+
 		switch (msg)
 		{
 		case WM_ACTIVATE:
@@ -143,13 +146,18 @@ bool ImGuiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		case WM_XBUTTONDOWN:
 		case WM_XBUTTONUP:
 		case WM_MOUSEHOVER:
+			if (io.WantCaptureMouse)
+				isInterrupting = true;
 		case WM_KEYDOWN:
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 		case WM_SYSKEYDOWN:
-			if (io.WantCaptureKeyboard || io.WantCaptureMouse)
-				return false;
+			if (io.WantCaptureKeyboard)
+				isInterrupting = true;
 		}
+
+		if (isInterrupting)
+			return false;
 	}
 
 	return true;
