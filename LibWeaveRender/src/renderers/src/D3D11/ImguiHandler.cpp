@@ -6,7 +6,7 @@
 #include "D3D11/ImguiRenderComponent.hpp"
 #include "InputHandler.hpp"
 
-#include <imgui.h>
+#include "WeaveRender/Imgui.hpp"
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 #include <math.h>
@@ -35,6 +35,13 @@ ImGuiHandler::ImGuiHandler(Renderer& renderer) :
 	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
 
+ImGuiHandler::~ImGuiHandler()
+{
+	delete pRenderComponent;
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+}
+
 void ImGuiHandler::Init(Renderer& renderer)
 {
 	if (pInstance.get() == nullptr)
@@ -45,14 +52,21 @@ void ImGuiHandler::Reset() { pInstance.reset(); }
 
 ImGuiHandler& ImGuiHandler::GetInstance() { D3D_ASSERT_MSG(pInstance.get(), "ImGuiHandler is null"); return *pInstance; }
 
-ImGuiHandler::~ImGuiHandler()
+string& ImGuiHandler::GetTempString() { return pRenderComponent->GetTempString(); }
+
+string_view ImGuiHandler::GetTmpNarrowStr(wstring_view str)
 {
-	delete pRenderComponent;
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+	string& buf = GetInstance().GetTempString();
+	GetMultiByteString_UTF16LE_TO_UTF8(str, buf);
+	return buf;
 }
 
-string& ImGuiHandler::GetTempString() { return pRenderComponent->GetTempString(); }
+char* ImGuiHandler::GetTmpNarrowCStr(wstring_view str)
+{
+	string& buf = GetInstance().GetTempString();
+	GetMultiByteString_UTF16LE_TO_UTF8(str, buf);
+	return buf.data();
+}
 
 void ImGuiHandler::UpdateUI()
 {

@@ -50,9 +50,21 @@ namespace Weave::D3D11
 
 			if (buf.empty() || buf.back() != '\0')
 				buf.push_back('\0');
-
+				
 			return buf.data();
 		}
+
+		/// <summary>
+		/// Creates a temporary string containing a copy of a UTF16LE string that will be reclaimed 
+		/// after the end of the next frame.
+		/// </summary>
+		static string_view GetTmpNarrowStr(wstring_view str);
+
+		/// <summary>
+		/// Creates a temporary string containing a copy of a UTF16LE string that will be reclaimed 
+		/// after the end of the next frame.
+		/// </summary>
+		static char* GetTmpNarrowCStr(wstring_view str);
 
 		void UpdateUI();
 
