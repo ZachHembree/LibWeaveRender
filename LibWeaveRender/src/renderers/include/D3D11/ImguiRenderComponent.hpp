@@ -6,20 +6,21 @@
 namespace Weave::D3D11
 {
 	/// <summary>
-	/// Wrapper for standard D3D11 Imgui implementation
+	/// Wrapper for standard D3D11 ImGui backend
 	/// </summary>
-	class ImguiRenderComponent : public RenderComponentBase
+	class ImGuiRenderComponent : public RenderComponentBase
 	{
 	public:
+		/// <summary>
+		/// Enables or disables the built-in ImGui demo UI
+		/// </summary>
 		bool enableDemoWindow;
 
-		ImguiRenderComponent();
+		ImGuiRenderComponent();
 
-		ImguiRenderComponent(Renderer& renderer);
+		ImGuiRenderComponent(Renderer& renderer);
 
-		~ImguiRenderComponent();
-
-		string& GetTempString();
+		~ImGuiRenderComponent();
 
 		/// <summary>
 		/// Returns overridden mouse position. Zero if disabled.
@@ -48,8 +49,5 @@ namespace Weave::D3D11
 	private:
 		vec2 mousePos;
 		uivec2 dispSize;
-
-		ObjectPool<string> stringPool;
-		UniqueVector<string> activeText;
 	};
 }

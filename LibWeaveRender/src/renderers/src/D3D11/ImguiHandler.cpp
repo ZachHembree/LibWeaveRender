@@ -1,95 +1,94 @@
 #include "pch.hpp"
-#include "WeaveUtils/Win32.hpp"
 #include "D3D11/Renderer.hpp"
-#include "D3D11/InternalD3D11.hpp"
-#include "D3D11/ImguiHandler.hpp"
-#include "D3D11/ImguiRenderComponent.hpp"
-#include "InputHandler.hpp"
+#include "D3D11/ImGuiHandler.hpp"
+#include "D3D11/ImGuiRenderComponent.hpp"
 
-#include "WeaveRender/Imgui.hpp"
+#include <imgui.h>
 #include <imgui_impl_win32.h>
-#include <imgui_impl_dx11.h>
-#include <math.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 using namespace Weave;
 using namespace Weave::D3D11;
 
-std::unique_ptr<ImGuiHandler> pInstance;
-
+ImGuiHandler ImGuiHandler::s_Instance;
 bool ImGuiHandler::enableDemoWindow = false;
 
+ImGuiHandler::ImGuiHandler() :
+	pRenderer(nullptr),
+	pRenderComponent(nullptr),
+	isInitialized(false)
+{ }
+
 ImGuiHandler::ImGuiHandler(Renderer& renderer) :
-	WindowComponentBase(renderer.GetWindow()),
-	pRenderer(&renderer)
+	WindowComponentBase(renderer.GetWindow(), 0),
+	pRenderer(&renderer),
+	isInitialized(true)
 { 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplWin32_Init(GetWindow().GetWndHandle());
-	pRenderComponent = new ImguiRenderComponent(renderer);	
-	InputHandler::Init(GetWindow());
+	pRenderComponent.reset(new ImGuiRenderComponent(renderer));
 
 	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
 
-ImGuiHandler::~ImGuiHandler()
+ImGuiHandler::ImGuiHandler(ImGuiHandler&& other) noexcept :
+	WindowComponentBase(std::move(other)),
+	pRenderer(other.pRenderer),
+	isInitialized(other.isInitialized),
+	pRenderComponent(std::move(other.pRenderComponent))
 {
-	delete pRenderComponent;
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+	other.isInitialized = false;
 }
+
+ImGuiHandler& ImGuiHandler::operator=(ImGuiHandler&& other) noexcept
+{
+	WindowComponentBase::operator=(std::move(other));
+
+	pRenderer = other.pRenderer;
+	isInitialized = other.isInitialized;
+	pRenderComponent = std::move(other.pRenderComponent);
+	other.isInitialized= false;
+	return *this;
+}
+
+ImGuiHandler::~ImGuiHandler()
+{	
+	if (isInitialized)
+	{
+		pRenderComponent.reset();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+	}
+}
+
+bool ImGuiHandler::GetIsInitialized() { return s_Instance.isInitialized; }
 
 void ImGuiHandler::Init(Renderer& renderer)
 {
-	if (pInstance.get() == nullptr)
-		pInstance.reset(new ImGuiHandler(renderer));
+	if (!s_Instance.isInitialized)
+		s_Instance = ImGuiHandler(renderer);
 }
 
-void ImGuiHandler::Reset() { pInstance.reset(); }
+void ImGuiHandler::Reset() { s_Instance = ImGuiHandler(); }
 
-ImGuiHandler& ImGuiHandler::GetInstance() { D3D_ASSERT_MSG(pInstance.get(), "ImGuiHandler is null"); return *pInstance; }
-
-string& ImGuiHandler::GetTempString() { return pRenderComponent->GetTempString(); }
+string& ImGuiHandler::GetTmpString() { return activeText.EmplaceBack(stringPool.Get()); }
 
 string_view ImGuiHandler::GetTmpNarrowStr(wstring_view str)
 {
-	string& buf = GetInstance().GetTempString();
+	string& buf = s_Instance.GetTmpString();
 	GetMultiByteString_UTF16LE_TO_UTF8(str, buf);
 	return buf;
 }
 
 char* ImGuiHandler::GetTmpNarrowCStr(wstring_view str)
 {
-	string& buf = GetInstance().GetTempString();
+	string& buf = s_Instance.GetTmpString();
 	GetMultiByteString_UTF16LE_TO_UTF8(str, buf);
 	return buf.data();
-}
-
-void ImGuiHandler::UpdateUI()
-{
-	ImGuiIO& io = ImGui::GetIO();
-	ImGuiStyle& style = ImGui::GetStyle();
-	vec2 scale = GetWindow().GetNormMonitorDPI();
-	float scaleDelta = (float)(scale.y / (double)io.FontGlobalScale);
-	
-	style.ScaleAllSizes(scaleDelta);
-	io.FontGlobalScale = scale.y;
-
-	pRenderComponent->enableDemoWindow = enableDemoWindow;
-
-	// Manually update UI size and cursor position
-	InputHandler::SetIsEnabled(true);
-	const uivec2 newSize = pRenderer->GetOutputResolution();
-	const vec2 normPos = InputHandler::GetNormMousePos();
-
-	// Disable input when ImGui wants to capture	
-	InputHandler::SetIsEnabled(!(io.WantCaptureKeyboard || io.WantCaptureMouse));
-
-	pRenderComponent->SetDispSize(newSize);
-	pRenderComponent->SetMousePos(normPos * vec2(newSize));
 }
 
 bool ImGuiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -97,6 +96,37 @@ bool ImGuiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 	if (ImGui::GetCurrentContext() != nullptr)
 	{ 
 		ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		// Update DPI scaling
+		vec2 scale = GetWindow().GetNormMonitorDPI();
+		float scaleDelta = (float)(scale.y / (double)io.FontGlobalScale);
+		style.ScaleAllSizes(scaleDelta);
+		io.FontGlobalScale = scale.y;
+
+		pRenderComponent->enableDemoWindow = enableDemoWindow;
+
+		// Manually update display size and cursor position
+		MinWindow& wnd = pRenderer->GetWindow();
+		ivec2 wndSize = pRenderer->GetWindow().GetBodySize(),
+			pos = wnd.GetGlobalCursorPos() - wnd.GetBodyPos();
+		float aspectRatio = (float)wndSize.y / wndSize.x;
+		const vec2 normPos = (1.0f / wndSize.y) * vec2(pos.x * aspectRatio, pos.y);
+
+		const uivec2 newSize = pRenderer->GetOutputResolution();
+		pRenderComponent->SetMousePos(normPos * vec2(newSize)); //
+		pRenderComponent->SetDispSize(newSize);
+
+		// Reset pool
+		for (string& str : activeText)
+		{
+			str.clear();
+			stringPool.Return(std::move(str));
+		}
+
+		activeText.Clear();
 
 		switch (msg)
 		{
@@ -117,7 +147,8 @@ bool ImGuiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 		case WM_SYSKEYDOWN:
-			UpdateUI();
+			if (io.WantCaptureKeyboard || io.WantCaptureMouse)
+				return false;
 		}
 	}
 

@@ -5,22 +5,34 @@
 
 namespace Weave::D3D11
 {
-	class ImguiRenderComponent;
+	class ImGuiRenderComponent;
 	class Renderer;
 	
 	/// <summary>
-	/// Manages initialization and cleanup of Imgui
+	/// ImGui singleton wrapper for default Win32 and D3D11 backends
 	/// </summary>
 	class ImGuiHandler : public WindowComponentBase
 	{
 	public:
+		/// <summary>
+		/// Enables or disables the built-in ImGui demo UI
+		/// </summary>
 		static bool enableDemoWindow;
 
+		/// <summary>
+		/// Returns true if the handler has been initialized
+		/// </summary>
+		static bool GetIsInitialized();
+
+		/// <summary>
+		/// Initializes ImGui to use the given D3D11 rendering backend
+		/// </summary>
 		static void Init(Renderer& renderer);
 
+		/// <summary>
+		/// Resets backend to initial state
+		/// </summary>
 		static void Reset();
-
-		static ImGuiHandler& GetInstance();
 
 		/// <summary>
 		/// Creates a temporary formatted string from an internal pool that will be reclaimed 
@@ -29,7 +41,7 @@ namespace Weave::D3D11
 		template<typename... FmtArgs>
 		static string_view GetTempFormatStr(string_view fmt, FmtArgs&&... args)
 		{
-			string& buf = GetInstance().GetTempString();
+			string& buf = s_Instance.GetTmpString();
 			VFormatTo(buf, fmt, std::forward<FmtArgs>(args)...);
 
 			if (buf.empty() || buf.back() != '\0')
@@ -45,7 +57,7 @@ namespace Weave::D3D11
 		template<typename... FmtArgs>
 		static char* GetTempFormatCStr(string_view fmt, FmtArgs&&... args)
 		{
-			string& buf = GetInstance().GetTempString();
+			string& buf = s_Instance.GetTmpString();
 			VFormatTo(buf, fmt, std::forward<FmtArgs>(args)...);
 
 			if (buf.empty() || buf.back() != '\0')
@@ -66,18 +78,30 @@ namespace Weave::D3D11
 		/// </summary>
 		static char* GetTmpNarrowCStr(wstring_view str);
 
-		void UpdateUI();
-
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
-		~ImGuiHandler();
-
 	private:
+		MAKE_NO_COPY(ImGuiHandler);
+
+		static ImGuiHandler s_Instance;
+
 		Renderer* pRenderer;
-		ImguiRenderComponent* pRenderComponent;
+		std::unique_ptr<ImGuiRenderComponent> pRenderComponent;
+		bool isInitialized;
+
+		ObjectPool<string> stringPool;
+		UniqueVector<string> activeText;
+
+		ImGuiHandler();
 
 		ImGuiHandler(Renderer& renderer);
 
-		string& GetTempString();
+		ImGuiHandler(ImGuiHandler&& other) noexcept;
+
+		ImGuiHandler& operator=(ImGuiHandler&& other) noexcept;
+
+		~ImGuiHandler();
+
+		string& GetTmpString();
 	};
 }

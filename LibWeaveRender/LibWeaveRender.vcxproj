@@ -232,7 +232,7 @@
     <ClCompile Include="src\renderers\src\D3D11\Resources\DeviceChild.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\RWTexture2D.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\DepthStencilTexture.cpp" />
-    <ClCompile Include="src\renderers\src\D3D11\ImguiHandler.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\ImGuiHandler.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\RenderComponent.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\Resources\Texture2D.cpp" />
     <ClCompile Include="src\renderers\src\D3D11\ShaderLibrary.cpp" />
@@ -283,8 +283,8 @@
     <ClInclude Include="src\renderers\include\D3D11\Resources\Texture2D.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ShaderLibrary.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\DepthStencilTexture.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\ImguiHandler.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\ImguiRenderComponent.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\ImGuiHandler.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\ImGuiRenderComponent.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\RenderComponent.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\BufferBase.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\ConstantBuffer.hpp" />
@@ -308,7 +308,7 @@
     <ClInclude Include="src\renderers\include\D3D11\Mesh.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Primitives.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\ResourceMap.hpp" />
-    <ClCompile Include="src\renderers\src\D3D11\ImguiRenderComponent.cpp" />
+    <ClCompile Include="src\renderers\src\D3D11\ImGuiRenderComponent.cpp" />
     <ClInclude Include="src\renderers\include\D3D11\Viewport.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\SwapChain.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\IndexBuffer.hpp" />

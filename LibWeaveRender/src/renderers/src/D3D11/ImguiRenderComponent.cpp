@@ -1,6 +1,5 @@
 #include "pch.hpp"
-#include "D3D11/InternalD3D11.hpp"
-#include "D3D11/ImguiRenderComponent.hpp"
+#include "D3D11/ImGuiRenderComponent.hpp"
 #include "D3D11/Renderer.hpp"
 #include "D3D11/Device.hpp"
 
@@ -9,10 +8,9 @@
 
 using namespace Weave::D3D11;
 
-ImguiRenderComponent::ImguiRenderComponent() : enableDemoWindow(false)
-{ }
+ImGuiRenderComponent::ImGuiRenderComponent() = default;
 
-ImguiRenderComponent::ImguiRenderComponent(Renderer& renderer) :
+ImGuiRenderComponent::ImGuiRenderComponent(Renderer& renderer) :
 	RenderComponentBase(renderer),
 	enableDemoWindow(false),
 	mousePos(0),
@@ -22,22 +20,20 @@ ImguiRenderComponent::ImguiRenderComponent(Renderer& renderer) :
 	ImGui_ImplDX11_Init(dev.Get(), dev.GetImmediateContext());
 }
 
-ImguiRenderComponent::~ImguiRenderComponent()
+ImGuiRenderComponent::~ImGuiRenderComponent()
 { 
 	ImGui_ImplDX11_Shutdown();
 }
 
-string& ImguiRenderComponent::GetTempString() { return activeText.EmplaceBack(stringPool.Get()); }
+vec2 ImGuiRenderComponent::GetMousePos() const { return mousePos; }
 
-vec2 ImguiRenderComponent::GetMousePos() const { return mousePos; }
+uivec2 ImGuiRenderComponent::GetDispSize() const { return dispSize; }
 
-uivec2 ImguiRenderComponent::GetDispSize() const { return dispSize; }
+void ImGuiRenderComponent::SetMousePos(vec2 mousePos) { this->mousePos = mousePos; }
 
-void ImguiRenderComponent::SetMousePos(vec2 mousePos) { this->mousePos = mousePos; }
+void ImGuiRenderComponent::SetDispSize(uivec2 dispSize) { this->dispSize = dispSize; }
 
-void ImguiRenderComponent::SetDispSize(uivec2 dispSize) { this->dispSize = dispSize; }
-
-void ImguiRenderComponent::Setup(CtxImm& ctx)
+void ImGuiRenderComponent::Setup(CtxImm& ctx)
 {
 	if (ImGui::GetCurrentContext() != nullptr)
 	{ 
@@ -54,21 +50,12 @@ void ImguiRenderComponent::Setup(CtxImm& ctx)
 
 		ImGui::NewFrame();	
 
-		// Reset pool
-		for (string& str : activeText)
-		{
-			str.clear();
-			stringPool.Return(std::move(str));
-		}
-
-		activeText.Clear();
-
 		if (enableDemoWindow)
 			ImGui::ShowDemoWindow();
 	}
 }
 
-void ImguiRenderComponent::DrawLate(CtxImm& ctx)
+void ImGuiRenderComponent::DrawLate(CtxImm& ctx)
 {
 	if (ImGui::GetCurrentContext() != nullptr)
 	{ 
