@@ -75,7 +75,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns default monitor config used by the desktop on startup
 		/// </summary>
-		const WinMonConfig& GetWinDefaults() const;
+		const WndMonConfig& GetWinDefaults() const;
 
 		/// <summary>
 		/// Returns mode ID that most closely aligns with the desktop settings on startup.
@@ -108,7 +108,7 @@ namespace Weave::D3D11
 	private:
 		string name;
 		HMONITOR handle;
-		WinMonConfig defaults;
+		WndMonConfig defaults;
 
 		Formats format;
 		ComPtr<IDXGIOutput1> pDisplay;

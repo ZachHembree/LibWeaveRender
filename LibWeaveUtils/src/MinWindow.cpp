@@ -17,27 +17,26 @@ MinWindow::MinWindow() :
 	isFullscreen(false),
 	lastPos(0),
 	lastSize(0),
-	paddingOverride(0),
 	canSysSleep(true),
 	canDispSleep(true),
-	isHeaderHovered(false),
-	isNcCustom(false),
 	isCompSortingStale(false),
 	areCompIDsStale(false)
 { }
 
 MinWindow::MinWindow(
-	wstring_view initName, 
-	ivec2 initSize, 
-	WndStyle initStyle, 
-	const HINSTANCE hInst, 
-	const wchar_t* iconRes
+	wstring_view name,
+	ivec2 bodySize,
+	const HINSTANCE hInst,
+	const wchar_t* iconRes,
+	WndStyle style,
+	const WndStyleOverride* pStyleOverride
 ) :
 	MinWindow()
 {
-	name = initName;
+	name = name;
 	this->hInst = hInst;
-	this->style = initStyle;
+	this->style = style;
+	this->pStyleOverride = pStyleOverride;
 
 	// Setup window descriptor
 	WNDCLASSEX wc = { 0 };
@@ -47,31 +46,41 @@ MinWindow::MinWindow(
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInst;
-	wc.hIcon = (HICON)LoadImage(hInst, iconRes, IMAGE_ICON, 64, 64, 0);
 	wc.hCursor = nullptr;
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
-	wc.lpszClassName = initName.data();
-	wc.hIconSm = (HICON)LoadImage(hInst, iconRes, IMAGE_ICON, 32, 32, 0);
+	wc.lpszClassName = name.data();
+
+	if (iconRes != nullptr)
+	{
+		wc.hIcon = (HICON)LoadImage(hInst, iconRes, IMAGE_ICON, 64, 64, 0);
+		wc.hIconSm = (HICON)LoadImage(hInst, iconRes, IMAGE_ICON, 32, 32, 0);
+	}
+	else
+	{
+		wc.hIcon = nullptr;
+		wc.hIconSm = nullptr;
+	}
 
 	// Register window class
 	WIN_ASSERT_NZ_LAST(RegisterClassEx(&wc));
 	
 	RECT wr;
 	wr.left = 50;
-	wr.right = initSize.x + wr.left;
+	wr.right = bodySize.x + wr.left;
 	wr.top = 50;
-	wr.bottom = initSize.y + wr.top;
+	wr.bottom = bodySize.y + wr.top;
 
-	// Resize body
-	WIN_ASSERT_NZ_LAST(AdjustWindowRect(&wr, initStyle.x, FALSE));
+	// Resize body if not overriding non-client area
+	if (pStyleOverride == nullptr)
+		WIN_ASSERT_NZ_LAST(AdjustWindowRect(&wr, style.x, FALSE));
 
 	// Create window instance
 	hWnd = CreateWindowExW(
-		initStyle.y,
-		initName.data(),
-		initName.data(),
-		initStyle.x,
+		style.y,
+		name.data(),
+		name.data(),
+		style.x,
 		// Default starting position
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		// Starting size
@@ -87,6 +96,7 @@ MinWindow::MinWindow(
 
 	// Make the window visible
 	WIN_ASSERT_NZ_LAST(ShowWindow(hWnd, SW_SHOW));
+	RepaintWindow();
 
 	// Setup mouse tracker
 	tme.cbSize = sizeof(tme);
@@ -94,6 +104,26 @@ MinWindow::MinWindow(
 	tme.dwFlags = TME_LEAVE | TME_HOVER;
 	tme.dwHoverTime = 1;
 }
+
+MinWindow::MinWindow(
+	wstring_view name,
+	ivec2 bodySize,
+	const HINSTANCE hInst,
+	WndStyle style,
+	const wchar_t* iconRes
+) :
+	MinWindow(name, bodySize, hInst, iconRes, style, nullptr)
+{ }
+
+MinWindow::MinWindow(
+	wstring_view name,
+	ivec2 bodySize,
+	const HINSTANCE hInst,
+	const WndStyleOverride& styleOverride,
+	const wchar_t* iconRes
+) :
+	MinWindow(name, bodySize, hInst, iconRes, g_DefaultWndStyle, &styleOverride)
+{ }
 
 MinWindow::~MinWindow()
 {
@@ -154,6 +184,8 @@ WndStyle MinWindow::GetStyle() const
 
 	return style;
 }
+
+bool MinWindow::GetIsStyleOverridden() const { return pStyleOverride != nullptr; }
 
 void MinWindow::SetStyle(WndStyle style)
 {
@@ -327,9 +359,9 @@ void MinWindow::SetActiveMonitor(HMONITOR newMon)
 		SetFullScreen(true);
 }
 
-WinMonConfig MinWindow::GetActiveMonitorConfig() const { return GetMonitorConfig(GetActiveMonitor()); }
+WndMonConfig MinWindow::GetActiveMonitorConfig() const { return GetMonitorConfig(GetActiveMonitor()); }
 
-WinMonConfig MinWindow::GetMonitorConfig(HMONITOR mon)
+WndMonConfig MinWindow::GetMonitorConfig(HMONITOR mon)
 {
 	MONITORINFOEXW info = GetMonInfo(mon);
 	DEVMODEW mode = {};
@@ -337,7 +369,7 @@ WinMonConfig MinWindow::GetMonitorConfig(HMONITOR mon)
 
 	WIN_CHECK_NZ_LAST(EnumDisplaySettingsExW(info.szDevice, ENUM_CURRENT_SETTINGS, &mode, 0));
 
-	WinMonConfig cfg = {};
+	WndMonConfig cfg = {};
 	cfg.res = uivec2(mode.dmPelsWidth, mode.dmPelsHeight);
 	cfg.pos = ivec2(mode.dmPosition.x, mode.dmPosition.y);
 	cfg.refreshHz = mode.dmDisplayFrequency;
@@ -378,27 +410,6 @@ ivec2 MinWindow::GetMonitorResolution() const
 
 	return ivec2(rect.right - rect.left, rect.bottom - rect.top);
 }
-
-/*
-	Non-client override config and related utilities
-*/
-
-bool MinWindow::GetIsNonClientCustom() const { return isNcCustom; }
-
-void MinWindow::SetIsNonClientCustom(bool value)
-{
-	if (value == isNcCustom)
-		return;
-
-	isNcCustom = value;
-	RepaintWindow();
-}
-
-ivec2 MinWindow::GetOverridePadding() const { return paddingOverride; }
-
-void MinWindow::SetOverridePadding(ivec2 padding) { paddingOverride = padding; }
-
-void MinWindow::HoverHeader(bool isHovered) { isHeaderHovered = isHovered; }
 
 void MinWindow::Minimize() { PostMessageW(hWnd, WM_SYSCOMMAND, SC_MINIMIZE, 0); }
 
@@ -538,7 +549,7 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		}
 
 		// Non-client override
-		if (GetIsNonClientCustom())
+		if (pStyleOverride != nullptr)
 			result = TryHandleOverrideNC(hWnd, msg, wParam, lParam);
 
 		// Pass messages through to components
@@ -582,11 +593,11 @@ void MinWindow::UpdateSize()
 	if (GetWindowRect(hWnd, &wndBox) != 0)
 		wndSize = ivec2(wndBox.right - wndBox.left, wndBox.bottom - wndBox.top);
 
-	if (isNcCustom)
+	if (pStyleOverride != nullptr)
 		WV_ASSERT_MSG(bodySize == wndSize, "Client and Window size should be equal when non-client area is overridden.");
 }
 
-std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
+std::optional<LRESULT> MinWindow::TryHandleOverrideNC(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -612,13 +623,29 @@ std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, UINT msg, WPARA
 
 			return 0;
 		}
+		case WM_NCLBUTTONDOWN:
+		{
+			switch (wParam)
+			{
+			case HTMINBUTTON:
+				Minimize();
+				return 0;
+			case HTMAXBUTTON:
+				Maximize();
+				return 0;
+			case HTCLOSE:
+				CloseWindow();
+				return 0;
+			}
+			break;
+		}
 		case WM_NCHITTEST:
 		{
 			POINTS pos = MAKEPOINTS(lParam);
 			const ivec2 wndPos = GetPos();
 			const ivec2 mndSize = GetSize();
 			const ivec2 cursorPos(pos.x - wndPos.x, pos.y - wndPos.y);
-			const ivec2 padding = paddingOverride;
+			const ivec2 padding = pStyleOverride->GetPadding();
 
 			if (AllTrue(cursorPos > ivec2(0) && cursorPos < wndSize))
 			{
@@ -636,9 +663,17 @@ std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, UINT msg, WPARA
 				if (cursorPos.y < padding.y)	return HTTOP;
 				if (cursorPos.y > innerMax.y)	return HTBOTTOM;
 
-				// Header
-				if (isHeaderHovered)
+				switch (pStyleOverride->GetHitTestOverride())
+				{
+				case WndHitTestOverrides::Minimize:
+					return HTMINBUTTON;
+				case WndHitTestOverrides::Maximize:
+					return HTMAXBUTTON;
+				case WndHitTestOverrides::Close:
+					return HTCLOSE;
+				case WndHitTestOverrides::Caption:
 					return HTCAPTION;
+				}
 
 				return HTCLIENT;
 			}
@@ -674,4 +709,20 @@ LRESULT CALLBACK MinWindow::WindowMessageHandler(HWND hWnd, UINT msg, WPARAM wPa
 {
 	MinWindow* const wndPtr = reinterpret_cast<MinWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	return wndPtr->OnWndMessage(hWnd, msg, wParam, lParam);
+}
+
+/*
+	Style override description
+*/
+
+uivec2 WndStyleOverride::GetPadding() const { return padding; }
+
+void WndStyleOverride::SetPadding(uivec2 padding) { this->padding = padding; }
+
+WndHitTestOverrides WndStyleOverride::GetHitTestOverride() const { return htOverride; }
+
+void WndStyleOverride::SetHitTestOverride(WndHitTestOverrides hitTest, bool isSet)
+{
+	if (htOverride == WndHitTestOverrides::None || hitTest == WndHitTestOverrides::None || hitTest == htOverride)
+		htOverride = (isSet ? hitTest : WndHitTestOverrides::None);
 }

@@ -5,10 +5,13 @@ namespace Weave
 {
 	class WindowComponentBase;
 
+	// Has title bar | Has minimize button | Has window menu on its title bar | Can maximize | Can resize
+	constexpr WndStyle g_DefaultWndStyle = WndStyle(WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_MAXIMIZEBOX | WS_SIZEBOX, 0L);
+
 	/// <summary>
 	/// Describes the configuration of a given monitor as reported by Win32
 	/// </summary>
-	struct WinMonConfig
+	struct WndMonConfig
 	{	
 		/// <summary>
 		/// Current resolution of the monitor. 
@@ -33,6 +36,74 @@ namespace Weave
 	};
 
 	/// <summary>
+	/// Enumerates hit test overrides for custom non client areas
+	/// </summary>
+	enum class WndHitTestOverrides : byte
+	{
+		None = 0,
+
+		/// <summary>
+		/// Used to indicate whether the window header is moused over
+		/// </summary>
+		Caption = 1,
+
+		/// <summary>
+		/// Used to indicate whether the minimize button is moused over
+		/// </summary>
+		Minimize = 2,
+
+		/// <summary>
+		/// Used to indicate whether the maximize button is moused over
+		/// </summary>
+		Maximize = 3,
+
+		/// <summary>
+		/// Used to indicate whether the close button is moused over
+		/// </summary>
+		Close = 4
+	};
+
+	/// <summary>
+	/// Defines a style override for a custom non-client area for MinWindow to be painted by the client.
+	/// </summary>
+	class WndStyleOverride
+	{
+	public:
+		WndStyleOverride(uivec2 padding = uivec2(10)) :
+			padding(padding),
+			htOverride(WndHitTestOverrides::None)
+		{ }
+
+		/// <summary>
+		/// Returns the logical thickness of the border around the window to be used for resizing
+		/// </summary>
+		uivec2 GetPadding() const;
+
+		/// <summary>
+		/// Sets the logical thickness of the border around the window to be used for resizing
+		/// </summary>
+		void SetPadding(uivec2 padding);
+
+		/// <summary>
+		/// Returns an enum indicating an override for a non-client area hit test override. These are used to 
+		/// indicate when the header, close, minimize, maximize buttons of a custom non-client area are moused
+		/// over. Override enums are mutually exclusive and must be cleared manually.
+		/// </summary>
+		WndHitTestOverrides GetHitTestOverride() const;
+
+		/// <summary>
+		/// Sets an enum indicating an override for a non-client area hit test override. These are used to 
+		/// indicate when the header, close, minimize, maximize buttons of a custom non-client area are moused
+		/// over. Override enums are mutually exclusive and must be cleared manually.
+		/// </summary>
+		void SetHitTestOverride(WndHitTestOverrides hitTest, bool isSet = true);
+
+	private:
+		ivec2 padding;
+		WndHitTestOverrides htOverride;
+	};
+
+	/// <summary>
 	/// Unique pointer containing a MinWindow component
 	/// </summary>
 	using WndCompHandle = std::unique_ptr<WindowComponentBase>;
@@ -47,12 +118,26 @@ namespace Weave
 
 			MinWindow();
 
+			/// <summary>
+			/// Creates a window with the given styling
+			/// </summary>
 			MinWindow(
-				wstring_view name, 
-				ivec2 initSize, 
-				WndStyle initStyle, 
-				const HINSTANCE hInst, 
-				const wchar_t* iconRes
+				wstring_view name,
+				ivec2 bodySize,
+				const HINSTANCE hInst,
+				WndStyle style = g_DefaultWndStyle,
+				const wchar_t* iconRes = nullptr
+			);
+
+			/// <summary>
+			/// Creates a window with an overridden non-client area
+			/// </summary>
+			MinWindow(
+				wstring_view name,
+				ivec2 bodySize,
+				const HINSTANCE hInst,
+				const WndStyleOverride& styleOverride,
+				const wchar_t* iconRes = nullptr
 			);
 
 			~MinWindow();
@@ -91,6 +176,11 @@ namespace Weave
 			/// Returns style and extended style as a vector
 			/// </summary>
 			WndStyle GetStyle() const;
+
+			/// <summary>
+			/// Returns true if the non-client area of the window has been overridden
+			/// </summary>
+			bool GetIsStyleOverridden() const;
 
 			/// <summary>
 			/// Returns true if the window is in borderless fullscreen mode
@@ -195,13 +285,13 @@ namespace Weave
 			/// Returns configuration details for the active monitor including resolution, position,
 			/// refresh rate and bits per pixel.
 			/// </summary>
-			WinMonConfig GetActiveMonitorConfig() const;
+			WndMonConfig GetActiveMonitorConfig() const;
 
 			/// <summary>
 			/// Returns configuration details for the given monitor including resolution, position,
 			/// refresh rate and bits per pixel.
 			/// </summary>
-			static WinMonConfig GetMonitorConfig(HMONITOR mon);
+			static WndMonConfig GetMonitorConfig(HMONITOR mon);
 
 			/// <summary>
 			/// Returns fractional, floating-point, DPI normalized to 96 DPI
@@ -222,31 +312,6 @@ namespace Weave
 			/// Returns the current resolution of the monitor occupied by the window
 			/// </summary>
 			ivec2 GetMonitorResolution() const;
-
-			/// <summary>
-			/// Returns true if the non client area is overridden
-			/// </summary>
-			bool GetIsNonClientCustom() const;
-
-			/// <summary>
-			/// Enables or disables the non client area override
-			/// </summary>
-			void SetIsNonClientCustom(bool value);
-
-			/// <summary>
-			/// Returns the custom border padding for non-client area overrides.
-			/// </summary>
-			ivec2 GetOverridePadding() const;
-
-			/// <summary>
-			/// Sets the custom border padding for non-client area overrides.
-			/// </summary>
-			void SetOverridePadding(ivec2 padding);
-
-			/// <summary>
-			/// Set to true to signal when a custom header is moused over
-			/// </summary>
-			void HoverHeader(bool isHovered);
 
 			/// <summary>
 			/// Minimizes the window as if the user had pressed the button
@@ -287,6 +352,11 @@ namespace Weave
 			}			
 
 			/// <summary>
+			/// Registers component object to the window.
+			/// </summary>
+			WindowComponentBase* RegisterComponent(WndCompHandle&& component);
+
+			/// <summary>
 			/// Unregisters the component from the window and destroys it
 			/// </summary>
 			void UnregisterComponent(WindowComponentBase& component);
@@ -320,14 +390,16 @@ namespace Weave
 			bool canDispSleep;
 
 			// Non-client override
-			ivec2 paddingOverride;
-			bool isHeaderHovered;
-			bool isNcCustom;
+			const WndStyleOverride* pStyleOverride;
 
-			/// <summary>
-			/// Registers component object to the window.
-			/// </summary>
-			WindowComponentBase* RegisterComponent(WndCompHandle&& component);
+			MinWindow(
+				wstring_view name,
+				ivec2 initSize,
+				const HINSTANCE hInst,
+				const wchar_t* iconRes,
+				WndStyle style,
+				const WndStyleOverride* pStyleOverride
+			);
 
 			/// <summary>
 			/// Sets the style of the window. Ex-style optional.
@@ -353,7 +425,7 @@ namespace Weave
 			/// <summary>
 			/// Overrides non-client area styling Win32 messages if enabled
 			/// </summary>
-			std::optional<slong> TryHandleOverrideNC(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
+			std::optional<LRESULT> TryHandleOverrideNC(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
 
 			/// <summary>
 			/// Updates window and body size

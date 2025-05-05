@@ -104,7 +104,7 @@ uivec2 SwapChain::GetRefresh() const
 	}
 	else
 	{
-		WinMonConfig monCfg = GetRenderer().GetWindow().GetActiveMonitorConfig();
+		WndMonConfig monCfg = GetRenderer().GetWindow().GetActiveMonitorConfig();
 		return uivec2(monCfg.refreshHz, 1u);
 	}
 }

@@ -129,7 +129,7 @@ string_view DisplayOutput::GetName() const { return name; }
 
 HMONITOR DisplayOutput::GetHandle() const { return handle; }
 
-const WinMonConfig& DisplayOutput::GetWinDefaults() const { return defaults; }
+const WndMonConfig& DisplayOutput::GetWinDefaults() const { return defaults; }
 
 const IDynamicArray<DisplayMode>& DisplayOutput::GetModes() const { return dispModes; }
 
