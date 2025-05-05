@@ -41,13 +41,7 @@ namespace Weave::D3D11
 	class Renderer : public WindowComponentBase
 	{
 	public:
-		MAKE_NO_COPY(Renderer);
-
-		Renderer(MinWindow& window);
-
-		Renderer(Renderer&&) noexcept;
-
-		Renderer& operator=(Renderer&&) noexcept;
+		Renderer();
 
 		~Renderer();
 

@@ -8,8 +8,6 @@
 
 using namespace Weave::D3D11;
 
-ImGuiRenderComponent::ImGuiRenderComponent() = default;
-
 ImGuiRenderComponent::ImGuiRenderComponent(Renderer& renderer) :
 	RenderComponentBase(renderer),
 	enableDemoWindow(false),

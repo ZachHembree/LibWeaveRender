@@ -16,8 +16,6 @@ namespace Weave::D3D11
 		/// </summary>
 		bool enableDemoWindow;
 
-		ImGuiRenderComponent();
-
 		ImGuiRenderComponent(Renderer& renderer);
 
 		~ImGuiRenderComponent();

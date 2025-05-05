@@ -111,10 +111,8 @@ MSG MinWindow::RunMessageLoop()
 
 	while (PollWindowMessages())
 	{
-		for (WindowComponentBase* component : components)
-		{
-			component->Update();
-		}
+		for (const std::unique_ptr<WindowComponentBase>& pComp : components)
+			pComp->Update();
 	}
 
 	return wndMsg;
@@ -122,8 +120,8 @@ MSG MinWindow::RunMessageLoop()
 
 wstring_view MinWindow::GetWindowTitle() const
 {
-	size_t len = GetWindowTextLengthW(hWnd);
-	wstring title(len, '\0');
+	size_t len = GetWindowTextLengthW(hWnd) + 1;
+	title.resize(len, '\0');
 	WIN_ASSERT_NZ_LAST(GetWindowTextW(hWnd, title.data(), (int)len));
 
 	return title;
@@ -417,34 +415,19 @@ void MinWindow::CloseWindow() { PostMessageW(hWnd, WM_CLOSE, 0, 0); }
 /*
 	Window component management
 */
-void MinWindow::RegisterComponent(WindowComponentBase& component)
+WindowComponentBase* MinWindow::RegisterComponent(WndCompHandle&& pComp)
 {
-	if (!component.GetIsRegistered(this))
+	if (!pComp->GetIsRegistered(this))
 	{
-		component.id = (uint)components.GetLength();
-		components.Add(&component);
+		pComp->pParent = this;
+		pComp->id = (uint)components.GetLength();
+		WndCompHandle& newHandle = components.EmplaceBack(std::move(pComp));
+
 		isCompSortingStale = true;
+		return newHandle.get();
 	}
-}
 
-void MinWindow::MoveComponent(WindowComponentBase& lhs, WindowComponentBase&& rhs)
-{
-	WV_CHECK_MSG(!lhs.GetIsRegistered(),
-		"Cannot transfer Window component registration to a component that is already in use.");
-	WV_CHECK_MSG(rhs.GetIsRegistered(this),
-		"Attempted to remove a Window component that did not belong to the window");
-	WV_ASSERT_MSG(rhs.id != uint(-1) && rhs.id < components.GetLength(), "Window component ID invalid.");
-
-	UpdateComponentIDs();
-
-	if (lhs.priority != uint(-1) && lhs.priority != rhs.priority)
-		isCompSortingStale = true;
-
-	components[rhs.id] = &lhs;
-	lhs.pParent = this;
-	lhs.id = rhs.id;
-	lhs.priority = rhs.priority;
-	rhs.id = uint(-1);
+	return nullptr;
 }
 
 void MinWindow::UnregisterComponent(WindowComponentBase& component)
@@ -455,7 +438,7 @@ void MinWindow::UnregisterComponent(WindowComponentBase& component)
 
 	UpdateComponentIDs();
 
-	if (components[component.id] == &component)
+	if (components[component.id].get() == &component)
 	{
 		areCompIDsStale = true;
 		components.RemoveAt(component.id);
@@ -500,7 +483,7 @@ void MinWindow::UpdateComponentIDs()
 	// Sort components
 	if (isCompSortingStale)
 	{
-		std::sort(components.begin(), components.end(), [](const WindowComponentBase* pLeft, const WindowComponentBase* pRight)
+		std::sort(components.begin(), components.end(), [](const WndCompHandle& pLeft, const WndCompHandle& pRight)
 		{
 			return pLeft->priority < pRight->priority;
 		});
@@ -561,10 +544,10 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		// Pass messages through to components
 		if (msg != WM_CLOSE && isInitialized)
 		{
-			for (WindowComponentBase* component : components)
+			for (const WndCompHandle& pComp : components)
 			{
 				// Allow earlier components to intercept messages from later components
-				if (!component->OnWndMessage(hWnd, msg, wParam, lParam))
+				if (!pComp->OnWndMessage(hWnd, msg, wParam, lParam))
 					break;
 			}
 		}

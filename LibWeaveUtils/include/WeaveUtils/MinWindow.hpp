@@ -33,6 +33,11 @@ namespace Weave
 	};
 
 	/// <summary>
+	/// Unique pointer containing a MinWindow component
+	/// </summary>
+	using WndCompHandle = std::unique_ptr<WindowComponentBase>;
+
+	/// <summary>
 	/// Minimal wrapper class for Win32 Window
 	/// </summary>
 	class MinWindow
@@ -258,10 +263,39 @@ namespace Weave
 			/// </summary>
 			void CloseWindow();
 
+			/// <summary>
+			/// Constructs and registers a new window component in place
+			/// </summary>
+			template <typename T, typename... ArgTs>
+			T& RegisterNewComponent(ArgTs... args)
+			{
+				WindowComponentBase* pComp = RegisterComponent(WndCompHandle(new T(args...)));
+				WV_ASSERT(pComp != nullptr);
+				return *static_cast<T*>(pComp);
+			}
+
+			/// <summary>
+			/// Transfers ownership of the given component to the window and registers it
+			/// </summary>
+			template <typename T>
+			T& RegisterNewComponent(T*&& pRawComp)
+			{
+				WindowComponentBase* pComp = RegisterComponent(WndCompHandle(pRawComp));
+				WV_ASSERT(pComp != nullptr);
+				pRawComp = nullptr;
+				return *static_cast<T*>(pComp);
+			}			
+
+			/// <summary>
+			/// Unregisters the component from the window and destroys it
+			/// </summary>
+			void UnregisterComponent(WindowComponentBase& component);
+
 		protected:	
 			friend WindowComponentBase;
 
-			wstring_view name;
+			wstring name;
+			mutable wstring title;
 			HINSTANCE hInst;
 			bool isInitialized;
 
@@ -275,7 +309,7 @@ namespace Weave
 			ivec2 lastPos, lastSize;
 
 			// Components
-			UniqueVector<WindowComponentBase*> components;
+			UniqueVector<WndCompHandle> components;
 			bool isCompSortingStale;
 			bool areCompIDsStale;
 
@@ -291,6 +325,11 @@ namespace Weave
 			bool isNcCustom;
 
 			/// <summary>
+			/// Registers component object to the window.
+			/// </summary>
+			WindowComponentBase* RegisterComponent(WndCompHandle&& component);
+
+			/// <summary>
 			/// Sets the style of the window. Ex-style optional.
 			/// </summary>
 			void SetStyle(WndStyle style);
@@ -299,21 +338,6 @@ namespace Weave
 			/// Manually triggers an update and repaint of the window
 			/// </summary>
 			void RepaintWindow();
-
-			/// <summary>
-			/// Registers component object to the window.
-			/// </summary>
-			void RegisterComponent(WindowComponentBase& component);
-
-			/// <summary>
-			/// Transfers component registration from the right component to the left
-			/// </summary>
-			void MoveComponent(WindowComponentBase& lhs, WindowComponentBase&& rhs);
-
-			/// <summary>
-			/// Unregisters the component from the window
-			/// </summary>
-			void UnregisterComponent(WindowComponentBase& component);
 
 			/// <summary>
 			/// Processes next window message without removing it from the queue.

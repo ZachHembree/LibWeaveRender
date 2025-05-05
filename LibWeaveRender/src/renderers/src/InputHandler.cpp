@@ -5,18 +5,11 @@
 using namespace Weave;
 using namespace DirectX;
 
-InputHandler InputHandler::s_Handler;
+InputHandler* InputHandler::s_pHandler;
 bool InputHandler::s_IsEnabled = true;
 
-InputHandler::InputHandler() : 
-	lastMousePos(0),
-	isInitialized(false),
-	currentMousePresses(MouseKey::None),
-	lastMousePresses(MouseKey::None)
-{ }
-
-InputHandler::InputHandler(MinWindow& window) :
-	WindowComponentBase(window, 10),
+InputHandler::InputHandler() :
+	WindowComponentBase(1),
 	lastMousePos(0),
 	isInitialized(true),
 	currentMousePresses(MouseKey::None),
@@ -25,23 +18,21 @@ InputHandler::InputHandler(MinWindow& window) :
 	mouse(new Mouse())
 { }
 
-InputHandler::InputHandler(InputHandler&& other) noexcept = default;
-
-InputHandler& InputHandler::operator=(InputHandler&& other) noexcept = default;
-
 InputHandler::~InputHandler() = default;
 
 void InputHandler::Init(MinWindow& wnd)
 {
-	if (!s_Handler.isInitialized)
+	if (!GetIsInitialized())
 	{
-		s_Handler = InputHandler(wnd);
+		s_pHandler = &wnd.RegisterNewComponent(new InputHandler());
 		s_IsEnabled = true;
-		s_Handler.lastMousePos = ivec2(0);
-		s_Handler.currentMousePresses = MouseKey::None;
-		s_Handler.lastMousePresses = MouseKey::None;
+		s_pHandler->lastMousePos = ivec2(0);
+		s_pHandler->currentMousePresses = MouseKey::None;
+		s_pHandler->lastMousePresses = MouseKey::None;
 	}
 }
+
+bool InputHandler::GetIsInitialized() { return s_pHandler != nullptr && s_pHandler->isInitialized; }
 
 bool InputHandler::GetIsEnabled() { return s_IsEnabled; }
 
@@ -49,12 +40,12 @@ void InputHandler::SetIsEnabled(bool value) { s_IsEnabled = value; }
 
 MouseKey InputHandler::GetLastPressedMouseKeys()
 {
-	return s_IsEnabled ? s_Handler.lastMousePresses : MouseKey::None;
+	return s_IsEnabled ? s_pHandler->lastMousePresses : MouseKey::None;
 }
 
 MouseKey InputHandler::GetPresssedMouseKeys()
 {		
-	return s_IsEnabled ? s_Handler.currentMousePresses : MouseKey::None;
+	return s_IsEnabled ? s_pHandler->currentMousePresses : MouseKey::None;
 }
 
 bool InputHandler::GetIsNewKeyPressed(MouseKey key)
@@ -74,29 +65,30 @@ bool InputHandler::GetIsKeyPressed(MouseKey key)
 
 bool InputHandler::GetIsNewKeyPressed(KbKey key)
 {
-	return s_IsEnabled && s_Handler.kbTracker.IsKeyPressed(key);
+	return s_IsEnabled && s_pHandler->kbTracker.IsKeyPressed(key);
 }
 
 bool InputHandler::GetWasKeyPressed(KbKey key)
 {
-	return s_IsEnabled && s_Handler.kbTracker.IsKeyReleased(key);
+	return s_IsEnabled && s_pHandler->kbTracker.IsKeyReleased(key);
 }
 
 bool InputHandler::GetIsKeyPressed(KbKey key)
 {
-	return s_IsEnabled && s_Handler.kbTracker.lastState.IsKeyDown(key);
+	return s_IsEnabled && s_pHandler->kbTracker.lastState.IsKeyDown(key);
 }
 
 ivec2 InputHandler::GetMousePos()
 {
 	auto state = Mouse::Get().GetState();
-	s_Handler.lastMousePos = s_IsEnabled ? ivec2(state.x, state.y) : s_Handler.lastMousePos;
-	return s_Handler.lastMousePos;
+	s_pHandler->lastMousePos = s_IsEnabled ? ivec2(state.x, state.y) : s_pHandler->lastMousePos;
+	return s_pHandler->lastMousePos;
 }
 
 vec2 InputHandler::GetNormMousePos()
 {
-	ivec2 vpSize = s_Handler.GetWindow().GetBodySize(),
+	WV_ASSERT(s_pHandler != nullptr);
+	ivec2 vpSize = s_pHandler->GetWindow().GetBodySize(),
 		pos = GetMousePos();
 	float aspectRatio = (float)vpSize.y / vpSize.x;
 
@@ -105,6 +97,8 @@ vec2 InputHandler::GetNormMousePos()
 
 bool InputHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	kbTracker.Update(Keyboard::Get().GetState());
+
 	switch (msg)
 	{
 	case WM_ACTIVATEAPP:
@@ -138,7 +132,6 @@ bool InputHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		break;
 	}	
 
-	kbTracker.Update(Keyboard::Get().GetState());
 	MouseState state = Mouse::Get().GetState();
 	lastMousePresses = currentMousePresses;
 	currentMousePresses = MouseKey::None;

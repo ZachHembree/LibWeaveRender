@@ -11,17 +11,11 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 using namespace Weave;
 using namespace Weave::D3D11;
 
-ImGuiHandler ImGuiHandler::s_Instance;
+ImGuiHandler* ImGuiHandler::s_pInstance;
 bool ImGuiHandler::enableDemoWindow = false;
 
-ImGuiHandler::ImGuiHandler() :
-	pRenderer(nullptr),
-	pRenderComponent(nullptr),
-	isInitialized(false)
-{ }
-
 ImGuiHandler::ImGuiHandler(Renderer& renderer) :
-	WindowComponentBase(renderer.GetWindow(), 0),
+	WindowComponentBase(0),
 	pRenderer(&renderer),
 	isInitialized(true)
 { 
@@ -29,30 +23,7 @@ ImGuiHandler::ImGuiHandler(Renderer& renderer) :
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 
-	ImGui_ImplWin32_Init(GetWindow().GetWndHandle());
-	pRenderComponent.reset(new ImGuiRenderComponent(renderer));
-
-	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-}
-
-ImGuiHandler::ImGuiHandler(ImGuiHandler&& other) noexcept :
-	WindowComponentBase(std::move(other)),
-	pRenderer(other.pRenderer),
-	isInitialized(other.isInitialized),
-	pRenderComponent(std::move(other.pRenderComponent))
-{
-	other.isInitialized = false;
-}
-
-ImGuiHandler& ImGuiHandler::operator=(ImGuiHandler&& other) noexcept
-{
-	WindowComponentBase::operator=(std::move(other));
-
-	pRenderer = other.pRenderer;
-	isInitialized = other.isInitialized;
-	pRenderComponent = std::move(other.pRenderComponent);
-	other.isInitialized= false;
-	return *this;
+	
 }
 
 ImGuiHandler::~ImGuiHandler()
@@ -65,36 +36,53 @@ ImGuiHandler::~ImGuiHandler()
 	}
 }
 
-bool ImGuiHandler::GetIsInitialized() { return s_Instance.isInitialized; }
+bool ImGuiHandler::GetIsInitialized() { return s_pInstance != nullptr && s_pInstance->isInitialized; }
 
 void ImGuiHandler::Init(Renderer& renderer)
 {
-	if (!s_Instance.isInitialized)
-		s_Instance = ImGuiHandler(renderer);
+	if (!GetIsInitialized())
+		s_pInstance = &renderer.GetWindow().RegisterNewComponent(new ImGuiHandler(renderer));
 }
 
-void ImGuiHandler::Reset() { s_Instance = ImGuiHandler(); }
+void ImGuiHandler::Reset() 
+{ 
+	if (GetIsInitialized())
+	{
+		s_pInstance->GetWindow().UnregisterComponent(*s_pInstance);
+		s_pInstance = nullptr;
+	}
+}
 
 string& ImGuiHandler::GetTmpString() { return activeText.EmplaceBack(stringPool.Get()); }
 
 string_view ImGuiHandler::GetTmpNarrowStr(wstring_view str)
 {
-	string& buf = s_Instance.GetTmpString();
+	WV_ASSERT(s_pInstance != nullptr);
+	string& buf = s_pInstance->GetTmpString();
 	GetMultiByteString_UTF16LE_TO_UTF8(str, buf);
 	return buf;
 }
 
 char* ImGuiHandler::GetTmpNarrowCStr(wstring_view str)
 {
-	string& buf = s_Instance.GetTmpString();
+	WV_ASSERT(s_pInstance != nullptr);
+	string& buf = s_pInstance->GetTmpString();
 	GetMultiByteString_UTF16LE_TO_UTF8(str, buf);
 	return buf.data();
 }
 
 bool ImGuiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (pRenderComponent.get() == nullptr)
+	{
+		ImGui_ImplWin32_Init(GetWindow().GetWndHandle());
+		pRenderComponent.reset(new ImGuiRenderComponent(*pRenderer));
+
+		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	}
+
 	if (ImGui::GetCurrentContext() != nullptr)
-	{ 
+	{
 		ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 
 		ImGuiIO& io = ImGui::GetIO();
@@ -110,13 +98,13 @@ bool ImGuiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 		// Manually update display size and cursor position
 		MinWindow& wnd = pRenderer->GetWindow();
-		ivec2 wndSize = pRenderer->GetWindow().GetBodySize(),
+		ivec2 vpSize = pRenderer->GetOutputResolution(),
 			pos = wnd.GetGlobalCursorPos() - wnd.GetBodyPos();
-		float aspectRatio = (float)wndSize.y / wndSize.x;
-		const vec2 normPos = (1.0f / wndSize.y) * vec2(pos.x * aspectRatio, pos.y);
+		float aspectRatio = (float)vpSize.y / vpSize.x;
+		const vec2 normPos = (1.0f / vpSize.y) * vec2(pos.x * aspectRatio, pos.y);
 
 		const uivec2 newSize = pRenderer->GetOutputResolution();
-		pRenderComponent->SetMousePos(normPos * vec2(newSize)); //
+		pRenderComponent->SetMousePos(normPos * vec2(newSize));
 		pRenderComponent->SetDispSize(newSize);
 
 		// Reset pool
@@ -148,6 +136,7 @@ bool ImGuiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		case WM_MOUSEHOVER:
 			if (io.WantCaptureMouse)
 				isInterrupting = true;
+			[[fallthrough]];
 		case WM_KEYDOWN:
 		case WM_KEYUP:
 		case WM_SYSKEYUP:

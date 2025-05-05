@@ -7,15 +7,18 @@ namespace Weave
 	class MinWindow;
 
 	/// <summary>
-	/// Base class for window components. Derived types must explicitly invoke base constructors and move operations
-	/// to register and update registration for the component.
+	/// Base class for MinWindow components
 	/// </summary>
 	class WindowComponentBase
 	{
 	friend MinWindow;
 
 	public:
-		MAKE_NO_COPY(WindowComponentBase)
+		MAKE_IMMOVABLE(WindowComponentBase);
+
+		WindowComponentBase(uint priority = 10);
+
+		virtual ~WindowComponentBase() = 0;
 
 		/// <summary>
 		/// Returns a reference to the parent window
@@ -44,23 +47,11 @@ namespace Weave
 		/// </summary>
 		uint GetPriority() const;
 
-	protected:
-		WindowComponentBase();
-
-		/// <summary>
-		/// Registers the component to the given window with the given update priority. Lower (sooner) priority values are 
-		/// not recommended unless you specifically need to define an update interrupt or intercept messages from later 
-		// components.
-		/// </summary>
-		WindowComponentBase(MinWindow& window, uint priority = 10);
-
-		WindowComponentBase(WindowComponentBase&&) noexcept;
-
-		WindowComponentBase& operator=(WindowComponentBase&&) noexcept;
-
 	private:
 		MinWindow* pParent;
 		uint id;
 		uint priority;
 	};
+
+	inline WindowComponentBase::~WindowComponentBase() {}
 }

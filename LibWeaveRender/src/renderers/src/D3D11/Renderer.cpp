@@ -17,13 +17,13 @@ using namespace Weave;
 using namespace Weave::D3D11;
 using namespace Weave::Effects;
 
-Renderer::Renderer(MinWindow& window) :
-	WindowComponentBase(window),
+Renderer::Renderer() :
+	WindowComponentBase(10),
 	pDev(new Device(*this)), // Create *pDev and context
 	pSwap(new SwapChain(*pDev)), // Create swap chain for window
 	pDefaultDS(new DepthStencilTexture()),
 	fsMode(WindowRenderModes::Windowed),
-	outputRes(GetWindow().GetMonitorResolution()),
+	outputRes(0),
 	lastDispMode(-1),
 	pDefaultShaders(new ShaderLibrary(*this, GetBuiltInShaders())),
 	useDefaultDS(true),
@@ -44,18 +44,19 @@ Renderer::Renderer(MinWindow& window) :
 	defaultSamplers["LinearBorder"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::BORDER);
 
 	pSwap->SetBufferFormat(Formats::R8G8B8A8_UNORM);
-	pSwap->ResizeBuffers(outputRes);
-
 	pFrameTimer->SetTargetFrameTimeNS(GetTimeHZtoNS(180));
 
 	WV_LOG_INFO() << "Renderer Init";
 }
 
-Renderer::Renderer(Renderer&&) noexcept = default;
-
-Renderer& Renderer::operator=(Renderer&&) noexcept = default;
-
-Renderer::~Renderer() = default;
+Renderer::~Renderer()
+{
+	for (RenderComponentBase* pComp : pComponents)
+	{
+		pComp->pRenderer = nullptr;
+		pComp->isRegistered = false;
+	}
+}
 
 Device& Renderer::GetDevice() { return *pDev; }
 
@@ -262,7 +263,12 @@ void Renderer::UpdateSwap()
 
 	// Deferred swap chain init
 	if (!pSwap->GetIsInitialized())
+	{
+		if (outputRes == uivec2(0))
+			outputRes = GetWindow().GetMonitorResolution();
+
 		pSwap->Init();
+	}
 
 	pSwap->GetBackBuf().SetRenderSize(outputRes);
 	canRender = (!isExclusiveSet || isFsAllowed) && (outputRes.x > 0 && outputRes.y > 0);

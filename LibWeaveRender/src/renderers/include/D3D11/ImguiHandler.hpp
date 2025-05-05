@@ -41,7 +41,8 @@ namespace Weave::D3D11
 		template<typename... FmtArgs>
 		static string_view GetTempFormatStr(string_view fmt, FmtArgs&&... args)
 		{
-			string& buf = s_Instance.GetTmpString();
+			WV_ASSERT(s_pInstance != nullptr);
+			string& buf = s_pInstance->GetTmpString();
 			VFormatTo(buf, fmt, std::forward<FmtArgs>(args)...);
 
 			if (buf.empty() || buf.back() != '\0')
@@ -57,7 +58,8 @@ namespace Weave::D3D11
 		template<typename... FmtArgs>
 		static char* GetTempFormatCStr(string_view fmt, FmtArgs&&... args)
 		{
-			string& buf = s_Instance.GetTmpString();
+			WV_ASSERT(s_pInstance != nullptr);
+			string& buf = s_pInstance->GetTmpString();
 			VFormatTo(buf, fmt, std::forward<FmtArgs>(args)...);
 
 			if (buf.empty() || buf.back() != '\0')
@@ -81,9 +83,7 @@ namespace Weave::D3D11
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 	private:
-		MAKE_NO_COPY(ImGuiHandler);
-
-		static ImGuiHandler s_Instance;
+		static ImGuiHandler* s_pInstance;
 
 		Renderer* pRenderer;
 		std::unique_ptr<ImGuiRenderComponent> pRenderComponent;
@@ -92,13 +92,7 @@ namespace Weave::D3D11
 		ObjectPool<string> stringPool;
 		UniqueVector<string> activeText;
 
-		ImGuiHandler();
-
 		ImGuiHandler(Renderer& renderer);
-
-		ImGuiHandler(ImGuiHandler&& other) noexcept;
-
-		ImGuiHandler& operator=(ImGuiHandler&& other) noexcept;
 
 		~ImGuiHandler();
 
