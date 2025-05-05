@@ -95,9 +95,28 @@ vec2 InputHandler::GetNormMousePos()
 	return (1.0f / vpSize.y) * vec2(pos.x * aspectRatio, pos.y);
 }
 
-bool InputHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+void InputHandler::Update()
 {
 	kbTracker.Update(Keyboard::Get().GetState());
+
+	MouseState state = Mouse::Get().GetState();
+	lastMousePresses = currentMousePresses;
+	currentMousePresses = MouseKey::None;
+
+	if (state.leftButton)
+		currentMousePresses |= MouseKey::LeftButton;
+	else if (state.middleButton)
+		currentMousePresses |= MouseKey::MiddleButton;
+	else if (state.rightButton)
+		currentMousePresses |= MouseKey::RightButton;
+	else if (state.xButton2)
+		currentMousePresses |= MouseKey::xButton1;
+	else if (state.xButton2)
+		currentMousePresses |= MouseKey::xButton2;
+}
+
+bool InputHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
 
 	switch (msg)
 	{
@@ -131,21 +150,6 @@ bool InputHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		Keyboard::Get().Reset();
 		break;
 	}	
-
-	MouseState state = Mouse::Get().GetState();
-	lastMousePresses = currentMousePresses;
-	currentMousePresses = MouseKey::None;
-
-	if (state.leftButton)
-		currentMousePresses |= MouseKey::LeftButton;
-	else if (state.middleButton)
-		currentMousePresses |= MouseKey::MiddleButton;
-	else if (state.rightButton)
-		currentMousePresses |= MouseKey::RightButton;
-	else if (state.xButton2)
-		currentMousePresses |= MouseKey::xButton1;
-	else if (state.xButton2)
-		currentMousePresses |= MouseKey::xButton2;
 
 	return true;
 }

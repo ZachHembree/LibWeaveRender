@@ -381,6 +381,10 @@ WndMonConfig MinWindow::GetMonitorConfig(HMONITOR mon)
 ivec2 MinWindow::GetMonitorDPI() const
 {
 	HMONITOR mon = GetActiveMonitor();
+
+	if (mon == nullptr)
+		return ivec2(96);
+
 	uivec2 dpi;
 	WIN_CHECK_HR(GetDpiForMonitor(mon, MDT_EFFECTIVE_DPI, &dpi.x, &dpi.y));
 

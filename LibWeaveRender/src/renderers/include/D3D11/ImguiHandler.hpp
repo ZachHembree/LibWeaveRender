@@ -80,6 +80,8 @@ namespace Weave::D3D11
 		/// </summary>
 		static char* GetTmpNarrowCStr(wstring_view str);
 
+		void Update() override;
+
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 	private:

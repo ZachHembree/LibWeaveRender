@@ -3,21 +3,21 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 
-using KbKey = DirectX::Keyboard::Keys;
-using MouseMode = DirectX::Mouse::Mode;
-
-enum class MouseKey : unsigned int
-{
-	None = 0x0,
-	LeftButton = 0x1,
-	MiddleButton = 0x2,
-	RightButton = 0x4,
-	xButton1 = 0x8,
-	xButton2 = 0x10
-};
-
 namespace Weave
 {
+	using KbKey = DirectX::Keyboard::Keys;
+	using MouseMode = DirectX::Mouse::Mode;
+
+	enum class MouseKey : unsigned int
+	{
+		None = 0x0,
+		LeftButton = 0x1,
+		MiddleButton = 0x2,
+		RightButton = 0x4,
+		xButton1 = 0x8,
+		xButton2 = 0x10
+	};
+
 	/// <summary>
 	/// Singleton wrapper for DirectXTK Keyboard and Mouse
 	/// </summary>
@@ -33,6 +33,8 @@ namespace Weave
 		static void Init(MinWindow& wnd);
 
 		static bool GetIsInitialized();
+
+		void Update() override;
 
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
