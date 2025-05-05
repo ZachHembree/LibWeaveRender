@@ -94,15 +94,14 @@ MinWindow::MinWindow(
 	// Check if window creation failed
 	WIN_CHECK_LAST(hWnd != NULL);
 
-	// Make the window visible
-	WIN_ASSERT_NZ_LAST(ShowWindow(hWnd, SW_SHOW));
-	RepaintWindow();
-
 	// Setup mouse tracker
 	tme.cbSize = sizeof(tme);
 	tme.hwndTrack = hWnd;
 	tme.dwFlags = TME_LEAVE | TME_HOVER;
 	tme.dwHoverTime = 1;
+
+	// Initial draw and show window
+	RepaintWindow();
 }
 
 MinWindow::MinWindow(
@@ -199,7 +198,6 @@ void MinWindow::SetStyle(WndStyle style)
 
 void MinWindow::RepaintWindow()
 {
-	WIN_CHECK_NZ_LAST(ShowWindow(hWnd, SW_SHOW));
 	WIN_CHECK_NZ_LAST(SetWindowPos(
 		hWnd,
 		HWND_TOPMOST,
@@ -207,6 +205,7 @@ void MinWindow::RepaintWindow()
 		SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
 	));
 	WIN_CHECK_NZ_LAST(InvalidateRect(hWnd, 0, NULL));
+	WIN_CHECK_NZ_LAST(ShowWindow(hWnd, SW_SHOW));
 }
 
 bool MinWindow::GetIsFullScreen() const { return isFullscreen; }
@@ -521,8 +520,10 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 {
 	std::optional<slong> result;
 
+#ifdef NDEBUG
 	try
 	{
+#endif
 		// Update internal window state
 		switch (msg)
 		{
@@ -566,7 +567,7 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 					break;
 			}
 		}
-
+#ifdef NDEBUG
 	}
 	catch (const WeaveException& err)
 	{
@@ -583,6 +584,7 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		WV_LOG_ERROR() << "An exception was thrown during Win32 message polling.\n"
 			<< "An unknown exception occurred." << '\n';
 	}
+#endif // ! WV_TRACE_EXCEPT
 
 	return (result.has_value() ? result.value() : DefWindowProcW(hWnd, msg, wParam, lParam));
 }
