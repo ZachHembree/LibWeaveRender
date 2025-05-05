@@ -1,6 +1,5 @@
 #pragma once
 #include "WeaveUtils/Utils.hpp"
-#include <stack>
 
 namespace Weave
 {
@@ -25,8 +24,8 @@ namespace Weave
 
 			if (!objectPool.empty())
 			{
-				T object = std::move(objectPool.top());
-				objectPool.pop();
+				T object = std::move(objectPool.back());
+				objectPool.pop_back();
 				return object;
 			}
 			else
@@ -40,7 +39,7 @@ namespace Weave
 		/// </summary>
 		virtual void Return(T&& object)
 		{
-			objectPool.push(std::move(object));
+			objectPool.push_back(std::move(object));
 			objectsOutstanding--;
 
 			WV_ASSERT_MSG(objectsOutstanding >= 0, "More objects returned to the pool than issued.");
@@ -71,14 +70,13 @@ namespace Weave
 
 			while (count > 0)
 			{
-				T object = std::move(objectPool.top());
-				objectPool.pop();
+				objectPool.pop_back();
 				count--;
 			}
 		}
 
 	protected:
-		std::stack<T> objectPool;
+		std::vector<T> objectPool;
 		int objectsOutstanding;
 	};
 }

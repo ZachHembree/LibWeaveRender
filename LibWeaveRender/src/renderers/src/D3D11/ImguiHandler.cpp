@@ -99,10 +99,10 @@ void ImGuiHandler::Update()
 		pRenderComponent->SetDispSize(newSize);
 
 		// Reset pool
-		for (string& str : activeText)
+		for (slong i = activeText.GetLength() - 1; i >= 0; i--)
 		{
-			str.clear();
-			stringPool.Return(std::move(str));
+			activeText[i].clear();
+			stringPool.Return(std::move(activeText[i]));
 		}
 
 		activeText.Clear();
