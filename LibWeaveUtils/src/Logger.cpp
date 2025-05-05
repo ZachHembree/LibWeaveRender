@@ -178,7 +178,11 @@ namespace Weave
 
             // Add timestamp and level prefix
             AddTimestamp(s_Instance.msgBuffer);
-            s_Instance.msgBuffer << '[' << GetLevelName(level) << "] " << message << std::endl;
+
+            if (level != Level::Info)
+                s_Instance.msgBuffer << '[' << GetLevelName(level) << "]";
+
+            s_Instance.msgBuffer << ' ' << message << std::endl;
 
             // Write immediately to fast streams
             std::string_view formattedMessage = s_Instance.msgBuffer.view();
