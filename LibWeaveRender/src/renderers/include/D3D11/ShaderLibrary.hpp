@@ -21,6 +21,10 @@ namespace Weave::D3D11
 
 		ShaderLibrary(Renderer& renderer, ShaderLibDef&& def);
 
+		ShaderLibrary(ShaderLibrary&&) noexcept;
+
+		ShaderLibrary& operator=(ShaderLibrary&&) noexcept;
+
 		~ShaderLibrary();
 
 		/// <summary>

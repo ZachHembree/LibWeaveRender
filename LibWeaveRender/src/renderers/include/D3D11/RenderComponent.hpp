@@ -13,14 +13,18 @@ namespace Weave::D3D11
 	class Device;
 
 	/// <summary>
-	/// Interface for types that can be drawn
+	/// Base class for Renderer components
 	/// </summary>
 	class RenderComponentBase
 	{
 	friend Renderer;
 
 	public:
-		MAKE_MOVE_ONLY(RenderComponentBase)
+		MAKE_IMMOVABLE(RenderComponentBase)
+
+		RenderComponentBase(Renderer& renderer, uint priority = 10);
+
+		virtual ~RenderComponentBase() = 0;
 
 		/// <summary>
 		/// Updates before draw, but after the state and resources for the previous
@@ -28,11 +32,7 @@ namespace Weave::D3D11
 		/// </summary>
 		virtual void Setup(CtxImm& ctx) { }
 
-		virtual void DrawEarly(CtxImm& ctx) { }
-
 		virtual void Draw(CtxImm& ctx) { }
-
-		virtual void DrawLate(CtxImm& ctx) { }
 
 		/// <summary>
 		/// Called after swap chain present but before any resources have been released
@@ -73,26 +73,19 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns true if the component has been registered to a renderer
 		/// </summary>
-		bool GetIsRegistered();
+		bool GetIsRegistered(Renderer* pRenderer = nullptr) const;
 
 		/// <summary>
-		/// Registers the component to the given renderer
+		/// Returns the update priority set for the component on construction. Components with higher priority values are 
+		/// updated later. Components with a priority of 0 update soonest.
 		/// </summary>
-		virtual void Register(Renderer& renderer);
+		uint GetPriority() const;
 
-		/// <summary>
-		/// Unregisters the component from its parent renderer
-		/// </summary>
-		virtual void Unregister();
-
-	protected:
+	private:
 		Renderer* pRenderer;
-		bool isRegistered;
-
-		RenderComponentBase();
-
-		RenderComponentBase(Renderer& renderer);
-
-		~RenderComponentBase();
+		uint id;
+		uint priority;
 	};
+
+	inline RenderComponentBase::~RenderComponentBase() {}
 }

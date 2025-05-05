@@ -26,6 +26,8 @@ Renderer::Renderer() :
 	outputRes(0),
 	lastDispMode(-1),
 	pDefaultShaders(new ShaderLibrary(*this, GetBuiltInShaders())),
+	isSortingStale(false),
+	areIDsStale(false),
 	useDefaultDS(true),
 	canRender(true),
 	isFsAllowed(true),
@@ -49,14 +51,7 @@ Renderer::Renderer() :
 	WV_LOG_INFO() << "Renderer Init";
 }
 
-Renderer::~Renderer()
-{
-	for (RenderComponentBase* pComp : pComponents)
-	{
-		pComp->pRenderer = nullptr;
-		pComp->isRegistered = false;
-	}
-}
+Renderer::~Renderer() = default;
 
 Device& Renderer::GetDevice() { return *pDev; }
 
@@ -294,6 +289,25 @@ void Renderer::Update()
 	// Mark frame start
 	pFrameTimer->BeginPresent();
 
+	if (isSortingStale)
+	{
+		std::sort(pComponents.begin(), pComponents.end(), [](const RenderCompHandle& pLeft, const RenderCompHandle& pRight)
+		{
+			return pLeft->priority < pRight->priority;
+		});
+
+		isSortingStale = false;
+		areIDsStale = true;
+	}
+
+	if (areIDsStale)
+	{
+		for (ulong i = 0; i < pComponents.GetLength(); i++)
+			pComponents[i]->id = (uint)i;
+
+		areIDsStale = false;
+	}
+
 	UpdateSwap();
 
 	// If rendering is explicitly disabled, skip everything else
@@ -324,9 +338,7 @@ void Renderer::Update()
 	else
 		ctx.BindRenderTarget(pSwap->GetBackBuf());
 
-	DrawEarly(ctx);
 	Draw(ctx);
-	DrawLate(ctx);
 
 	// Present frame
 	const bool canSync = pSwap->GetSyncMode() == VSyncRenderModes::TripleBuffered;
@@ -343,78 +355,51 @@ void Renderer::Update()
 	Render component utilities
 */
 
-bool Renderer::RegisterComponent(RenderComponentBase& component)
+RenderComponentBase* Renderer::RegisterComponent(RenderCompHandle&& pComp)
 {
-	if (!component.GetIsRegistered())
+	if (!pComp->GetIsRegistered(this))
 	{
-		component.pRenderer = this;
-		component.isRegistered = true;
-		pComponents.Add(&component);
-		return true;
+		isSortingStale = true;
+		pComp->id = pComponents.GetLength();
+		RenderComponentBase& newComp = *pComponents.EmplaceBack(std::move(pComp));
+		return &newComp;
 	}
 	else
-		return false;
+		return nullptr;
 }
 
-bool Renderer::UnregisterComponent(RenderComponentBase& component)
+void Renderer::UnregisterComponent(RenderComponentBase& comp)
 {
-	int index = -1;
+	WV_CHECK_MSG(comp.GetIsRegistered(this),
+		"Attempted to remove a Renderer component that did not belong to the renderer");
+	WV_ASSERT_MSG(comp.id != uint(-1) && comp.id < pComponents.GetLength(), "Renderer component ID invalid.");
 
-	for (int i = (int)pComponents.GetLength() - 1; i >= 0; i--)
-	{
-		if (pComponents[i] == &component)
-		{
-			index = i;
-			break;
-		}
-	}
-
-	if (index != -1)
-	{
-		component.isRegistered = false;
-		component.pRenderer = nullptr;
-		pComponents.RemoveAt(index);
-		return true;
-	}
-	else
-		return false;
+	areIDsStale = true;
+	const uint lastID = comp.id;
+	comp.id = uint(-1);
+	comp.pRenderer = nullptr;
+	pComponents.RemoveAt(lastID);
 }
 
 void Renderer::BeforeDraw(CtxImm& ctx)
 { 
-	for (RenderComponentBase* pComp : pComponents)
+	for (const auto& pComp : pComponents)
 	{
 		pComp->Setup(ctx);
 	}
 }
 
-void Renderer::DrawEarly(CtxImm& ctx)
-{ 
-	for (RenderComponentBase* pComp : pComponents)
-	{
-		pComp->DrawEarly(ctx);
-	}
-}
-
 void Renderer::Draw(CtxImm& ctx)
 {
-	for (RenderComponentBase* pComp : pComponents)
+	for (const auto& pComp : pComponents)
 	{
 		pComp->Draw(ctx);
 	}
 }
 
-void Renderer::DrawLate(CtxImm& ctx)
-{
-	for (RenderComponentBase* pComp : pComponents)
-	{
-		pComp->DrawLate(ctx);
-	}	
-}
-
 void Renderer::AfterDraw(CtxImm& ctx)
 {
-	for (RenderComponentBase* pComp : pComponents)
+	for (const auto& pComp : pComponents)
 	{
 		pComp->AfterDraw(ctx);
 	}

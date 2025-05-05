@@ -42,7 +42,7 @@ namespace Weave::D3D11
 
 		void Setup(CtxImm& ctx) override;
 
-		void DrawLate(CtxImm& ctx) override;
+		void Draw(CtxImm& ctx) override;
 
 	private:
 		vec2 mousePos;

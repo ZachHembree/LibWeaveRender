@@ -19,6 +19,10 @@ ShaderLibrary::ShaderLibrary(Renderer& renderer, ShaderLibDef&& def) :
 	pManager(new ShaderVariantManager(renderer.GetDevice(), std::move(def)))
 { }
 
+inline Weave::D3D11::ShaderLibrary::ShaderLibrary(ShaderLibrary&&) noexcept = default;
+
+ShaderLibrary& ShaderLibrary::operator=(ShaderLibrary&&) noexcept = default;
+
 ShaderLibrary::~ShaderLibrary() = default;
 
 const StringIDMap& ShaderLibrary::GetStringMap() const { return pManager->GetStringMap(); }

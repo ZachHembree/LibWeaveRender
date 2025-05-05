@@ -38,6 +38,11 @@ namespace Weave::D3D11
 	class ShaderLibrary;
 	class RenderComponentBase;
 
+	/// <summary>
+	/// Unique pointer containing a render component
+	/// </summary>
+	using RenderCompHandle = std::unique_ptr<RenderComponentBase>;
+
 	class Renderer : public WindowComponentBase
 	{
 	public:
@@ -220,14 +225,36 @@ namespace Weave::D3D11
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 		/// <summary>
-		/// Registers a new render component. Returns false if the component is already registered.
+		/// Creates and registers a new renderer component in place
 		/// </summary>
-		bool RegisterComponent(RenderComponentBase& component);
+		template<typename T, typename... ArgTs>
+		T& RegisterNewComponent(ArgTs&&... args)
+		{
+			RenderComponentBase* pBase = RegisterComponent(RenderCompHandle(new T(*this, args...)));
+			D3D_ASSERT(pBase != nullptr);
+			return static_cast<T&>(*pBase);
+		}
 
 		/// <summary>
-		/// Unregisters the given component from the renderer. Returns false on fail.
+		/// Creates and registers a new renderer component in place
 		/// </summary>
-		bool UnregisterComponent(RenderComponentBase& component);
+		template<typename T, typename... ArgTs>
+		void RegisterNewComponent(T*& pDerived, ArgTs&&... args)
+		{
+			RenderComponentBase* pBase = RegisterComponent(RenderCompHandle(new T(*this, args...)));
+			D3D_ASSERT(pBase != nullptr);
+			pDerived = static_cast<T*>(pBase);
+		}
+
+		/// <summary>
+		/// Registers a new render component
+		/// </summary>
+		RenderComponentBase* RegisterComponent(RenderCompHandle&& pComp);
+
+		/// <summary>
+		/// Unregisters the given component from the renderer
+		/// </summary>
+		void UnregisterComponent(RenderComponentBase& pComp);
 
 	private:
 		mutable std::unordered_map<uint, ComputeInstance> defaultCompute;
@@ -243,7 +270,9 @@ namespace Weave::D3D11
 		uivec2 lastDispMode;
 
 		std::unique_ptr<ShaderLibrary> pDefaultShaders;
-		UniqueVector<RenderComponentBase*> pComponents;
+		UniqueVector<RenderCompHandle> pComponents;
+		bool areIDsStale;
+		bool isSortingStale;
 
 		double targetFPS;
 		bool useDefaultDS;
@@ -256,11 +285,7 @@ namespace Weave::D3D11
 
 		void BeforeDraw(CtxImm& ctx);
 
-		void DrawEarly(CtxImm& ctx);
-
 		void Draw(CtxImm& ctx);
-
-		void DrawLate(CtxImm& ctx);
 
 		void AfterDraw(CtxImm& ctx);
 	};

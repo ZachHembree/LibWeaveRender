@@ -88,7 +88,7 @@ namespace Weave::D3D11
 		static ImGuiHandler* s_pInstance;
 
 		Renderer* pRenderer;
-		std::unique_ptr<ImGuiRenderComponent> pRenderComponent;
+		ImGuiRenderComponent* pRenderComponent;
 		bool isInitialized;
 
 		ObjectPool<string> stringPool;

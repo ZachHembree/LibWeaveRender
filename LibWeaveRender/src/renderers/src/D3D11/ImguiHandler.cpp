@@ -22,19 +22,9 @@ ImGuiHandler::ImGuiHandler(Renderer& renderer) :
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
-
-	
 }
 
-ImGuiHandler::~ImGuiHandler()
-{	
-	if (isInitialized)
-	{
-		pRenderComponent.reset();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
-	}
-}
+ImGuiHandler::~ImGuiHandler() = default;
 
 bool ImGuiHandler::GetIsInitialized() { return s_pInstance != nullptr && s_pInstance->isInitialized; }
 
@@ -111,10 +101,10 @@ void ImGuiHandler::Update()
 
 bool ImGuiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (pRenderComponent.get() == nullptr)
+	if (pRenderComponent == nullptr)
 	{
 		ImGui_ImplWin32_Init(GetWindow().GetWndHandle());
-		pRenderComponent.reset(new ImGuiRenderComponent(*pRenderer));
+		pRenderer->RegisterNewComponent(pRenderComponent);
 
 		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	}

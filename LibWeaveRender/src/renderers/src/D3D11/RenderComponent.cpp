@@ -4,6 +4,10 @@
 using namespace Weave;
 using namespace Weave::D3D11;
 
+RenderComponentBase::RenderComponentBase(Renderer& renderer, uint priority) :
+	pRenderer(&renderer), priority(priority), id(uint(-1))
+{ }
+
 Renderer& RenderComponentBase::GetRenderer() { return *pRenderer; }
 
 Device& RenderComponentBase::GetDevice() { return pRenderer->GetDevice(); }
@@ -16,33 +20,12 @@ const Device& RenderComponentBase::GetDevice() const { return pRenderer->GetDevi
 
 const MinWindow& RenderComponentBase::GetWindow() const { return pRenderer->GetWindow(); }
 
-bool RenderComponentBase::GetIsRegistered() { return isRegistered; }
+uint RenderComponentBase::GetPriority() const { return priority; }
 
-void RenderComponentBase::Register(Renderer& renderer)
-{
-	if (!isRegistered)
-	{
-		renderer.RegisterComponent(*this);
-	}
-}
-
-void RenderComponentBase::Unregister()
-{
-	if (isRegistered)
-	{
-		pRenderer->UnregisterComponent(*this);
-	}
-}
-
-RenderComponentBase::RenderComponentBase() : pRenderer(nullptr), isRegistered(false)
-{ }
-
-RenderComponentBase::RenderComponentBase(Renderer & renderer) : pRenderer(nullptr), isRegistered(false)
-{
-	Register(renderer);
-}
-
-RenderComponentBase::~RenderComponentBase()
-{
-	Unregister();
+bool RenderComponentBase::GetIsRegistered(Renderer* pRenderer) const
+{ 
+	if (pRenderer == nullptr)
+		return id != uint(-1);
+	else 
+		return pRenderer == this->pRenderer && id != uint(-1);
 }

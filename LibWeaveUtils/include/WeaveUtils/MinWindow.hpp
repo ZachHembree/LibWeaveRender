@@ -332,7 +332,7 @@ namespace Weave
 			/// Constructs and registers a new window component in place
 			/// </summary>
 			template <typename T, typename... ArgTs>
-			T& RegisterNewComponent(ArgTs... args)
+			T& RegisterNewComponent(ArgTs&&... args)
 			{
 				WindowComponentBase* pComp = RegisterComponent(WndCompHandle(new T(args...)));
 				WV_ASSERT(pComp != nullptr);

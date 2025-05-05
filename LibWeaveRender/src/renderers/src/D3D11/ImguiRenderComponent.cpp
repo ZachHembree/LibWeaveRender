@@ -9,7 +9,7 @@
 using namespace Weave::D3D11;
 
 ImGuiRenderComponent::ImGuiRenderComponent(Renderer& renderer) :
-	RenderComponentBase(renderer),
+	RenderComponentBase(renderer, 1000),
 	enableDemoWindow(false),
 	mousePos(0),
 	dispSize(0)
@@ -21,6 +21,8 @@ ImGuiRenderComponent::ImGuiRenderComponent(Renderer& renderer) :
 ImGuiRenderComponent::~ImGuiRenderComponent()
 { 
 	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 }
 
 vec2 ImGuiRenderComponent::GetMousePos() const { return mousePos; }
@@ -53,7 +55,7 @@ void ImGuiRenderComponent::Setup(CtxImm& ctx)
 	}
 }
 
-void ImGuiRenderComponent::DrawLate(CtxImm& ctx)
+void ImGuiRenderComponent::Draw(CtxImm& ctx)
 {
 	if (ImGui::GetCurrentContext() != nullptr)
 	{ 

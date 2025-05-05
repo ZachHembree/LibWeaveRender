@@ -455,8 +455,9 @@ void MinWindow::UnregisterComponent(WindowComponentBase& component)
 	if (components[component.id].get() == &component)
 	{
 		areCompIDsStale = true;
-		components.RemoveAt(component.id);
+		const uint lastID = component.id;
 		component.id = uint(-1);
+		components.RemoveAt(lastID);
 	}
 }
 
