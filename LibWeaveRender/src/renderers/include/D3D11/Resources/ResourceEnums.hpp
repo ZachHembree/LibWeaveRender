@@ -1,218 +1,238 @@
 #pragma once
-#include "../InternalD3D11.hpp"
-#include "WeaveUtils/GlobalUtils.hpp"
+#include "../../D3DUtils.hpp"
+
+enum D3D11_USAGE;
+enum D3D11_BIND_FLAG;
+enum D3D11_CPU_ACCESS_FLAG;
+enum D3D11_CLEAR_FLAG;
+enum D3D11_INPUT_CLASSIFICATION;
+enum DXGI_FORMAT;
+enum D3D11_FILTER;
+enum D3D11_TEXTURE_ADDRESS_MODE;
+enum D3D11_COMPARISON_FUNC;
 
 namespace Weave::D3D11
 {
 	/// <summary>
 	/// Specifies how a buffer will be used
 	/// </summary>
-	enum class ResourceUsages
+	struct ResourceUsages : public EnumAlias<D3D11_USAGE>
 	{
+		using EnumAlias::EnumAlias;
+
 		/// <summary>
 		/// R/W Access required for GPU
 		/// </summary>
-		Default = D3D11_USAGE_DEFAULT,
+		static const ResourceUsages Default;
 
 		/// <summary>
 		/// Read-only GPU resource. Cannot be accessed by CPU.
 		/// </summary>
-		Immutable = D3D11_USAGE_IMMUTABLE,
+		static const ResourceUsages Immutable;
 
 		/// <summary>
 		/// Read-only GPU access; write-only CPU access.
 		/// </summary>
-		Dynamic = D3D11_USAGE_DYNAMIC,
+		static const ResourceUsages Dynamic;
 
 		/// <summary>
 		/// Resource supports transfer from GPU to CPU
 		/// </summary>
-		Staging = D3D11_USAGE_STAGING
+		static const ResourceUsages Staging;
 	};
 
 	/// <summary>
 	/// Supported buffer types
 	/// </summary>
-	enum class ResourceBindFlags
+	struct ResourceBindFlags : public EnumAlias<D3D11_BIND_FLAG>
 	{
-		None = 0,
-		Vertex = D3D11_BIND_VERTEX_BUFFER,
-		Index = D3D11_BIND_INDEX_BUFFER,
-		Constant = D3D11_BIND_CONSTANT_BUFFER,
-		ShaderResource = D3D11_BIND_SHADER_RESOURCE,
-		StreamOutput = D3D11_BIND_STREAM_OUTPUT,
-		RenderTarget = D3D11_BIND_RENDER_TARGET,
-		DepthStencil = D3D11_BIND_DEPTH_STENCIL,
-		UnorderedAccess = D3D11_BIND_UNORDERED_ACCESS,
-		Decoder = D3D11_BIND_DECODER,
-		VideoEncoder = D3D11_BIND_VIDEO_ENCODER,
+		using EnumAlias::EnumAlias;
 
-		RWTexture = ShaderResource | RenderTarget | UnorderedAccess
+		static const ResourceBindFlags None;
+		static const ResourceBindFlags Vertex;
+		static const ResourceBindFlags Index;
+		static const ResourceBindFlags Constant;
+		static const ResourceBindFlags ShaderResource;
+		static const ResourceBindFlags StreamOutput;
+		static const ResourceBindFlags RenderTarget;
+		static const ResourceBindFlags DepthStencil;
+		static const ResourceBindFlags UnorderedAccess;
+		static const ResourceBindFlags Decoder;
+		static const ResourceBindFlags VideoEncoder;
+		static const ResourceBindFlags RWTexture;
 	};
 
 	/// <summary>
 	/// Specifies types of CPU access allowed for mappable resources
 	/// </summary>
-	enum class ResourceAccessFlags : UINT
+	struct ResourceAccessFlags : public EnumAlias<D3D11_CPU_ACCESS_FLAG>
 	{
-		None = 0u,
-		Write = D3D11_CPU_ACCESS_WRITE,
-		Read = D3D11_CPU_ACCESS_READ,
-		ReadWrite = Read | Write
+		using EnumAlias::EnumAlias;
+
+		static const ResourceAccessFlags None;
+		static const ResourceAccessFlags Write;
+		static const ResourceAccessFlags Read;
+		static const ResourceAccessFlags ReadWrite;
 	};
 
-	enum class DSClearFlags : int
+	struct DSClearFlags : public EnumAlias<D3D11_CLEAR_FLAG>
 	{
-		None = 0,
-		Depth = D3D11_CLEAR_DEPTH,
-		Stencil = D3D11_CLEAR_STENCIL,
-		DepthStencil = Depth | Stencil
+		using EnumAlias::EnumAlias;
+
+		static const DSClearFlags None;
+		static const DSClearFlags Depth;
+		static const DSClearFlags Stencil;
+		static const DSClearFlags DepthStencil;
 	};
 
 	/// <summary>
 	/// Indicates the type of data in an input slot. Per-instance or per-vertex.
 	/// </summary>
-	enum class InputClass
+	struct InputClasses : public EnumAlias<D3D11_INPUT_CLASSIFICATION>
 	{
-		PerVertex = D3D11_INPUT_PER_VERTEX_DATA,
-		PerInstance = D3D11_INPUT_PER_INSTANCE_DATA
+		using EnumAlias::EnumAlias;
+
+		static const InputClasses PerVertex;
+		static const InputClasses PerInstance;
 	};
 
-	string_view GetInputClassName(InputClass inputClass);
+	string_view GetInputClassName(InputClasses inputClass);
 
 	/// <summary>
 	/// Resource data formats
 	/// </summary>
-	enum class Formats
+	struct Formats : public EnumAlias<DXGI_FORMAT>
 	{
-		UNKNOWN = DXGI_FORMAT_UNKNOWN,
-		R32G32B32A32_TYPELESS = DXGI_FORMAT_R32G32B32A32_TYPELESS,
-		R32G32B32A32_FLOAT = DXGI_FORMAT_R32G32B32A32_FLOAT,
-		R32G32B32A32_UINT = DXGI_FORMAT_R32G32B32A32_UINT,
-		R32G32B32A32_SINT = DXGI_FORMAT_R32G32B32A32_SINT,
-		R32G32B32_TYPELESS = DXGI_FORMAT_R32G32B32_TYPELESS,
-		R32G32B32_FLOAT = DXGI_FORMAT_R32G32B32_FLOAT,
-		R32G32B32_UINT = DXGI_FORMAT_R32G32B32_UINT,
-		R32G32B32_SINT = DXGI_FORMAT_R32G32B32_SINT,
-		R16G16B16A16_TYPELESS = DXGI_FORMAT_R16G16B16A16_TYPELESS,
+		using EnumAlias::EnumAlias;
+
+		static const Formats UNKNOWN;
+		static const Formats R32G32B32A32_TYPELESS;
+		static const Formats R32G32B32A32_FLOAT;
+		static const Formats R32G32B32A32_UINT;
+		static const Formats R32G32B32A32_SINT;
+		static const Formats R32G32B32_TYPELESS;
+		static const Formats R32G32B32_FLOAT;
+		static const Formats R32G32B32_UINT;
+		static const Formats R32G32B32_SINT;
+		static const Formats R16G16B16A16_TYPELESS;
 
 		/// <summary>
 		/// Default HDR
 		/// </summary>
-		R16G16B16A16_FLOAT = DXGI_FORMAT_R16G16B16A16_FLOAT,
-		R16G16B16A16_UNORM = DXGI_FORMAT_R16G16B16A16_UNORM,
-		R16G16B16A16_UINT = DXGI_FORMAT_R16G16B16A16_UINT,
-		R16G16B16A16_SNORM = DXGI_FORMAT_R16G16B16A16_SNORM,
-		R16G16B16A16_SINT = DXGI_FORMAT_R16G16B16A16_SINT,
-		R32G32_TYPELESS = DXGI_FORMAT_R32G32_TYPELESS,
-		R32G32_FLOAT = DXGI_FORMAT_R32G32_FLOAT,
-		R32G32_UINT = DXGI_FORMAT_R32G32_UINT,
-		R32G32_SINT = DXGI_FORMAT_R32G32_SINT,
-		R32G8X24_TYPELESS = DXGI_FORMAT_R32G8X24_TYPELESS,
-		D32_FLOAT_S8X24_UINT = DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
-		R32_FLOAT_X8X24_TYPELESS = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS,
-		X32_TYPELESS_G8X24_UINT = DXGI_FORMAT_X32_TYPELESS_G8X24_UINT,
-		R10G10B10A2_TYPELESS = DXGI_FORMAT_R10G10B10A2_TYPELESS,
-		R10G10B10A2_UNORM = DXGI_FORMAT_R10G10B10A2_UNORM,
-		R10G10B10A2_UINT = DXGI_FORMAT_R10G10B10A2_UINT,
-		R11G11B10_FLOAT = DXGI_FORMAT_R11G11B10_FLOAT,
-		R8G8B8A8_TYPELESS = DXGI_FORMAT_R8G8B8A8_TYPELESS,
+		static const Formats R16G16B16A16_FLOAT;
+		static const Formats R16G16B16A16_UNORM;
+		static const Formats R16G16B16A16_UINT;
+		static const Formats R16G16B16A16_SNORM;
+		static const Formats R16G16B16A16_SINT;
+		static const Formats R32G32_TYPELESS;
+		static const Formats R32G32_FLOAT;
+		static const Formats R32G32_UINT;
+		static const Formats R32G32_SINT;
+		static const Formats R32G8X24_TYPELESS;
+		static const Formats D32_FLOAT_S8X24_UINT;
+		static const Formats R32_FLOAT_X8X24_TYPELESS;
+		static const Formats X32_TYPELESS_G8X24_UINT;
+		static const Formats R10G10B10A2_TYPELESS;
+		static const Formats R10G10B10A2_UNORM;
+		static const Formats R10G10B10A2_UINT;
+		static const Formats R11G11B10_FLOAT;
+		static const Formats R8G8B8A8_TYPELESS;
 
 		/// <summary>
 		/// Default SDR
 		/// </summary>
-		R8G8B8A8_UNORM = DXGI_FORMAT_R8G8B8A8_UNORM,
+		static const Formats R8G8B8A8_UNORM;
 
-		R8G8B8A8_UNORM_SRGB = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
-		R8G8B8A8_UINT = DXGI_FORMAT_R8G8B8A8_UINT,
-		R8G8B8A8_SNORM = DXGI_FORMAT_R8G8B8A8_SNORM,
-		R8G8B8A8_SINT = DXGI_FORMAT_R8G8B8A8_SINT,
-		R16G16_TYPELESS = DXGI_FORMAT_R16G16_TYPELESS,
-		R16G16_FLOAT = DXGI_FORMAT_R16G16_FLOAT,
-		R16G16_UNORM = DXGI_FORMAT_R16G16_UNORM,
-		R16G16_UINT = DXGI_FORMAT_R16G16_UINT,
-		R16G16_SNORM = DXGI_FORMAT_R16G16_SNORM,
-		R16G16_SINT = DXGI_FORMAT_R16G16_SINT,
-		R32_TYPELESS = DXGI_FORMAT_R32_TYPELESS,
-		D32_FLOAT = DXGI_FORMAT_D32_FLOAT,
-		R32_FLOAT = DXGI_FORMAT_R32_FLOAT,
-		R32_UINT = DXGI_FORMAT_R32_UINT,
-		R32_SINT = DXGI_FORMAT_R32_SINT,
-		R24G8_TYPELESS = DXGI_FORMAT_R24G8_TYPELESS,
-		D24_UNORM_S8_UINT = DXGI_FORMAT_D24_UNORM_S8_UINT,
-		R24_UNORM_X8_TYPELESS = DXGI_FORMAT_R24_UNORM_X8_TYPELESS,
-		X24_TYPELESS_G8_UINT = DXGI_FORMAT_X24_TYPELESS_G8_UINT,
-		R8G8_TYPELESS = DXGI_FORMAT_R8G8_TYPELESS,
-		R8G8_UNORM = DXGI_FORMAT_R8G8_UNORM,
-		R8G8_UINT = DXGI_FORMAT_R8G8_UINT,
-		R8G8_SNORM = DXGI_FORMAT_R8G8_SNORM,
-		R8G8_SINT = DXGI_FORMAT_R8G8_SINT,
-		R16_TYPELESS = DXGI_FORMAT_R16_TYPELESS,
-		R16_FLOAT = DXGI_FORMAT_R16_FLOAT,
-		D16_UNORM = DXGI_FORMAT_D16_UNORM,
-		R16_UNORM = DXGI_FORMAT_R16_UNORM,
-		R16_UINT = DXGI_FORMAT_R16_UINT,
-		R16_SNORM = DXGI_FORMAT_R16_SNORM,
-		R16_SINT = DXGI_FORMAT_R16_SINT,
-		R8_TYPELESS = DXGI_FORMAT_R8_TYPELESS,
-		R8_UNORM = DXGI_FORMAT_R8_UNORM,
-		R8_UINT = DXGI_FORMAT_R8_UINT,
-		R8_SNORM = DXGI_FORMAT_R8_SNORM,
-		R8_SINT = DXGI_FORMAT_R8_SINT,
-		A8_UNORM = DXGI_FORMAT_A8_UNORM,
-		R1_UNORM = DXGI_FORMAT_R1_UNORM,
-		R9G9B9E5_SHAREDEXP = DXGI_FORMAT_R9G9B9E5_SHAREDEXP,
-		R8G8_B8G8_UNORM = DXGI_FORMAT_R8G8_B8G8_UNORM,
-		G8R8_G8B8_UNORM = DXGI_FORMAT_G8R8_G8B8_UNORM,
-		BC1_TYPELESS = DXGI_FORMAT_BC1_TYPELESS,
-		BC1_UNORM = DXGI_FORMAT_BC1_UNORM,
-		BC1_UNORM_SRGB = DXGI_FORMAT_BC1_UNORM_SRGB,
-		BC2_TYPELESS = DXGI_FORMAT_BC2_TYPELESS,
-		BC2_UNORM = DXGI_FORMAT_BC2_UNORM,
-		BC2_UNORM_SRGB = DXGI_FORMAT_BC2_UNORM_SRGB,
-		BC3_TYPELESS = DXGI_FORMAT_BC3_TYPELESS,
-		BC3_UNORM = DXGI_FORMAT_BC3_UNORM,
-		BC3_UNORM_SRGB = DXGI_FORMAT_BC3_UNORM_SRGB,
-		BC4_TYPELESS = DXGI_FORMAT_BC4_TYPELESS,
-		BC4_UNORM = DXGI_FORMAT_BC4_UNORM,
-		BC4_SNORM = DXGI_FORMAT_BC4_SNORM,
-		BC5_TYPELESS = DXGI_FORMAT_BC5_TYPELESS,
-		BC5_UNORM = DXGI_FORMAT_BC5_UNORM,
-		BC5_SNORM = DXGI_FORMAT_BC5_SNORM,
-		B5G6R5_UNORM = DXGI_FORMAT_B5G6R5_UNORM,
-		B5G5R5A1_UNORM = DXGI_FORMAT_B5G5R5A1_UNORM,
-		B8G8R8A8_UNORM = DXGI_FORMAT_B8G8R8A8_UNORM,
-		B8G8R8X8_UNORM = DXGI_FORMAT_B8G8R8X8_UNORM,
-		R10G10B10_XR_BIAS_A2_UNORM = DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM,
-		B8G8R8A8_TYPELESS = DXGI_FORMAT_B8G8R8A8_TYPELESS,
-		B8G8R8A8_UNORM_SRGB = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,
-		B8G8R8X8_TYPELESS = DXGI_FORMAT_B8G8R8X8_TYPELESS,
-		B8G8R8X8_UNORM_SRGB = DXGI_FORMAT_B8G8R8X8_UNORM_SRGB,
-		BC6H_TYPELESS = DXGI_FORMAT_BC6H_TYPELESS,
-		BC6H_UF16 = DXGI_FORMAT_BC6H_UF16,
-		BC6H_SF16 = DXGI_FORMAT_BC6H_SF16,
-		BC7_TYPELESS = DXGI_FORMAT_BC7_TYPELESS,
-		BC7_UNORM = DXGI_FORMAT_BC7_UNORM,
-		BC7_UNORM_SRGB = DXGI_FORMAT_BC7_UNORM_SRGB,
-		AYUV = DXGI_FORMAT_AYUV,
-		Y410 = DXGI_FORMAT_Y410,
-		Y416 = DXGI_FORMAT_Y416,
-		NV12 = DXGI_FORMAT_NV12,
-		P010 = DXGI_FORMAT_P010,
-		P016 = DXGI_FORMAT_P016,
-		OPAQUE_420 = DXGI_FORMAT_420_OPAQUE,
-		YUY2 = DXGI_FORMAT_YUY2,
-		Y210 = DXGI_FORMAT_Y210,
-		Y216 = DXGI_FORMAT_Y216,
-		NV11 = DXGI_FORMAT_NV11,
-		AI44 = DXGI_FORMAT_AI44,
-		IA44 = DXGI_FORMAT_IA44,
-		P8 = DXGI_FORMAT_P8,
-		A8P8 = DXGI_FORMAT_A8P8,
-		B4G4R4A4_UNORM = DXGI_FORMAT_B4G4R4A4_UNORM,
-		P208 = DXGI_FORMAT_P208,
-		V208 = DXGI_FORMAT_V208,
-		V408 = DXGI_FORMAT_V408
+		static const Formats R8G8B8A8_UNORM_SRGB;
+		static const Formats R8G8B8A8_UINT;
+		static const Formats R8G8B8A8_SNORM;
+		static const Formats R8G8B8A8_SINT;
+		static const Formats R16G16_TYPELESS;
+		static const Formats R16G16_FLOAT;
+		static const Formats R16G16_UNORM;
+		static const Formats R16G16_UINT;
+		static const Formats R16G16_SNORM;
+		static const Formats R16G16_SINT;
+		static const Formats R32_TYPELESS;
+		static const Formats D32_FLOAT;
+		static const Formats R32_FLOAT;
+		static const Formats R32_UINT;
+		static const Formats R32_SINT;
+		static const Formats R24G8_TYPELESS;
+		static const Formats D24_UNORM_S8_UINT;
+		static const Formats R24_UNORM_X8_TYPELESS;
+		static const Formats X24_TYPELESS_G8_UINT;
+		static const Formats R8G8_TYPELESS;
+		static const Formats R8G8_UNORM;
+		static const Formats R8G8_UINT;
+		static const Formats R8G8_SNORM;
+		static const Formats R8G8_SINT;
+		static const Formats R16_TYPELESS;
+		static const Formats R16_FLOAT;
+		static const Formats D16_UNORM;
+		static const Formats R16_UNORM;
+		static const Formats R16_UINT;
+		static const Formats R16_SNORM;
+		static const Formats R16_SINT;
+		static const Formats R8_TYPELESS;
+		static const Formats R8_UNORM;
+		static const Formats R8_UINT;
+		static const Formats R8_SNORM;
+		static const Formats R8_SINT;
+		static const Formats A8_UNORM;
+		static const Formats R1_UNORM;
+		static const Formats R9G9B9E5_SHAREDEXP;
+		static const Formats R8G8_B8G8_UNORM;
+		static const Formats G8R8_G8B8_UNORM;
+		static const Formats BC1_TYPELESS;
+		static const Formats BC1_UNORM;
+		static const Formats BC1_UNORM_SRGB;
+		static const Formats BC2_TYPELESS;
+		static const Formats BC2_UNORM;
+		static const Formats BC2_UNORM_SRGB;
+		static const Formats BC3_TYPELESS;
+		static const Formats BC3_UNORM;
+		static const Formats BC3_UNORM_SRGB;
+		static const Formats BC4_TYPELESS;
+		static const Formats BC4_UNORM;
+		static const Formats BC4_SNORM;
+		static const Formats BC5_TYPELESS;
+		static const Formats BC5_UNORM;
+		static const Formats BC5_SNORM;
+		static const Formats B5G6R5_UNORM;
+		static const Formats B5G5R5A1_UNORM;
+		static const Formats B8G8R8A8_UNORM;
+		static const Formats B8G8R8X8_UNORM;
+		static const Formats R10G10B10_XR_BIAS_A2_UNORM;
+		static const Formats B8G8R8A8_TYPELESS;
+		static const Formats B8G8R8A8_UNORM_SRGB;
+		static const Formats B8G8R8X8_TYPELESS;
+		static const Formats B8G8R8X8_UNORM_SRGB;
+		static const Formats BC6H_TYPELESS;
+		static const Formats BC6H_UF16;
+		static const Formats BC6H_SF16;
+		static const Formats BC7_TYPELESS;
+		static const Formats BC7_UNORM;
+		static const Formats BC7_UNORM_SRGB;
+		static const Formats AYUV;
+		static const Formats Y410;
+		static const Formats Y416;
+		static const Formats NV12;
+		static const Formats P010;
+		static const Formats P016;
+		static const Formats OPAQUE_420;
+		static const Formats YUY2;
+		static const Formats Y210;
+		static const Formats Y216;
+		static const Formats NV11;
+		static const Formats AI44;
+		static const Formats IA44;
+		static const Formats P8;
+		static const Formats A8P8;
+		static const Formats B4G4R4A4_UNORM;
+		static const Formats P208;
+		static const Formats V208;
+		static const Formats V408;
 	};
 
 	string_view GetFormatName(Formats format);
@@ -220,77 +240,83 @@ namespace Weave::D3D11
 	/// <summary>
 	/// Determines filter mode for minification/magnification on all three potential axes of a texture (U/V/W)
 	/// </summary>
-	enum class TexFilterMode
+	struct TexFilterModes : public EnumAlias<D3D11_FILTER>
 	{
-		POINT = D3D11_FILTER_MIN_MAG_MIP_POINT,
-		MIN_MAG_POINT_MIP_LINEAR = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR,
-		MIN_POINT_MAG_LINEAR_MIP_POINT = D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT,
-		MIN_POINT_MAG_MIP_LINEAR = D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR,
-		MIN_LINEAR_MAG_MIP_POINT = D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT,
-		MIN_LINEAR_MAG_POINT_MIP_LINEAR = D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR,
-		MIN_MAG_LINEAR_MIP_POINT = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT,
-		LINEAR = D3D11_FILTER_MIN_MAG_MIP_LINEAR,
-		ANISOTROPIC = D3D11_FILTER_ANISOTROPIC,
-		COMPARISON_POINT = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT,
-		COMPARISON_MIN_MAG_POINT_MIP_LINEAR = D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR,
-		COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT = D3D11_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT,
-		COMPARISON_MIN_POINT_MAG_MIP_LINEAR = D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR,
-		COMPARISON_MIN_LINEAR_MAG_MIP_POINT = D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT,
-		COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR = D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR,
-		COMPARISON_MIN_MAG_LINEAR_MIP_POINT = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT,
-		COMPARISON_LINEAR = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR,
-		COMPARISON_ANISOTROPIC = D3D11_FILTER_COMPARISON_ANISOTROPIC,
-		MINIMUM_POINT = D3D11_FILTER_MINIMUM_MIN_MAG_MIP_POINT,
-		MINIMUM_MIN_MAG_POINT_MIP_LINEAR = D3D11_FILTER_MINIMUM_MIN_MAG_POINT_MIP_LINEAR,
-		MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT = D3D11_FILTER_MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT,
-		MINIMUM_MIN_POINT_MAG_MIP_LINEAR = D3D11_FILTER_MINIMUM_MIN_POINT_MAG_MIP_LINEAR,
-		MINIMUM_MIN_LINEAR_MAG_MIP_POINT = D3D11_FILTER_MINIMUM_MIN_LINEAR_MAG_MIP_POINT,
-		MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR = D3D11_FILTER_MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR,
-		MINIMUM_MIN_MAG_LINEAR_MIP_POINT = D3D11_FILTER_MINIMUM_MIN_MAG_LINEAR_MIP_POINT,
-		MINIMUM_LINEAR = D3D11_FILTER_MINIMUM_MIN_MAG_MIP_LINEAR,
-		MINIMUM_ANISOTROPIC = D3D11_FILTER_MINIMUM_ANISOTROPIC,
-		MAXIMUM_POINT = D3D11_FILTER_MAXIMUM_MIN_MAG_MIP_POINT,
-		MAXIMUM_MIN_MAG_POINT_MIP_LINEAR = D3D11_FILTER_MAXIMUM_MIN_MAG_POINT_MIP_LINEAR,
-		MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT = D3D11_FILTER_MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT,
-		MAXIMUM_MIN_POINT_MAG_MIP_LINEAR = D3D11_FILTER_MAXIMUM_MIN_POINT_MAG_MIP_LINEAR,
-		MAXIMUM_MIN_LINEAR_MAG_MIP_POINT = D3D11_FILTER_MAXIMUM_MIN_LINEAR_MAG_MIP_POINT,
-		MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR = D3D11_FILTER_MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR,
-		MAXIMUM_MIN_MAG_LINEAR_MIP_POINT = D3D11_FILTER_MAXIMUM_MIN_MAG_LINEAR_MIP_POINT,
-		MAXIMUM_LINEAR = D3D11_FILTER_MAXIMUM_MIN_MAG_MIP_LINEAR,
-		MAXIMUM_ANISOTROPIC = D3D11_FILTER_MAXIMUM_ANISOTROPIC
+		using EnumAlias::EnumAlias;
+
+		static const TexFilterModes POINT;
+		static const TexFilterModes MIN_MAG_POINT_MIP_LINEAR;
+		static const TexFilterModes MIN_POINT_MAG_LINEAR_MIP_POINT;
+		static const TexFilterModes MIN_POINT_MAG_MIP_LINEAR;
+		static const TexFilterModes MIN_LINEAR_MAG_MIP_POINT;
+		static const TexFilterModes MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+		static const TexFilterModes MIN_MAG_LINEAR_MIP_POINT;
+		static const TexFilterModes LINEAR;
+		static const TexFilterModes ANISOTROPIC;
+		static const TexFilterModes COMPARISON_POINT;
+		static const TexFilterModes COMPARISON_MIN_MAG_POINT_MIP_LINEAR;
+		static const TexFilterModes COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT;
+		static const TexFilterModes COMPARISON_MIN_POINT_MAG_MIP_LINEAR;
+		static const TexFilterModes COMPARISON_MIN_LINEAR_MAG_MIP_POINT;
+		static const TexFilterModes COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+		static const TexFilterModes COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+		static const TexFilterModes COMPARISON_LINEAR;
+		static const TexFilterModes COMPARISON_ANISOTROPIC;
+		static const TexFilterModes MINIMUM_POINT;
+		static const TexFilterModes MINIMUM_MIN_MAG_POINT_MIP_LINEAR;
+		static const TexFilterModes MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT;
+		static const TexFilterModes MINIMUM_MIN_POINT_MAG_MIP_LINEAR;
+		static const TexFilterModes MINIMUM_MIN_LINEAR_MAG_MIP_POINT;
+		static const TexFilterModes MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+		static const TexFilterModes MINIMUM_MIN_MAG_LINEAR_MIP_POINT;
+		static const TexFilterModes MINIMUM_LINEAR;
+		static const TexFilterModes MINIMUM_ANISOTROPIC;
+		static const TexFilterModes MAXIMUM_POINT;
+		static const TexFilterModes MAXIMUM_MIN_MAG_POINT_MIP_LINEAR;
+		static const TexFilterModes MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT;
+		static const TexFilterModes MAXIMUM_MIN_POINT_MAG_MIP_LINEAR;
+		static const TexFilterModes MAXIMUM_MIN_LINEAR_MAG_MIP_POINT;
+		static const TexFilterModes MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+		static const TexFilterModes MAXIMUM_MIN_MAG_LINEAR_MIP_POINT;
+		static const TexFilterModes MAXIMUM_LINEAR;
+		static const TexFilterModes MAXIMUM_ANISOTROPIC;
 	};
 
-	string_view GetFilterModeName(TexFilterMode mode);
+	string_view GetFilterModeName(TexFilterModes mode);
 
 	/// <summary>
 	/// Determines how texture sampling is/isn't bounded
 	/// </summary>
-	enum class TexClampMode
+	struct TexClampModes : public EnumAlias<D3D11_TEXTURE_ADDRESS_MODE>
 	{
-		WRAP = D3D11_TEXTURE_ADDRESS_WRAP,
-		MIRROR = D3D11_TEXTURE_ADDRESS_MIRROR,
-		CLAMP = D3D11_TEXTURE_ADDRESS_CLAMP,
-		BORDER = D3D11_TEXTURE_ADDRESS_BORDER,
-		MIRROR_ONCE = D3D11_TEXTURE_ADDRESS_MIRROR_ONCE
+		using EnumAlias::EnumAlias;
+
+		static const TexClampModes WRAP;
+		static const TexClampModes MIRROR;
+		static const TexClampModes CLAMP;
+		static const TexClampModes BORDER;
+		static const TexClampModes MIRROR_ONCE;
 	};
 
-	string_view GetTexClampModeName(TexClampMode mode);
+	string_view GetTexClampModeName(TexClampModes mode);
 
 	/// <summary>
 	/// Comparison functions used to determine when new (source) data is to be
 	/// stored in a given destination. Typically used in depth-stencil buffers.
 	/// </summary>
-	enum class TexCmpFunc
+	struct TexCmpFuncs : public EnumAlias<D3D11_COMPARISON_FUNC>
 	{
-		NEVER = D3D11_COMPARISON_NEVER,
-		LESS = D3D11_COMPARISON_LESS,
-		EQUAL = D3D11_COMPARISON_EQUAL,
-		LESS_EQUAL = D3D11_COMPARISON_LESS_EQUAL,
-		GREATER = D3D11_COMPARISON_GREATER,
-		NOT_EQUAL = D3D11_COMPARISON_NOT_EQUAL,
-		GREATER_EQUAL = D3D11_COMPARISON_GREATER_EQUAL,
-		ALWAYS = D3D11_COMPARISON_ALWAYS
+		using EnumAlias::EnumAlias;
+
+		static const TexCmpFuncs NEVER;
+		static const TexCmpFuncs LESS;
+		static const TexCmpFuncs EQUAL;
+		static const TexCmpFuncs LESS_EQUAL;
+		static const TexCmpFuncs GREATER;
+		static const TexCmpFuncs NOT_EQUAL;
+		static const TexCmpFuncs GREATER_EQUAL;
+		static const TexCmpFuncs ALWAYS;
 	};
 
-	string_view GetTexCmpFuncName(TexCmpFunc func);
+	string_view GetTexCmpFuncName(TexCmpFuncs func);
 }

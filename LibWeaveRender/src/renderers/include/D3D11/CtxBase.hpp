@@ -3,6 +3,7 @@
 #include "WeaveUtils/Span.hpp"
 #include "Resources/DeviceChild.hpp"
 #include "Resources/ResourceBase.hpp"
+#include "InternalD3D11.hpp"
 
 struct ID3D11DeviceContext1;
 
@@ -15,7 +16,7 @@ namespace Weave::D3D11
 	struct Viewport;
 	class ContextState;
 
-	enum class PrimTopology;
+	struct PrimTopology;
 	class InputLayout;
 
 	class IRenderTarget;
@@ -246,7 +247,7 @@ namespace Weave::D3D11
 			IDepthStencil& depthStencil, 
 			DSClearFlags clearFlags = DSClearFlags::Depth,
 			float depthClear = 1.0f,
-			UINT8 stencilClear = 0
+			byte stencilClear = 0
 		);
 
 		/// <summary>

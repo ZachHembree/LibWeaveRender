@@ -3,6 +3,8 @@
 #include "Resources/VertexBuffer.hpp"
 #include "Resources/IndexBuffer.hpp"
 
+enum D3D_PRIMITIVE_TOPOLOGY;
+
 namespace Weave::D3D11
 {
 	class Device;
@@ -12,50 +14,52 @@ namespace Weave::D3D11
 	/// <summary>
 	/// Determines how vertex topology is interpreted by the input assembler
 	/// </summary>
-	enum class PrimTopology
+	struct PrimTopology : EnumAlias<D3D_PRIMITIVE_TOPOLOGY>
 	{
-		UNDEFINED = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED,
-		POINTLIST = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST,
-		LINELIST = D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
-		LINESTRIP = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP,
-		TRIANGLELIST = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-		TRIANGLESTRIP = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
-		LINELIST_ADJ = D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ,
-		LINESTRIP_ADJ = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ,
-		TRIANGLELIST_ADJ = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ,
-		TRIANGLESTRIP_ADJ = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ,
-		CP1_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST,
-		CP2_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST,
-		CP3_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST,
-		CP4_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST,
-		CP5_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_5_CONTROL_POINT_PATCHLIST,
-		CP6_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_6_CONTROL_POINT_PATCHLIST,
-		CP7_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_7_CONTROL_POINT_PATCHLIST,
-		CP8_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_8_CONTROL_POINT_PATCHLIST,
-		CP9_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_9_CONTROL_POINT_PATCHLIST,
-		CP10_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_10_CONTROL_POINT_PATCHLIST,
-		CP11_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_11_CONTROL_POINT_PATCHLIST,
-		CP12_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST,
-		CP13_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_13_CONTROL_POINT_PATCHLIST,
-		CP14_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_14_CONTROL_POINT_PATCHLIST,
-		CP15_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_15_CONTROL_POINT_PATCHLIST,
-		CP16_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_16_CONTROL_POINT_PATCHLIST,
-		CP17_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_17_CONTROL_POINT_PATCHLIST,
-		CP18_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_18_CONTROL_POINT_PATCHLIST,
-		CP19_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_19_CONTROL_POINT_PATCHLIST,
-		CP20_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_20_CONTROL_POINT_PATCHLIST,
-		CP21_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_21_CONTROL_POINT_PATCHLIST,
-		CP22_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_22_CONTROL_POINT_PATCHLIST,
-		CP23_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_23_CONTROL_POINT_PATCHLIST,
-		CP24_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_24_CONTROL_POINT_PATCHLIST,
-		CP25_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_25_CONTROL_POINT_PATCHLIST,
-		CP26_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_26_CONTROL_POINT_PATCHLIST,
-		CP27_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_27_CONTROL_POINT_PATCHLIST,
-		CP28_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_28_CONTROL_POINT_PATCHLIST,
-		CP29_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_29_CONTROL_POINT_PATCHLIST,
-		CP30_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_30_CONTROL_POINT_PATCHLIST,
-		CP31_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_31_CONTROL_POINT_PATCHLIST,
-		CP32_PATCHLIST = D3D11_PRIMITIVE_TOPOLOGY_32_CONTROL_POINT_PATCHLIST
+		using EnumAlias::EnumAlias;
+
+		static const PrimTopology UNDEFINED;
+		static const PrimTopology POINTLIST;
+		static const PrimTopology LINELIST;
+		static const PrimTopology LINESTRIP;
+		static const PrimTopology TRIANGLELIST;
+		static const PrimTopology TRIANGLESTRIP;
+		static const PrimTopology LINELIST_ADJ;
+		static const PrimTopology LINESTRIP_ADJ;
+		static const PrimTopology TRIANGLELIST_ADJ;
+		static const PrimTopology TRIANGLESTRIP_ADJ;
+		static const PrimTopology CP1_PATCHLIST;
+		static const PrimTopology CP2_PATCHLIST;
+		static const PrimTopology CP3_PATCHLIST;
+		static const PrimTopology CP4_PATCHLIST;
+		static const PrimTopology CP5_PATCHLIST;
+		static const PrimTopology CP6_PATCHLIST;
+		static const PrimTopology CP7_PATCHLIST;
+		static const PrimTopology CP8_PATCHLIST;
+		static const PrimTopology CP9_PATCHLIST;
+		static const PrimTopology CP10_PATCHLIST;
+		static const PrimTopology CP11_PATCHLIST;
+		static const PrimTopology CP12_PATCHLIST;
+		static const PrimTopology CP13_PATCHLIST;
+		static const PrimTopology CP14_PATCHLIST;
+		static const PrimTopology CP15_PATCHLIST;
+		static const PrimTopology CP16_PATCHLIST;
+		static const PrimTopology CP17_PATCHLIST;
+		static const PrimTopology CP18_PATCHLIST;
+		static const PrimTopology CP19_PATCHLIST;
+		static const PrimTopology CP20_PATCHLIST;
+		static const PrimTopology CP21_PATCHLIST;
+		static const PrimTopology CP22_PATCHLIST;
+		static const PrimTopology CP23_PATCHLIST;
+		static const PrimTopology CP24_PATCHLIST;
+		static const PrimTopology CP25_PATCHLIST;
+		static const PrimTopology CP26_PATCHLIST;
+		static const PrimTopology CP27_PATCHLIST;
+		static const PrimTopology CP28_PATCHLIST;
+		static const PrimTopology CP29_PATCHLIST;
+		static const PrimTopology CP30_PATCHLIST;
+		static const PrimTopology CP31_PATCHLIST;
+		static const PrimTopology CP32_PATCHLIST;
 	};
 
 	/// <summary>
@@ -99,7 +103,7 @@ namespace Weave::D3D11
 			const MeshDef<VertT, IndexT>& def, 
 			PrimTopology topology = PrimTopology::TRIANGLELIST
 		) :
-			Mesh(device, def.indices, def.vertices.GetData(), def.vertices.GetLength(), sizeof(VertT), topology)
+			Mesh(device, def.indices, def.vertices.GetData(), (uint)def.vertices.GetLength(), (uint)sizeof(VertT), topology)
 		{ }
 
 		template <typename VertT, typename IndexT = ushort>
@@ -109,15 +113,15 @@ namespace Weave::D3D11
 			const IDynamicArray<IndexT>& indices, 
 			PrimTopology topology = PrimTopology::TRIANGLELIST
 		) : 
-			Mesh(device, indices, vertices.GetData(), vertices.GetLength(), sizeof(VertT), topology)
+			Mesh(device, indices, vertices.GetData(), (uint)vertices.GetLength(), (uint)sizeof(VertT), topology)
 		{ }
 
 		Mesh(
 			Device& device,
 			const IDynamicArray<ushort>& indices,
 			const void* vertices,
-			size_t vCount,
-			size_t vStride, 
+			uint vCount,
+			uint vStride,
 			PrimTopology topology = PrimTopology::TRIANGLELIST
 		);
 
@@ -125,8 +129,8 @@ namespace Weave::D3D11
 			Device& device,
 			const IDynamicArray<uint>& indices,
 			const void* vertices,
-			size_t vCount,
-			size_t vStride, 
+			uint vCount,
+			uint vStride,
 			PrimTopology topology = PrimTopology::TRIANGLELIST
 		);
 

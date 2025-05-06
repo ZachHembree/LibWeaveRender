@@ -6,13 +6,14 @@
 #include "D3D11/Resources/ResourceMap.hpp"
 #include "D3D11/Resources/ResourceSet.hpp"
 #include "D3D11/Viewport.hpp"
+#include "D3D11/Mesh.hpp"
 
 namespace Weave::D3D11
 {
 	using Effects::ShadeStages;
 	using Effects::ShaderTypes;
 
-	enum class PrimTopology;
+	struct PrimTopology;
 	class InputLayout;
 	class VertexBuffer;
 

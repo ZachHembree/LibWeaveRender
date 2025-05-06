@@ -3,7 +3,8 @@
 #include "WeaveUtils/Math.hpp"
 #include <d3d11_4.h>
 #include "Resources/ResourceEnums.hpp"
-#include "../src/renderers/include/D3DException.hpp"
+#include "../D3DException.hpp"
+#include "../D3DUtils.hpp"
 
 namespace Weave::D3D11
 {
@@ -33,20 +34,6 @@ namespace Weave::D3D11
 	/// Defines the total number of programmable shading stages (Vertex, Hull, Domain, Geometry, Pixel) plus the Compute shader stage.
 	/// </summary>
 	static constexpr uint g_ShadeStageCount = 6;
-
-	/// <summary>
-	/// Generic enum name lookup helper template
-	/// </summary>
-	template<typename EnumT>
-	inline static string_view GetEnumName(EnumT value, const std::unordered_map<EnumT, string_view>& nameMap)
-	{
-		const auto& it = nameMap.find(value);
-
-		if (it != nameMap.end())
-			return it->second;
-		else
-			return "Unknown Enum";
-	}
 
 	/// <summary>
 	/// Retrieves the string representation of a DXGI_MODE_SCALING enumeration value.

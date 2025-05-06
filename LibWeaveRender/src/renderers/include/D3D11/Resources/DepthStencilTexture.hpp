@@ -15,7 +15,7 @@ namespace Weave::D3D11
 			vec2 range = vec2(0, 1),
 			Formats format = Formats::D32_FLOAT,
 			ResourceUsages usage = ResourceUsages::Default,
-			TexCmpFunc depthCmp = TexCmpFunc::LESS
+			TexCmpFuncs depthCmp = TexCmpFuncs::LESS
 		);
 
 		/// <summary>

@@ -712,9 +712,9 @@ void CtxBase::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 	}
 }
 
-void CtxBase::ClearDepthStencil(IDepthStencil& ds, DSClearFlags clearFlags, float depthClear, UINT8 stencilClear)
+void CtxBase::ClearDepthStencil(IDepthStencil& ds, DSClearFlags clearFlags, float depthClear, byte stencilClear)
 {
-	pCtx->ClearDepthStencilView(ds.GetDSV(), (UINT)clearFlags, depthClear, stencilClear);
+	pCtx->ClearDepthStencilView(ds.GetDSV(), clearFlags.value, depthClear, stencilClear);
 }
 
 void CtxBase::ResetShaders() 

@@ -15,7 +15,7 @@ DepthStencilTexture::DepthStencilTexture(
 	vec2 range,
 	Formats format,
 	ResourceUsages usage,
-	TexCmpFunc depthCmp
+	TexCmpFuncs depthCmp
 ) :
 	Texture2DBase(dev, dim, format, usage, ResourceBindFlags::DepthStencil ),
 	range(range)

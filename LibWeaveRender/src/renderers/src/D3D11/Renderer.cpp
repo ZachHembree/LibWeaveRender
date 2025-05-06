@@ -35,13 +35,13 @@ Renderer::Renderer(MinWindow& parent) :
 	MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
 	defaultMeshes["FSQuad"] = Mesh(*pDev, quadDef);
 
-	defaultSamplers["PointClamp"] = Sampler(*pDev, TexFilterMode::POINT, TexClampMode::CLAMP);
-	defaultSamplers["PointMirror"] = Sampler(*pDev, TexFilterMode::POINT, TexClampMode::MIRROR);
-	defaultSamplers["PointBorder"] = Sampler(*pDev, TexFilterMode::POINT, TexClampMode::BORDER);
+	defaultSamplers["PointClamp"] = Sampler(*pDev, TexFilterModes::POINT, TexClampModes::CLAMP);
+	defaultSamplers["PointMirror"] = Sampler(*pDev, TexFilterModes::POINT, TexClampModes::MIRROR);
+	defaultSamplers["PointBorder"] = Sampler(*pDev, TexFilterModes::POINT, TexClampModes::BORDER);
 
-	defaultSamplers["LinearClamp"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::CLAMP);
-	defaultSamplers["LinearMirror"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::MIRROR);
-	defaultSamplers["LinearBorder"] = Sampler(*pDev, TexFilterMode::LINEAR, TexClampMode::BORDER);
+	defaultSamplers["LinearClamp"] = Sampler(*pDev, TexFilterModes::LINEAR, TexClampModes::CLAMP);
+	defaultSamplers["LinearMirror"] = Sampler(*pDev, TexFilterModes::LINEAR, TexClampModes::MIRROR);
+	defaultSamplers["LinearBorder"] = Sampler(*pDev, TexFilterModes::LINEAR, TexClampModes::BORDER);
 
 	pSwap->SetBufferFormat(Formats::R8G8B8A8_UNORM);
 	pSwap->ResizeBuffers(outputRes);

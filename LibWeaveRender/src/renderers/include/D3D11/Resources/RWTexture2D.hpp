@@ -89,7 +89,7 @@ namespace Weave::D3D11
 
 	private:
 		ComPtr<ID3D11UnorderedAccessView> pUAV;
-		ComPtr< ID3D11RenderTargetView> pRTV;
+		ComPtr<ID3D11RenderTargetView> pRTV;
 		mutable vec2 renderOffset;
 		mutable vec2 renderScale;
 

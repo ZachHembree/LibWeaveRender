@@ -8,7 +8,7 @@ using namespace Weave::D3D11;
 Sampler::Sampler()
 { }
 
-Sampler::Sampler(Device& dev, TexFilterMode filter, TexClampMode u, TexClampMode v, TexClampMode w) :
+Sampler::Sampler(Device& dev, TexFilterModes filter, TexClampModes u, TexClampModes v, TexClampModes w) :
 	DeviceChild(dev)
 {
 	D3D11_SAMPLER_DESC desc = {};
@@ -21,8 +21,8 @@ Sampler::Sampler(Device& dev, TexFilterMode filter, TexClampMode u, TexClampMode
 }
 
 Sampler::Sampler(Device& dev,
-	TexFilterMode filter,
-	TexClampMode mode
+	TexFilterModes filter,
+	TexClampModes mode
 ) :
 	Sampler(dev, filter, mode, mode, mode)
 { }

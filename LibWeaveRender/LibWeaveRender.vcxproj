@@ -267,8 +267,9 @@
     <ClInclude Include="src\pch.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ContextState.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ContextUtils.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\DeferredContext.hpp" />
+    <ClInclude Include="src\renderers\include\D3D11\CtxDeferred.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\CtxBase.hpp" />
+    <ClInclude Include="src\renderers\include\D3DUtils.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\RenderModes.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\DisplayOutput.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\InternalD3D11.hpp" />

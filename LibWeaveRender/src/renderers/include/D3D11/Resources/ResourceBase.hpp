@@ -223,7 +223,7 @@ namespace Weave::D3D11
 			CtxBase& ctx,
 			DSClearFlags clearFlags = DSClearFlags::Depth,
 			float depthClear = 1.0f,
-			UINT8 stencilClear = 0
+			byte stencilClear = 0
 		) = 0;
 	};
 

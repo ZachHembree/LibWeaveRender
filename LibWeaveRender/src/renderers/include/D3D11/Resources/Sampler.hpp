@@ -1,6 +1,7 @@
 #pragma once
 #include "DeviceChild.hpp"
 #include "ResourceEnums.hpp"
+#include "../InternalD3D11.hpp"
 
 struct ID3D11SamplerState;
 
@@ -12,15 +13,15 @@ namespace Weave::D3D11
         Sampler();
 
 		Sampler(Device& dev, 
-            TexFilterMode filter, 
-            TexClampMode u, 
-            TexClampMode v, 
-            TexClampMode w
+            TexFilterModes filter, 
+            TexClampModes u, 
+            TexClampModes v, 
+            TexClampModes w
         );
 
         Sampler(Device& dev,
-            TexFilterMode filter = TexFilterMode::LINEAR, 
-            TexClampMode mode = TexClampMode::WRAP
+            TexFilterModes filter = TexFilterModes::LINEAR, 
+            TexClampModes mode = TexClampModes::WRAP
         );
 
         /// <summary>

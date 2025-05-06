@@ -1,16 +1,229 @@
 #include "pch.hpp"
 #include <unordered_map>
 #include "D3D11/Resources/ResourceEnums.hpp"
+#include "D3D11/InternalD3D11.hpp"
 
 namespace Weave::D3D11
 {
-	static const std::unordered_map<InputClass, string_view> s_InputClassNames
+	const ResourceUsages ResourceUsages::Default = D3D11_USAGE_DEFAULT;
+	const ResourceUsages ResourceUsages::Immutable = D3D11_USAGE_IMMUTABLE;
+	const ResourceUsages ResourceUsages::Dynamic = D3D11_USAGE_DYNAMIC;
+	const ResourceUsages ResourceUsages::Staging = D3D11_USAGE_STAGING;
+	
+	const ResourceBindFlags ResourceBindFlags::None = 0;
+	const ResourceBindFlags ResourceBindFlags::Vertex = D3D11_BIND_VERTEX_BUFFER;
+	const ResourceBindFlags ResourceBindFlags::Index = D3D11_BIND_INDEX_BUFFER;
+	const ResourceBindFlags ResourceBindFlags::Constant = D3D11_BIND_CONSTANT_BUFFER;
+	const ResourceBindFlags ResourceBindFlags::ShaderResource = D3D11_BIND_SHADER_RESOURCE;
+	const ResourceBindFlags ResourceBindFlags::StreamOutput = D3D11_BIND_STREAM_OUTPUT;
+	const ResourceBindFlags ResourceBindFlags::RenderTarget = D3D11_BIND_RENDER_TARGET;
+	const ResourceBindFlags ResourceBindFlags::DepthStencil = D3D11_BIND_DEPTH_STENCIL;
+	const ResourceBindFlags ResourceBindFlags::UnorderedAccess = D3D11_BIND_UNORDERED_ACCESS;
+	const ResourceBindFlags ResourceBindFlags::Decoder = D3D11_BIND_DECODER;
+	const ResourceBindFlags ResourceBindFlags::VideoEncoder = D3D11_BIND_VIDEO_ENCODER;
+	const ResourceBindFlags ResourceBindFlags::RWTexture = (ShaderResource | RenderTarget) | UnorderedAccess;
+
+	const ResourceAccessFlags ResourceAccessFlags::None = 0u;
+	const ResourceAccessFlags ResourceAccessFlags::Write = D3D11_CPU_ACCESS_WRITE;
+	const ResourceAccessFlags ResourceAccessFlags::Read = D3D11_CPU_ACCESS_READ;
+	const ResourceAccessFlags ResourceAccessFlags::ReadWrite = Read | Write;
+
+	const DSClearFlags DSClearFlags::None = 0;
+	const DSClearFlags DSClearFlags::Depth = D3D11_CLEAR_DEPTH;
+	const DSClearFlags DSClearFlags::Stencil = D3D11_CLEAR_STENCIL;
+	const DSClearFlags DSClearFlags::DepthStencil = Depth | Stencil;
+
+	const InputClasses InputClasses::PerVertex = D3D11_INPUT_PER_VERTEX_DATA;
+	const InputClasses InputClasses::PerInstance = D3D11_INPUT_PER_INSTANCE_DATA;
+
+	const Formats Formats::UNKNOWN = DXGI_FORMAT_UNKNOWN;
+	const Formats Formats::R32G32B32A32_TYPELESS = DXGI_FORMAT_R32G32B32A32_TYPELESS;
+	const Formats Formats::R32G32B32A32_FLOAT = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	const Formats Formats::R32G32B32A32_UINT = DXGI_FORMAT_R32G32B32A32_UINT;
+	const Formats Formats::R32G32B32A32_SINT = DXGI_FORMAT_R32G32B32A32_SINT;
+	const Formats Formats::R32G32B32_TYPELESS = DXGI_FORMAT_R32G32B32_TYPELESS;
+	const Formats Formats::R32G32B32_FLOAT = DXGI_FORMAT_R32G32B32_FLOAT;
+	const Formats Formats::R32G32B32_UINT = DXGI_FORMAT_R32G32B32_UINT;
+	const Formats Formats::R32G32B32_SINT = DXGI_FORMAT_R32G32B32_SINT;
+	const Formats Formats::R16G16B16A16_TYPELESS = DXGI_FORMAT_R16G16B16A16_TYPELESS;
+
+	/// <summary>
+	/// Default HDR
+	/// </summary>
+	const Formats Formats::R16G16B16A16_FLOAT = DXGI_FORMAT_R16G16B16A16_FLOAT;
+	const Formats Formats::R16G16B16A16_UNORM = DXGI_FORMAT_R16G16B16A16_UNORM;
+	const Formats Formats::R16G16B16A16_UINT = DXGI_FORMAT_R16G16B16A16_UINT;
+	const Formats Formats::R16G16B16A16_SNORM = DXGI_FORMAT_R16G16B16A16_SNORM;
+	const Formats Formats::R16G16B16A16_SINT = DXGI_FORMAT_R16G16B16A16_SINT;
+	const Formats Formats::R32G32_TYPELESS = DXGI_FORMAT_R32G32_TYPELESS;
+	const Formats Formats::R32G32_FLOAT = DXGI_FORMAT_R32G32_FLOAT;
+	const Formats Formats::R32G32_UINT = DXGI_FORMAT_R32G32_UINT;
+	const Formats Formats::R32G32_SINT = DXGI_FORMAT_R32G32_SINT;
+	const Formats Formats::R32G8X24_TYPELESS = DXGI_FORMAT_R32G8X24_TYPELESS;
+	const Formats Formats::D32_FLOAT_S8X24_UINT = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+	const Formats Formats::R32_FLOAT_X8X24_TYPELESS = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+	const Formats Formats::X32_TYPELESS_G8X24_UINT = DXGI_FORMAT_X32_TYPELESS_G8X24_UINT;
+	const Formats Formats::R10G10B10A2_TYPELESS = DXGI_FORMAT_R10G10B10A2_TYPELESS;
+	const Formats Formats::R10G10B10A2_UNORM = DXGI_FORMAT_R10G10B10A2_UNORM;
+	const Formats Formats::R10G10B10A2_UINT = DXGI_FORMAT_R10G10B10A2_UINT;
+	const Formats Formats::R11G11B10_FLOAT = DXGI_FORMAT_R11G11B10_FLOAT;
+	const Formats Formats::R8G8B8A8_TYPELESS = DXGI_FORMAT_R8G8B8A8_TYPELESS;
+
+	/// <summary>
+	/// Default SDR
+	/// </summary>
+	const Formats Formats::R8G8B8A8_UNORM = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+	const Formats Formats::R8G8B8A8_UNORM_SRGB = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	const Formats Formats::R8G8B8A8_UINT = DXGI_FORMAT_R8G8B8A8_UINT;
+	const Formats Formats::R8G8B8A8_SNORM = DXGI_FORMAT_R8G8B8A8_SNORM;
+	const Formats Formats::R8G8B8A8_SINT = DXGI_FORMAT_R8G8B8A8_SINT;
+	const Formats Formats::R16G16_TYPELESS = DXGI_FORMAT_R16G16_TYPELESS;
+	const Formats Formats::R16G16_FLOAT = DXGI_FORMAT_R16G16_FLOAT;
+	const Formats Formats::R16G16_UNORM = DXGI_FORMAT_R16G16_UNORM;
+	const Formats Formats::R16G16_UINT = DXGI_FORMAT_R16G16_UINT;
+	const Formats Formats::R16G16_SNORM = DXGI_FORMAT_R16G16_SNORM;
+	const Formats Formats::R16G16_SINT = DXGI_FORMAT_R16G16_SINT;
+	const Formats Formats::R32_TYPELESS = DXGI_FORMAT_R32_TYPELESS;
+	const Formats Formats::D32_FLOAT = DXGI_FORMAT_D32_FLOAT;
+	const Formats Formats::R32_FLOAT = DXGI_FORMAT_R32_FLOAT;
+	const Formats Formats::R32_UINT = DXGI_FORMAT_R32_UINT;
+	const Formats Formats::R32_SINT = DXGI_FORMAT_R32_SINT;
+	const Formats Formats::R24G8_TYPELESS = DXGI_FORMAT_R24G8_TYPELESS;
+	const Formats Formats::D24_UNORM_S8_UINT = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	const Formats Formats::R24_UNORM_X8_TYPELESS = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+	const Formats Formats::X24_TYPELESS_G8_UINT = DXGI_FORMAT_X24_TYPELESS_G8_UINT;
+	const Formats Formats::R8G8_TYPELESS = DXGI_FORMAT_R8G8_TYPELESS;
+	const Formats Formats::R8G8_UNORM = DXGI_FORMAT_R8G8_UNORM;
+	const Formats Formats::R8G8_UINT = DXGI_FORMAT_R8G8_UINT;
+	const Formats Formats::R8G8_SNORM = DXGI_FORMAT_R8G8_SNORM;
+	const Formats Formats::R8G8_SINT = DXGI_FORMAT_R8G8_SINT;
+	const Formats Formats::R16_TYPELESS = DXGI_FORMAT_R16_TYPELESS;
+	const Formats Formats::R16_FLOAT = DXGI_FORMAT_R16_FLOAT;
+	const Formats Formats::D16_UNORM = DXGI_FORMAT_D16_UNORM;
+	const Formats Formats::R16_UNORM = DXGI_FORMAT_R16_UNORM;
+	const Formats Formats::R16_UINT = DXGI_FORMAT_R16_UINT;
+	const Formats Formats::R16_SNORM = DXGI_FORMAT_R16_SNORM;
+	const Formats Formats::R16_SINT = DXGI_FORMAT_R16_SINT;
+	const Formats Formats::R8_TYPELESS = DXGI_FORMAT_R8_TYPELESS;
+	const Formats Formats::R8_UNORM = DXGI_FORMAT_R8_UNORM;
+	const Formats Formats::R8_UINT = DXGI_FORMAT_R8_UINT;
+	const Formats Formats::R8_SNORM = DXGI_FORMAT_R8_SNORM;
+	const Formats Formats::R8_SINT = DXGI_FORMAT_R8_SINT;
+	const Formats Formats::A8_UNORM = DXGI_FORMAT_A8_UNORM;
+	const Formats Formats::R1_UNORM = DXGI_FORMAT_R1_UNORM;
+	const Formats Formats::R9G9B9E5_SHAREDEXP = DXGI_FORMAT_R9G9B9E5_SHAREDEXP;
+	const Formats Formats::R8G8_B8G8_UNORM = DXGI_FORMAT_R8G8_B8G8_UNORM;
+	const Formats Formats::G8R8_G8B8_UNORM = DXGI_FORMAT_G8R8_G8B8_UNORM;
+	const Formats Formats::BC1_TYPELESS = DXGI_FORMAT_BC1_TYPELESS;
+	const Formats Formats::BC1_UNORM = DXGI_FORMAT_BC1_UNORM;
+	const Formats Formats::BC1_UNORM_SRGB = DXGI_FORMAT_BC1_UNORM_SRGB;
+	const Formats Formats::BC2_TYPELESS = DXGI_FORMAT_BC2_TYPELESS;
+	const Formats Formats::BC2_UNORM = DXGI_FORMAT_BC2_UNORM;
+	const Formats Formats::BC2_UNORM_SRGB = DXGI_FORMAT_BC2_UNORM_SRGB;
+	const Formats Formats::BC3_TYPELESS = DXGI_FORMAT_BC3_TYPELESS;
+	const Formats Formats::BC3_UNORM = DXGI_FORMAT_BC3_UNORM;
+	const Formats Formats::BC3_UNORM_SRGB = DXGI_FORMAT_BC3_UNORM_SRGB;
+	const Formats Formats::BC4_TYPELESS = DXGI_FORMAT_BC4_TYPELESS;
+	const Formats Formats::BC4_UNORM = DXGI_FORMAT_BC4_UNORM;
+	const Formats Formats::BC4_SNORM = DXGI_FORMAT_BC4_SNORM;
+	const Formats Formats::BC5_TYPELESS = DXGI_FORMAT_BC5_TYPELESS;
+	const Formats Formats::BC5_UNORM = DXGI_FORMAT_BC5_UNORM;
+	const Formats Formats::BC5_SNORM = DXGI_FORMAT_BC5_SNORM;
+	const Formats Formats::B5G6R5_UNORM = DXGI_FORMAT_B5G6R5_UNORM;
+	const Formats Formats::B5G5R5A1_UNORM = DXGI_FORMAT_B5G5R5A1_UNORM;
+	const Formats Formats::B8G8R8A8_UNORM = DXGI_FORMAT_B8G8R8A8_UNORM;
+	const Formats Formats::B8G8R8X8_UNORM = DXGI_FORMAT_B8G8R8X8_UNORM;
+	const Formats Formats::R10G10B10_XR_BIAS_A2_UNORM = DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM;
+	const Formats Formats::B8G8R8A8_TYPELESS = DXGI_FORMAT_B8G8R8A8_TYPELESS;
+	const Formats Formats::B8G8R8A8_UNORM_SRGB = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+	const Formats Formats::B8G8R8X8_TYPELESS = DXGI_FORMAT_B8G8R8X8_TYPELESS;
+	const Formats Formats::B8G8R8X8_UNORM_SRGB = DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+	const Formats Formats::BC6H_TYPELESS = DXGI_FORMAT_BC6H_TYPELESS;
+	const Formats Formats::BC6H_UF16 = DXGI_FORMAT_BC6H_UF16;
+	const Formats Formats::BC6H_SF16 = DXGI_FORMAT_BC6H_SF16;
+	const Formats Formats::BC7_TYPELESS = DXGI_FORMAT_BC7_TYPELESS;
+	const Formats Formats::BC7_UNORM = DXGI_FORMAT_BC7_UNORM;
+	const Formats Formats::BC7_UNORM_SRGB = DXGI_FORMAT_BC7_UNORM_SRGB;
+	const Formats Formats::AYUV = DXGI_FORMAT_AYUV;
+	const Formats Formats::Y410 = DXGI_FORMAT_Y410;
+	const Formats Formats::Y416 = DXGI_FORMAT_Y416;
+	const Formats Formats::NV12 = DXGI_FORMAT_NV12;
+	const Formats Formats::P010 = DXGI_FORMAT_P010;
+	const Formats Formats::P016 = DXGI_FORMAT_P016;
+	const Formats Formats::OPAQUE_420 = DXGI_FORMAT_420_OPAQUE;
+	const Formats Formats::YUY2 = DXGI_FORMAT_YUY2;
+	const Formats Formats::Y210 = DXGI_FORMAT_Y210;
+	const Formats Formats::Y216 = DXGI_FORMAT_Y216;
+	const Formats Formats::NV11 = DXGI_FORMAT_NV11;
+	const Formats Formats::AI44 = DXGI_FORMAT_AI44;
+	const Formats Formats::IA44 = DXGI_FORMAT_IA44;
+	const Formats Formats::P8 = DXGI_FORMAT_P8;
+	const Formats Formats::A8P8 = DXGI_FORMAT_A8P8;
+	const Formats Formats::B4G4R4A4_UNORM = DXGI_FORMAT_B4G4R4A4_UNORM;
+	const Formats Formats::P208 = DXGI_FORMAT_P208;
+	const Formats Formats::V208 = DXGI_FORMAT_V208;
+	const Formats Formats::V408 = DXGI_FORMAT_V408;
+
+	const TexFilterModes TexFilterModes::POINT = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	const TexFilterModes TexFilterModes::MIN_MAG_POINT_MIP_LINEAR = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::MIN_POINT_MAG_LINEAR_MIP_POINT = D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
+	const TexFilterModes TexFilterModes::MIN_POINT_MAG_MIP_LINEAR = D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::MIN_LINEAR_MAG_MIP_POINT = D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
+	const TexFilterModes TexFilterModes::MIN_LINEAR_MAG_POINT_MIP_LINEAR = D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::MIN_MAG_LINEAR_MIP_POINT = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+	const TexFilterModes TexFilterModes::LINEAR = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::ANISOTROPIC = D3D11_FILTER_ANISOTROPIC;
+	const TexFilterModes TexFilterModes::COMPARISON_POINT = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
+	const TexFilterModes TexFilterModes::COMPARISON_MIN_MAG_POINT_MIP_LINEAR = D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT = D3D11_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT;
+	const TexFilterModes TexFilterModes::COMPARISON_MIN_POINT_MAG_MIP_LINEAR = D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::COMPARISON_MIN_LINEAR_MAG_MIP_POINT = D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT;
+	const TexFilterModes TexFilterModes::COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR = D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::COMPARISON_MIN_MAG_LINEAR_MIP_POINT = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+	const TexFilterModes TexFilterModes::COMPARISON_LINEAR = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::COMPARISON_ANISOTROPIC = D3D11_FILTER_COMPARISON_ANISOTROPIC;
+	const TexFilterModes TexFilterModes::MINIMUM_POINT = D3D11_FILTER_MINIMUM_MIN_MAG_MIP_POINT;
+	const TexFilterModes TexFilterModes::MINIMUM_MIN_MAG_POINT_MIP_LINEAR = D3D11_FILTER_MINIMUM_MIN_MAG_POINT_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT = D3D11_FILTER_MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT;
+	const TexFilterModes TexFilterModes::MINIMUM_MIN_POINT_MAG_MIP_LINEAR = D3D11_FILTER_MINIMUM_MIN_POINT_MAG_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::MINIMUM_MIN_LINEAR_MAG_MIP_POINT = D3D11_FILTER_MINIMUM_MIN_LINEAR_MAG_MIP_POINT;
+	const TexFilterModes TexFilterModes::MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR = D3D11_FILTER_MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::MINIMUM_MIN_MAG_LINEAR_MIP_POINT = D3D11_FILTER_MINIMUM_MIN_MAG_LINEAR_MIP_POINT;
+	const TexFilterModes TexFilterModes::MINIMUM_LINEAR = D3D11_FILTER_MINIMUM_MIN_MAG_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::MINIMUM_ANISOTROPIC = D3D11_FILTER_MINIMUM_ANISOTROPIC;
+	const TexFilterModes TexFilterModes::MAXIMUM_POINT = D3D11_FILTER_MAXIMUM_MIN_MAG_MIP_POINT;
+	const TexFilterModes TexFilterModes::MAXIMUM_MIN_MAG_POINT_MIP_LINEAR = D3D11_FILTER_MAXIMUM_MIN_MAG_POINT_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT = D3D11_FILTER_MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT;
+	const TexFilterModes TexFilterModes::MAXIMUM_MIN_POINT_MAG_MIP_LINEAR = D3D11_FILTER_MAXIMUM_MIN_POINT_MAG_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::MAXIMUM_MIN_LINEAR_MAG_MIP_POINT = D3D11_FILTER_MAXIMUM_MIN_LINEAR_MAG_MIP_POINT;
+	const TexFilterModes TexFilterModes::MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR = D3D11_FILTER_MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::MAXIMUM_MIN_MAG_LINEAR_MIP_POINT = D3D11_FILTER_MAXIMUM_MIN_MAG_LINEAR_MIP_POINT;
+	const TexFilterModes TexFilterModes::MAXIMUM_LINEAR = D3D11_FILTER_MAXIMUM_MIN_MAG_MIP_LINEAR;
+	const TexFilterModes TexFilterModes::MAXIMUM_ANISOTROPIC = D3D11_FILTER_MAXIMUM_ANISOTROPIC;
+
+	const TexClampModes TexClampModes::WRAP = D3D11_TEXTURE_ADDRESS_WRAP;
+	const TexClampModes TexClampModes::MIRROR = D3D11_TEXTURE_ADDRESS_MIRROR;
+	const TexClampModes TexClampModes::CLAMP = D3D11_TEXTURE_ADDRESS_CLAMP;
+	const TexClampModes TexClampModes::BORDER = D3D11_TEXTURE_ADDRESS_BORDER;
+	const TexClampModes TexClampModes::MIRROR_ONCE = D3D11_TEXTURE_ADDRESS_MIRROR_ONCE;
+
+	const TexCmpFuncs TexCmpFuncs::NEVER = D3D11_COMPARISON_NEVER;
+	const TexCmpFuncs TexCmpFuncs::LESS = D3D11_COMPARISON_LESS;
+	const TexCmpFuncs TexCmpFuncs::EQUAL = D3D11_COMPARISON_EQUAL;
+	const TexCmpFuncs TexCmpFuncs::LESS_EQUAL = D3D11_COMPARISON_LESS_EQUAL;
+	const TexCmpFuncs TexCmpFuncs::GREATER = D3D11_COMPARISON_GREATER;
+	const TexCmpFuncs TexCmpFuncs::NOT_EQUAL = D3D11_COMPARISON_NOT_EQUAL;
+	const TexCmpFuncs TexCmpFuncs::GREATER_EQUAL = D3D11_COMPARISON_GREATER_EQUAL;
+	const TexCmpFuncs TexCmpFuncs::ALWAYS = D3D11_COMPARISON_ALWAYS;
+
+	static const std::unordered_map<EnumAlias<D3D11_INPUT_CLASSIFICATION>, string_view> s_InputClassNames
 	{
-		{ InputClass::PerVertex, "PerVertex" },
-		{ InputClass::PerInstance, "PerInstance" }
+		{ InputClasses::PerVertex, "PerVertex" },
+		{ InputClasses::PerInstance, "PerInstance" }
 	};
 
-	static const std::unordered_map<Formats, string_view> s_FormatNames
+	static const std::unordered_map<EnumAlias<DXGI_FORMAT>, string_view> s_FormatNames
 	{
 		{ Formats::UNKNOWN, "UNKNOWN" },
 		{ Formats::R32G32B32A32_TYPELESS, "R32G32B32A32_TYPELESS" },
@@ -133,74 +346,74 @@ namespace Weave::D3D11
 		{ Formats::V408, "V408" }
 	};
 
-	string_view GetInputClassName(InputClass inputClass) { return GetEnumName(inputClass, s_InputClassNames); }
+	string_view GetInputClassName(InputClasses inputClass) { return GetEnumName(inputClass, s_InputClassNames); }
 
 	string_view GetFormatName(Formats format) { return GetEnumName(format, s_FormatNames); }
 
-	std::unordered_map<TexFilterMode, string_view> s_FilterModeNames
+	std::unordered_map<EnumAlias<D3D11_FILTER>, string_view> s_FilterModeNames
 	{
-		{ TexFilterMode::POINT, "POINT" },
-		{ TexFilterMode::MIN_MAG_POINT_MIP_LINEAR, "MIN_MAG_POINT_MIP_LINEAR" },
-		{ TexFilterMode::MIN_POINT_MAG_LINEAR_MIP_POINT, "MIN_POINT_MAG_LINEAR_MIP_POINT" },
-		{ TexFilterMode::MIN_POINT_MAG_MIP_LINEAR, "MIN_POINT_MAG_MIP_LINEAR" },
-		{ TexFilterMode::MIN_LINEAR_MAG_MIP_POINT, "MIN_LINEAR_MAG_MIP_POINT" },
-		{ TexFilterMode::MIN_LINEAR_MAG_POINT_MIP_LINEAR, "MIN_LINEAR_MAG_POINT_MIP_LINEAR" },
-		{ TexFilterMode::MIN_MAG_LINEAR_MIP_POINT, "MIN_MAG_LINEAR_MIP_POINT" },
-		{ TexFilterMode::LINEAR, "LINEAR" },
-		{ TexFilterMode::ANISOTROPIC, "ANISOTROPIC" },
-		{ TexFilterMode::COMPARISON_POINT, "COMPARISON_POINT" },
-		{ TexFilterMode::COMPARISON_MIN_MAG_POINT_MIP_LINEAR, "COMPARISON_MIN_MAG_POINT_MIP_LINEAR" },
-		{ TexFilterMode::COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT, "COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT" },
-		{ TexFilterMode::COMPARISON_MIN_POINT_MAG_MIP_LINEAR, "COMPARISON_MIN_POINT_MAG_MIP_LINEAR" },
-		{ TexFilterMode::COMPARISON_MIN_LINEAR_MAG_MIP_POINT, "COMPARISON_MIN_LINEAR_MAG_MIP_POINT" },
-		{ TexFilterMode::COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR, "COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR" },
-		{ TexFilterMode::COMPARISON_MIN_MAG_LINEAR_MIP_POINT, "COMPARISON_MIN_MAG_LINEAR_MIP_POINT" },
-		{ TexFilterMode::COMPARISON_LINEAR, "COMPARISON_LINEAR" },
-		{ TexFilterMode::COMPARISON_ANISOTROPIC, "COMPARISON_ANISOTROPIC" },
-		{ TexFilterMode::MINIMUM_POINT, "MINIMUM_POINT" },
-		{ TexFilterMode::MINIMUM_MIN_MAG_POINT_MIP_LINEAR, "MINIMUM_MIN_MAG_POINT_MIP_LINEAR" },
-		{ TexFilterMode::MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT, "MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT" },
-		{ TexFilterMode::MINIMUM_MIN_POINT_MAG_MIP_LINEAR, "MINIMUM_MIN_POINT_MAG_MIP_LINEAR" },
-		{ TexFilterMode::MINIMUM_MIN_LINEAR_MAG_MIP_POINT, "MINIMUM_MIN_LINEAR_MAG_MIP_POINT" },
-		{ TexFilterMode::MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR, "MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR" },
-		{ TexFilterMode::MINIMUM_MIN_MAG_LINEAR_MIP_POINT, "MINIMUM_MIN_MAG_LINEAR_MIP_POINT" },
-		{ TexFilterMode::MINIMUM_LINEAR, "MINIMUM_LINEAR" },
-		{ TexFilterMode::MINIMUM_ANISOTROPIC, "MINIMUM_ANISOTROPIC" },
-		{ TexFilterMode::MAXIMUM_POINT, "MAXIMUM_POINT" },
-		{ TexFilterMode::MAXIMUM_MIN_MAG_POINT_MIP_LINEAR, "MAXIMUM_MIN_MAG_POINT_MIP_LINEAR" },
-		{ TexFilterMode::MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT, "MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT" },
-		{ TexFilterMode::MAXIMUM_MIN_POINT_MAG_MIP_LINEAR, "MAXIMUM_MIN_POINT_MAG_MIP_LINEAR" },
-		{ TexFilterMode::MAXIMUM_MIN_LINEAR_MAG_MIP_POINT, "MAXIMUM_MIN_LINEAR_MAG_MIP_POINT" },
-		{ TexFilterMode::MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR, "MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR" },
-		{ TexFilterMode::MAXIMUM_MIN_MAG_LINEAR_MIP_POINT, "MAXIMUM_MIN_MAG_LINEAR_MIP_POINT" },
-		{ TexFilterMode::MAXIMUM_LINEAR, "MAXIMUM_LINEAR" },
-		{ TexFilterMode::MAXIMUM_ANISOTROPIC, "MAXIMUM_ANISOTROPIC" }
+		{ TexFilterModes::POINT, "POINT" },
+		{ TexFilterModes::MIN_MAG_POINT_MIP_LINEAR, "MIN_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterModes::MIN_POINT_MAG_LINEAR_MIP_POINT, "MIN_POINT_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterModes::MIN_POINT_MAG_MIP_LINEAR, "MIN_POINT_MAG_MIP_LINEAR" },
+		{ TexFilterModes::MIN_LINEAR_MAG_MIP_POINT, "MIN_LINEAR_MAG_MIP_POINT" },
+		{ TexFilterModes::MIN_LINEAR_MAG_POINT_MIP_LINEAR, "MIN_LINEAR_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterModes::MIN_MAG_LINEAR_MIP_POINT, "MIN_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterModes::LINEAR, "LINEAR" },
+		{ TexFilterModes::ANISOTROPIC, "ANISOTROPIC" },
+		{ TexFilterModes::COMPARISON_POINT, "COMPARISON_POINT" },
+		{ TexFilterModes::COMPARISON_MIN_MAG_POINT_MIP_LINEAR, "COMPARISON_MIN_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterModes::COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT, "COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterModes::COMPARISON_MIN_POINT_MAG_MIP_LINEAR, "COMPARISON_MIN_POINT_MAG_MIP_LINEAR" },
+		{ TexFilterModes::COMPARISON_MIN_LINEAR_MAG_MIP_POINT, "COMPARISON_MIN_LINEAR_MAG_MIP_POINT" },
+		{ TexFilterModes::COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR, "COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterModes::COMPARISON_MIN_MAG_LINEAR_MIP_POINT, "COMPARISON_MIN_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterModes::COMPARISON_LINEAR, "COMPARISON_LINEAR" },
+		{ TexFilterModes::COMPARISON_ANISOTROPIC, "COMPARISON_ANISOTROPIC" },
+		{ TexFilterModes::MINIMUM_POINT, "MINIMUM_POINT" },
+		{ TexFilterModes::MINIMUM_MIN_MAG_POINT_MIP_LINEAR, "MINIMUM_MIN_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterModes::MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT, "MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterModes::MINIMUM_MIN_POINT_MAG_MIP_LINEAR, "MINIMUM_MIN_POINT_MAG_MIP_LINEAR" },
+		{ TexFilterModes::MINIMUM_MIN_LINEAR_MAG_MIP_POINT, "MINIMUM_MIN_LINEAR_MAG_MIP_POINT" },
+		{ TexFilterModes::MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR, "MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterModes::MINIMUM_MIN_MAG_LINEAR_MIP_POINT, "MINIMUM_MIN_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterModes::MINIMUM_LINEAR, "MINIMUM_LINEAR" },
+		{ TexFilterModes::MINIMUM_ANISOTROPIC, "MINIMUM_ANISOTROPIC" },
+		{ TexFilterModes::MAXIMUM_POINT, "MAXIMUM_POINT" },
+		{ TexFilterModes::MAXIMUM_MIN_MAG_POINT_MIP_LINEAR, "MAXIMUM_MIN_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterModes::MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT, "MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterModes::MAXIMUM_MIN_POINT_MAG_MIP_LINEAR, "MAXIMUM_MIN_POINT_MAG_MIP_LINEAR" },
+		{ TexFilterModes::MAXIMUM_MIN_LINEAR_MAG_MIP_POINT, "MAXIMUM_MIN_LINEAR_MAG_MIP_POINT" },
+		{ TexFilterModes::MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR, "MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR" },
+		{ TexFilterModes::MAXIMUM_MIN_MAG_LINEAR_MIP_POINT, "MAXIMUM_MIN_MAG_LINEAR_MIP_POINT" },
+		{ TexFilterModes::MAXIMUM_LINEAR, "MAXIMUM_LINEAR" },
+		{ TexFilterModes::MAXIMUM_ANISOTROPIC, "MAXIMUM_ANISOTROPIC" }
 	};
 
-	string_view GetFilterModeName(TexFilterMode mode) { return GetEnumName(mode, s_FilterModeNames); }
+	string_view GetFilterModeName(TexFilterModes mode) { return GetEnumName(mode, s_FilterModeNames); }
 
-	static const std::unordered_map<TexClampMode, string_view> s_ClampModeNames
+	static const std::unordered_map<EnumAlias<D3D11_TEXTURE_ADDRESS_MODE>, string_view> s_ClampModeNames
 	{
-		{ TexClampMode::WRAP, "WRAP" },
-		{ TexClampMode::MIRROR, "MIRROR" },
-		{ TexClampMode::CLAMP, "CLAMP" },
-		{ TexClampMode::BORDER, "BORDER" },
-		{ TexClampMode::MIRROR_ONCE, "MIRROR_ONCE" }
+		{ TexClampModes::WRAP, "WRAP" },
+		{ TexClampModes::MIRROR, "MIRROR" },
+		{ TexClampModes::CLAMP, "CLAMP" },
+		{ TexClampModes::BORDER, "BORDER" },
+		{ TexClampModes::MIRROR_ONCE, "MIRROR_ONCE" }
 	};
 
-	string_view GetTexClampModeName(TexClampMode mode) { return GetEnumName(mode, s_ClampModeNames); }
+	string_view GetTexClampModeName(TexClampModes mode) { return GetEnumName(mode, s_ClampModeNames); }
 
-	static const std::unordered_map<TexCmpFunc, string_view> s_CmpFuncNames
+	static const std::unordered_map<EnumAlias<D3D11_COMPARISON_FUNC>, string_view> s_CmpFuncNames
 	{
-		{ TexCmpFunc::NEVER, "NEVER" },
-		{ TexCmpFunc::LESS, "LESS" },
-		{ TexCmpFunc::EQUAL, "EQUAL" },
-		{ TexCmpFunc::LESS_EQUAL, "LESS_EQUAL" },
-		{ TexCmpFunc::GREATER, "GREATER" },
-		{ TexCmpFunc::NOT_EQUAL, "NOT_EQUAL" },
-		{ TexCmpFunc::GREATER_EQUAL, "GREATER_EQUAL" },
-		{ TexCmpFunc::ALWAYS, "ALWAYS" }
+		{ TexCmpFuncs::NEVER, "NEVER" },
+		{ TexCmpFuncs::LESS, "LESS" },
+		{ TexCmpFuncs::EQUAL, "EQUAL" },
+		{ TexCmpFuncs::LESS_EQUAL, "LESS_EQUAL" },
+		{ TexCmpFuncs::GREATER, "GREATER" },
+		{ TexCmpFuncs::NOT_EQUAL, "NOT_EQUAL" },
+		{ TexCmpFuncs::GREATER_EQUAL, "GREATER_EQUAL" },
+		{ TexCmpFuncs::ALWAYS, "ALWAYS" }
 	};
 
-	string_view GetTexCmpFuncName(TexCmpFunc func) { return GetEnumName(func, s_CmpFuncNames); }
+	string_view GetTexCmpFuncName(TexCmpFuncs func) { return GetEnumName(func, s_CmpFuncNames); }
 }
