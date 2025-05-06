@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "WeaveUtils/WinUtils.hpp"
+#include "WeaveUtils/Win32.hpp"
 #include "WeaveUtils/WeaveWinException.hpp"
 
 namespace Weave

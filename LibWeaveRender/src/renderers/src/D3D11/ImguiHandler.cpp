@@ -111,7 +111,7 @@ void ImGuiHandler::Update()
 	}
 }
 
-bool ImGuiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+bool ImGuiHandler::OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam)
 {
 	if (ImGui::GetCurrentContext() != nullptr)
 	{

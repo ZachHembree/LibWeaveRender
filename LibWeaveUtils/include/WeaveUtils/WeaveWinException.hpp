@@ -13,7 +13,7 @@
 
 #define WIN_THROW_HR(HR) WIN_THROW_HR_MSG(HR, "")
 
-#define WIN_CHECK_HR_MSG(HR, ...) do { HRESULT _hr = (HR); if (FAILED(_hr)) { WIN_THROW_HR_MSG(_hr, __VA_ARGS__); } } while(0)
+#define WIN_CHECK_HR_MSG(HR, ...) do { slong _hr = (HR); if (FAILED(_hr)) { WIN_THROW_HR_MSG(_hr, __VA_ARGS__); } } while(0)
 #define WIN_CHECK_LAST_MSG(COND, ...) WV_IF_NOT(COND, WIN_CHECK_HR_MSG(GetLastError(), __VA_ARGS__))
 #define WIN_CHECK_NZ_LAST_MSG(X, ...) WIN_CHECK_LAST_MSG((X) != 0, __VA_ARGS__)
 
@@ -51,25 +51,25 @@ namespace Weave
 
 			WeaveWinException();
 
-			WeaveWinException(HRESULT hr, string&& msg = "") noexcept;
+			WeaveWinException(slong hr, string&& msg = "") noexcept;
 
-			WeaveWinException(const std::source_location& loc, HRESULT hr, string&& msg = "") noexcept;
+			WeaveWinException(const std::source_location& loc, slong hr, string&& msg = "") noexcept;
 
 			template<typename... FmtArgs>
-			WeaveWinException(HRESULT hr, string_view fmt, FmtArgs... args) :
+			WeaveWinException(slong hr, string_view fmt, FmtArgs... args) :
 				WeaveWinException(hr, std::vformat(fmt, std::make_format_args(args...)))
 			{ }
 
 			template<typename... FmtArgs>
-			WeaveWinException(const std::source_location& loc, HRESULT hr, string_view fmt, FmtArgs... args) :
+			WeaveWinException(const std::source_location& loc, slong hr, string_view fmt, FmtArgs... args) :
 				WeaveWinException(loc, hr, std::vformat(fmt, std::make_format_args(args...)))
 			{ }
 
-			HRESULT GetErrorCode() const noexcept;
+			slong GetErrorCode() const noexcept;
 
 			string_view GetType() const noexcept override;
 		
 		protected:
-			HRESULT hr;
+			slong hr;
 	};
 }

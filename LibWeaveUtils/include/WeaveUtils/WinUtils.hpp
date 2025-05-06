@@ -1,5 +1,4 @@
 #pragma once
-
 // Essential defines
 #define WIN32_LEAN_AND_MEAN      // Exclude rarely-used stuff from Windows headers
 #define NOMINMAX                 // Exclude min/max macros
@@ -37,18 +36,29 @@
 #define NOTAPE                   // Tape APIs
 #define NOKERNEL
 
-#include <wrl/client.h>
 #include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/Math.hpp"
 
-namespace Weave
-{
-	typedef glm::tvec2<DWORD> WndStyle;
-	typedef glm::tvec2<uint> uivec2;
+#ifndef _WINDOWS_
+#ifndef CALLBACK
+#define CALLBACK    __stdcall
+#endif
+#ifndef WINAPI
+#define WINAPI      __stdcall
+#endif
 
-	using glm::ivec2;
-	using glm::vec2;
+struct HWND__;
+typedef HWND__* HWND;
 
-	template <typename T>
-	using ComPtr = Microsoft::WRL::ComPtr<T>;
-}
+struct HMONITOR__;
+typedef HMONITOR__* HMONITOR;
+
+struct tagMSG;
+typedef tagMSG MSG;
+
+struct HINSTANCE__;
+typedef HINSTANCE__* HINSTANCE;
+
+struct tagTRACKMOUSEEVENT;
+typedef tagTRACKMOUSEEVENT TRACKMOUSEEVENT;
+#endif

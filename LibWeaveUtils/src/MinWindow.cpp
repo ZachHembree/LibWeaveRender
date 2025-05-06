@@ -7,11 +7,13 @@
 
 using namespace Weave;
 
+// Has title bar | Has minimize button | Has window menu on its title bar | Can maximize | Can resize
+constexpr WndStyle g_DefaultWndStyle = WndStyle(WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_MAXIMIZEBOX | WS_SIZEBOX, 0L);
+
 MinWindow::MinWindow() :
 	ComponentManagerBase(),
 	hInst(nullptr),
 	hWnd(nullptr),
-	wndMsg(MSG{}),
 	bodySize(0),
 	wndSize(0),
 	isInitialized(false),
@@ -33,6 +35,9 @@ MinWindow::MinWindow(
 ) :
 	MinWindow()
 {
+	if (style == g_NullStyle)
+		style = g_DefaultWndStyle;
+
 	name = name;
 	this->hInst = hInst;
 	this->style = style;
@@ -95,6 +100,8 @@ MinWindow::MinWindow(
 	WIN_CHECK_LAST(hWnd != NULL);
 
 	// Setup mouse tracker
+	pMouseTrackEvent.reset(new TRACKMOUSEEVENT{});
+	TRACKMOUSEEVENT& tme = *pMouseTrackEvent;
 	tme.cbSize = sizeof(tme);
 	tme.hwndTrack = hWnd;
 	tme.dwFlags = TME_LEAVE | TME_HOVER;
@@ -134,17 +141,15 @@ MinWindow::~MinWindow()
 	}
 }
 
-MSG MinWindow::RunMessageLoop()
+void MinWindow::RunMessageLoop(MSG& msg)
 {
 	isInitialized = true;
 
-	while (PollWindowMessages())
+	while (PollWindowMessages(msg))
 	{
 		for (WindowComponentBase* pComp : sortedComps)
 			pComp->Update();
 	}
-
-	return wndMsg;
 }
 
 wstring_view MinWindow::GetWindowTitle() const
@@ -430,7 +435,7 @@ void MinWindow::CloseWindow() { PostMessageW(hWnd, WM_CLOSE, 0, 0); }
 	Win32 message polling and callbacks
 */
 
-bool MinWindow::PollWindowMessages()
+bool MinWindow::PollWindowMessages(MSG& wndMsg)
 {
 	UpdateComponentIDs();
 
@@ -458,7 +463,7 @@ bool MinWindow::PollWindowMessages()
 	return true;
 }
 
-LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+slong MinWindow::OnWndMessage(HWND window, uint msg, ulong wParam, slong lParam)
 {
 	std::optional<slong> result;
 
@@ -484,7 +489,7 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		case WM_MOUSEMOVE:
 
 			if (!isMousedOver)
-				TrackMouseEvent(&tme);
+				TrackMouseEvent(pMouseTrackEvent.get());
 
 			isMousedOver = true;
 			break;
@@ -545,7 +550,7 @@ void MinWindow::UpdateSize()
 		WV_ASSERT_MSG(bodySize == wndSize, "Client and Window size should be equal when non-client area is overridden.");
 }
 
-std::optional<LRESULT> MinWindow::TryHandleOverrideNC(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
+std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, uint msg, ulong wParam, slong lParam)
 {
 	switch (msg)
 	{
@@ -633,7 +638,7 @@ std::optional<LRESULT> MinWindow::TryHandleOverrideNC(HWND window, UINT msg, WPA
 	return std::nullopt;
 }
 
-LRESULT CALLBACK MinWindow::HandleWindowSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+slong CALLBACK MinWindow::HandleWindowSetup(HWND hWnd, uint msg, ulong wParam, slong lParam)
 {
 	if (msg == WM_CREATE)
 	{
@@ -646,14 +651,14 @@ LRESULT CALLBACK MinWindow::HandleWindowSetup(HWND hWnd, UINT msg, WPARAM wParam
 
 		// Switch to main message forwarding proceedure
 		SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&WindowMessageHandler));
-
+		
 		return wndPtr->OnWndMessage(hWnd, msg, wParam, lParam);
 	}
 	else
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK MinWindow::WindowMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+slong CALLBACK MinWindow::WindowMessageHandler(HWND hWnd, uint msg, ulong wParam, slong lParam)
 {
 	MinWindow* const wndPtr = reinterpret_cast<MinWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	return wndPtr->OnWndMessage(hWnd, msg, wParam, lParam);

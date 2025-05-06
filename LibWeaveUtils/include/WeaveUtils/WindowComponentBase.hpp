@@ -1,5 +1,4 @@
 #pragma once
-#include "GlobalUtils.hpp"
 #include "WinUtils.hpp"
 #include "ComponentManagerBase.hpp"
 
@@ -30,6 +29,6 @@ namespace Weave
 		/// <summary>
 		/// Invoked on WndProc callback. Interrupts update if the component returns false.
 		/// </summary>
-		virtual bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		virtual bool OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam);
 	};
 }

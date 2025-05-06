@@ -82,7 +82,7 @@ namespace Weave::D3D11
 
 		void Update() override;
 
-		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
+		bool OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam) override;
 
 	private:
 		friend ManagerT;

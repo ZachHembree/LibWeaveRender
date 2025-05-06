@@ -1,5 +1,5 @@
 #pragma once
-#include "WeaveUtils/WinUtils.hpp"
+#include "WeaveUtils/Win32.hpp"
 #include "WeaveUtils/Math.hpp"
 #include <d3d11_4.h>
 #include "Resources/ResourceEnums.hpp"

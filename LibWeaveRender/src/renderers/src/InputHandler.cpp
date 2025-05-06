@@ -115,7 +115,7 @@ void InputHandler::Update()
 		currentMousePresses |= MouseKey::xButton2;
 }
 
-bool InputHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+bool InputHandler::OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam)
 {
 
 	switch (msg)

@@ -1,13 +1,14 @@
 #pragma once
-#include "WinUtils.hpp"
+#include "WeaveUtils/GlobalUtils.hpp"
+#include "WeaveUtils/Math.hpp"
 #include "ComponentManagerBase.hpp"
 
 namespace Weave
 {
 	class WindowComponentBase;
 
-	// Has title bar | Has minimize button | Has window menu on its title bar | Can maximize | Can resize
-	constexpr WndStyle g_DefaultWndStyle = WndStyle(WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_MAXIMIZEBOX | WS_SIZEBOX, 0L);
+	typedef glm::tvec2<uint> WndStyle;
+	constexpr WndStyle g_NullStyle(-1, -1);
 
 	/// <summary>
 	/// Describes the configuration of a given monitor as reported by Win32
@@ -126,7 +127,7 @@ namespace Weave
 				wstring_view name,
 				ivec2 bodySize,
 				const HINSTANCE hInst,
-				WndStyle style = g_DefaultWndStyle,
+				WndStyle style = g_NullStyle,
 				const wchar_t* iconRes = nullptr
 			);
 
@@ -146,7 +147,7 @@ namespace Weave
 			/// <summary>
 			/// Updates window message loop until the window is closed
 			/// </summary>
-			MSG RunMessageLoop();
+			void RunMessageLoop(MSG& msg);
 
 			/// <summary>
 			/// Returns the contents of the titlebar
@@ -338,7 +339,6 @@ namespace Weave
 			bool isInitialized;
 
 			HWND hWnd;
-			MSG wndMsg;
 
 			// Styling
 			WndStyle style;
@@ -347,7 +347,7 @@ namespace Weave
 			ivec2 lastPos, lastSize;
 
 			// Mouse tracking
-			TRACKMOUSEEVENT tme;
+			std::unique_ptr<TRACKMOUSEEVENT> pMouseTrackEvent;
 			bool isMousedOver;
 			bool canSysSleep;
 			bool canDispSleep;
@@ -378,17 +378,17 @@ namespace Weave
 			/// Processes next window message without removing it from the queue.
 			/// Returns false only on exit.
 			/// </summary>
-			virtual bool PollWindowMessages();
+			virtual bool PollWindowMessages(MSG& msg);
 
 			/// <summary>
 			/// Proceedure for processing window messages sent from Win32 API
 			/// </summary>
-			LRESULT OnWndMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
+			slong OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam);
 
 			/// <summary>
 			/// Overrides non-client area styling Win32 messages if enabled
 			/// </summary>
-			std::optional<LRESULT> TryHandleOverrideNC(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
+			std::optional<slong> TryHandleOverrideNC(HWND hWnd, uint msg, ulong wParam, slong lParam);
 
 			/// <summary>
 			/// Updates window and body size
@@ -398,11 +398,11 @@ namespace Weave
 			/// <summary>
 			/// Handles messaging setup on creation of new windows
 			/// </summary>
-			static LRESULT CALLBACK HandleWindowSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+			static slong CALLBACK HandleWindowSetup(HWND hWnd, uint msg, ulong wParam, slong lParam);
 
 			/// <summary>
 			/// Forwards messages from the Win32 API to the appropriate window instance
 			/// </summary>
-			static LRESULT CALLBACK WindowMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+			static slong CALLBACK WindowMessageHandler(HWND hWnd, uint msg, ulong wParam, slong lParam);
 	};
 }

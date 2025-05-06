@@ -11,7 +11,7 @@
 
 #define D3D_CHECK_MSG(COND, ...) WV_IF_NOT( COND, D3D_THROW(__VA_ARGS__) )
 #define D3D_CHECK(COND) WV_IF_NOT( COND, D3D_THROW("Check failed") )
-#define D3D_CHECK_HR_MSG(HR, ...) do { HRESULT hr = (HR); if (FAILED(hr)) { D3D_THROW_HR_MSG(hr, __VA_ARGS__); } } while(0)
+#define D3D_CHECK_HR_MSG(HR, ...) do { slong hr = (HR); if (FAILED(hr)) { D3D_THROW_HR_MSG(hr, __VA_ARGS__); } } while(0)
 #define D3D_CHECK_HR(HR) D3D_CHECK_HR_MSG(HR, "")
 
 #ifndef NDEBUG
@@ -37,12 +37,12 @@ namespace Weave::D3D11
 		using WeaveWinException::WeaveWinException;
 
 		template<typename... FmtArgs>
-		D3DException(HRESULT hr, string_view fmt, FmtArgs... args) :
+		D3DException(slong hr, string_view fmt, FmtArgs... args) :
 			D3DException(hr, std::vformat(fmt, std::make_format_args(args...)))
 		{ }
 
 		template<typename... FmtArgs>
-		D3DException(const std::source_location& loc, HRESULT hr, string_view fmt, FmtArgs... args) :
+		D3DException(const std::source_location& loc, slong hr, string_view fmt, FmtArgs... args) :
 			D3DException(loc, hr, std::vformat(fmt, std::make_format_args(args...)))
 		{ }
 

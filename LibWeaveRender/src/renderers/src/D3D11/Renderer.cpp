@@ -187,7 +187,7 @@ Sampler& Renderer::GetDefaultSampler(string_view name) const { return const_cast
 	Core rendering functions
 */
 
-bool Renderer::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+bool Renderer::OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam)
 { 
 	switch (msg)
 	{

@@ -1,18 +1,18 @@
 #include "pch.hpp"
-#include "WeaveUtils/WinUtils.hpp"
+#include "WeaveUtils/Win32.hpp"
 #include "WeaveUtils/WeaveWinException.hpp"
 
 using namespace std;
 using namespace Weave;
 
-static string GetTranslatedErrorCode(HRESULT hr) noexcept
+static string GetTranslatedErrorCode(slong hr) noexcept
 {
 	wchar_t* lpBuf = nullptr;
 	DWORD msgLen = FormatMessageW(
 		// Alloc Mem for Message + Write Address to Ptr Var | Search Sys Tables for Message
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr,
-		hr,
+		(DWORD)hr,
 		0, // Auto lang ID
 		(wchar_t*)&lpBuf,
 		0,
@@ -33,7 +33,7 @@ WeaveWinException::WeaveWinException() :
 	hr(E_FAIL)
 { }
 
-WeaveWinException::WeaveWinException(HRESULT hr, string&& msg) noexcept :
+WeaveWinException::WeaveWinException(slong hr, string&& msg) noexcept :
 	hr(hr)
 {
 	if (msg.length() > 0)
@@ -52,7 +52,7 @@ WeaveWinException::WeaveWinException(HRESULT hr, string&& msg) noexcept :
 	}
 }
 
-WeaveWinException::WeaveWinException(const std::source_location& loc, HRESULT hr, string&& msg) noexcept :
+WeaveWinException::WeaveWinException(const std::source_location& loc, slong hr, string&& msg) noexcept :
 	hr(hr)
 { 
 	if (msg.length() > 0)
@@ -71,6 +71,6 @@ WeaveWinException::WeaveWinException(const std::source_location& loc, HRESULT hr
 	}
 }
 
-HRESULT WeaveWinException::GetErrorCode() const noexcept { return hr; }
+slong WeaveWinException::GetErrorCode() const noexcept { return hr; }
 
 string_view WeaveWinException::GetType() const noexcept { return "Windows Exception"; }

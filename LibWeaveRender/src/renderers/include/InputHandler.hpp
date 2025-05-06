@@ -36,7 +36,7 @@ namespace Weave
 
 		void Update() override;
 
-		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
+		bool OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam) override;
 
 		/// <summary>
 		/// Returns true if input is enabled

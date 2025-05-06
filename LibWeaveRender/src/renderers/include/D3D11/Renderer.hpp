@@ -222,7 +222,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Handles event messages from the Win32 API
 		/// </summary>
-		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
+		bool OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam) override;
 
 	private:
 		mutable std::unordered_map<uint, ComputeInstance> defaultCompute;
