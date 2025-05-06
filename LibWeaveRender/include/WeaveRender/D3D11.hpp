@@ -5,7 +5,6 @@
 #include "../src/renderers/include/D3DException.hpp"
 
 #include "../src/renderers/include/D3D11/CtxBase.hpp"
-
 #include "../src/renderers/include/D3D11/CtxImm.hpp"
 #include "../src/renderers/include/D3D11/Device.hpp"
 #include "../src/renderers/include/D3D11/Renderer.hpp"

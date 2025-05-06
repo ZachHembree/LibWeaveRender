@@ -1,6 +1,10 @@
 #pragma once
 #include "ResourceBase.hpp"
-#include "ResourceEnums.hpp"
+#include "../CommonEnums.hpp"
+#include "../CommonTypes.hpp"
+#include "WeaveUtils/Win32.hpp"
+
+struct ID3D11Texture2D;
 
 namespace DirectX
 {
@@ -56,7 +60,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns descriptor object for the texture
 		/// </summary>
-		const D3D11_TEXTURE2D_DESC& GetDescription() const;
+		const Texture2DDesc& GetDescription() const;
 
 		/// <summary>
 		/// Returns interface to resource
@@ -81,7 +85,7 @@ namespace Weave::D3D11
 
 	protected:
 		ComPtr<ID3D11Texture2D> pRes;
-		D3D11_TEXTURE2D_DESC desc;
+		Texture2DDesc desc;
 		uint pixelStride;
 
 		Texture2DBase();

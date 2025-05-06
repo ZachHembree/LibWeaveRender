@@ -1,7 +1,7 @@
 #pragma once
-#include "../InternalD3D11.hpp"
 #include "WeaveUtils/DataBufferHandle.hpp"
 #include "ResourceBase.hpp"
+#include "../CommonTypes.hpp"
 
 namespace Weave::D3D11
 {
@@ -50,9 +50,9 @@ namespace Weave::D3D11
 
 	protected:
 		friend CtxImm;
-		D3D11_MAPPED_SUBRESOURCE msr;		
+		MappedSubresource msr;
 		uint subresIndex;	
 
-		MappedBufferHandle(IBuffer& parent, D3D11_MAPPED_SUBRESOURCE msr);
+		MappedBufferHandle(IBuffer& parent, MappedSubresource msr);
 	};
 }

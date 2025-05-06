@@ -43,10 +43,10 @@ RWTexture2D::RWTexture2D(
 	{
 		// SRV
 		D3D11_SHADER_RESOURCE_VIEW_DESC vDesc = {};
-		vDesc.Format = desc.Format;
+		vDesc.Format = (DXGI_FORMAT)desc.format;
 		vDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		vDesc.Texture2D.MostDetailedMip = 0;
-		vDesc.Texture2D.MipLevels = desc.MipLevels;
+		vDesc.Texture2D.MipLevels = desc.mipLevels;
 
 		D3D_CHECK_HR(dev->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
 
@@ -134,11 +134,11 @@ void RWTexture2D::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, u
 			(void*)src.GetData(),
 			(UINT)pixStride,
 			GetFormat(),
-			desc.MipLevels
+			desc.mipLevels
 		));
 	}
 
-	pRes->GetDesc(&desc);
+	pRes->GetDesc(reinterpret_cast<D3D11_TEXTURE2D_DESC*>(&desc));
 }
 
 RWTexture2D RWTexture2D::FromImageWIC(Device& dev, wstring_view file)

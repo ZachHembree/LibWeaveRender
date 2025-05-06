@@ -158,7 +158,7 @@ void ResizeableTexture2D::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>
 			GetUsage(),
 			GetBindFlags(),
 			GetAccessFlags(),
-			desc.MipLevels,
+			desc.mipLevels,
 			(void*)src.GetData(), (uint)pixStride
 		));
 	}

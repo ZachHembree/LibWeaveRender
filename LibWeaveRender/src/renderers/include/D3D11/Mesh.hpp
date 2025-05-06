@@ -3,64 +3,11 @@
 #include "Resources/VertexBuffer.hpp"
 #include "Resources/IndexBuffer.hpp"
 
-enum D3D_PRIMITIVE_TOPOLOGY;
-
 namespace Weave::D3D11
 {
 	class Device;
 	class CtxBase;
 	class Material;
-
-	/// <summary>
-	/// Determines how vertex topology is interpreted by the input assembler
-	/// </summary>
-	struct PrimTopology : EnumAlias<D3D_PRIMITIVE_TOPOLOGY>
-	{
-		using EnumAlias::EnumAlias;
-
-		static const PrimTopology UNDEFINED;
-		static const PrimTopology POINTLIST;
-		static const PrimTopology LINELIST;
-		static const PrimTopology LINESTRIP;
-		static const PrimTopology TRIANGLELIST;
-		static const PrimTopology TRIANGLESTRIP;
-		static const PrimTopology LINELIST_ADJ;
-		static const PrimTopology LINESTRIP_ADJ;
-		static const PrimTopology TRIANGLELIST_ADJ;
-		static const PrimTopology TRIANGLESTRIP_ADJ;
-		static const PrimTopology CP1_PATCHLIST;
-		static const PrimTopology CP2_PATCHLIST;
-		static const PrimTopology CP3_PATCHLIST;
-		static const PrimTopology CP4_PATCHLIST;
-		static const PrimTopology CP5_PATCHLIST;
-		static const PrimTopology CP6_PATCHLIST;
-		static const PrimTopology CP7_PATCHLIST;
-		static const PrimTopology CP8_PATCHLIST;
-		static const PrimTopology CP9_PATCHLIST;
-		static const PrimTopology CP10_PATCHLIST;
-		static const PrimTopology CP11_PATCHLIST;
-		static const PrimTopology CP12_PATCHLIST;
-		static const PrimTopology CP13_PATCHLIST;
-		static const PrimTopology CP14_PATCHLIST;
-		static const PrimTopology CP15_PATCHLIST;
-		static const PrimTopology CP16_PATCHLIST;
-		static const PrimTopology CP17_PATCHLIST;
-		static const PrimTopology CP18_PATCHLIST;
-		static const PrimTopology CP19_PATCHLIST;
-		static const PrimTopology CP20_PATCHLIST;
-		static const PrimTopology CP21_PATCHLIST;
-		static const PrimTopology CP22_PATCHLIST;
-		static const PrimTopology CP23_PATCHLIST;
-		static const PrimTopology CP24_PATCHLIST;
-		static const PrimTopology CP25_PATCHLIST;
-		static const PrimTopology CP26_PATCHLIST;
-		static const PrimTopology CP27_PATCHLIST;
-		static const PrimTopology CP28_PATCHLIST;
-		static const PrimTopology CP29_PATCHLIST;
-		static const PrimTopology CP30_PATCHLIST;
-		static const PrimTopology CP31_PATCHLIST;
-		static const PrimTopology CP32_PATCHLIST;
-	};
 
 	/// <summary>
 	/// Contains vertex and index data needed to instantiate a new mesh.

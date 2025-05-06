@@ -35,13 +35,13 @@ MappedBufferHandle CtxImm::GetMappedBufferHandle(IBuffer& buf)
 	if ((uint)(buf.GetAccessFlags() & ResourceAccessFlags::Write))
 		mapFlags = (D3D11_MAP)(mapFlags | D3D11_MAP_WRITE);
 
-	D3D11_MAPPED_SUBRESOURCE msr;
+	MappedSubresource msr;
 	D3D_CHECK_HR(pCtx->Map(
 		buf.GetResource(),
 		0u,
 		mapFlags,
 		0u,
-		&msr
+		msr.GetD3DPtr()
 	));
 
 	return MappedBufferHandle(buf, msr);

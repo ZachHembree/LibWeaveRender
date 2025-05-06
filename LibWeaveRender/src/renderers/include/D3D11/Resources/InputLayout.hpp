@@ -1,6 +1,6 @@
 #pragma once
 #include "DeviceChild.hpp"
-#include "ResourceEnums.hpp"
+#include "../CommonEnums.hpp"
 #include "WeaveEffects/ShaderDataHandles.hpp"
 
 namespace Weave::D3D11

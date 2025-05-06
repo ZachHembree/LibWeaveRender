@@ -85,7 +85,7 @@ void StagingTexture2D::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& s
 			(void*)src.GetData(),
 			(UINT)pixStride,
 			GetFormat(),
-			desc.MipLevels,
+			desc.mipLevels,
 			GetAccessFlags()
 		));
 	}
@@ -127,7 +127,7 @@ void StagingTexture2D::WriteToFileWIC(CtxImm& ctx, wstring_view path)
 	Image imageData = 
 	{
 		(uint)size.x, (uint)size.y,
-		desc.Format,
+		(DXGI_FORMAT)desc.format,
 		buffer.GetRowPitch(),
 		buffer.GetByteSize(),
 		buffer.GetData()

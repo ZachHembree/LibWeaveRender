@@ -3,15 +3,7 @@
 
 #include "WeaveUtils/Math.hpp"
 #include "DeviceChild.hpp"
-#include "ResourceEnums.hpp"
-#include "ResourceEnums.hpp"
-
-struct ID3D11Resource;
-struct ID3D11ShaderResourceView;
-struct ID3D11RenderTargetView;
-struct ID3D11UnorderedAccessView;
-struct ID3D11DepthStencilState;
-struct ID3D11DepthStencilView;
+#include "../CommonTypes.hpp"
 
 namespace Weave::D3D11
 {

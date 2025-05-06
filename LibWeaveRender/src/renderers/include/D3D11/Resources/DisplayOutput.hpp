@@ -1,7 +1,8 @@
 #pragma once
 #include "WeaveUtils/MinWindow.hpp"
-#include "../InternalD3D11.hpp"
+#include "../CommonTypes.hpp"
 #include "DeviceChild.hpp"
+#include "WeaveUtils/Win32.hpp"
 
 namespace Weave::D3D11
 {

@@ -2,9 +2,7 @@
 #include "WeaveUtils/Win32.hpp"
 #include "WeaveUtils/Math.hpp"
 #include <d3d11_4.h>
-#include "Resources/ResourceEnums.hpp"
-#include "../D3DException.hpp"
-#include "../D3DUtils.hpp"
+#include "D3D11Utils.hpp"
 
 namespace Weave::D3D11
 {

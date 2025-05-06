@@ -37,10 +37,10 @@ Texture2D::Texture2D(
 	if (pRes.Get() != nullptr)
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC vDesc = {};
-		vDesc.Format = desc.Format;
+		vDesc.Format = (DXGI_FORMAT)desc.format;
 		vDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		vDesc.Texture2D.MostDetailedMip = 0;
-		vDesc.Texture2D.MipLevels = desc.MipLevels;
+		vDesc.Texture2D.MipLevels = desc.mipLevels;
 
 		D3D_CHECK_HR(dev->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
 	}
@@ -127,7 +127,7 @@ void Texture2D::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uin
 			GetUsage(),
 			GetBindFlags(),
 			GetAccessFlags(),
-			desc.MipLevels,
+			desc.mipLevels,
 			(void*)src.GetData(), (uint)pixStride
 		));
 	}

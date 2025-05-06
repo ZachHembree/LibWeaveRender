@@ -2,6 +2,7 @@
 #include "WeaveUtils/MinWindow.hpp"
 #include "D3D11/Resources/DisplayOutput.hpp"
 #include "D3D11/Device.hpp"
+#include "D3D11/InternalD3D11.hpp"
 
 using namespace Weave;
 using namespace Weave::D3D11;

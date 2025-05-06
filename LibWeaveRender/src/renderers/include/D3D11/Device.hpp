@@ -2,12 +2,6 @@
 #include "CtxImm.hpp"
 #include "Resources/DisplayOutput.hpp"
 
-struct ID3D11Device1;
-struct ID3D11DeviceContext1;
-struct ID3D11VertexShader;
-struct ID3D11PixelShader;
-struct ID3D11ComputeShader;
-
 namespace Weave::D3D11
 {	
 	class Renderer;

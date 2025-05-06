@@ -19,26 +19,31 @@ BufferBase::BufferBase(
 	const uint byteSize
 ) :
 	ResourceBase(dev),
-	desc({})
+	desc({
+		.byteWidth= byteSize,
+		.usage = usage,
+		.bindFlags = type,
+		.cpuAccessFlags = cpuAccess
+	})
 {
 	D3D_ASSERT_MSG(byteSize > 0, "Buffer size cannot be 0.");
 	D3D11_SUBRESOURCE_DATA resDesc = {};
-
-	desc.Usage = (D3D11_USAGE)usage;
-	desc.BindFlags = (UINT)type;
-	desc.ByteWidth = byteSize;
-	desc.CPUAccessFlags = (UINT)cpuAccess;
-	desc.MiscFlags = 0;
 
 	resDesc.pSysMem = data;
 	resDesc.SysMemPitch = 0;
 	resDesc.SysMemSlicePitch = 0;
 
 	if (data != nullptr)
-		D3D_CHECK_HR(dev->CreateBuffer(&desc, &resDesc, &pBuf));
+		D3D_CHECK_HR(dev->CreateBuffer(desc.GetD3DPtr(), &resDesc, &pBuf));
 	else
-		D3D_CHECK_HR(dev->CreateBuffer(&desc, nullptr, &pBuf));
+		D3D_CHECK_HR(dev->CreateBuffer(desc.GetD3DPtr(), nullptr, &pBuf));
 }
+
+BufferBase::BufferBase(BufferBase&&) noexcept = default;
+
+BufferBase& BufferBase::operator=(BufferBase&&) noexcept = default;
+
+BufferBase::~BufferBase() = default;
 
 ID3D11Buffer* BufferBase::Get() { return pBuf.Get(); }
 
@@ -48,13 +53,13 @@ ID3D11Resource* BufferBase::GetResource() { return Get(); }
 
 ID3D11Resource** const BufferBase::GetResAddress() { return reinterpret_cast<ID3D11Resource**>(GetAddressOf()); }
 
-uint BufferBase::GetSize() const { return desc.ByteWidth; }
+uint BufferBase::GetSize() const { return desc.byteWidth; }
 
-ResourceUsages BufferBase::GetUsage() const { return (ResourceUsages)desc.Usage; }
+ResourceUsages BufferBase::GetUsage() const { return desc.usage; }
 
-ResourceBindFlags BufferBase::GetBindFlags() const { return (ResourceBindFlags)desc.BindFlags; }
+ResourceBindFlags BufferBase::GetBindFlags() const { return desc.bindFlags; }
 
-ResourceAccessFlags BufferBase::GetAccessFlags() const { return (ResourceAccessFlags)desc.CPUAccessFlags; }
+ResourceAccessFlags BufferBase::GetAccessFlags() const { return desc.cpuAccessFlags; }
 
 void BufferBase::SetData(CtxBase& ctx, const IDynamicArray<byte>& data)
 {

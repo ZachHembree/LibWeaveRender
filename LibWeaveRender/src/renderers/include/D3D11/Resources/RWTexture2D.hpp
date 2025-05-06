@@ -1,6 +1,5 @@
 #pragma once
 #include "ResizeableTexture2D.hpp"
-#include "../Resources/RWTexture2D.hpp"
 
 namespace Weave::D3D11
 {

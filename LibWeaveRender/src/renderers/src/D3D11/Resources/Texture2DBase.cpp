@@ -26,40 +26,39 @@ Texture2DBase::Texture2DBase(
 	pixelStride(stride)
 {
 	desc = {};
-	desc.Width = dim.x;
-	desc.Height = dim.y;
-	desc.Format = (DXGI_FORMAT)format;
+	desc.size = dim;
+	desc.format = format;
 
-	desc.MipLevels = mipLevels;
-	desc.ArraySize = 1;
+	desc.mipLevels = mipLevels;
+	desc.arraySize = 1;
 
-	desc.Usage = (D3D11_USAGE)usage;
-	desc.BindFlags = (D3D11_BIND_FLAG)bindFlags;
-	desc.CPUAccessFlags = (D3D11_CPU_ACCESS_FLAG)accessFlags;
-	desc.MiscFlags = 0u;
+	desc.usage = usage;
+	desc.bindFlags = bindFlags;
+	desc.cpuAccessFlags = accessFlags;
+	desc.miscFlags = 0u;
 
 	// Multisampling
-	desc.SampleDesc.Count = 1;
-	desc.SampleDesc.Quality = 0;
+	desc.sampleDesc.count = 1;
+	desc.sampleDesc.quality = 0;
 
 	if (data != nullptr)
 	{ 
 		D3D11_SUBRESOURCE_DATA initData = {};
 		initData.pSysMem = data;
 		initData.SysMemPitch = dim.x * stride;
-		D3D_CHECK_HR(GetDevice()->CreateTexture2D(&desc, &initData, &pRes));
+		D3D_CHECK_HR(GetDevice()->CreateTexture2D(desc.GetD3DPtr(), &initData, &pRes));
 	}
 	else if (dim.x != 0 && dim.y != 0)
 	{
-		D3D_CHECK_HR(GetDevice()->CreateTexture2D(&desc, nullptr, &pRes));
+		D3D_CHECK_HR(GetDevice()->CreateTexture2D(desc.GetD3DPtr(), nullptr, &pRes));
 	}
 }
 
 Texture2DBase::Texture2DBase() : desc({}) {}
 
-uivec3 Texture2DBase::GetDimensions() const { return ivec3(desc.Width, desc.Height, 1u); }
+uivec3 Texture2DBase::GetDimensions() const { return uivec3(desc.size.x, desc.size.y, 1u); }
 
-uivec2 Texture2DBase::GetSize() const { return uivec2(desc.Width, desc.Height); }
+uivec2 Texture2DBase::GetSize() const { return desc.size; }
 
 vec4 Texture2DBase::GetTexelSize() const
 {
@@ -69,18 +68,15 @@ vec4 Texture2DBase::GetTexelSize() const
 
 uint Texture2DBase::GetPixelPitch() const { return pixelStride; }
 
-Formats Texture2DBase::GetFormat() const { return (Formats)desc.Format; }
+Formats Texture2DBase::GetFormat() const { return desc.format; }
 
-ResourceUsages Texture2DBase::GetUsage() const { return (ResourceUsages)desc.Usage; }
+ResourceUsages Texture2DBase::GetUsage() const { return desc.usage; }
 
-ResourceBindFlags Texture2DBase::GetBindFlags() const { return (ResourceBindFlags)desc.BindFlags; }
+ResourceBindFlags Texture2DBase::GetBindFlags() const { return desc.bindFlags; }
 
-ResourceAccessFlags Texture2DBase::GetAccessFlags() const { return (ResourceAccessFlags)desc.CPUAccessFlags; }
+ResourceAccessFlags Texture2DBase::GetAccessFlags() const { return desc.cpuAccessFlags; }
 
-const D3D11_TEXTURE2D_DESC& Texture2DBase::GetDescription() const
-{
-	return desc;
-}
+const Texture2DDesc& Texture2DBase::GetDescription() const { return desc; }
 
 /// <summary>
 /// Returns interface to resource

@@ -1,6 +1,7 @@
 #pragma once
-#include "../InternalD3D11.hpp"
 #include "ResourceBase.hpp"
+#include "../CommonTypes.hpp"
+#include "WeaveUtils/Win32.hpp"
 
 namespace Weave::D3D11
 {
@@ -47,7 +48,7 @@ namespace Weave::D3D11
 		void SetData(CtxBase& ctx, const IDynamicArray<byte>& data);
 
 	protected:
-		D3D11_BUFFER_DESC desc;
+		BufferDesc desc;
 		ComPtr<ID3D11Buffer> pBuf;
 
 		template<typename T>
@@ -69,5 +70,11 @@ namespace Weave::D3D11
 			Device& device, 
 			const void* data, 
 			const uint byteSize);
+
+		BufferBase(BufferBase&&) noexcept;
+
+		BufferBase& operator=(BufferBase&&) noexcept;
+
+		virtual ~BufferBase();
 	};
 }

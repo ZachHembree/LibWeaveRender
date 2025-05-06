@@ -18,20 +18,20 @@ bool MappedBufferHandle::GetCanRead() const { return (uint)(pParent->GetAccessFl
 
 bool MappedBufferHandle::GetCanWrite() const { return (uint)(pParent->GetAccessFlags() & ResourceAccessFlags::Write) > 0; }
 
-uint MappedBufferHandle::GetRowPitch() const { return msr.RowPitch; }
+uint MappedBufferHandle::GetRowPitch() const { return msr.rowPitch; }
 
-uint MappedBufferHandle::GetDepthPitch() const { return msr.DepthPitch; }
+uint MappedBufferHandle::GetDepthPitch() const { return msr.depthPitch; }
 
 uint MappedBufferHandle::GetByteSize() const { return (uint)length; }
 
-static uint GetTotalExtent(uivec3 dim, D3D11_MAPPED_SUBRESOURCE msr)
+static uint GetTotalExtent(uivec3 dim, MappedSubresource msr)
 {
-	const uint planeSize = msr.RowPitch * dim.y;
-	const uint cubeSize = msr.DepthPitch * dim.z;
+	const uint planeSize = msr.rowPitch * dim.y;
+	const uint cubeSize = msr.depthPitch * dim.z;
 	return std::max(planeSize, cubeSize);
 }
 
-MappedBufferHandle::MappedBufferHandle(IBuffer& parent, D3D11_MAPPED_SUBRESOURCE msr) :
+MappedBufferHandle::MappedBufferHandle(IBuffer& parent, MappedSubresource msr) :
 	DataBufferSpan(&parent, (byte*)msr.pData, GetTotalExtent(parent.GetDimensions(), msr)),
 	msr(msr)
 { }
