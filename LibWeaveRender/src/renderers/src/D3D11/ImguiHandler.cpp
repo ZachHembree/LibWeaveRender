@@ -14,14 +14,19 @@ using namespace Weave::D3D11;
 ImGuiHandler* ImGuiHandler::s_pInstance;
 bool ImGuiHandler::enableDemoWindow = false;
 
-ImGuiHandler::ImGuiHandler(Renderer& renderer) :
-	WindowComponentBase(0),
+ImGuiHandler::ImGuiHandler(MinWindow& parent, Renderer& renderer) :
+	WindowComponentBase(parent, 0),
 	pRenderer(&renderer),
 	isInitialized(true)
 { 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
+
+	ImGui_ImplWin32_Init(GetWindow().GetWndHandle());
+	pRenderer->RegisterNewComponent(pRenderComponent);
+
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
 
 ImGuiHandler::~ImGuiHandler() = default;
@@ -31,7 +36,10 @@ bool ImGuiHandler::GetIsInitialized() { return s_pInstance != nullptr && s_pInst
 void ImGuiHandler::Init(Renderer& renderer)
 {
 	if (!GetIsInitialized())
-		s_pInstance = &renderer.GetWindow().RegisterNewComponent(new ImGuiHandler(renderer));
+	{
+		MinWindow& wnd = renderer.GetWindow();
+		wnd.RegisterNewComponent(s_pInstance, renderer);
+	}
 }
 
 void ImGuiHandler::Reset() 
@@ -101,14 +109,6 @@ void ImGuiHandler::Update()
 
 bool ImGuiHandler::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (pRenderComponent == nullptr)
-	{
-		ImGui_ImplWin32_Init(GetWindow().GetWndHandle());
-		pRenderer->RegisterNewComponent(pRenderComponent);
-
-		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	}
-
 	if (ImGui::GetCurrentContext() != nullptr)
 	{
 		ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);

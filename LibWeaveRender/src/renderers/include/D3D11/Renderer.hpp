@@ -46,7 +46,7 @@ namespace Weave::D3D11
 	class Renderer : public WindowComponentBase
 	{
 	public:
-		Renderer();
+		Renderer(MinWindow& parent);
 
 		~Renderer();
 

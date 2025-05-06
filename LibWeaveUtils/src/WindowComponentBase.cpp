@@ -5,8 +5,8 @@ using namespace Weave;
 
 uint WindowComponentBase::GetPriority() const { return priority; }
 
-WindowComponentBase::WindowComponentBase(uint priority) :
-	pParent(nullptr),
+WindowComponentBase::WindowComponentBase(MinWindow& parent, uint priority) :
+	pParent(&parent),
 	id(uint(-1)),
 	priority(priority)
 { }

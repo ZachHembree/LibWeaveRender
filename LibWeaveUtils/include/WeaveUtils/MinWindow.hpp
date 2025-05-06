@@ -334,25 +334,24 @@ namespace Weave
 			template <typename T, typename... ArgTs>
 			T& RegisterNewComponent(ArgTs&&... args)
 			{
-				WindowComponentBase* pComp = RegisterComponent(WndCompHandle(new T(args...)));
+				WindowComponentBase* pComp = RegisterComponent(WndCompHandle(new T(*this, args...)));
 				WV_ASSERT(pComp != nullptr);
-				return *static_cast<T*>(pComp);
+				return static_cast<T&>(*pComp);
 			}
 
 			/// <summary>
-			/// Transfers ownership of the given component to the window and registers it
+			/// Constructs and registers a new window component in place
 			/// </summary>
-			template <typename T>
-			T& RegisterNewComponent(T*&& pRawComp)
+			template <typename T, typename... ArgTs>
+			void RegisterNewComponent(T*& pDerived, ArgTs&&... args)
 			{
-				WindowComponentBase* pComp = RegisterComponent(WndCompHandle(pRawComp));
-				WV_ASSERT(pComp != nullptr);
-				pRawComp = nullptr;
-				return *static_cast<T*>(pComp);
+				WindowComponentBase* pBase = RegisterComponent(WndCompHandle(new T(*this, args...)));
+				WV_ASSERT(pBase != nullptr);
+				pDerived = static_cast<T*>(pBase);
 			}			
 
 			/// <summary>
-			/// Registers component object to the window.
+			/// Transfers ownership of the component to the window and registers it
 			/// </summary>
 			WindowComponentBase* RegisterComponent(WndCompHandle&& component);
 

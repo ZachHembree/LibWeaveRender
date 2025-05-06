@@ -85,6 +85,7 @@ namespace Weave::D3D11
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 	private:
+		friend MinWindow;
 		static ImGuiHandler* s_pInstance;
 
 		Renderer* pRenderer;
@@ -94,7 +95,7 @@ namespace Weave::D3D11
 		ObjectPool<string> stringPool;
 		UniqueVector<string> activeText;
 
-		ImGuiHandler(Renderer& renderer);
+		ImGuiHandler(MinWindow& parent, Renderer& renderer);
 
 		~ImGuiHandler();
 

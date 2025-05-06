@@ -101,6 +101,7 @@ namespace Weave
 		static vec2 GetNormMousePos();
 
 	private:
+		friend MinWindow;
 		static InputHandler* s_pHandler;
 		static bool s_IsEnabled;
 
@@ -113,7 +114,7 @@ namespace Weave
 		ivec2 lastMousePos;
 		bool isInitialized;
 
-		InputHandler();
+		InputHandler(MinWindow& parent);
 
 		~InputHandler();
 	};

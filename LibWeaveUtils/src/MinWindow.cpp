@@ -433,7 +433,6 @@ WindowComponentBase* MinWindow::RegisterComponent(WndCompHandle&& pComp)
 {
 	if (!pComp->GetIsRegistered(this))
 	{
-		pComp->pParent = this;
 		pComp->id = (uint)components.GetLength();
 		WndCompHandle& newHandle = components.EmplaceBack(std::move(pComp));
 

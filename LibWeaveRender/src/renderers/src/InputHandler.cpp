@@ -8,8 +8,8 @@ using namespace DirectX;
 InputHandler* InputHandler::s_pHandler;
 bool InputHandler::s_IsEnabled = true;
 
-InputHandler::InputHandler() :
-	WindowComponentBase(1),
+InputHandler::InputHandler(MinWindow& parent) :
+	WindowComponentBase(parent, 1),
 	lastMousePos(0),
 	isInitialized(true),
 	currentMousePresses(MouseKey::None),
@@ -24,7 +24,7 @@ void InputHandler::Init(MinWindow& wnd)
 {
 	if (!GetIsInitialized())
 	{
-		s_pHandler = &wnd.RegisterNewComponent(new InputHandler());
+		wnd.RegisterNewComponent(s_pHandler);
 		s_IsEnabled = true;
 		s_pHandler->lastMousePos = ivec2(0);
 		s_pHandler->currentMousePresses = MouseKey::None;

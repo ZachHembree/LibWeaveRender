@@ -16,7 +16,7 @@ namespace Weave
 	public:
 		MAKE_IMMOVABLE(WindowComponentBase);
 
-		WindowComponentBase(uint priority = 10);
+		WindowComponentBase(MinWindow& parent, uint priority = 10);
 
 		virtual ~WindowComponentBase() = 0;
 
