@@ -1,5 +1,6 @@
 #pragma once
 #include "SymbolTable.hpp"
+#include "WeaveUtils/TextBlock.hpp"
 
 namespace Weave::Effects
 {

@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "WeaveUtils/Utils.hpp"
+#include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/WindowComponentBase.hpp"
 #include "Viewport.hpp"
 #include "ShaderLibrary.hpp"

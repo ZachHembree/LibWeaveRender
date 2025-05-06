@@ -5,6 +5,7 @@
 #include <thread>
 #include "WeaveUtils/WinUtils.hpp"
 #include "WeaveUtils/WeaveWinException.hpp"
+#include "WeaveUtils/Span.hpp"
 #include "WeaveEffects/EffectParseException.hpp"
 #include "WeaveEffects/ShaderLibBuilder/ShaderCompiler.hpp"
 

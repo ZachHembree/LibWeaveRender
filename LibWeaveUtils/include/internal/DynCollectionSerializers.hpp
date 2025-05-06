@@ -1,7 +1,7 @@
 #pragma once
 #include <concepts>
 #include <cereal/cereal.hpp>
-#include "WeaveUtils/Utils.hpp"
+#include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/StringIDMap.hpp"
 
 namespace Weave

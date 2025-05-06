@@ -1,5 +1,5 @@
 #pragma once
-#include "WeaveUtils/Utils.hpp"
+#include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveEffects/ShaderDataHandles.hpp"
 #include "ResourceSet.hpp"
 #include "WeaveUtils/Span.hpp"

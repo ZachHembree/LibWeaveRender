@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include "SymbolEnums.hpp"
 #include "ShaderTypeInfo.hpp"
+#include "WeaveUtils/Span.hpp"
 
 namespace Weave::Effects
 {

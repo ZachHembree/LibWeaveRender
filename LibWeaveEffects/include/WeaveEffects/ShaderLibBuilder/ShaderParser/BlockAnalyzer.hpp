@@ -1,5 +1,6 @@
 #pragma once
-#include "WeaveUtils/Utils.hpp"
+#include "WeaveUtils/TextUtils.hpp"
+#include "WeaveUtils/TextBlock.hpp"
 #include <unordered_map>
 
 namespace Weave::Effects

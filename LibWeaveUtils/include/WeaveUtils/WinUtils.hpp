@@ -38,8 +38,8 @@
 #define NOKERNEL
 
 #include <wrl/client.h>
+#include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/Math.hpp"
-#include "WeaveUtils/Utils.hpp"
 
 namespace Weave
 {

@@ -1,7 +1,10 @@
 #pragma once
-#include "WeaveUtils/Int.hpp"
+#include <optional>
 #include <concepts>
 #include <type_traits>
+
+#include "WeaveUtils/Int.hpp"
+#include "WeaveUtils/WeaveException.hpp"
 
 // Default constructor and copy/move operator utils
 // Delete copy/move

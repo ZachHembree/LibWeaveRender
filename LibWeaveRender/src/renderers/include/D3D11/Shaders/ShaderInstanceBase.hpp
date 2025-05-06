@@ -1,4 +1,5 @@
 #pragma once
+#include "WeaveUtils/Span.hpp"
 #include "../Resources/ResourceBase.hpp"
 #include "../Resources/Sampler.hpp"
 

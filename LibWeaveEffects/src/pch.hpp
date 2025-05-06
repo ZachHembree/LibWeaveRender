@@ -9,7 +9,7 @@
 #include <concepts>
 #include <type_traits>
 
-#include "WeaveUtils/Utils.hpp"
+#include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/Math.hpp"
 #include "WeaveEffects/ShaderLibBuilder/WaveConfig.hpp"
 #include "WeaveEffects/EffectParseException.hpp"

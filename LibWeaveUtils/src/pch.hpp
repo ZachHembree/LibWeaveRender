@@ -11,6 +11,5 @@
 #include <type_traits>
 
 #include "WeaveUtils/GlobalUtils.hpp"
-#include "WeaveUtils/Utils.hpp"
 #include "WeaveUtils/WinUtils.hpp"
 #include "WeaveUtils/Logger.hpp"

@@ -1,5 +1,5 @@
 #pragma once
-#include "internal/DeltaUtils.hpp"
+#include "Math.hpp"
 #include "DynamicCollections.hpp"
 #include <array>
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "WeaveUtils/Span.hpp"
 #include "WeaveEffects/ShaderData.hpp"
 #include "D3D11/InternalD3D11.hpp"
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "WeaveUtils/Span.hpp"
 #include "Texture2DBase.hpp"
 
 namespace DirectX

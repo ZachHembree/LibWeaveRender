@@ -1,5 +1,6 @@
 #pragma once
-#include "WeaveUtils/Utils.hpp"
+#include <vector>
+#include "WeaveUtils/GlobalUtils.hpp"
 
 namespace Weave
 {

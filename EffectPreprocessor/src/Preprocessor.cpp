@@ -6,6 +6,7 @@
 #include "WeaveEffects/EffectParseException.hpp"
 #include "WeaveUtils/Logger.hpp"
 #include "WeaveUtils/GenericMain.hpp"
+#include "WeaveUtils/Stopwatch.hpp"
 #include "WeaveEffects/ShaderLibBuilder.hpp"
 #include "FXHelpText.hpp"
 

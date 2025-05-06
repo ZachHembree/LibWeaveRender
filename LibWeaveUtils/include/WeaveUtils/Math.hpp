@@ -1,12 +1,12 @@
 #pragma once
 #define GLM_ENABLE_EXPERIMENTAL
 
-#include <concepts>
+#include "GlobalUtils.hpp"
+#include <algorithm>
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "WeaveUtils/Int.hpp"
 
 namespace Weave
 {
@@ -53,6 +53,26 @@ namespace Weave
 	
 	fquat QuatFromAxis(vec3 axis, float rad);
 	size_t GetAlignedByteSize(size_t size, size_t alignment);
+
+	/// <summary>
+	/// Returns unsigned difference (a - b) between two unsigned integers, clamped to zero.
+	/// </summary>
+	size_t UnsignedDelta(size_t a, size_t b);
+
+	/// <summary>
+	/// Returns unsigned difference (a - b) between two pointers, clamped to zero.
+	/// </summary>
+	size_t UnsignedDelta(const void* a, const void* b);
+
+	/// <summary>
+	/// Returns signed difference (a - b) between two unsigned integers.
+	/// </summary>
+	long Delta(size_t a, size_t b);
+
+	/// <summary>
+	/// Returns signed difference (a - b) between two unsigned integers.
+	/// </summary>
+	long Delta(const void* a, const void* b);
 
 	template <typename VecT>
 	concept IsFixedLengthVec = requires

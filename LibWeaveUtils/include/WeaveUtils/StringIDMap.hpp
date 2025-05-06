@@ -1,5 +1,6 @@
 #pragma once
-#include "WeaveUtils/Utils.hpp"
+#include "WeaveUtils/GlobalUtils.hpp"
+#include "WeaveUtils/DynamicCollections.hpp"
 #include <unordered_map>
 #include <limits>
 

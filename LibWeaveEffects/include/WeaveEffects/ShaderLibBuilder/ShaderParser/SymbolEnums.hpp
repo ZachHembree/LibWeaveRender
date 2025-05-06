@@ -1,5 +1,5 @@
 #pragma once
-#include "WeaveUtils/Utils.hpp"
+#include "WeaveUtils/GlobalUtils.hpp"
 
 namespace Weave::Effects
 { 

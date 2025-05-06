@@ -1,6 +1,6 @@
 #pragma once
 #include "../InternalD3D11.hpp"
-#include "WeaveUtils/Utils.hpp"
+#include "WeaveUtils/GlobalUtils.hpp"
 
 namespace Weave::D3D11
 {

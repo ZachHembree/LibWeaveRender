@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_set>
 #include <list>
-#include "WeaveUtils/Utils.hpp"
+#include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/StringSpan.hpp"
 #include "ShaderEntrypoint.hpp"
 

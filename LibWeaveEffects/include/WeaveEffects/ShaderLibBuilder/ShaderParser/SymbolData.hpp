@@ -1,6 +1,7 @@
 #pragma once
 #include "SymbolEnums.hpp"
 #include "ShaderTypeInfo.hpp"
+#include "WeaveUtils/TextBlock.hpp"
 
 namespace Weave::Effects
 {

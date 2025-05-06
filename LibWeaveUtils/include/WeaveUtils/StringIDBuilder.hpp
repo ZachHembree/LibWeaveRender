@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
-#include "WeaveUtils/Utils.hpp"
+#include "WeaveUtils/GlobalUtils.hpp"
+#include "WeaveUtils/DynamicCollections.hpp"
 #include "WeaveUtils/StringIDMap.hpp"
 #include "WeaveUtils/StringSpan.hpp"
 

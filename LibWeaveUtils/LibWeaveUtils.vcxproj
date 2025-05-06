@@ -41,10 +41,8 @@
     <ClInclude Include="include\WeaveUtils\Stopwatch.hpp" />
     <ClInclude Include="include\WeaveUtils\TextBlock.hpp" />
     <ClInclude Include="include\WeaveUtils\TextUtils.hpp" />
-    <ClInclude Include="include\internal\DeltaUtils.hpp" />
     <ClInclude Include="include\WeaveUtils\WindowComponentBase.hpp" />
     <ClInclude Include="include\WeaveUtils\Math.hpp" />
-    <ClInclude Include="include\WeaveUtils\Utils.hpp" />
     <ClInclude Include="include\WeaveUtils\Win32.hpp" />
     <ClInclude Include="include\WeaveUtils\WinUtils.hpp" />
     <ClInclude Include="include\WeaveUtils\StringIDMap.hpp" />
@@ -65,7 +63,6 @@
     <ClCompile Include="src\StringIDMap.cpp" />
     <ClCompile Include="src\TextBlock.cpp" />
     <ClCompile Include="src\TextUtils.cpp" />
-    <ClCompile Include="src\internal\DeltaUtils.cpp" />
     <ClCompile Include="src\WindowComponentBase.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
