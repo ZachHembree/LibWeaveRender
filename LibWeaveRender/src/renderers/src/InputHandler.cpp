@@ -24,7 +24,7 @@ void InputHandler::Init(MinWindow& wnd)
 {
 	if (!GetIsInitialized())
 	{
-		wnd.RegisterNewComponent(s_pHandler);
+		wnd.CreateComponent(s_pHandler);
 		s_IsEnabled = true;
 		s_pHandler->lastMousePos = ivec2(0);
 		s_pHandler->currentMousePresses = MouseKey::None;

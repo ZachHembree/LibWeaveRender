@@ -24,12 +24,16 @@ ImGuiHandler::ImGuiHandler(MinWindow& parent, Renderer& renderer) :
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplWin32_Init(GetWindow().GetWndHandle());
-	pRenderer->RegisterNewComponent(pRenderComponent);
-
+	pRenderer->CreateComponent(pRenderComponent);
+	
 	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
 
-ImGuiHandler::~ImGuiHandler() = default;
+ImGuiHandler::~ImGuiHandler()
+{
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+}
 
 bool ImGuiHandler::GetIsInitialized() { return s_pInstance != nullptr && s_pInstance->isInitialized; }
 
@@ -38,7 +42,7 @@ void ImGuiHandler::Init(Renderer& renderer)
 	if (!GetIsInitialized())
 	{
 		MinWindow& wnd = renderer.GetWindow();
-		wnd.RegisterNewComponent(s_pInstance, renderer);
+		wnd.CreateComponent(s_pInstance, renderer);
 	}
 }
 

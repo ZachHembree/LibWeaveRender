@@ -7,6 +7,8 @@
 #include <mutex>
 #include <algorithm>
 #include <chrono>
+#include <concepts>
+#include <type_traits>
 
 #include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/Utils.hpp"

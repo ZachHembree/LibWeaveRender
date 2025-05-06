@@ -26,8 +26,6 @@ Renderer::Renderer(MinWindow& parent) :
 	outputRes(GetWindow().GetMonitorResolution()),
 	lastDispMode(-1),
 	pDefaultShaders(new ShaderLibrary(*this, GetBuiltInShaders())),
-	isSortingStale(false),
-	areIDsStale(false),
 	useDefaultDS(true),
 	canRender(true),
 	isFsAllowed(true),
@@ -284,26 +282,7 @@ void Renderer::Update()
 {
 	// Mark frame start
 	pFrameTimer->BeginPresent();
-
-	if (isSortingStale)
-	{
-		std::sort(pComponents.begin(), pComponents.end(), [](const RenderCompHandle& pLeft, const RenderCompHandle& pRight)
-		{
-			return pLeft->priority < pRight->priority;
-		});
-
-		isSortingStale = false;
-		areIDsStale = true;
-	}
-
-	if (areIDsStale)
-	{
-		for (ulong i = 0; i < pComponents.GetLength(); i++)
-			pComponents[i]->id = (uint)i;
-
-		areIDsStale = false;
-	}
-
+	UpdateComponentIDs();
 	UpdateSwap();
 
 	// If rendering is explicitly disabled, skip everything else
@@ -351,35 +330,9 @@ void Renderer::Update()
 	Render component utilities
 */
 
-RenderComponentBase* Renderer::RegisterComponent(RenderCompHandle&& pComp)
-{
-	if (!pComp->GetIsRegistered(this))
-	{
-		isSortingStale = true;
-		pComp->id = pComponents.GetLength();
-		RenderComponentBase& newComp = *pComponents.EmplaceBack(std::move(pComp));
-		return &newComp;
-	}
-	else
-		return nullptr;
-}
-
-void Renderer::UnregisterComponent(RenderComponentBase& comp)
-{
-	WV_CHECK_MSG(comp.GetIsRegistered(this),
-		"Attempted to remove a Renderer component that did not belong to the renderer");
-	WV_ASSERT_MSG(comp.id != uint(-1) && comp.id < pComponents.GetLength(), "Renderer component ID invalid.");
-
-	areIDsStale = true;
-	const uint lastID = comp.id;
-	comp.id = uint(-1);
-	comp.pRenderer = nullptr;
-	pComponents.RemoveAt(lastID);
-}
-
 void Renderer::BeforeDraw(CtxImm& ctx)
 { 
-	for (const auto& pComp : pComponents)
+	for (const auto& pComp : sortedComps)
 	{
 		pComp->Setup(ctx);
 	}
@@ -387,7 +340,7 @@ void Renderer::BeforeDraw(CtxImm& ctx)
 
 void Renderer::Draw(CtxImm& ctx)
 {
-	for (const auto& pComp : pComponents)
+	for (const auto& pComp : sortedComps)
 	{
 		pComp->Draw(ctx);
 	}
@@ -395,7 +348,7 @@ void Renderer::Draw(CtxImm& ctx)
 
 void Renderer::AfterDraw(CtxImm& ctx)
 {
-	for (const auto& pComp : pComponents)
+	for (const auto& pComp : sortedComps)
 	{
 		pComp->AfterDraw(ctx);
 	}

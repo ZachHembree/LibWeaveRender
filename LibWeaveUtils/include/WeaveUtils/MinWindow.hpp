@@ -1,5 +1,6 @@
 #pragma once
-#include "WeaveUtils/WinUtils.hpp"
+#include "WinUtils.hpp"
+#include "ComponentManagerBase.hpp"
 
 namespace Weave
 {
@@ -111,7 +112,7 @@ namespace Weave
 	/// <summary>
 	/// Minimal wrapper class for Win32 Window
 	/// </summary>
-	class MinWindow
+	class MinWindow : public ComponentManagerBase<MinWindow, WindowComponentBase>
 	{
 		public:
 			MAKE_MOVE_ONLY(MinWindow);
@@ -328,38 +329,6 @@ namespace Weave
 			/// </summary>
 			void CloseWindow();
 
-			/// <summary>
-			/// Constructs and registers a new window component in place
-			/// </summary>
-			template <typename T, typename... ArgTs>
-			T& RegisterNewComponent(ArgTs&&... args)
-			{
-				WindowComponentBase* pComp = RegisterComponent(WndCompHandle(new T(*this, args...)));
-				WV_ASSERT(pComp != nullptr);
-				return static_cast<T&>(*pComp);
-			}
-
-			/// <summary>
-			/// Constructs and registers a new window component in place
-			/// </summary>
-			template <typename T, typename... ArgTs>
-			void RegisterNewComponent(T*& pDerived, ArgTs&&... args)
-			{
-				WindowComponentBase* pBase = RegisterComponent(WndCompHandle(new T(*this, args...)));
-				WV_ASSERT(pBase != nullptr);
-				pDerived = static_cast<T*>(pBase);
-			}			
-
-			/// <summary>
-			/// Transfers ownership of the component to the window and registers it
-			/// </summary>
-			WindowComponentBase* RegisterComponent(WndCompHandle&& component);
-
-			/// <summary>
-			/// Unregisters the component from the window and destroys it
-			/// </summary>
-			void UnregisterComponent(WindowComponentBase& component);
-
 		protected:	
 			friend WindowComponentBase;
 
@@ -376,11 +345,6 @@ namespace Weave
 			ivec2 bodySize, wndSize;
 			bool isFullscreen;
 			ivec2 lastPos, lastSize;
-
-			// Components
-			UniqueVector<WndCompHandle> components;
-			bool isCompSortingStale;
-			bool areCompIDsStale;
 
 			// Mouse tracking
 			TRACKMOUSEEVENT tme;
@@ -430,11 +394,6 @@ namespace Weave
 			/// Updates window and body size
 			/// </summary>
 			void UpdateSize();
-
-			/// <summary>
-			/// Updates component IDs and update ordering
-			/// </summary>
-			void UpdateComponentIDs();
 
 			/// <summary>
 			/// Handles messaging setup on creation of new windows

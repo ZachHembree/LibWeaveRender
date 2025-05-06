@@ -21,8 +21,6 @@ ImGuiRenderComponent::ImGuiRenderComponent(Renderer& renderer) :
 ImGuiRenderComponent::~ImGuiRenderComponent()
 { 
 	ImGui_ImplDX11_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
 }
 
 vec2 ImGuiRenderComponent::GetMousePos() const { return mousePos; }

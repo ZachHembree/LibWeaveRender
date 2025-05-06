@@ -85,7 +85,7 @@ namespace Weave::D3D11
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 	private:
-		friend MinWindow;
+		friend ManagerT;
 		static ImGuiHandler* s_pInstance;
 
 		Renderer* pRenderer;

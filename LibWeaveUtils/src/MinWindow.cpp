@@ -1,12 +1,14 @@
 #include "pch.hpp"
 #include "WeaveUtils/Win32.hpp"
+#include "WeaveUtils/WeaveWinException.hpp"
 #include <ShellScalingApi.h>
 
 #pragma comment(lib, "Shcore.lib")
 
 using namespace Weave;
 
-MinWindow::MinWindow() : 
+MinWindow::MinWindow() :
+	ComponentManagerBase(),
 	hInst(nullptr),
 	hWnd(nullptr),
 	wndMsg(MSG{}),
@@ -18,9 +20,7 @@ MinWindow::MinWindow() :
 	lastPos(0),
 	lastSize(0),
 	canSysSleep(true),
-	canDispSleep(true),
-	isCompSortingStale(false),
-	areCompIDsStale(false)
+	canDispSleep(true)
 { }
 
 MinWindow::MinWindow(
@@ -140,7 +140,7 @@ MSG MinWindow::RunMessageLoop()
 
 	while (PollWindowMessages())
 	{
-		for (const std::unique_ptr<WindowComponentBase>& pComp : components)
+		for (WindowComponentBase* pComp : sortedComps)
 			pComp->Update();
 	}
 
@@ -427,40 +427,6 @@ void MinWindow::Maximize()
 void MinWindow::CloseWindow() { PostMessageW(hWnd, WM_CLOSE, 0, 0); }
 
 /*
-	Window component management
-*/
-WindowComponentBase* MinWindow::RegisterComponent(WndCompHandle&& pComp)
-{
-	if (!pComp->GetIsRegistered(this))
-	{
-		pComp->id = (uint)components.GetLength();
-		WndCompHandle& newHandle = components.EmplaceBack(std::move(pComp));
-
-		isCompSortingStale = true;
-		return newHandle.get();
-	}
-
-	return nullptr;
-}
-
-void MinWindow::UnregisterComponent(WindowComponentBase& component)
-{
-	WV_CHECK_MSG(component.GetIsRegistered(this),
-		"Attempted to remove a Window component that did not belong to the window");
-	WV_ASSERT_MSG(component.id != uint(-1) && component.id < components.GetLength(), "Window component ID invalid.");
-
-	UpdateComponentIDs();
-
-	if (components[component.id].get() == &component)
-	{
-		areCompIDsStale = true;
-		const uint lastID = component.id;
-		component.id = uint(-1);
-		components.RemoveAt(lastID);
-	}
-}
-
-/*
 	Win32 message polling and callbacks
 */
 
@@ -490,30 +456,6 @@ bool MinWindow::PollWindowMessages()
 	SetThreadExecutionState(execFlags);
 
 	return true;
-}
-
-void MinWindow::UpdateComponentIDs()
-{
-	// Sort components
-	if (isCompSortingStale)
-	{
-		std::sort(components.begin(), components.end(), [](const WndCompHandle& pLeft, const WndCompHandle& pRight)
-		{
-			return pLeft->priority < pRight->priority;
-		});
-
-		isCompSortingStale = false;
-		areCompIDsStale = true;
-	}
-
-	// Update IDs
-	if (areCompIDsStale)
-	{
-		for (ulong i = 0; i < components.GetLength(); i++)
-			components[i]->id = (uint)i;
-
-		areCompIDsStale = false;
-	}
 }
 
 LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -560,7 +502,7 @@ LRESULT MinWindow::OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		// Pass messages through to components
 		if (msg != WM_CLOSE && isInitialized)
 		{
-			for (const WndCompHandle& pComp : components)
+			for (WindowComponentBase* pComp : sortedComps)
 			{
 				// Allow earlier components to intercept messages from later components
 				if (!pComp->OnWndMessage(hWnd, msg, wParam, lParam))

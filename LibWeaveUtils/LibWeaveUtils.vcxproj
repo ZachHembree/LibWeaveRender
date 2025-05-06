@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\WeaveUtils\ComponentManagerBase.hpp" />
     <ClInclude Include="include\WeaveUtils\GenericMain.hpp" />
     <ClInclude Include="include\WeaveUtils\Logger.hpp" />
     <ClInclude Include="include\WeaveUtils\ObjectPool.hpp" />

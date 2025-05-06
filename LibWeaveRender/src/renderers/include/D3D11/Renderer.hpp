@@ -43,7 +43,7 @@ namespace Weave::D3D11
 	/// </summary>
 	using RenderCompHandle = std::unique_ptr<RenderComponentBase>;
 
-	class Renderer : public WindowComponentBase
+	class Renderer : public WindowComponentBase, public ComponentManagerBase<Renderer, RenderComponentBase>
 	{
 	public:
 		Renderer(MinWindow& parent);
@@ -224,38 +224,6 @@ namespace Weave::D3D11
 		/// </summary>
 		bool OnWndMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
-		/// <summary>
-		/// Creates and registers a new renderer component in place
-		/// </summary>
-		template<typename T, typename... ArgTs>
-		T& RegisterNewComponent(ArgTs&&... args)
-		{
-			RenderComponentBase* pBase = RegisterComponent(RenderCompHandle(new T(*this, args...)));
-			D3D_ASSERT(pBase != nullptr);
-			return static_cast<T&>(*pBase);
-		}
-
-		/// <summary>
-		/// Creates and registers a new renderer component in place
-		/// </summary>
-		template<typename T, typename... ArgTs>
-		void RegisterNewComponent(T*& pDerived, ArgTs&&... args)
-		{
-			RenderComponentBase* pBase = RegisterComponent(RenderCompHandle(new T(*this, args...)));
-			D3D_ASSERT(pBase != nullptr);
-			pDerived = static_cast<T*>(pBase);
-		}
-
-		/// <summary>
-		/// Registers a new render component
-		/// </summary>
-		RenderComponentBase* RegisterComponent(RenderCompHandle&& pComp);
-
-		/// <summary>
-		/// Unregisters the given component from the renderer
-		/// </summary>
-		void UnregisterComponent(RenderComponentBase& pComp);
-
 	private:
 		mutable std::unordered_map<uint, ComputeInstance> defaultCompute;
 		mutable std::unordered_map<uint, Material> defaultMaterials;
@@ -270,9 +238,6 @@ namespace Weave::D3D11
 		uivec2 lastDispMode;
 
 		std::unique_ptr<ShaderLibrary> pDefaultShaders;
-		UniqueVector<RenderCompHandle> pComponents;
-		bool areIDsStale;
-		bool isSortingStale;
 
 		double targetFPS;
 		bool useDefaultDS;

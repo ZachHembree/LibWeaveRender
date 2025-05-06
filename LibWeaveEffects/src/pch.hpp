@@ -6,6 +6,8 @@
 #include <optional>
 #include <algorithm>
 #include <format>
+#include <concepts>
+#include <type_traits>
 
 #include "WeaveUtils/Utils.hpp"
 #include "WeaveUtils/Math.hpp"

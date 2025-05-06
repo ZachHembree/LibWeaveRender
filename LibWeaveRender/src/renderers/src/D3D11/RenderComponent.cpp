@@ -1,31 +1,22 @@
 #include "pch.hpp"
-#include "WeaveRender/D3D11.hpp"
+#include "D3D11/Renderer.hpp"
+#include "D3D11/RenderComponent.hpp"
 
 using namespace Weave;
 using namespace Weave::D3D11;
 
 RenderComponentBase::RenderComponentBase(Renderer& renderer, uint priority) :
-	pRenderer(&renderer), priority(priority), id(uint(-1))
+	Renderer::CompBaseT(renderer, priority)
 { }
 
-Renderer& RenderComponentBase::GetRenderer() { return *pRenderer; }
+Renderer& RenderComponentBase::GetRenderer() { return *pParent; }
 
-Device& RenderComponentBase::GetDevice() { return pRenderer->GetDevice(); }
+Device& RenderComponentBase::GetDevice() { return pParent->GetDevice(); }
 
-MinWindow& RenderComponentBase::GetWindow() { return pRenderer->GetWindow(); }
+MinWindow& RenderComponentBase::GetWindow() { return pParent->GetWindow(); }
 
-const Renderer& RenderComponentBase::GetRenderer() const { return *pRenderer; }
+const Renderer& RenderComponentBase::GetRenderer() const { return *pParent; }
 
-const Device& RenderComponentBase::GetDevice() const { return pRenderer->GetDevice(); }
+const Device& RenderComponentBase::GetDevice() const { return pParent->GetDevice(); }
 
-const MinWindow& RenderComponentBase::GetWindow() const { return pRenderer->GetWindow(); }
-
-uint RenderComponentBase::GetPriority() const { return priority; }
-
-bool RenderComponentBase::GetIsRegistered(Renderer* pRenderer) const
-{ 
-	if (pRenderer == nullptr)
-		return id != uint(-1);
-	else 
-		return pRenderer == this->pRenderer && id != uint(-1);
-}
+const MinWindow& RenderComponentBase::GetWindow() const { return pParent->GetWindow(); }

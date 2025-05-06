@@ -101,7 +101,7 @@ namespace Weave
 		static vec2 GetNormMousePos();
 
 	private:
-		friend MinWindow;
+		friend ManagerT;
 		static InputHandler* s_pHandler;
 		static bool s_IsEnabled;
 

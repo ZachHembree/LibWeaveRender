@@ -1,5 +1,6 @@
 #pragma once
 #include "WeaveUtils/Utils.hpp"
+#include "WeaveUtils/ComponentManagerBase.hpp"
 
 namespace Weave
 {
@@ -15,16 +16,10 @@ namespace Weave::D3D11
 	/// <summary>
 	/// Base class for Renderer components
 	/// </summary>
-	class RenderComponentBase
+	class RenderComponentBase : public ComponentManagerBase<Renderer, RenderComponentBase>::ComponentBase
 	{
-	friend Renderer;
-
 	public:
-		MAKE_IMMOVABLE(RenderComponentBase)
-
 		RenderComponentBase(Renderer& renderer, uint priority = 10);
-
-		virtual ~RenderComponentBase() = 0;
 
 		/// <summary>
 		/// Updates before draw, but after the state and resources for the previous
@@ -69,23 +64,5 @@ namespace Weave::D3D11
 		/// Returns interface reference to window being rendered to
 		/// </summary>
 		const MinWindow& GetWindow() const;
-
-		/// <summary>
-		/// Returns true if the component has been registered to a renderer
-		/// </summary>
-		bool GetIsRegistered(Renderer* pRenderer = nullptr) const;
-
-		/// <summary>
-		/// Returns the update priority set for the component on construction. Components with higher priority values are 
-		/// updated later. Components with a priority of 0 update soonest.
-		/// </summary>
-		uint GetPriority() const;
-
-	private:
-		Renderer* pRenderer;
-		uint id;
-		uint priority;
 	};
-
-	inline RenderComponentBase::~RenderComponentBase() {}
 }

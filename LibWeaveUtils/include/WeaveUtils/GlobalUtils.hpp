@@ -1,5 +1,6 @@
 #pragma once
 #include "WeaveUtils/Int.hpp"
+#include <concepts>
 #include <type_traits>
 
 // Default constructor and copy/move operator utils
