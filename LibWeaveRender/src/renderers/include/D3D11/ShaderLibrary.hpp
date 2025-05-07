@@ -13,19 +13,13 @@ namespace Weave::D3D11
 	class ShaderLibrary
 	{
 	public:
-		MAKE_NO_COPY(ShaderLibrary)
+		DECL_DEST_MOVE(ShaderLibrary)
 
 		ShaderLibrary();
 
 		ShaderLibrary(Renderer& renderer, const ShaderLibDef& def);
 
 		ShaderLibrary(Renderer& renderer, ShaderLibDef&& def);
-
-		ShaderLibrary(ShaderLibrary&&) noexcept;
-
-		ShaderLibrary& operator=(ShaderLibrary&&) noexcept;
-
-		~ShaderLibrary();
 
 		/// <summary>
 		/// Retrieves interface for querying string IDs used in library resources

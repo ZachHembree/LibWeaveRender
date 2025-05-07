@@ -1,6 +1,5 @@
 #pragma once
 #include "DeviceChild.hpp"
-#include "../CommonEnums.hpp"
 #include "WeaveEffects/ShaderDataHandles.hpp"
 
 namespace Weave::D3D11
@@ -13,6 +12,7 @@ namespace Weave::D3D11
 	class InputLayout : public DeviceChild
 	{
 	public:
+		DECL_DEST_MOVE(InputLayout);
 
 		InputLayout() noexcept;
 
@@ -32,6 +32,6 @@ namespace Weave::D3D11
 		ID3D11InputLayout* Get() const;
 
 	private:
-		ComPtr<ID3D11InputLayout> pLayout;
+		UniqueComPtr<ID3D11InputLayout> pLayout;
 	};
 }

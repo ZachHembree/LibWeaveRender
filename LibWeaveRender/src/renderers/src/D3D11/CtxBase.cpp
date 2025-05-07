@@ -17,9 +17,11 @@
 using namespace Weave;
 using namespace Weave::D3D11;
 
+DEF_DEST_MOVE(CtxBase);
+
 CtxBase::CtxBase() = default;
 
-CtxBase::CtxBase(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx) :
+CtxBase::CtxBase(Device& dev, UniqueComPtr<ID3D11DeviceContext1>&& pCtx) :
 	DeviceChild(dev),
 	pCtx(std::move(pCtx)),
 	pState(new ContextState()),
@@ -27,10 +29,6 @@ CtxBase::CtxBase(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx) :
 {
 	pState->Init();
 }
-
-CtxBase::CtxBase(CtxBase&&) noexcept = default;
-
-CtxBase& CtxBase::operator=(CtxBase&&) noexcept = default;
 
 void CtxBase::BindDepthStencilBuffer(IDepthStencil& depthStencil) 
 {

@@ -16,11 +16,9 @@ namespace Weave::D3D11
 	class SwapChain : public DeviceChild
 	{
 	public:
+		DECL_DEST_MOVE(SwapChain);
+
 		SwapChain(Device& dev);
-
-		SwapChain(SwapChain&&) = default;
-
-		SwapChain& operator=(SwapChain&&) = default;
 
 		/// <summary>
 		/// Initializes swap chain after initial renderer config
@@ -121,15 +119,15 @@ namespace Weave::D3D11
 		void Present(uint syncInterval);
 
 	private:
-		ComPtr<IDXGIFactory5> pFactory;
-		ComPtr<IDXGISwapChain4> pSwap;
+		UniqueComPtr<IDXGIFactory5> pFactory;
+		UniqueComPtr<IDXGISwapChain4> pSwap;
 		DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsDesc;
 		DXGI_SWAP_CHAIN_DESC1 desc;
 		bool isInitialized;
 		bool isTearingSupported;
 
-		ComPtr<ID3D11Resource> pBackBuffer;
-		ComPtr<ID3D11RenderTargetView> pBackBufRTV;
+		UniqueComPtr<ID3D11Resource> pBackBuffer;
+		UniqueComPtr<ID3D11RenderTargetView> pBackBufRTV;
 		RTHandle backBufRt;
 		VSyncRenderModes syncMode;
 

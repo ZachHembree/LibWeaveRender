@@ -11,6 +11,8 @@ namespace Weave::D3D11
 	class RTHandle : public DeviceChild, public IRenderTarget
 	{
 	public:
+		MAKE_MOVE_ONLY(RTHandle)
+
 		RTHandle();
 		
 		RTHandle(
@@ -50,7 +52,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns a pointer to the resource field address
 		/// </summary>
-		ID3D11Resource** const GetResAddress() override;
+		ID3D11Resource* const* GetResAddress() override;
 
 		/// <summary>
 		/// Returns the dimensions of the 2D texture
@@ -110,10 +112,7 @@ namespace Weave::D3D11
 		/// </summary>
 		ID3D11RenderTargetView* GetRTV() override;
 
-		/// <summary>
-		/// Binds the render target to the output merger
-		/// </summary>
-		ID3D11RenderTargetView** const GetAddressRTV() override;
+		ID3D11RenderTargetView* const* const GetAddressRTV() override;
 
 		/// <summary>
 		/// Clears the render target to the given color

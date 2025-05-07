@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "D3D11/InternalD3D11.hpp"
 #include "D3D11/Device.hpp"
 #include "D3D11/CtxImm.hpp"
 #include "D3D11/ContextState.hpp"
@@ -9,21 +10,17 @@ using namespace glm;
 using namespace Weave;
 using namespace Weave::D3D11;
 
+DEF_DEST_MOVE(CtxImm);
+
 CtxImm::CtxImm() :
 	CtxBase()
 { }
 
-CtxImm::CtxImm(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx) :
+CtxImm::CtxImm(Device& dev, UniqueComPtr<ID3D11DeviceContext1>&& pCtx) :
 	CtxBase(dev, std::move(pCtx))
 { 
 	D3D_ASSERT_MSG(GetIsImmediate(), "An immediate context wrapper cannot point to a deferred context.");
 }
-
-CtxImm::CtxImm(CtxImm&&) noexcept = default;
-
-CtxImm& CtxImm::operator=(CtxImm&&) noexcept = default;
-
-CtxImm::~CtxImm() = default;
 
 MappedBufferHandle CtxImm::GetMappedBufferHandle(IBuffer& buf)
 {

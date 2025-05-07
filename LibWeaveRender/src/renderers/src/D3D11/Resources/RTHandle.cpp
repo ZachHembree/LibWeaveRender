@@ -40,7 +40,7 @@ ResourceAccessFlags RTHandle::GetAccessFlags() const { return ResourceAccessFlag
 
 ID3D11Resource* RTHandle::GetResource() { return *ppRes; }
 
-ID3D11Resource** const RTHandle::GetResAddress() { return ppRes; }
+ID3D11Resource* const* RTHandle::GetResAddress() { return ppRes; }
 
 uivec2 RTHandle::GetSize() const
 {
@@ -117,7 +117,7 @@ vec2 RTHandle::GetRenderScale() const
 
 ID3D11RenderTargetView* RTHandle::GetRTV() { return *ppRTV; }
 
-ID3D11RenderTargetView** const RTHandle::GetAddressRTV() { return ppRTV; }
+ID3D11RenderTargetView* const* const RTHandle::GetAddressRTV() { return ppRTV; }
 
 void RTHandle::Clear(
 	CtxBase& ctx,

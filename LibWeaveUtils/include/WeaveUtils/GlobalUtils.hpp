@@ -2,12 +2,14 @@
 #include <optional>
 #include <concepts>
 #include <type_traits>
+#include <utility>
+#include <cstddef>
 
 #include "WeaveUtils/Int.hpp"
 #include "WeaveUtils/WeaveException.hpp"
 
 // Default constructor and copy/move operator utils
-// Delete copy/move
+// Delete copy operations
 #define MAKE_NO_COPY(Type) \
     Type(const Type&) = delete; \
     Type& operator=(const Type&) = delete;  
@@ -15,23 +17,23 @@
 #define MAKE_NO_MOVE(Type) \
     Type(Type&&) = delete; \
     Type& operator=(Type&&) = delete;
-// Default copy/move
+// Default copy inline
 #define MAKE_DEF_COPY(Type) \
     Type(const Type&) = default; \
     Type& operator=(const Type&) = default;  
-// Defaults move operations
+// Defaults move operations inline
 #define MAKE_DEF_MOVE(Type) \
     Type(Type&&) noexcept = default; \
     Type& operator=(Type&&) noexcept = default;
-// Defaults move and copy operators
+// Defaults move and copy operators inline
 #define MAKE_DEF_MOVE_COPY(Type) \
     MAKE_DEF_COPY(Type) \
     MAKE_DEF_MOVE(Type)
-// Default move or copy only
+// Default move only defaulted inline
 #define MAKE_MOVE_ONLY(Type) \
     MAKE_NO_COPY(Type) \
     MAKE_DEF_MOVE(Type)
-// Defaults copy operations and deletes move operations
+// Defaults copy operations inline and deletes move operations 
 #define MAKE_COPY_ONLY(Type) \
     MAKE_DEF_COPY(Type)  \
     MAKE_NO_MOVE(Type)
@@ -42,10 +44,27 @@
 // Default compare
 #define USE_DEFAULT_CMP(Type) bool operator==(const Type& rhs) const = default; \
     bool operator!=(const Type& rhs) const = default;
-// Default copy, move and compare
+// Default copy, move and compare inline
 #define MAKE_DEF_ALL(Type) \
     MAKE_DEF_MOVE_COPY(Type) \
     USE_DEFAULT_CMP(Type) 
+// Declares, but does not define, move operations. Deletes copy operations.
+#define DECL_MOVE_ONLY(Type)\
+    MAKE_NO_COPY(Type)\
+    Type(Type&&) noexcept;\
+    Type& operator=(Type&&) noexcept;
+// Defines default move operations. For use in implementation file.
+#define DEF_MOVE_ONLY(Type)\
+    Type::Type(Type&&) noexcept = default;\
+    Type& Type::operator=(Type&&) noexcept = default;
+// Defines default move operations and destruction. For use in implementation file.
+#define DECL_DEST_MOVE(Type)\
+    DECL_MOVE_ONLY(Type)\
+    ~Type();
+// Defines default move operations and destruction. For use in implementation file.
+#define DEF_DEST_MOVE(Type)\
+    DEF_MOVE_ONLY(Type)\
+    Type::~Type() = default;
 
 /*
     Allocates temporary stack allocated array with alloca and assigns it to the given pointer.

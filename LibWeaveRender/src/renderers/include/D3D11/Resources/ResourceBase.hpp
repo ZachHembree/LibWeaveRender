@@ -20,10 +20,10 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns a pointer to the resource field address
 		/// </summary>
-		virtual ID3D11Resource** const GetResAddress() = 0;
+		virtual ID3D11Resource* const* GetResAddress() = 0;
 	};
 
-	class ResourceBase : public IResource, public DeviceChild
+	class ResourceBase : public virtual IResource, public DeviceChild
 	{
 	public:
 
@@ -148,7 +148,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Read-only pointer to pointer for Render Target view
 		/// </summary>
-		virtual ID3D11RenderTargetView** const GetAddressRTV() = 0;
+		virtual ID3D11RenderTargetView* const* const GetAddressRTV() = 0;
 
 		/// <summary>
 		/// Clears the render target to the given color
@@ -170,7 +170,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns pointer to UAV pointer field
 		/// </summary>
-		virtual ID3D11UnorderedAccessView** const GetAddressUAV() = 0;
+		virtual ID3D11UnorderedAccessView* const* GetAddressUAV() = 0;
 	};
 
 	/// <summary>
@@ -185,7 +185,7 @@ namespace Weave::D3D11
 	class ITexture2D : public virtual ITexture2DBase, public IShaderResource
 	{ };
 
-	class IDepthStencil : public ITexture2DBase
+	class IDepthStencil : public virtual ITexture2DBase
 	{
 	public:
 		/// <summary>
@@ -206,7 +206,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns interface to depth-stencil view
 		/// </summary>
-		virtual ID3D11DepthStencilView** const GetDSVAddress() = 0;
+		virtual ID3D11DepthStencilView* const* GetDSVAddress() = 0;
 
 		/// <summary>
 		/// Clears the texture

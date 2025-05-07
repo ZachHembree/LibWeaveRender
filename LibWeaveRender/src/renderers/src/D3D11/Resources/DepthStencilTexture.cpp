@@ -6,6 +6,8 @@
 using namespace Weave;
 using namespace Weave::D3D11;
 
+DEF_DEST_MOVE(DepthStencilTexture);
+
 DepthStencilTexture::DepthStencilTexture()
 { }
 
@@ -51,9 +53,9 @@ ID3D11DepthStencilState* DepthStencilTexture::GetState() { return pState.Get(); 
 
 ID3D11DepthStencilView* DepthStencilTexture::GetDSV() { return pDSV.Get(); }
 
-ID3D11DepthStencilView** const DepthStencilTexture::GetDSVAddress() { return pDSV.GetAddressOf(); }
+ID3D11DepthStencilView* const* DepthStencilTexture::GetDSVAddress() { return pDSV.GetAddressOf(); }
 
-void DepthStencilTexture::Clear(CtxBase& ctx, DSClearFlags clearFlags, float depthClear, UINT8 stencilClear )
+void DepthStencilTexture::Clear(CtxBase& ctx, DSClearFlags clearFlags, float depthClear, byte stencilClear )
 {
 	ctx.ClearDepthStencil(*this, clearFlags, depthClear, stencilClear);
 }

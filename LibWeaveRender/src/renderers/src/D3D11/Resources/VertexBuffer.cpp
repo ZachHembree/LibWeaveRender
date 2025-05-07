@@ -5,6 +5,8 @@
 
 using namespace Weave::D3D11;
 
+DEF_DEST_MOVE(VertexBuffer);
+
 VertexBuffer::VertexBuffer(
 	Device& device, 
 	const void* data, 
@@ -21,10 +23,6 @@ VertexBuffer::VertexBuffer(
 { }
 
 VertexBuffer::VertexBuffer() : count(0), stride(0), offset(0) {}
-
-VertexBuffer::VertexBuffer(VertexBuffer&&) = default;
-
-VertexBuffer& VertexBuffer::operator=(VertexBuffer&&) = default;
 
 uint VertexBuffer::GetLength() const { return count; }
 

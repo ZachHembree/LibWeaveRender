@@ -4,6 +4,8 @@
 
 struct ID3D11Buffer;
 struct ID3D11Resource;
+struct ID3D11Texture2D;
+
 struct ID3D11ShaderResourceView;
 struct ID3D11RenderTargetView;
 struct ID3D11UnorderedAccessView;
@@ -12,11 +14,13 @@ struct ID3D11DepthStencilView;
 
 struct IDXGIOutput1;
 struct ID3D11Device1;
+struct ID3D11DeviceChild;
 struct ID3D11DeviceContext1;
 struct ID3D11VertexShader;
 struct ID3D11PixelShader;
 struct ID3D11ComputeShader;
 struct ID3D11SamplerState;
+struct ID3D11InputLayout;
 
 struct D3D11_MAPPED_SUBRESOURCE;
 struct D3D11_BUFFER_DESC;

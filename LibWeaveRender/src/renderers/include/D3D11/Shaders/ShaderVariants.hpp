@@ -45,7 +45,7 @@ namespace Weave::D3D11
 		ShadeStages GetStage() const override { return Stage; }
 
 	protected:
-		ComPtr<ShaderT> pShader;
+		UniqueComPtr<ShaderT> pShader;
 	};
 
 	template<typename ShaderT, ShadeStages StageT>
@@ -57,12 +57,10 @@ namespace Weave::D3D11
 	class VertexShaderVariant : public ShaderVariant<ID3D11VertexShader, ShadeStages::Vertex>
 	{
 	public:
-		MAKE_MOVE_ONLY(VertexShaderVariant)
+		DECL_DEST_MOVE(VertexShaderVariant)
 		using ShaderVariant::ShaderVariant;
 
 		VertexShaderVariant(Device& dev, const ShaderDefHandle& def);
-
-		~VertexShaderVariant();
 
 		const InputLayout& GetInputLayout() const { return layout; }
 
@@ -76,10 +74,8 @@ namespace Weave::D3D11
 	class PixelShaderVariant : public ShaderVariant<ID3D11PixelShader, ShadeStages::Pixel>
 	{
 	public:
-		MAKE_MOVE_ONLY(PixelShaderVariant)
+		DECL_DEST_MOVE(PixelShaderVariant)
 		using ShaderVariant::ShaderVariant;
-
-		~PixelShaderVariant();
 
 	private:
 	};
@@ -90,12 +86,10 @@ namespace Weave::D3D11
 	class ComputeShaderVariant : public ShaderVariant<ID3D11ComputeShader, ShadeStages::Compute>
 	{
 	public:
-		MAKE_MOVE_ONLY(ComputeShaderVariant)
+		DECL_DEST_MOVE(ComputeShaderVariant)
 		using ShaderVariant::ShaderVariant;
 	
 		ComputeShaderVariant(Device& dev, const ShaderDefHandle& def);
-
-		~ComputeShaderVariant();
 
 		/// <summary>
 		/// Returns the layout map for unordered access views. Returns nullptr if undefined or empty.

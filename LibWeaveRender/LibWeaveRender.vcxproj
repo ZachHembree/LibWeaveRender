@@ -321,6 +321,7 @@
     <ClInclude Include="src\renderers\include\D3DException.hpp" />
     <ClInclude Include="src\renderers\include\FrameTimer.hpp" />
     <ClInclude Include="src\renderers\include\InputHandler.hpp" />
+    <ClInclude Include="src\renderers\include\UniqueComPtr.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

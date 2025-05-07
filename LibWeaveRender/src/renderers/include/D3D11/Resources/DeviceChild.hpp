@@ -1,5 +1,6 @@
 #pragma once
 #include "WeaveUtils/GlobalUtils.hpp"
+#include "../D3D11Utils.hpp"
 
 namespace Weave::D3D11
 {
@@ -12,8 +13,6 @@ namespace Weave::D3D11
 	class DeviceChild
 	{
 	public:
-		MAKE_MOVE_ONLY(DeviceChild)
-
 		/// <summary>
 		/// Returns the device associated with the child object
 		/// </summary>
@@ -30,10 +29,14 @@ namespace Weave::D3D11
 		virtual bool GetIsValid() const;
 
 	protected:
+		DECL_MOVE_ONLY(DeviceChild);
+
 		Device* pDev;
 
 		DeviceChild();
 
 		DeviceChild(Device& dev);
+
+		virtual ~DeviceChild();
 	};
 }

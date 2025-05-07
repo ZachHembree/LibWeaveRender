@@ -1,13 +1,14 @@
 #pragma once
 #include "DeviceChild.hpp"
-#include "../CommonEnums.hpp"
-#include "WeaveUtils/Win32.hpp"
+#include "../D3D11Utils.hpp"
 
 namespace Weave::D3D11
 {
 	class Sampler : public DeviceChild
 	{
 	public:
+        DECL_DEST_MOVE(Sampler);
+
         Sampler();
 
 		Sampler(Device& dev, 
@@ -30,9 +31,9 @@ namespace Weave::D3D11
         /// <summary>
         /// Returns pointer to COM interface pointer
         /// </summary>
-        ID3D11SamplerState** GetAddressOf();
+        ID3D11SamplerState* const* GetAddressOf();
 
 	private:
-		ComPtr<ID3D11SamplerState> pSamp;
+        UniqueComPtr<ID3D11SamplerState> pSamp;
 	};
 }

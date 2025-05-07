@@ -10,6 +10,8 @@ using namespace DirectX;
 using namespace Weave;
 using namespace Weave::D3D11;
 
+DEF_DEST_MOVE(Texture2DBase);
+
 Texture2DBase::Texture2DBase(
 	Device& dev,
 	uivec2 dim,
@@ -98,4 +100,4 @@ void Texture2DBase::LoadImageWIC(wstring_view file, ScratchImage& buffer)
 /// </summary>
 bool Texture2DBase::GetIsValid() const { return pDev != nullptr && pRes.Get() != nullptr; }
 
-ID3D11Resource** const Texture2DBase::GetResAddress() { return reinterpret_cast<ID3D11Resource**>(pRes.GetAddressOf()); }
+ID3D11Resource* const* Texture2DBase::GetResAddress() { return reinterpret_cast<ID3D11Resource* const*>(pRes.GetAddressOf()); }

@@ -5,7 +5,9 @@
 
 using namespace Weave::D3D11;
 
-ConstantBuffer::ConstantBuffer() { }
+DEF_DEST_MOVE(ConstantBuffer);
+
+ConstantBuffer::ConstantBuffer() = default;
 
 ConstantBuffer::ConstantBuffer(Device& device,
 	size_t size,

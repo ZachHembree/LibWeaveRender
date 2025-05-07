@@ -7,15 +7,11 @@
 using namespace Weave;
 using namespace Weave::D3D11;
 
+DEF_DEST_MOVE(DisplayOutput);
+
 DisplayOutput::DisplayOutput() : handle(nullptr), format(Formats::UNKNOWN), defaults({}) {}
 
-DisplayOutput::~DisplayOutput() {}
-
-DisplayOutput::DisplayOutput(DisplayOutput&&) noexcept = default;
-
-DisplayOutput& DisplayOutput::operator=(DisplayOutput&&) noexcept = default;
-
-DisplayOutput::DisplayOutput(Device& dev, ComPtr<IDXGIOutput1>&& pOutput, string&& name) :
+DisplayOutput::DisplayOutput(Device& dev, UniqueComPtr<IDXGIOutput1>&& pOutput, string&& name) :
 	DeviceChild(dev),
 	pDisplay(std::move(pOutput)),
 	name(std::move(name)),

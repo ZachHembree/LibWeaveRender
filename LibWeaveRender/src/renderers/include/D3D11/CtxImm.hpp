@@ -10,15 +10,11 @@ namespace Weave::D3D11
 	class CtxImm : public CtxBase
 	{
 	public:
+		DECL_DEST_MOVE(CtxImm);
+
 		CtxImm();
 
-		CtxImm(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx);
-
-		CtxImm(CtxImm&&) noexcept;
-
-		CtxImm& operator=(CtxImm&&) noexcept;
-
-		~CtxImm();
+		CtxImm(Device& dev, UniqueComPtr<ID3D11DeviceContext1>&& pCtx);
 
 		/// <summary>
 		/// Returns a handle for reading and or writing the given buffer, based on the 

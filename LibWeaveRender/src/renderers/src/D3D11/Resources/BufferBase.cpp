@@ -7,6 +7,8 @@
 
 using namespace Weave::D3D11;
 
+DEF_MOVE_ONLY(BufferBase);
+
 BufferBase::BufferBase() : desc({})
 { }
 
@@ -39,19 +41,15 @@ BufferBase::BufferBase(
 		D3D_CHECK_HR(dev->CreateBuffer(desc.GetD3DPtr(), nullptr, &pBuf));
 }
 
-BufferBase::BufferBase(BufferBase&&) noexcept = default;
-
-BufferBase& BufferBase::operator=(BufferBase&&) noexcept = default;
-
 BufferBase::~BufferBase() = default;
 
 ID3D11Buffer* BufferBase::Get() { return pBuf.Get(); }
 
-ID3D11Buffer** const BufferBase::GetAddressOf() { return pBuf.GetAddressOf(); }
+ID3D11Buffer* const* BufferBase::GetAddressOf() { return pBuf.GetAddressOf(); }
 
 ID3D11Resource* BufferBase::GetResource() { return Get(); }
 
-ID3D11Resource** const BufferBase::GetResAddress() { return reinterpret_cast<ID3D11Resource**>(GetAddressOf()); }
+ID3D11Resource* const* BufferBase::GetResAddress() { return reinterpret_cast<ID3D11Resource* const*>(GetAddressOf()); }
 
 uint BufferBase::GetSize() const { return desc.byteWidth; }
 

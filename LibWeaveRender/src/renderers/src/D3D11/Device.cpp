@@ -8,12 +8,14 @@ using namespace glm;
 using namespace Weave;
 using namespace Weave::D3D11;
 
+DEF_DEST_MOVE(Device);
+
 Device::Device(Renderer& renderer) : pRenderer(&renderer)
 {
 	WV_LOG_INFO() << "Device Init";
 
-	ComPtr<ID3D11DeviceContext> pCtxBase;
-	ComPtr<ID3D11Device> pDevBase;
+	UniqueComPtr<ID3D11DeviceContext> pCtxBase;
+	UniqueComPtr<ID3D11Device> pDevBase;
 	D3D_CHECK_HR(D3D11CreateDevice(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
@@ -30,12 +32,12 @@ Device::Device(Renderer& renderer) : pRenderer(&renderer)
 	D3D_CHECK_HR(pDevBase.As(&pDev));
 	D3D_CHECK_HR(pCtxBase.As(&pCtxImm));
 
-	context = CtxImm(*this, ComPtr<ID3D11DeviceContext1>(pCtxImm));
+	context = CtxImm(*this, UniqueComPtr<ID3D11DeviceContext1>(pCtxImm.Get()));
 
 	// Get device info
-	ComPtr<IDXGIDevice1> pDxgiDev;
-	ComPtr<IDXGIAdapter> pAdapterBase;
-	ComPtr<IDXGIAdapter1> pAdapter;
+	UniqueComPtr<IDXGIDevice1> pDxgiDev;
+	UniqueComPtr<IDXGIAdapter> pAdapterBase;
+	UniqueComPtr<IDXGIAdapter1> pAdapter;
 	D3D_CHECK_HR(pDev.As(&pDxgiDev));
 	D3D_CHECK_HR(pDxgiDev->GetAdapter(&pAdapterBase));
 	D3D_CHECK_HR(pAdapterBase.As(&pAdapter));
@@ -44,12 +46,12 @@ Device::Device(Renderer& renderer) : pRenderer(&renderer)
 	D3D_CHECK_HR(pAdapter->GetDesc1(&adapterDesc));
 	GetMultiByteString_UTF16LE_TO_UTF8(adapterDesc.Description, name);
 
-	ComPtr<IDXGIOutput> pDispBase;
+	UniqueComPtr<IDXGIOutput> pDispBase;
 
-	for (uint i = 0; pAdapter->EnumOutputs(i, pDispBase.ReleaseAndGetAddressOf()) != DXGI_ERROR_NOT_FOUND; i++)
+	for (uint i = 0; pAdapter->EnumOutputs(i, &pDispBase) != DXGI_ERROR_NOT_FOUND; i++)
 	{
-		ComPtr<IDXGIOutput1> pDisp;
-		pDispBase.As(&pDisp);
+		UniqueComPtr<IDXGIOutput1> pDisp;
+		D3D_CHECK_HR(pDispBase.As(&pDisp));
 		displays.emplace_back(DisplayOutput(*this, std::move(pDisp), std::format("Display {} ({})", i, name)));
 	}
 
@@ -83,17 +85,17 @@ IDynamicArray<DisplayOutput>& Device::GetDisplays() { return displays; }
 
 const IDynamicArray<DisplayOutput>& Device::GetDisplays() const { return displays; }
 
-void Device::CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11VertexShader>& pVS)
+void Device::CreateShader(const IDynamicArray<byte>& binSrc, UniqueComPtr<ID3D11VertexShader>& pVS)
 {
 	D3D_CHECK_HR(pDev->CreateVertexShader(binSrc.GetData(), binSrc.GetLength(), nullptr, &pVS));
 }
 
-void Device::CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11PixelShader>& pPS)
+void Device::CreateShader(const IDynamicArray<byte>& binSrc, UniqueComPtr<ID3D11PixelShader>& pPS)
 {
 	D3D_CHECK_HR(pDev->CreatePixelShader(binSrc.GetData(), binSrc.GetLength(), nullptr, &pPS));
 }
 
-void Device::CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11ComputeShader>& pCS)
+void Device::CreateShader(const IDynamicArray<byte>& binSrc, UniqueComPtr<ID3D11ComputeShader>& pCS)
 {
 	D3D_CHECK_HR(pDev->CreateComputeShader(binSrc.GetData(), binSrc.GetLength(), nullptr, &pCS));
 }

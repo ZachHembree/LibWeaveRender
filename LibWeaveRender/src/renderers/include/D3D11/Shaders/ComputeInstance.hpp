@@ -10,15 +10,11 @@ namespace Weave::D3D11
 	class ComputeInstance : public ShaderInstanceBase
 	{
 	public:
-		MAKE_NO_COPY(ComputeInstance)
+		DECL_DEST_MOVE(ComputeInstance)
 
 		ComputeInstance();
 
 		ComputeInstance(ShaderVariantManager& lib, uint nameID, uint vID);
-
-		ComputeInstance(ComputeInstance&&) noexcept;
-
-		ComputeInstance& operator=(ComputeInstance&&) noexcept;
 
 		void Dispatch(CtxBase& ctx, ivec3 groups);
 

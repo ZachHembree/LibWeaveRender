@@ -1,9 +1,9 @@
 #pragma once
+#include "D3D11Utils.hpp"
 #include "WeaveEffects/ShaderData.hpp"
 #include "WeaveUtils/Span.hpp"
 #include "Resources/DeviceChild.hpp"
 #include "Resources/ResourceBase.hpp"
-#include "WeaveUtils/Win32.hpp"
 
 namespace Weave::D3D11
 {
@@ -38,7 +38,6 @@ namespace Weave::D3D11
 	class CtxBase : public DeviceChild
 	{
 	public:
-		MAKE_NO_COPY(CtxBase);
 
 		using ActiveShaderMask = std::array<bool, 5>;
 
@@ -264,17 +263,17 @@ namespace Weave::D3D11
 		void Reset();
 
 	protected:
-		ComPtr<ID3D11DeviceContext1> pCtx;
+		DECL_MOVE_ONLY(CtxBase);
+
+		UniqueComPtr<ID3D11DeviceContext1> pCtx;
 		std::unique_ptr<ContextState> pState;
 		bool isImmediate;
 
 		CtxBase();
 
-		CtxBase(Device& dev, ComPtr<ID3D11DeviceContext1>&& pCtx);
+		CtxBase(Device& dev, UniqueComPtr<ID3D11DeviceContext1>&& pCtx);
 
-		CtxBase(CtxBase&&) noexcept;
-
-		CtxBase& operator=(CtxBase&&) noexcept;
+		virtual ~CtxBase();
 
 		/// <summary>
 		/// Binds subtype-specific resources to the pipeline

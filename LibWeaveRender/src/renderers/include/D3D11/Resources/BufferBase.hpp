@@ -1,7 +1,6 @@
 #pragma once
 #include "ResourceBase.hpp"
-#include "../CommonTypes.hpp"
-#include "WeaveUtils/Win32.hpp"
+#include "../D3D11Utils.hpp"
 
 namespace Weave::D3D11
 {
@@ -15,11 +14,11 @@ namespace Weave::D3D11
 	public:
 		ID3D11Buffer* Get();
 
-		ID3D11Buffer** const GetAddressOf();
+		ID3D11Buffer* const* GetAddressOf();
 
-		ID3D11Resource* GetResource();
+		ID3D11Resource* GetResource() override;
 
-		ID3D11Resource** const GetResAddress();
+		ID3D11Resource* const* GetResAddress() override;
 
 		/// <summary>
 		/// Returns the total size of the buffer in bytes.
@@ -48,8 +47,10 @@ namespace Weave::D3D11
 		void SetData(CtxBase& ctx, const IDynamicArray<byte>& data);
 
 	protected:
+		DECL_MOVE_ONLY(BufferBase);
+
 		BufferDesc desc;
-		ComPtr<ID3D11Buffer> pBuf;
+		UniqueComPtr<ID3D11Buffer> pBuf;
 
 		template<typename T>
 		BufferBase(
@@ -70,10 +71,6 @@ namespace Weave::D3D11
 			Device& device, 
 			const void* data, 
 			const uint byteSize);
-
-		BufferBase(BufferBase&&) noexcept;
-
-		BufferBase& operator=(BufferBase&&) noexcept;
 
 		virtual ~BufferBase();
 	};

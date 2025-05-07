@@ -10,6 +10,8 @@ namespace Weave::D3D11
 	class IndexBuffer : public BufferBase
 	{
 	public:
+		MAKE_MOVE_ONLY(IndexBuffer);
+
 		IndexBuffer(
 			Device& device,
 			const IDynamicArray<ushort>& data,
@@ -25,10 +27,6 @@ namespace Weave::D3D11
 		);
 
 		IndexBuffer();
-
-		IndexBuffer(IndexBuffer&&);
-
-		IndexBuffer& operator=(IndexBuffer&&);
 
 		/// <summary>
 		/// Returns the number of elements in the buffer

@@ -1,8 +1,7 @@
 #pragma once
 #include "WeaveUtils/MinWindow.hpp"
-#include "../CommonTypes.hpp"
+#include "../D3D11Utils.hpp"
 #include "DeviceChild.hpp"
-#include "WeaveUtils/Win32.hpp"
 
 namespace Weave::D3D11
 {
@@ -48,15 +47,11 @@ namespace Weave::D3D11
 	class DisplayOutput : public DeviceChild
 	{
 	public:
+		DECL_DEST_MOVE(DisplayOutput);
+
 		DisplayOutput();
 
-		DisplayOutput(Device& dev, ComPtr<IDXGIOutput1>&& pOutput, string&& name);
-
-		~DisplayOutput();
-
-		DisplayOutput(DisplayOutput&&) noexcept;
-
-		DisplayOutput& operator=(DisplayOutput&&) noexcept;
+		DisplayOutput(Device& dev, UniqueComPtr<IDXGIOutput1>&& pOutput, string&& name);
 
 		/// <summary>
 		/// Returns a pointer to the underlying DXGI object
@@ -112,7 +107,7 @@ namespace Weave::D3D11
 		WndMonConfig defaults;
 
 		Formats format;
-		ComPtr<IDXGIOutput1> pDisplay;
+		UniqueComPtr<IDXGIOutput1> pDisplay;
 		UniqueVector<DisplayMode> dispModes;
 		uivec2 defaultMode;
 	};

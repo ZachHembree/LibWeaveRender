@@ -1,10 +1,6 @@
 #pragma once
 #include "ResourceBase.hpp"
-#include "../CommonEnums.hpp"
-#include "../CommonTypes.hpp"
-#include "WeaveUtils/Win32.hpp"
-
-struct ID3D11Texture2D;
+#include "../D3D11Utils.hpp"
 
 namespace DirectX
 {
@@ -70,7 +66,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns pointer to interface pointer field
 		/// </summary>
-		ID3D11Resource** const GetResAddress() override;
+		ID3D11Resource* const* GetResAddress() override;
 
 		/// <summary>
 		/// Loads WIC-compatible image into a buffer
@@ -84,7 +80,9 @@ namespace Weave::D3D11
 		bool GetIsValid() const override;
 
 	protected:
-		ComPtr<ID3D11Texture2D> pRes;
+		DECL_MOVE_ONLY(Texture2DBase);
+
+		UniqueComPtr<ID3D11Texture2D> pRes;
 		Texture2DDesc desc;
 		uint pixelStride;
 
@@ -102,5 +100,7 @@ namespace Weave::D3D11
 			void* data = nullptr,
 			uint pixelStride = 0u
 		);
+
+		virtual ~Texture2DBase();
 	};
 }

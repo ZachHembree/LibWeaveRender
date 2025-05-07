@@ -9,6 +9,8 @@ using namespace DirectX;
 using namespace Weave;
 using namespace Weave::D3D11;
 
+DEF_DEST_MOVE(RWTexture2D);
+
 RWTexture2D::RWTexture2D() :
 	renderScale(1),
 	renderOffset(0)
@@ -21,9 +23,9 @@ RWTexture2D::RWTexture2D(
 	ResourceUsages usage,
 	ResourceBindFlags bindFlags,
 	ResourceAccessFlags accessFlags,
-	UINT mipLevels,
+	uint mipLevels,
 	void* data,
-	UINT stride
+	uint stride
 ) :
 	ResizeableTexture2D(
 		dev,
@@ -66,9 +68,9 @@ RWTexture2D::RWTexture2D(
 RWTexture2D::RWTexture2D(Device& dev,
 	uivec2 dim,
 	void* data,
-	UINT stride,
+	uint stride,
 	Formats format,
-	UINT mipLevels
+	uint mipLevels
 ) :
 	RWTexture2D(
 		dev,
@@ -86,7 +88,7 @@ RWTexture2D::RWTexture2D(
 	Device& dev,
 	Formats format,
 	uivec2 dim,
-	UINT mipLevels
+	uint mipLevels
 ) :
 	RWTexture2D(
 		dev,
@@ -108,11 +110,11 @@ ID3D11UnorderedAccessView* RWTexture2D::GetUAV() { return pUAV.Get(); }
 /// <summary>
 /// Returns pointer to UAV pointer field
 /// </summary>
-ID3D11UnorderedAccessView** const RWTexture2D::GetAddressUAV() { return pUAV.GetAddressOf(); }
+ID3D11UnorderedAccessView* const* RWTexture2D::GetAddressUAV() { return pUAV.GetAddressOf(); }
 
 ID3D11RenderTargetView* RWTexture2D::GetRTV() { return pRTV.Get(); }
 
-ID3D11RenderTargetView** const RWTexture2D::GetAddressRTV() { return pRTV.GetAddressOf(); }
+ID3D11RenderTargetView* const* const RWTexture2D::GetAddressRTV() { return pRTV.GetAddressOf(); }
 
 void RWTexture2D::Clear(CtxBase& ctx, vec4 color)
 {

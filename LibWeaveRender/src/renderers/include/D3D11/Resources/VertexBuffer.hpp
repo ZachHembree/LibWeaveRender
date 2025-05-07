@@ -6,6 +6,8 @@ namespace Weave::D3D11
 	class VertexBuffer : public BufferBase
 	{
 	public:
+		DECL_DEST_MOVE(VertexBuffer);
+
 		template<typename T>
 		VertexBuffer(
 			Device& device,
@@ -27,10 +29,6 @@ namespace Weave::D3D11
 		);
 
 		VertexBuffer();
-
-		VertexBuffer(VertexBuffer&&);
-
-		VertexBuffer& operator=(VertexBuffer&&);
 
 		/// <summary>
 		/// Returns the number of elements in the buffer

@@ -15,6 +15,7 @@ namespace Weave::D3D11
 	class Texture2D : public virtual ITexture2D, public Texture2DBase
 	{
 	public:
+		DECL_DEST_MOVE(Texture2D);
 
 		/// <summary>
 		/// Constructs and alocates a texture initialized with the given data with either
@@ -111,7 +112,7 @@ namespace Weave::D3D11
 		);
 		
 	protected:
-		ComPtr<ID3D11ShaderResourceView> pSRV;
+		UniqueComPtr<ID3D11ShaderResourceView> pSRV;
 
 		Texture2D(
 			Device& dev,

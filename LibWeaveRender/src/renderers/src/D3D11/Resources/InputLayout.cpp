@@ -7,7 +7,8 @@
 
 using namespace Weave;
 using namespace Weave::D3D11;
-using namespace Microsoft::WRL;
+
+DEF_DEST_MOVE(InputLayout);
 
 static DXGI_FORMAT GetFormat(const IOElementDef& def)
 {

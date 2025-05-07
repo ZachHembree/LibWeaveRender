@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "WeaveUtils/Win32.hpp"
 #include "D3D11/Renderer.hpp"
 #include "D3D11/ImGuiHandler.hpp"
 #include "D3D11/ImGuiRenderComponent.hpp"

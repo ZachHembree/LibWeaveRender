@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "D3D11/InternalD3D11.hpp"
 #include "D3D11/ShaderVariantManager.hpp"
 #include "D3D11/Shaders/ShaderVariants.hpp"
 #include "D3D11/Shaders/ComputeInstance.hpp"
@@ -7,6 +8,8 @@
 using namespace Weave;
 using namespace Weave::D3D11;
 
+DEF_DEST_MOVE(ComputeInstance);
+
 ComputeInstance::ComputeInstance() = default;
 
 ComputeInstance::ComputeInstance(ShaderVariantManager& lib, uint nameID, uint vID)  : 
@@ -14,10 +17,6 @@ ComputeInstance::ComputeInstance(ShaderVariantManager& lib, uint nameID, uint vI
 { 
 	SetVariantID(vID);
 }
-
-ComputeInstance::ComputeInstance(ComputeInstance&&) noexcept = default;
-
-ComputeInstance& ComputeInstance::operator=(ComputeInstance&&) noexcept = default;
 
 void ComputeInstance::Dispatch(CtxBase& ctx, ivec3 groups) { ctx.Dispatch(GetShader(), groups, *pRes); }
 

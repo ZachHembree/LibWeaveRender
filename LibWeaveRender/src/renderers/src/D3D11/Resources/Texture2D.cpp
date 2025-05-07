@@ -9,6 +9,8 @@
 using namespace DirectX;
 using namespace Weave::D3D11;
 
+DEF_DEST_MOVE(Texture2D);
+
 Texture2D::Texture2D() 
 { }
 

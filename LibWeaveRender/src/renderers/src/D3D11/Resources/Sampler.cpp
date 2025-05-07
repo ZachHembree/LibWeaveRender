@@ -5,6 +5,8 @@
 
 using namespace Weave::D3D11;
 
+DEF_DEST_MOVE(Sampler);
+
 Sampler::Sampler()
 { }
 
@@ -16,7 +18,7 @@ Sampler::Sampler(Device& dev, TexFilterModes filter, TexClampModes u, TexClampMo
 	desc.AddressU = (D3D11_TEXTURE_ADDRESS_MODE)u;
 	desc.AddressV = (D3D11_TEXTURE_ADDRESS_MODE)v;
 	desc.AddressW = (D3D11_TEXTURE_ADDRESS_MODE)w;
-
+	
 	D3D_CHECK_HR(dev->CreateSamplerState(&desc, &pSamp));
 }
 
@@ -29,4 +31,4 @@ Sampler::Sampler(Device& dev,
 
 ID3D11SamplerState* Sampler::Get() { return pSamp.Get(); }
 
-ID3D11SamplerState** Sampler::GetAddressOf() { return pSamp.GetAddressOf(); }
+ID3D11SamplerState* const* Sampler::GetAddressOf() { return pSamp.GetAddressOf(); }

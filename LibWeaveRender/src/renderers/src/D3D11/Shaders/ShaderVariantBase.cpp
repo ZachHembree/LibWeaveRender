@@ -7,9 +7,7 @@
 using namespace Weave;
 using namespace Weave::D3D11;
 
-ShaderVariantBase::ShaderVariantBase(ShaderVariantBase&& other) noexcept = default;
-
-ShaderVariantBase& ShaderVariantBase::operator=(ShaderVariantBase&& other) noexcept = default;
+DEF_DEST_MOVE(ShaderVariantBase);
 
 uint ShaderVariantBase::GetNameID() const { return def.GetNameID(); }
 

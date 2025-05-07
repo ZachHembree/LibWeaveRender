@@ -5,6 +5,8 @@
 
 using namespace Weave::D3D11;
 
+DEF_MOVE_ONLY(DeviceChild);
+
 /// <summary>
 /// Returns the device associated with the child object
 /// </summary>
@@ -23,3 +25,5 @@ bool DeviceChild::GetIsValid() const { return pDev != nullptr; }
 DeviceChild::DeviceChild() : pDev(nullptr) { }
 
 DeviceChild::DeviceChild(Device& dev) : pDev(&dev) { }
+
+DeviceChild::~DeviceChild() = default;

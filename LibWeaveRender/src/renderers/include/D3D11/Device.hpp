@@ -9,7 +9,7 @@ namespace Weave::D3D11
 	class Device
 	{
 	public:
-		MAKE_MOVE_ONLY(Device)
+		DECL_DEST_MOVE(Device)
 
 		Device(Renderer& renderer);
 
@@ -57,22 +57,22 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Creates and compiles a new vertex shader
 		/// </summary>
-		void CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11VertexShader>& pVS);
+		void CreateShader(const IDynamicArray<byte>& binSrc, UniqueComPtr<ID3D11VertexShader>& pVS);
 
 		/// <summary>
 		/// Creates and compiles a new pixel shader
 		/// </summary>
-		void CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11PixelShader>& pPS);
+		void CreateShader(const IDynamicArray<byte>& binSrc, UniqueComPtr<ID3D11PixelShader>& pPS);
 
 		/// <summary>
 		/// Creates and compiles a new compute shader
 		/// </summary>
-		void CreateShader(const IDynamicArray<byte>& binSrc, ComPtr<ID3D11ComputeShader>& pCS);
+		void CreateShader(const IDynamicArray<byte>& binSrc, UniqueComPtr<ID3D11ComputeShader>& pCS);
 
 	private:
 		Renderer* pRenderer;
-		ComPtr<ID3D11Device1> pDev;
-		ComPtr<ID3D11DeviceContext1> pCtxImm;
+		UniqueComPtr<ID3D11Device1> pDev;
+		UniqueComPtr<ID3D11DeviceContext1> pCtxImm;
 		CtxImm context;
 		string name;
 		UniqueVector<DisplayOutput> displays;

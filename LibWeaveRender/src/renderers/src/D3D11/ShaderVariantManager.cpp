@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "D3D11/InternalD3D11.hpp"
 #include "D3D11/ShaderVariantManager.hpp"
 
 using namespace Weave;

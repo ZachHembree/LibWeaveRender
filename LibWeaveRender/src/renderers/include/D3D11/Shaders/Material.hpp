@@ -10,15 +10,11 @@ namespace Weave::D3D11
 	class Material : public ShaderInstanceBase
 	{
 	public:		
-		MAKE_NO_COPY(Material)
+		DECL_DEST_MOVE(Material)
 
 		Material();
 
 		Material(ShaderVariantManager& lib, uint nameID, uint vID);
-
-		Material(Material&&) noexcept;
-
-		Material& operator=(Material&&) noexcept;
 
 		/// <summary>
 		/// Returns the number of passes in the effect

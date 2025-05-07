@@ -1,11 +1,12 @@
 #include "pch.hpp"
-#include "WeaveUtils/Win32.hpp"
 #include "D3D11/InternalD3D11.hpp"
 #include "D3D11/SwapChain.hpp"
 #include "D3D11/Renderer.hpp"
 
 using namespace Weave;
 using namespace Weave::D3D11;
+
+DEF_DEST_MOVE(SwapChain);
 
 SwapChain::SwapChain(Device& dev) :
 	DeviceChild(dev),
@@ -15,7 +16,7 @@ SwapChain::SwapChain(Device& dev) :
 	syncMode(VSyncRenderModes::TripleBuffered)
 {
 	WV_LOG_INFO() << "Swap Chain Init";
-	D3D_CHECK_HR(CreateDXGIFactory2(0, __uuidof(IDXGIFactory5), &pFactory));
+	D3D_CHECK_HR(CreateDXGIFactory2(0, __uuidof(IDXGIFactory5), reinterpret_cast<void**>(&pFactory)));
 
 	// Set defaults
 	fsDesc = {};
@@ -54,7 +55,7 @@ void SwapChain::Init()
 	const MinWindow& wnd = GetRenderer().GetWindow();
 	Device& dev = *pDev;
 
-	ComPtr<IDXGISwapChain1> pSwapBase;
+	UniqueComPtr<IDXGISwapChain1> pSwapBase;
 	D3D_CHECK_HR(pFactory->CreateSwapChainForHwnd(
 		dev.Get(),
 		wnd.GetWndHandle(),

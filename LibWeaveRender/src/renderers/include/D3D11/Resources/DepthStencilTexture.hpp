@@ -7,6 +7,8 @@ namespace Weave::D3D11
 	class DepthStencilTexture : public Texture2DBase, public IDepthStencil
 	{
 	public:
+		DECL_DEST_MOVE(DepthStencilTexture);
+
 		DepthStencilTexture();
 
 		DepthStencilTexture(
@@ -42,7 +44,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns interface to depth-stencil view
 		/// </summary>
-		ID3D11DepthStencilView** const GetDSVAddress() override;
+		ID3D11DepthStencilView* const* GetDSVAddress() override;
 
 		/// <summary>
 		/// Clears the texture
@@ -51,12 +53,12 @@ namespace Weave::D3D11
 			CtxBase& ctx,
 			DSClearFlags clearFlags = DSClearFlags::Depth,
 			float depthClear = 1.0f,
-			UINT8 stencilClear = 0
+			byte stencilClear = 0
 		) override;
 
 	private:
-		ComPtr<ID3D11DepthStencilState> pState;
-		ComPtr<ID3D11DepthStencilView> pDSV;
+		UniqueComPtr<ID3D11DepthStencilState> pState;
+		UniqueComPtr<ID3D11DepthStencilView> pDSV;
 		vec2 range;
 	};
 }

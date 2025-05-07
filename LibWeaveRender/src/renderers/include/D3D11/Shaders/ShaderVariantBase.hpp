@@ -19,8 +19,6 @@ namespace Weave::D3D11
 	class ShaderVariantBase : public DeviceChild
 	{
 	public:
-		MAKE_NO_COPY(ShaderVariantBase)
-
 		/// <summary>
 		/// Returns unique ID representing the entrypoint name in the associated ShaderLibrary
 		/// </summary>
@@ -67,6 +65,8 @@ namespace Weave::D3D11
 		virtual const UnorderedAccessMap* GetUAVMap() const;
 
 	protected:
+		DECL_MOVE_ONLY(ShaderVariantBase);
+
 		ShaderDefHandle def;
 
 		std::unique_ptr<ConstantGroupMap> pConstants;
@@ -78,8 +78,6 @@ namespace Weave::D3D11
 
 		ShaderVariantBase(Device& dev, const ShaderDefHandle& def);
 
-		ShaderVariantBase(ShaderVariantBase&& other) noexcept;
-
-		ShaderVariantBase& operator=(ShaderVariantBase&& other) noexcept;
+		virtual ~ShaderVariantBase();
 	};
 }

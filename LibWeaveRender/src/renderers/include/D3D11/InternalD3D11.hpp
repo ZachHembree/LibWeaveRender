@@ -1,8 +1,7 @@
 #pragma once
-#include "WeaveUtils/Win32.hpp"
+#include "D3D11Utils.hpp"
 #include "WeaveUtils/Math.hpp"
 #include <d3d11_4.h>
-#include "D3D11Utils.hpp"
 
 namespace Weave::D3D11
 {

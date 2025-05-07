@@ -2,7 +2,7 @@
 #include "WeaveUtils/WinUtils.hpp"
 #include "WeaveUtils/Math.hpp"
 
-#include "../src/renderers/include/D3DException.hpp"
+#include "../src/renderers/include/D3D11/D3D11Utils.hpp"
 
 #include "../src/renderers/include/D3D11/CtxBase.hpp"
 #include "../src/renderers/include/D3D11/CtxImm.hpp"

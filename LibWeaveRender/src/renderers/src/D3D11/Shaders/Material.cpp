@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "D3D11/InternalD3D11.hpp"
 #include "D3D11/Shaders/Material.hpp"
 #include "D3D11/Shaders/EffectVariant.hpp"
 #include "D3D11/ShaderVariantManager.hpp"
@@ -6,6 +7,8 @@
 
 using namespace Weave;
 using namespace Weave::D3D11;
+
+DEF_DEST_MOVE(Material);
 
 Material::Material() : pEffect(nullptr)
 { }
@@ -15,10 +18,6 @@ Material::Material(ShaderVariantManager& lib, uint nameID, uint vID) :
 {
 	SetVariantID(vID);
 }
-
-Material::Material(Material&&) noexcept = default;
-
-Material& Material::operator=(Material&&) noexcept = default;
 
 uint Material::GetPassCount() const { return GetEffect().GetPassCount(); }
 

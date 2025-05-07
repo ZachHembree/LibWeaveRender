@@ -1,23 +1,20 @@
 #include "pch.hpp"
+#include "D3D11/InternalD3D11.hpp"
 #include "D3D11/ShaderVariantManager.hpp"
 #include "D3D11/Shaders/ShaderInstanceBase.hpp"
 
 using namespace Weave;
 using namespace Weave::D3D11;
 
+DEF_DEST_MOVE(ShaderInstanceBase);
+
 ShaderInstanceBase::ShaderInstanceBase() :
 	pLib(nullptr), vID(-1), nameID(-1)
 { }
 
-ShaderInstanceBase::~ShaderInstanceBase() = default;
-
 ShaderInstanceBase::ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, uint vID) :
 	pLib(&lib), vID(vID), nameID(nameID), pRes(new ResourceSet())
 { }
-
-ShaderInstanceBase::ShaderInstanceBase(ShaderInstanceBase&&) noexcept = default;
-
-ShaderInstanceBase& ShaderInstanceBase::operator=(ShaderInstanceBase&&) noexcept = default;
 
 uint ShaderInstanceBase::GetNameID() const { return nameID; }
 

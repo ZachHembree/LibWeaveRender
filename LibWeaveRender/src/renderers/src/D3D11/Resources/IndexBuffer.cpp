@@ -27,10 +27,6 @@ IndexBuffer::IndexBuffer(Device& device,
 
 IndexBuffer::IndexBuffer() : count(0), format(Formats::UNKNOWN) {}
 
-IndexBuffer::IndexBuffer(IndexBuffer&&) = default;
-
-IndexBuffer& IndexBuffer::operator=(IndexBuffer&&) = default;
-
 uint IndexBuffer::GetLength() const { return count; }
 
 Formats IndexBuffer::GetFormat() const { return format; }

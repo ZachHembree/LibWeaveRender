@@ -207,6 +207,8 @@ namespace Weave::Effects
 	class EffectDefHandle
 	{
 	public:
+		MAKE_DEF_MOVE_COPY(EffectDefHandle);
+
 		EffectDefHandle();
 
 		EffectDefHandle(const ShaderRegistryMap& map, uint effectID);

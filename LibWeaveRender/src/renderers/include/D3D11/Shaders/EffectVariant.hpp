@@ -15,8 +15,6 @@ namespace Weave::D3D11
 	class EffectVariant
 	{
 	public:
-		MAKE_MOVE_ONLY(EffectVariant)
-
 		EffectVariant();
 
 		EffectVariant(

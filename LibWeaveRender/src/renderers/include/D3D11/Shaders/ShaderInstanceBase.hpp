@@ -12,7 +12,7 @@ namespace Weave::D3D11
 	class ShaderInstanceBase
 	{
 	public:
-		MAKE_NO_COPY(ShaderInstanceBase)
+		DECL_MOVE_ONLY(ShaderInstanceBase)
 
 		/// <summary>
 		/// Returns a unique int ID associated with the name of the underlying unique resource
@@ -197,13 +197,9 @@ namespace Weave::D3D11
 
 		ShaderInstanceBase();
 
-		~ShaderInstanceBase();
+		virtual ~ShaderInstanceBase();
 
 		ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, uint vID);
-
-		ShaderInstanceBase(ShaderInstanceBase&&) noexcept;
-
-		ShaderInstanceBase& operator=(ShaderInstanceBase&&) noexcept;
 
 		uint GetVariantID() const;
 

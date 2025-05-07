@@ -1,6 +1,5 @@
 #pragma once
 #include <unordered_map>
-#include "../InternalD3D11.hpp"
 #include "WeaveEffects/ShaderDataHandles.hpp"
 #include "ResourceSet.hpp"
 
