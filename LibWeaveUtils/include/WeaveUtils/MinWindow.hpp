@@ -1,7 +1,11 @@
 #pragma once
+#include <atomic>
+#include <mutex>
+#include <shared_mutex>
 #include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/Math.hpp"
 #include "ComponentManagerBase.hpp"
+#include "WinUtils.hpp"
 
 namespace Weave
 {
@@ -101,8 +105,8 @@ namespace Weave
 		void SetHitTestOverride(WndHitTestOverrides hitTest, bool isSet = true);
 
 	private:
-		ivec2 padding;
-		WndHitTestOverrides htOverride;
+		std::atomic<uivec2> padding;
+		std::atomic<WndHitTestOverrides> htOverride;
 	};
 
 	/// <summary>
@@ -145,14 +149,14 @@ namespace Weave
 			~MinWindow();
 
 			/// <summary>
-			/// Updates window message loop until the window is closed
+			/// Updates main Window loop until the application exits. To be run once from the owning thread.
 			/// </summary>
 			void RunMessageLoop(MSG& msg);
 
 			/// <summary>
 			/// Returns the contents of the titlebar
 			/// </summary>
-			wstring_view GetWindowTitle() const;
+			void GetWindowTitle(wstring& title) const;
 
 			/// <summary>
 			/// Writes the given text to the titlebar
@@ -197,22 +201,17 @@ namespace Weave
 			/// <summary>
 			/// Returns the size of the window in pixels.
 			/// </summary>
-			ivec2 GetSize() const;
+			uivec2 GetSize() const;
 
 			/// <summary>
 			/// Resizes the window to the given dimensions in pixels.
 			/// </summary>
-			void SetSize(ivec2 size);
+			void SetSize(uivec2 size);
 
 			/// <summary>
 			/// Returns the size of the window's body in pixels.
 			/// </summary>
-			ivec2 GetBodySize() const;
-			
-			/// <summary>
-			/// Resizes the window body to the given dimensions in pixels.
-			/// </summary>
-			void SetBodySize(ivec2 size);
+			uivec2 GetBodySize() const;
 
 			/// <summary>
 			/// Returns the position of the window's top right corner in pixels
@@ -332,25 +331,29 @@ namespace Weave
 
 		protected:	
 			friend WindowComponentBase;
-
-			wstring name;
-			mutable wstring title;
-			HINSTANCE hInst;
-			bool isInitialized;
+			mutable std::shared_mutex wndMutex;
 
 			HWND hWnd;
+			wstring name;
+			HINSTANCE hInst;
+			std::atomic<bool> isInitialized;
+			bool isMoving;
+			ulong timerID;
 
 			// Styling
 			WndStyle style;
-			ivec2 bodySize, wndSize;
-			bool isFullscreen;
-			ivec2 lastPos, lastSize;
+			std::atomic<uivec2> bodySize, wndSize;
+			std::atomic<ivec2> wndPos, bodyPos;
+
+			std::atomic<bool> isFullscreen;
+			uivec2 lastSize;
+			ivec2 lastPos;
 
 			// Mouse tracking
 			std::unique_ptr<TRACKMOUSEEVENT> pMouseTrackEvent;
-			bool isMousedOver;
-			bool canSysSleep;
-			bool canDispSleep;
+			std::atomic<bool> isMousedOver;
+			std::atomic<bool> canSysSleep;
+			std::atomic<bool> canDispSleep;
 
 			// Non-client override
 			const WndStyleOverride* pStyleOverride;
@@ -375,10 +378,15 @@ namespace Weave
 			void RepaintWindow();
 
 			/// <summary>
+			/// Runs component update tick
+			/// </summary>
+			void UpdateComponents();
+
+			/// <summary>
 			/// Processes next window message without removing it from the queue.
 			/// Returns false only on exit.
 			/// </summary>
-			virtual bool PollWindowMessages(MSG& msg);
+			bool PollWindowMessages(MSG& msg);
 
 			/// <summary>
 			/// Proceedure for processing window messages sent from Win32 API
@@ -386,9 +394,19 @@ namespace Weave
 			slong OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam);
 
 			/// <summary>
+			/// Checks Win32 messages for changes to the window
+			/// </summary>
+			void TrackState(HWND hWnd, uint msg, ulong wParam, slong lParam);
+
+			/// <summary>
 			/// Overrides non-client area styling Win32 messages if enabled
 			/// </summary>
 			std::optional<slong> TryHandleOverrideNC(HWND hWnd, uint msg, ulong wParam, slong lParam);
+
+			/// <summary>
+			/// Handles changes to sizing and position
+			/// </summary>
+			std::optional<slong> TryHandleMove(HWND hWnd, uint msg, ulong wParam, slong lParam);
 
 			/// <summary>
 			/// Updates window and body size

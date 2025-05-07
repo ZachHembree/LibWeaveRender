@@ -5,6 +5,8 @@
 
 #pragma comment(lib, "Shcore.lib")
 
+#define WM_FULLSCREEN WM_USER + 0
+
 using namespace Weave;
 
 // Has title bar | Has minimize button | Has window menu on its title bar | Can maximize | Can resize
@@ -14,9 +16,13 @@ MinWindow::MinWindow() :
 	ComponentManagerBase(),
 	hInst(nullptr),
 	hWnd(nullptr),
-	bodySize(0),
-	wndSize(0),
+	bodySize(uivec2(0)),
+	wndSize(uivec2(0)),
+	wndPos(ivec2(0)),
+	bodyPos(ivec2(0)),
 	isInitialized(false),
+	isMoving(false),
+	timerID(0),
 	isMousedOver(false),
 	isFullscreen(false),
 	lastPos(0),
@@ -38,7 +44,7 @@ MinWindow::MinWindow(
 	if (style == g_NullStyle)
 		style = g_DefaultWndStyle;
 
-	name = name;
+	this->name = name;
 	this->hInst = hInst;
 	this->style = style;
 	this->pStyleOverride = pStyleOverride;
@@ -135,6 +141,7 @@ MinWindow::~MinWindow()
 {
 	if (hWnd != nullptr)
 	{
+		std::unique_lock lock(wndMutex);
 		isInitialized = false;
 		UnregisterClass(name.data(), hInst);
 		DestroyWindow(hWnd);
@@ -147,22 +154,22 @@ void MinWindow::RunMessageLoop(MSG& msg)
 
 	while (PollWindowMessages(msg))
 	{
-		for (WindowComponentBase* pComp : sortedComps)
-			pComp->Update();
+		if (!isMoving)
+			UpdateComponents();
 	}
 }
 
-wstring_view MinWindow::GetWindowTitle() const
+void MinWindow::GetWindowTitle(wstring& title) const
 {
-	size_t len = GetWindowTextLengthW(hWnd) + 1;
+	std::shared_lock lock(wndMutex);
+	const int len = GetWindowTextLengthW(hWnd) + 1;
 	title.resize(len, '\0');
-	WIN_ASSERT_NZ_LAST(GetWindowTextW(hWnd, title.data(), (int)len));
-
-	return title;
+	WIN_ASSERT_NZ_LAST(GetWindowTextW(hWnd, title.data(), len));
 }
 
 void MinWindow::SetWindowTitle(wstring_view text)
 {
+	std::unique_lock lock(wndMutex);
 	WIN_CHECK_NZ_LAST(SetWindowTextW(hWnd, text.data()));
 }
 
@@ -213,78 +220,51 @@ void MinWindow::RepaintWindow()
 	WIN_CHECK_NZ_LAST(ShowWindow(hWnd, SW_SHOW));
 }
 
+void MinWindow::UpdateComponents()
+{
+	// Update thread execution state
+	DWORD execFlags = ES_CONTINUOUS;
+
+	if (!canSysSleep)
+		execFlags |= ES_SYSTEM_REQUIRED;
+
+	if (!canDispSleep)
+		execFlags |= ES_DISPLAY_REQUIRED;
+
+	SetThreadExecutionState(execFlags);
+	UpdateComponentIDs();
+
+	for (WindowComponentBase* pComp : sortedComps)
+		pComp->Update();
+}
+
 bool MinWindow::GetIsFullScreen() const { return isFullscreen; }
 
 void MinWindow::SetFullScreen(bool value)
 {
 	if (value != isFullscreen)
 	{
-		isFullscreen = value;
-
-		if (isFullscreen)
-		{
-			lastPos = GetPos();
-			lastSize = GetSize();
-
-			SetStyle(WndStyle(WS_VISIBLE | WS_POPUP, 0));
-			SetSize(GetMonitorResolution());
-			SetPos(GetMonitorPosition());
-		}
-		else
-		{
-			SetStyle(style);
-			SetSize(lastSize);
-			SetPos(lastPos);
-		}
+		WIN_CHECK_NZ_LAST(PostMessageW(hWnd, WM_FULLSCREEN, 0, value));
 	}
 }
 
-ivec2 MinWindow::GetSize() const { return wndSize; }
+uivec2 MinWindow::GetSize() const { return wndSize; }
 
-void MinWindow::SetSize(ivec2 size)
+void MinWindow::SetSize(uivec2 size)
 {
-	WIN_CHECK_NZ_LAST(SetWindowPos(
-		hWnd,
-		HWND_TOP,
-		0, 0,
-		size.x, size.y,
-		SWP_NOREPOSITION | SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED
-	));
+	WIN_CHECK_NZ_LAST(PostMessageW(hWnd, WM_SIZE, 0, MAKELPARAM(size.x, size.y)));
 }
 
-ivec2 MinWindow::GetBodySize() const { return bodySize; }
+uivec2 MinWindow::GetBodySize() const { return bodySize; }
 
-void MinWindow::SetBodySize(ivec2 size)
-{
-	ivec2 borderSize = wndSize - bodySize;
-	size += borderSize;
-	SetSize(size);
-}
-
-ivec2 MinWindow::GetPos() const
-{
-	RECT rect;
-	WIN_CHECK_NZ_LAST(GetWindowRect(hWnd, &rect));
-	return ivec2(rect.left, rect.top);
-}
+ivec2 MinWindow::GetPos() const { return wndPos; }
 
 void MinWindow::SetPos(ivec2 pos)
 {
-	WIN_CHECK_NZ_LAST(SetWindowPos(
-		hWnd,
-		0,
-		pos.x, pos.y,
-		0, 0,
-		SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
-	));
+	WIN_CHECK_NZ_LAST(PostMessageW(hWnd, WM_MOVE, 0, MAKELPARAM(pos.x, pos.y)));
 }
 
-ivec2 MinWindow::GetBodyPos() const
-{
-	POINT pos = {};
-	WIN_CHECK_NZ_LAST(ClientToScreen(hWnd, &pos));
-	return ivec2((sint)pos.x, (sint)pos.y);
-}
+ivec2 MinWindow::GetBodyPos() const { return bodyPos; }
 
 /*
 	System utilities
@@ -437,8 +417,6 @@ void MinWindow::CloseWindow() { PostMessageW(hWnd, WM_CLOSE, 0, 0); }
 
 bool MinWindow::PollWindowMessages(MSG& wndMsg)
 {
-	UpdateComponentIDs();
-
 	// Process windows events
 	if (PeekMessage(&wndMsg, nullptr, 0, 0, PM_REMOVE))
 	{
@@ -448,17 +426,6 @@ bool MinWindow::PollWindowMessages(MSG& wndMsg)
 		TranslateMessage(&wndMsg);
 		DispatchMessage(&wndMsg);
 	}
-
-	// Update thread execution state
-	DWORD execFlags = ES_CONTINUOUS;
-
-	if (!canSysSleep)
-		execFlags |= ES_SYSTEM_REQUIRED;
-
-	if (!canDispSleep)
-		execFlags |= ES_DISPLAY_REQUIRED;
-
-	SetThreadExecutionState(execFlags);
 
 	return true;
 }
@@ -471,38 +438,14 @@ slong MinWindow::OnWndMessage(HWND window, uint msg, ulong wParam, slong lParam)
 	try
 	{
 #endif
-		// Update internal window state
-		switch (msg)
-		{
-		case WM_CLOSE: // Window closed, normal exit
-			PostQuitMessage(0);
-			break;
-		case WM_SIZE:
-			UpdateSize();
-			break;
-		case WM_ACTIVATE:
-		case WM_SETFOCUS:
-		case WM_MOUSEACTIVATE:
-		case WM_NCMOUSEHOVER:
-		case WM_NCMOUSEMOVE:
-		case WM_MOUSEHOVER:
-		case WM_MOUSEMOVE:
-
-			if (!isMousedOver)
-				TrackMouseEvent(pMouseTrackEvent.get());
-
-			isMousedOver = true;
-			break;
-		case WM_KILLFOCUS:
-		case WM_MOUSELEAVE:
-		case WM_NCMOUSELEAVE:
-			isMousedOver = false;
-			break;
-		}
+		result = TryHandleMove(hWnd, msg, wParam, lParam);
 
 		// Non-client override
-		if (pStyleOverride != nullptr)
+		if (!result.has_value() && pStyleOverride != nullptr)
 			result = TryHandleOverrideNC(hWnd, msg, wParam, lParam);
+		
+		if (!result.has_value())
+			TrackState(hWnd, msg, wParam, lParam);
 
 		// Pass messages through to components
 		if (msg != WM_CLOSE && isInitialized)
@@ -531,23 +474,59 @@ slong MinWindow::OnWndMessage(HWND window, uint msg, ulong wParam, slong lParam)
 		WV_LOG_ERROR() << "An exception was thrown during Win32 message polling.\n"
 			<< "An unknown exception occurred." << '\n';
 	}
-#endif // ! WV_TRACE_EXCEPT
+#endif
 
 	return (result.has_value() ? result.value() : DefWindowProcW(hWnd, msg, wParam, lParam));
 }
 
-void MinWindow::UpdateSize()
+void MinWindow::TrackState(HWND hWnd, uint msg, ulong wParam, slong lParam)
 {
-	RECT clientBox, wndBox;
+	// Update internal window state
+	switch (msg)
+	{
+	case WM_CLOSE: // Window closed, normal exit
+		PostQuitMessage(0);
+		break;
+	case WM_FULLSCREEN:
+	{
+		isFullscreen = lParam > 0;
 
-	if (GetClientRect(hWnd, &clientBox) != 0)
-		bodySize = ivec2(clientBox.right - clientBox.left, clientBox.bottom - clientBox.top);
+		if (isFullscreen)
+		{
+			lastPos = GetPos();
+			lastSize = GetSize();
 
-	if (GetWindowRect(hWnd, &wndBox) != 0)
-		wndSize = ivec2(wndBox.right - wndBox.left, wndBox.bottom - wndBox.top);
+			SetStyle(WndStyle(WS_VISIBLE | WS_POPUP, 0));
+			SetSize(GetMonitorResolution());
+			SetPos(GetMonitorPosition());
+		}
+		else
+		{
+			SetStyle(style);
+			SetSize(lastSize);
+			SetPos(lastPos);
+		}
+		break;
+	}
+	case WM_ACTIVATE:
+	case WM_SETFOCUS:
+	case WM_MOUSEACTIVATE:
+	case WM_NCMOUSEHOVER:
+	case WM_NCMOUSEMOVE:
+	case WM_MOUSEHOVER:
+	case WM_MOUSEMOVE:
 
-	if (pStyleOverride != nullptr)
-		WV_ASSERT_MSG(bodySize == wndSize, "Client and Window size should be equal when non-client area is overridden.");
+		if (!isMousedOver)
+			TrackMouseEvent(pMouseTrackEvent.get());
+
+		isMousedOver = true;
+		break;
+	case WM_KILLFOCUS:
+	case WM_MOUSELEAVE:
+	case WM_NCMOUSELEAVE:
+		isMousedOver = false;
+		break;
+	}
 }
 
 std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, uint msg, ulong wParam, slong lParam)
@@ -594,15 +573,15 @@ std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, uint msg, ulong
 		}
 		case WM_NCHITTEST:
 		{
-			POINTS pos = MAKEPOINTS(lParam);
-			const ivec2 wndPos = GetPos();
-			const ivec2 mndSize = GetSize();
-			const ivec2 cursorPos(pos.x - wndPos.x, pos.y - wndPos.y);
+			POINTS hitPos = MAKEPOINTS(lParam);
+			const ivec2 pos = wndPos.load();
+			const ivec2 size = wndSize.load();
+			const ivec2 cursorPos(hitPos.x - pos.x, hitPos.y - pos.y);
 			const ivec2 padding = pStyleOverride->GetPadding();
 
-			if (AllTrue(cursorPos > ivec2(0) && cursorPos < wndSize))
+			if (AllTrue(cursorPos > ivec2(0) && cursorPos < size))
 			{
-				const ivec2 innerMax = (wndSize - padding);
+				const ivec2 innerMax = size - padding;
 
 				// Corners
 				if (cursorPos.x < padding.x && cursorPos.y < padding.y)		return HTTOPLEFT;
@@ -636,6 +615,85 @@ std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, uint msg, ulong
 	}
 	
 	return std::nullopt;
+}
+
+std::optional<slong> MinWindow::TryHandleMove(HWND hWnd, uint msg, ulong wParam, slong lParam)
+{
+	switch (msg)
+	{
+	case WM_SIZE:
+	{
+		const POINTS& size = MAKEPOINTS(lParam);
+		WIN_CHECK_NZ_LAST(SetWindowPos(
+			hWnd,
+			HWND_TOP,
+			0, 0,
+			size.x, size.y,
+			SWP_NOREPOSITION | SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED
+		));
+		UpdateSize();
+		return 0;
+	}
+	case WM_MOVE:
+	{
+		const POINTS& pos = MAKEPOINTS(lParam);
+		WIN_CHECK_NZ_LAST(SetWindowPos(
+			hWnd,
+			0,
+			pos.x, pos.y,
+			0, 0,
+			SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
+		));
+		UpdateSize();
+		return 0;
+	}
+	case WM_ENTERSIZEMOVE:
+		isMoving = true;
+		timerID = SetTimer(hWnd, 1, USER_TIMER_MINIMUM, nullptr);
+		return 0;
+	case WM_EXITSIZEMOVE:
+		isMoving = false;
+		if (timerID != 0)
+		{
+			KillTimer(hWnd, timerID);
+			timerID = 0;
+		}
+		return 0;
+	case WM_TIMER:
+		if (isMoving)
+		{
+			UpdateComponents();
+			RepaintWindow();
+		}
+		break;
+	case WM_DESTROY:
+		if (timerID)
+			KillTimer(hWnd, timerID);
+
+		PostQuitMessage(0);
+	}
+
+	return std::nullopt;
+}
+
+void MinWindow::UpdateSize()
+{
+	RECT clientBox, wndBox;
+
+	WIN_CHECK_NZ_LAST(GetClientRect(hWnd, &clientBox));
+	bodySize = uivec2(clientBox.right - clientBox.left, clientBox.bottom - clientBox.top);
+
+	WIN_CHECK_NZ_LAST(GetWindowRect(hWnd, &wndBox));
+	wndSize = uivec2(wndBox.right - wndBox.left, wndBox.bottom - wndBox.top);
+	wndPos = ivec2(wndBox.left, wndBox.top);
+
+	POINT pt = {};
+	WIN_CHECK_NZ_LAST(ClientToScreen(hWnd, &pt));
+	bodyPos = ivec2((sint)pt.x, (sint)pt.y);
+
+	if (pStyleOverride != nullptr)
+		WV_ASSERT_MSG(bodySize.load() == wndSize.load() && wndPos.load() == bodyPos.load(),
+			"Client and Window size should be equal when non-client area is overridden.");
 }
 
 slong CALLBACK MinWindow::HandleWindowSetup(HWND hWnd, uint msg, ulong wParam, slong lParam)

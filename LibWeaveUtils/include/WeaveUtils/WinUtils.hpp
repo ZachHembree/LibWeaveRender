@@ -61,4 +61,7 @@ typedef HINSTANCE__* HINSTANCE;
 
 struct tagTRACKMOUSEEVENT;
 typedef tagTRACKMOUSEEVENT TRACKMOUSEEVENT;
+
+struct tagPOINTS;
+typedef tagPOINTS POINTS;
 #endif
