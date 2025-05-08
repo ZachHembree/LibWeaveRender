@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 #include <unordered_map>
 #include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/WindowComponentBase.hpp"
@@ -69,11 +70,6 @@ namespace Weave::D3D11
 		/// Returns the viewport used with the back buffer
 		/// </summary>
 		Viewport GetMainViewport() const;
-
-		/// <summary>
-		/// Sets the viewport used with the back buffer
-		/// </summary>
-		void SetMainViewport(Viewport& vp);
 
 		/// <summary>
 		/// Returns the resolution of the back buffer
@@ -223,16 +219,16 @@ namespace Weave::D3D11
 		std::unique_ptr<Device> pDev;
 		std::unique_ptr<SwapChain> pSwap;
 		std::unique_ptr<DepthStencilTexture> pDefaultDS;
-		WindowRenderModes fsMode;
-		uivec2 outputRes;
+		std::atomic<WindowRenderModes> fsMode;
+		std::atomic<uivec2> outputRes;
 		uivec2 lastDispMode;
 
 		std::unique_ptr<ShaderLibrary> pDefaultShaders;
 
-		double targetFPS;
-		bool useDefaultDS;
-		bool canRender;
-		bool isFsAllowed;
+		std::atomic<double> targetFPS;
+		std::atomic<bool> useDefaultDS;
+		std::atomic<bool> canRender;
+		std::atomic<bool> isFsAllowed;
 
 		std::unique_ptr<FrameTimer> pFrameTimer;
 

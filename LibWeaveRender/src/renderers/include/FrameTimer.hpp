@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 #include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/Stopwatch.hpp"
 
@@ -67,8 +68,8 @@ namespace Weave
 		void EndPresent();
 
 	private:
-		slong nativeRefreshCycleNS;
-		slong targetFrameTimeNS;
+		std::atomic<slong> nativeRefreshCycleNS;
+		std::atomic<slong> targetFrameTimeNS;
 
 		bool canHighResSleep;
 		uint sysInterruptTickMS;
@@ -78,9 +79,9 @@ namespace Weave
 
 		slong avgPresentErrorNS;
 		slong avgSpinErrorNS;
-		slong avgFrameDeltaNS;
+		std::atomic<slong> avgFrameDeltaNS;
 
 		Stopwatch frameTimer;
-		ulong frameCount;
+		std::atomic<slong> frameCount;
 	};
 }

@@ -126,13 +126,6 @@ Viewport Renderer::GetMainViewport() const
 	};
 }
 
-void Renderer::SetMainViewport(Viewport& vp)
-{
-	SetOutputResolution(vp.size);
-	pSwap->GetBackBuf().SetRenderOffset(vp.offset);
-	pDefaultDS->SetRange(vp.zDepth);
-}
-
 bool Renderer::GetIsDepthStencilEnabled() const { return useDefaultDS; }
 
 void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
@@ -251,7 +244,7 @@ void Renderer::UpdateSwap()
 		if (isFitToWindow)
 			outputRes = GetWindow().GetBodySize();
 
-		if (outputRes.x > lastBackSize.x || outputRes.y > lastBackSize.y)
+		if (AllTrue(outputRes.load() > lastBackSize))
 			pSwap->ResizeBuffers(outputRes);
 	}
 
@@ -260,7 +253,7 @@ void Renderer::UpdateSwap()
 		pSwap->Init();
 
 	pSwap->GetBackBuf().SetRenderSize(outputRes);
-	canRender = (!isExclusiveSet || isFsAllowed) && (outputRes.x > 0 && outputRes.y > 0);
+	canRender = (!isExclusiveSet || isFsAllowed) && AllTrue(outputRes.load() > uivec2(0));
 
 	// Update refresh cycle time for frame limiter
 	const uivec2 refreshRate = pSwap->GetRefresh();
