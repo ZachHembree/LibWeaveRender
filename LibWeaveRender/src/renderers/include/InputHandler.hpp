@@ -1,4 +1,6 @@
 #pragma once
+#include <atomic>
+#include <array>
 #include "WeaveUtils/WindowComponentBase.hpp"
 #include "Keyboard.h"
 #include "Mouse.h"
@@ -8,7 +10,7 @@ namespace Weave
 	using KbKey = DirectX::Keyboard::Keys;
 	using MouseMode = DirectX::Mouse::Mode;
 
-	enum class MouseKey : unsigned int
+	enum class MouseKey : byte
 	{
 		None = 0x0,
 		LeftButton = 0x1,
@@ -47,16 +49,6 @@ namespace Weave
 		/// Enables or disables input
 		/// </summary>
 		static void SetIsEnabled(bool value);
-
-		/// <summary>
-		/// Returns pressed mouse keys as a set of enum flags
-		/// </summary>
-		static MouseKey GetPresssedMouseKeys();
-
-		/// <summary>
-		/// Returns previously pressed mouse keys
-		/// </summary>
-		static MouseKey GetLastPressedMouseKeys();
 
 		/// <summary>
 		/// Returns true if the given key was only just pressed
@@ -100,19 +92,63 @@ namespace Weave
 		/// </summary>
 		static vec2 GetNormMousePos();
 
+		/// <summary>
+		/// Retrieves complete input state
+		/// </summary>
+		static void GetInputState(KbState& kbState, MouseState& msState);
+
 	private:
+		class MouseTracker
+		{
+		public:
+			MouseTracker() :
+				currentMousePresses(MouseKey::None),
+				lastMousePresses(MouseKey::None),
+				lastMousePos(0),
+				mousePos(0)
+			{}
+
+			ivec2 GetMousePos() const;
+
+			ivec2 GetLastMousePos() const;
+
+			ivec2 GetMousePosDelta() const;
+
+			bool GetWasKeyPressed(MouseKey key) const;
+
+			bool GetIsKeyPressed(MouseKey key) const;
+
+			bool GetIsNewKeyPressed(MouseKey key) const;
+
+			void Update(const MouseState& state);
+
+			void Reset();
+
+		private:
+			MouseKey currentMousePresses,
+				lastMousePresses;
+			ivec2 lastMousePos;
+			ivec2 mousePos;
+		};
+
 		friend ManagerT;
 		static InputHandler* s_pHandler;
-		static bool s_IsEnabled;
+		static std::atomic<bool> s_IsEnabled;
 
-		KbTracker kbTracker;
-		MouseKey currentMousePresses,
-			lastMousePresses;
+		static constexpr uint g_TrackHistSize = 3;
+		std::array<KbTracker, g_TrackHistSize> kbTrackers;
+		std::array<KbState, g_TrackHistSize> kbStates;
+		std::array<MouseTracker, g_TrackHistSize> msTrackers;
+		std::array<MouseState, g_TrackHistSize> msStates;
+		std::atomic<uint> writeIndex, readIndex;
 
 		std::unique_ptr<Keyboard> keyboard;
 		std::unique_ptr <Mouse> mouse;
 		ivec2 lastMousePos;
-		bool isInitialized;
+
+		const KbTracker& ReadKeyboard() const;
+
+		const MouseTracker& ReadMouse() const;
 
 		InputHandler(MinWindow& parent);
 
