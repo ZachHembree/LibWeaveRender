@@ -2,6 +2,7 @@
 #include "WeaveUtils/WindowComponentBase.hpp"
 #include "WeaveUtils/TextUtils.hpp"
 #include "WeaveUtils/ObjectPool.hpp"
+#include "RenderComponent.hpp"
 
 namespace Weave::D3D11
 {
@@ -85,9 +86,10 @@ namespace Weave::D3D11
 		static ImGuiHandler* s_pInstance;
 
 		Renderer* pRenderer;
-		ImGuiRenderComponent* pRenderComponent;
+		RenderHook* pRenderHook;
 		bool isInitialized;
 
+		std::atomic<ulong> frameNum;
 		ObjectPool<string> stringPool;
 		UniqueVector<string> activeText;
 
@@ -95,10 +97,14 @@ namespace Weave::D3D11
 
 		~ImGuiHandler();
 
-		void Update() override;
+		void Setup(CtxImm& ctx);
+
+		void Draw(CtxImm& ctx);
 
 		bool OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam) override;
 
 		string& GetTmpString();
+
+		void ResetStrPool();
 	};
 }

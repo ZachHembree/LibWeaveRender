@@ -287,7 +287,6 @@
     <ClInclude Include="src\renderers\include\D3D11\ShaderLibrary.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\DepthStencilTexture.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ImGuiHandler.hpp" />
-    <ClInclude Include="src\renderers\include\D3D11\ImGuiRenderComponent.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\RenderComponent.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\BufferBase.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\ConstantBuffer.hpp" />
@@ -311,7 +310,6 @@
     <ClInclude Include="src\renderers\include\D3D11\Mesh.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Primitives.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\ResourceMap.hpp" />
-    <ClCompile Include="src\renderers\src\D3D11\ImGuiRenderComponent.cpp" />
     <ClInclude Include="src\renderers\include\D3D11\Viewport.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\SwapChain.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\Resources\IndexBuffer.hpp" />

@@ -1,11 +1,13 @@
 #include "pch.hpp"
+#include "D3D11/InternalD3D11.hpp"
 #include "WeaveUtils/Win32.hpp"
 #include "D3D11/Renderer.hpp"
+#include "D3D11/Device.hpp"
 #include "D3D11/ImGuiHandler.hpp"
-#include "D3D11/ImGuiRenderComponent.hpp"
 
 #include <imgui.h>
 #include <imgui_impl_win32.h>
+#include <imgui_impl_dx11.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -18,22 +20,79 @@ bool ImGuiHandler::enableDemoWindow = false;
 ImGuiHandler::ImGuiHandler(MinWindow& parent, Renderer& renderer) :
 	WindowComponentBase(parent, 0),
 	pRenderer(&renderer),
-	isInitialized(true)
+	pRenderHook(&renderer.CreateComponent<RenderHook>(1000)),
+	isInitialized(true),
+	frameNum(0)
 { 
+	Device& dev = renderer.GetDevice();
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 
-	ImGui_ImplWin32_Init(GetWindow().GetWndHandle());
-	pRenderer->CreateComponent(pRenderComponent);
-	
+	ImGui_ImplWin32_Init(GetWindow().GetWndHandle());	
+	ImGui_ImplDX11_Init(dev.Get(), dev.GetImmediateContext());
 	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+	pRenderHook->SetCallback(RenderStages::Setup, [this](CtxImm& ctx) { this->Setup(ctx); });
+	pRenderHook->SetCallback(RenderStages::Draw, [this](CtxImm& ctx) { this->Draw(ctx); });
 }
 
 ImGuiHandler::~ImGuiHandler()
 {
+	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+}
+
+void ImGuiHandler::Setup(CtxImm& ctx)
+{
+	if (ImGui::GetCurrentContext() != nullptr)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		// Update DPI scaling
+		vec2 scale = GetWindow().GetNormMonitorDPI();
+		float scaleDelta = (float)(scale.y / (double)io.FontGlobalScale);
+		style.ScaleAllSizes(scaleDelta);
+		io.FontGlobalScale = scale.y;
+
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+
+		// Manually update display size and cursor position
+		const Renderer& rnd = *pRenderer;
+		const MinWindow& wnd = rnd.GetWindow();
+		const ivec2 cursorPos = wnd.GetGlobalCursorPos() - wnd.GetBodyPos();
+		const vec2 vpSize = (rnd.GetWindowRenderMode() == WindowRenderModes::ExclusiveFS) ?
+			(vec2)wnd.GetMonitorResolution() : (vec2)rnd.GetOutputResolution();
+		const float aspectRatio = vpSize.y / vpSize.x;
+		const vec2 normPos = (1.0f / vpSize.y) * vec2(cursorPos.x * aspectRatio, cursorPos.y);
+
+		const vec2 dispSize = rnd.GetOutputResolution();
+		const vec2 setMousePos = (normPos * dispSize);
+
+		if (dispSize != vec2(0))
+			io.DisplaySize = ImVec2(dispSize.x, dispSize.y);
+
+		if (setMousePos != vec2(0))
+			io.AddMousePosEvent(setMousePos.x, setMousePos.y);
+
+		ImGui::NewFrame();
+
+		if (enableDemoWindow)
+			ImGui::ShowDemoWindow();
+	}
+}
+
+void ImGuiHandler::Draw(CtxImm& ctx)
+{
+	if (ImGui::GetCurrentContext() != nullptr)
+	{
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	}
 }
 
 bool ImGuiHandler::GetIsInitialized() { return s_pInstance != nullptr && s_pInstance->isInitialized; }
@@ -56,7 +115,27 @@ void ImGuiHandler::Reset()
 	}
 }
 
-string& ImGuiHandler::GetTmpString() { return activeText.EmplaceBack(stringPool.Get()); }
+string& ImGuiHandler::GetTmpString() 
+{
+	const ulong currentFrame = pRenderer->GetFrameNumber();
+
+	if (frameNum != currentFrame)
+		ResetStrPool();
+
+	return activeText.EmplaceBack(stringPool.Get()); 
+}
+
+void ImGuiHandler::ResetStrPool()
+{
+	// Reset pool
+	for (slong i = activeText.GetLength() - 1; i >= 0; i--)
+	{
+		activeText[i].clear();
+		stringPool.Return(std::move(activeText[i]));
+	}
+
+	activeText.Clear();
+}
 
 string_view ImGuiHandler::GetTmpNarrowStr(wstring_view str)
 {
@@ -72,44 +151,6 @@ char* ImGuiHandler::GetTmpNarrowCStr(wstring_view str)
 	string& buf = s_pInstance->GetTmpString();
 	GetMultiByteString_UTF16LE_TO_UTF8(str, buf);
 	return buf.data();
-}
-
-void ImGuiHandler::Update()
-{
-	if (ImGui::GetCurrentContext() != nullptr)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		ImGuiStyle& style = ImGui::GetStyle();
-
-		// Update DPI scaling
-		vec2 scale = GetWindow().GetNormMonitorDPI();
-		float scaleDelta = (float)(scale.y / (double)io.FontGlobalScale);
-		style.ScaleAllSizes(scaleDelta);
-		io.FontGlobalScale = scale.y;
-
-		pRenderComponent->enableDemoWindow = enableDemoWindow;
-
-		// Manually update display size and cursor position
-		MinWindow& wnd = pRenderer->GetWindow();
-		const ivec2 cursorPos = wnd.GetGlobalCursorPos() - wnd.GetBodyPos();
-		const ivec2 vpSize = (pRenderer->GetWindowRenderMode() == WindowRenderModes::ExclusiveFS) ?
-			wnd.GetMonitorResolution() : (ivec2)pRenderer->GetOutputResolution();
-		const float aspectRatio = (float)vpSize.y / vpSize.x;
-		const vec2 normPos = (1.0f / vpSize.y) * vec2(cursorPos.x * aspectRatio, cursorPos.y);
-
-		const uivec2 newSize = pRenderer->GetOutputResolution();
-		pRenderComponent->SetMousePos(normPos * vec2(newSize));
-		pRenderComponent->SetDispSize(newSize);
-
-		// Reset pool
-		for (slong i = activeText.GetLength() - 1; i >= 0; i--)
-		{
-			activeText[i].clear();
-			stringPool.Return(std::move(activeText[i]));
-		}
-
-		activeText.Clear();
-	}
 }
 
 bool ImGuiHandler::OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam)
