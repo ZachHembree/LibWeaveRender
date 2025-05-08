@@ -1,4 +1,6 @@
 #pragma once
+#include <array>
+#include <functional>
 #include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/ComponentManagerBase.hpp"
 
@@ -13,14 +15,20 @@ namespace Weave::D3D11
 	class Renderer;
 	class Device;
 
+	enum class RenderStages : byte
+	{
+		Setup = 0,
+		Draw = 1,
+		AfterDraw = 2,
+		Count
+	};
+
 	/// <summary>
 	/// Base class for Renderer components
 	/// </summary>
 	class RenderComponentBase : public ComponentManagerBase<Renderer, RenderComponentBase>::ComponentBase
 	{
 	public:
-		RenderComponentBase(Renderer& renderer, uint priority = 10);
-
 		/// <summary>
 		/// Updates before draw, but after the state and resources for the previous
 		/// frame have been cleaned up.
@@ -64,5 +72,43 @@ namespace Weave::D3D11
 		/// Returns interface reference to window being rendered to
 		/// </summary>
 		const MinWindow& GetWindow() const;
+
+	protected:
+		RenderComponentBase(Renderer& renderer, uint priority = 10);
+
+	};
+
+	/// <summary>
+	/// Generic render component wrapper that provides std::function hooks for callbacks 
+	/// into render updates
+	/// </summary>
+	class RenderHook : public RenderComponentBase
+	{
+	public:
+		/// <summary>
+		/// Type erased function pointer callback alias
+		/// </summary>
+		using CallbackT = std::function<void(CtxImm&)>;
+
+		RenderHook(Renderer& renderer, uint priority = 10);
+
+		/// <summary>
+		/// Returns the callback function used for the given render stage
+		/// </summary>
+		const CallbackT& GetCallback(RenderStages stage) const;
+
+		/// <summary>
+		/// Sets the callback to be invoked when the given render stage update occurs
+		/// </summary>
+		void SetCallback(RenderStages stage, CallbackT&& func);
+
+	private:
+		std::array<CallbackT, (byte)RenderStages::Count> callbacks;
+
+		void Setup(CtxImm& ctx) override;
+
+		void Draw(CtxImm& ctx) override;
+
+		void AfterDraw(CtxImm& ctx) override;
 	};
 }
