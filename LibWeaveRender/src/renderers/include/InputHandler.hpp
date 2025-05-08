@@ -21,7 +21,7 @@ namespace Weave
 	};
 
 	/// <summary>
-	/// Singleton wrapper for DirectXTK Keyboard and Mouse
+	/// Singleton wrapper for DirectXTK Keyboard and Mouse. Input reads thread safe.
 	/// </summary>
 	class InputHandler : public WindowComponentBase
 	{
@@ -35,10 +35,6 @@ namespace Weave
 		static void Init(MinWindow& wnd);
 
 		static bool GetIsInitialized();
-
-		void Update() override;
-
-		bool OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam) override;
 
 		/// <summary>
 		/// Returns true if input is enabled
@@ -146,12 +142,17 @@ namespace Weave
 		std::unique_ptr <Mouse> mouse;
 		ivec2 lastMousePos;
 
+		InputHandler(MinWindow& parent);
+
+		~InputHandler();
+
 		const KbTracker& ReadKeyboard() const;
 
 		const MouseTracker& ReadMouse() const;
 
-		InputHandler(MinWindow& parent);
+		void Update() override;
 
-		~InputHandler();
+		bool OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam) override;
+
 	};
 }

@@ -232,9 +232,9 @@ void MinWindow::UpdateComponents()
 		execFlags |= ES_DISPLAY_REQUIRED;
 
 	SetThreadExecutionState(execFlags);
-	UpdateComponentIDs();
+	CompSpan comps = GetComponents();
 
-	for (WindowComponentBase* pComp : sortedComps)
+	for (WindowComponentBase* pComp : comps)
 		pComp->Update();
 }
 
@@ -450,7 +450,8 @@ slong MinWindow::OnWndMessage(HWND window, uint msg, ulong wParam, slong lParam)
 		// Pass messages through to components
 		if (msg != WM_CLOSE && isInitialized)
 		{
-			for (WindowComponentBase* pComp : sortedComps)
+			CompSpan comps = GetComponents();
+			for (WindowComponentBase* pComp : comps)
 			{
 				// Allow earlier components to intercept messages from later components
 				if (!pComp->OnWndMessage(hWnd, msg, wParam, lParam))

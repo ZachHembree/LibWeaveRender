@@ -40,12 +40,13 @@ namespace Weave::D3D11
 		/// </summary>
 		void SetDispSize(uivec2 dispSize);
 
+	private:
+		vec2 mousePos;
+		uivec2 dispSize;
+
 		void Setup(CtxImm& ctx) override;
 
 		void Draw(CtxImm& ctx) override;
 
-	private:
-		vec2 mousePos;
-		uivec2 dispSize;
 	};
 }

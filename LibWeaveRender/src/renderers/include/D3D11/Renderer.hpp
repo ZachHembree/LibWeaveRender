@@ -214,16 +214,6 @@ namespace Weave::D3D11
 		/// </summary>
 		Sampler& GetDefaultSampler(string_view name) const;
 
-		/// <summary>
-		/// Updates the state of the renderer
-		/// </summary>
-		void Update() override;
-
-		/// <summary>
-		/// Handles event messages from the Win32 API
-		/// </summary>
-		bool OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam) override;
-
 	private:
 		mutable std::unordered_map<uint, ComputeInstance> defaultCompute;
 		mutable std::unordered_map<uint, Material> defaultMaterials;
@@ -245,6 +235,16 @@ namespace Weave::D3D11
 		bool isFsAllowed;
 
 		std::unique_ptr<FrameTimer> pFrameTimer;
+
+		/// <summary>
+		/// Updates the state of the renderer
+		/// </summary>
+		void Update() override;
+
+		/// <summary>
+		/// Handles event messages from the Win32 API
+		/// </summary>
+		bool OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam) override;
 
 		void UpdateSwap();
 

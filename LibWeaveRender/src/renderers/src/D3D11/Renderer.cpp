@@ -282,7 +282,6 @@ void Renderer::Update()
 {
 	// Mark frame start
 	pFrameTimer->BeginPresent();
-	UpdateComponentIDs();
 	UpdateSwap();
 
 	// If rendering is explicitly disabled, skip everything else
@@ -332,7 +331,9 @@ void Renderer::Update()
 
 void Renderer::BeforeDraw(CtxImm& ctx)
 { 
-	for (const auto& pComp : sortedComps)
+	CompSpan comps = GetComponents();
+
+	for (RenderComponentBase* pComp : comps)
 	{
 		pComp->Setup(ctx);
 	}
@@ -340,7 +341,9 @@ void Renderer::BeforeDraw(CtxImm& ctx)
 
 void Renderer::Draw(CtxImm& ctx)
 {
-	for (const auto& pComp : sortedComps)
+	CompSpan comps = GetComponents();
+
+	for (RenderComponentBase* pComp : comps)
 	{
 		pComp->Draw(ctx);
 	}
@@ -348,7 +351,9 @@ void Renderer::Draw(CtxImm& ctx)
 
 void Renderer::AfterDraw(CtxImm& ctx)
 {
-	for (const auto& pComp : sortedComps)
+	CompSpan comps = GetComponents();
+
+	for (RenderComponentBase* pComp : comps)
 	{
 		pComp->AfterDraw(ctx);
 	}

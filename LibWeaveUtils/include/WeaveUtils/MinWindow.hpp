@@ -110,7 +110,7 @@ namespace Weave
 	};
 
 	/// <summary>
-	/// Unique pointer containing a MinWindow component
+	/// Unique pointer containing a MinWindow component. Thread safe.
 	/// </summary>
 	using WndCompHandle = std::unique_ptr<WindowComponentBase>;
 

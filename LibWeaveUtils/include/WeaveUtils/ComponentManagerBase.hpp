@@ -1,12 +1,13 @@
 #pragma once
-#include "WeaveUtils/GlobalUtils.hpp"
-#include "WeaveUtils/DynamicCollections.hpp"
+#include "GlobalUtils.hpp"
+#include "DynamicCollections.hpp"
+#include "Span.hpp"
 #include <algorithm>
 
 namespace Weave
 {
 	/// <summary>
-	/// Base class template for managing components associated with a parent object.
+	/// Base class template for managing components associated with a parent object. Not thread safe.
 	/// </summary>
 	/// <typeparam name="ParentT">The type of the parent object that owns the components.</typeparam>
 	/// <typeparam name="ComponentT">The base type of the components being managed.</typeparam>
@@ -57,6 +58,7 @@ namespace Weave
 
 		protected:
 			ParentT* pParent;
+		private:
 			uint id;
 			uint priority;
 		};
@@ -72,7 +74,7 @@ namespace Weave
 		using CompBaseT = ComponentBase;
 
 		/// <summary>
-		/// Constructs and registers a new parent object component in place
+		/// Constructs and registers a new parent object component in place. Not thread safe.
 		/// </summary>
 		template <typename T, typename... ArgTs>
 		T& CreateComponent(ArgTs&&... args)
@@ -84,7 +86,7 @@ namespace Weave
 		}
 
 		/// <summary>
-		/// Constructs and registers a new parent object component in place
+		/// Constructs and registers a new parent object component in place. Not thread safe.
 		/// </summary>
 		template <typename T, typename... ArgTs>
 		void CreateComponent(T*& pDerived, ArgTs&&... args)
@@ -96,7 +98,7 @@ namespace Weave
 		}
 
 		/// <summary>
-		/// Transfers ownership of the component to the parent object and registers it
+		/// Transfers ownership of the component to the parent object and registers it. Not thread safe.
 		/// </summary>
 		ComponentT* RegisterComponent(CompHandle&& pComp)
 		{
@@ -112,7 +114,7 @@ namespace Weave
 		}
 
 		/// <summary>
-		/// Unregisters the component from the parent object and destroys it
+		/// Unregisters the component from the parent object and destroys it. Not thread safe.
 		/// </summary>
 		void UnregisterComponent(ComponentT& component)
 		{
@@ -129,20 +131,30 @@ namespace Weave
 				areCompIDsStale = true;
 			}
 		}
-
-	private:
-		UniqueVector<CompHandle> components;
-		bool isCompSortingStale;
-		bool areCompIDsStale;
 	protected:
-		UniqueVector<ComponentT*> sortedComps;
-		
+		using CompSpan = Span<ComponentT*>;
+
 		ComponentManagerBase() :
 			isCompSortingStale(false),
 			areCompIDsStale(false)
 		{ }
 
 		virtual ~ComponentManagerBase() = default;
+
+		/// <summary>
+		/// Returns a span of components sorted by priority
+		/// </summary>
+		CompSpan GetComponents()
+		{
+			UpdateComponentIDs();
+			return CompSpan(sortedComps.GetData(), sortedComps.GetLength());
+		}
+
+	private:
+		UniqueVector<CompHandle> components;
+		UniqueVector<ComponentT*> sortedComps;
+		bool isCompSortingStale;
+		bool areCompIDsStale;
 
 		/// <summary>
 		/// Updates internal component lists: removes nulls, resorts by priority, and updates component IDs.

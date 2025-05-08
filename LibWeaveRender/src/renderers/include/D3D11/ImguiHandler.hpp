@@ -80,10 +80,6 @@ namespace Weave::D3D11
 		/// </summary>
 		static char* GetTmpNarrowCStr(wstring_view str);
 
-		void Update() override;
-
-		bool OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam) override;
-
 	private:
 		friend ManagerT;
 		static ImGuiHandler* s_pInstance;
@@ -98,6 +94,10 @@ namespace Weave::D3D11
 		ImGuiHandler(MinWindow& parent, Renderer& renderer);
 
 		~ImGuiHandler();
+
+		void Update() override;
+
+		bool OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam) override;
 
 		string& GetTmpString();
 	};
