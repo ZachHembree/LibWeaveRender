@@ -2,6 +2,7 @@
 #include "WeaveUtils/WindowComponentBase.hpp"
 #include "WeaveUtils/TextUtils.hpp"
 #include "WeaveUtils/ObjectPool.hpp"
+#include "WeaveUtils/AsyncWin32Buffer.hpp"
 #include "RenderComponent.hpp"
 
 namespace Weave::D3D11
@@ -89,6 +90,9 @@ namespace Weave::D3D11
 		RenderHook* pRenderHook;
 		bool isInitialized;
 
+		AsyncWin32Buffer win32Buf;
+		std::atomic<bool> wantsKeyboard;
+		std::atomic<bool> wantsMouse;
 		std::atomic<ulong> frameNum;
 		ObjectPool<string> stringPool;
 		UniqueVector<string> activeText;

@@ -2,6 +2,8 @@
 #include <atomic>
 #include <array>
 #include "WeaveUtils/WindowComponentBase.hpp"
+#include "WeaveUtils/AsyncWin32Buffer.hpp"
+#include "D3D11/RenderComponent.hpp"
 #include "Keyboard.h"
 #include "Mouse.h"
 
@@ -21,7 +23,7 @@ namespace Weave
 	};
 
 	/// <summary>
-	/// Singleton wrapper for DirectXTK Keyboard and Mouse. Input reads thread safe.
+	/// Singleton wrapper for DirectXTK Keyboard and Mouse. Used on the main render thread.
 	/// </summary>
 	class InputHandler : public WindowComponentBase
 	{
@@ -32,7 +34,7 @@ namespace Weave
 		using MouseState = Mouse::State;
 		using KbState = Keyboard::State;
 
-		static void Init(MinWindow& wnd);
+		static void Init(D3D11::Renderer& rnd);
 
 		static bool GetIsInitialized();
 
@@ -131,26 +133,21 @@ namespace Weave
 		static InputHandler* s_pHandler;
 		static std::atomic<bool> s_IsEnabled;
 
-		static constexpr uint g_TrackHistSize = 3;
-		std::array<KbTracker, g_TrackHistSize> kbTrackers;
-		std::array<KbState, g_TrackHistSize> kbStates;
-		std::array<MouseTracker, g_TrackHistSize> msTrackers;
-		std::array<MouseState, g_TrackHistSize> msStates;
-		std::atomic<uint> writeIndex, readIndex;
+		D3D11::RenderHook* pRenderHook;
+		AsyncWin32Buffer msgBuf;
+
+		KbTracker kbTracker;
+		MouseTracker msTracker;
 
 		std::unique_ptr<Keyboard> keyboard;
 		std::unique_ptr <Mouse> mouse;
 		ivec2 lastMousePos;
 
-		InputHandler(MinWindow& parent);
+		InputHandler(MinWindow& parent, D3D11::Renderer& rnd);
 
 		~InputHandler();
 
-		const KbTracker& ReadKeyboard() const;
-
-		const MouseTracker& ReadMouse() const;
-
-		void Update() override;
+		void Setup(D3D11::CtxImm& ctx);
 
 		bool OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam) override;
 

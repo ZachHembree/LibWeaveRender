@@ -1,33 +1,32 @@
 #include "pch.hpp"
 #include "WeaveUtils/Win32.hpp"
+#include "D3D11/Renderer.hpp"
 #include "../src/renderers/include/InputHandler.hpp"
 
 using namespace Weave;
+using namespace Weave::D3D11;
 using namespace DirectX;
 
 InputHandler* InputHandler::s_pHandler;
 std::atomic<bool> InputHandler::s_IsEnabled = true;
 
-const InputHandler::KbTracker& InputHandler::ReadKeyboard() const { return kbTrackers[readIndex]; }
-
-const InputHandler::MouseTracker& InputHandler::ReadMouse() const { return msTrackers[readIndex]; }
-
-InputHandler::InputHandler(MinWindow& parent) :
+InputHandler::InputHandler(MinWindow& parent, Renderer& rnd) :
 	WindowComponentBase(parent, 1),
+	pRenderHook(&rnd.CreateComponent<RenderHook>(1)),
 	lastMousePos(0),
 	keyboard(new Keyboard()),
-	mouse(new Mouse()),
-	writeIndex(0),
-	readIndex(g_TrackHistSize - 1)
-{ }
+	mouse(new Mouse())
+{ 
+	pRenderHook->SetCallback(RenderStages::Setup, [this](CtxImm& ctx) { Setup(ctx); });
+}
 
 InputHandler::~InputHandler() = default;
 
-void InputHandler::Init(MinWindow& wnd)
+void InputHandler::Init(Renderer& rnd)
 {
 	if (!GetIsInitialized())
 	{
-		wnd.CreateComponent(s_pHandler);
+		rnd.GetWindow().CreateComponent(s_pHandler, rnd);
 		s_IsEnabled = true;
 		s_pHandler->lastMousePos = ivec2(0);
 	}
@@ -41,35 +40,35 @@ void InputHandler::SetIsEnabled(bool value) { s_IsEnabled = value; }
 
 bool InputHandler::GetIsNewKeyPressed(MouseKey key)
 {
-	return s_pHandler->ReadMouse().GetIsNewKeyPressed(key);
+	return s_pHandler->msTracker.GetIsNewKeyPressed(key);
 }
 
 bool InputHandler::GetWasKeyPressed(MouseKey key)
 {
-	return s_pHandler->ReadMouse().GetWasKeyPressed(key);
+	return s_pHandler->msTracker.GetWasKeyPressed(key);
 }
 
 bool InputHandler::GetIsKeyPressed(MouseKey key)
 {
-	return s_pHandler->ReadMouse().GetIsKeyPressed(key);
+	return s_pHandler->msTracker.GetIsKeyPressed(key);
 }
 
 bool InputHandler::GetIsNewKeyPressed(KbKey key)
 {
-	return s_pHandler->ReadKeyboard().IsKeyPressed(key);
+	return s_pHandler->kbTracker.IsKeyPressed(key);
 }
 
 bool InputHandler::GetWasKeyPressed(KbKey key)
 {
-	return s_pHandler->ReadKeyboard().IsKeyReleased(key);
+	return s_pHandler->kbTracker.IsKeyReleased(key);
 }
 
 bool InputHandler::GetIsKeyPressed(KbKey key)
 {
-	return s_pHandler->ReadKeyboard().lastState.IsKeyDown(key);
+	return s_pHandler->kbTracker.lastState.IsKeyDown(key);
 }
 
-ivec2 InputHandler::GetMousePos() { return s_pHandler->ReadMouse().GetMousePos(); }
+ivec2 InputHandler::GetMousePos() { return s_pHandler->msTracker.GetMousePos(); }
 
 vec2 InputHandler::GetNormMousePos()
 {
@@ -83,71 +82,57 @@ vec2 InputHandler::GetNormMousePos()
 
 void InputHandler::GetInputState(KbState& kbState, MouseState& msState)
 {
-	const uint idx = s_pHandler->readIndex;
-	kbState = s_pHandler->kbStates[idx];
-	msState = s_pHandler->msStates[idx];
+	kbState = s_pHandler->keyboard->GetState();
+	msState = s_pHandler->mouse->GetState();
 }
 
-void InputHandler::Update()
+void InputHandler::Setup(CtxImm& ctx)
 {
-	// Trackers need to see the states they missed and the current state
-	for (uint offset = 0; offset < g_TrackHistSize; offset++)
-	{
-		const uint index = ((writeIndex + 1) + offset) % g_TrackHistSize;
+	const auto& messages = msgBuf.GetMessages();
 
-		if (index != writeIndex)
+	for (const auto& msg : messages)
+	{
+		switch (msg.msg)
 		{
-			kbTrackers[writeIndex].Update(kbStates[index]);
-			msTrackers[writeIndex].Update(msStates[index]);
+		case WM_ACTIVATEAPP:
+			Keyboard::ProcessMessage(msg.msg, msg.wParam, msg.lParam);
+			Mouse::ProcessMessage(msg.msg, msg.wParam, msg.lParam);
+			break;
+		case WM_ACTIVATE:
+		case WM_INPUT:
+		case WM_MOUSEMOVE:
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONUP:
+		case WM_MOUSEWHEEL:
+		case WM_XBUTTONDOWN:
+		case WM_XBUTTONUP:
+		case WM_MOUSEHOVER:
+			Mouse::ProcessMessage(msg.msg, msg.wParam, msg.lParam);
+			break;
+		case WM_KEYDOWN:
+		case WM_KEYUP:
+		case WM_SYSKEYUP:
+		case WM_SYSKEYDOWN:
+			Keyboard::ProcessMessage(msg.msg, msg.wParam, msg.lParam);
+			break;
+		case WM_SETFOCUS:
+		case WM_KILLFOCUS:
+			Keyboard::Get().Reset();
+			break;
 		}
 	}
 
-	kbStates[writeIndex] = Keyboard::Get().GetState();
-	msStates[writeIndex] = Mouse::Get().GetState();
-
-	kbTrackers[writeIndex].Update(kbStates[writeIndex]);
-	msTrackers[writeIndex].Update(msStates[writeIndex]);
-
-	// Make next state visible
-	readIndex = (readIndex + 1) % g_TrackHistSize;
-	writeIndex = (writeIndex + 1) % g_TrackHistSize;
+	kbTracker.Update(keyboard->GetState());
+	msTracker.Update(mouse->GetState());
 }
 
 bool InputHandler::OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam)
 {
-	switch (msg)
-	{
-	case WM_ACTIVATEAPP:
-		Keyboard::ProcessMessage(msg, wParam, lParam);
-		Mouse::ProcessMessage(msg, wParam, lParam);
-		break;
-	case WM_ACTIVATE:
-	case WM_INPUT:
-	case WM_MOUSEMOVE:
-	case WM_LBUTTONDOWN:
-	case WM_LBUTTONUP:
-	case WM_RBUTTONDOWN:
-	case WM_RBUTTONUP:
-	case WM_MBUTTONDOWN:
-	case WM_MBUTTONUP:
-	case WM_MOUSEWHEEL:
-	case WM_XBUTTONDOWN:
-	case WM_XBUTTONUP:
-	case WM_MOUSEHOVER:
-		Mouse::ProcessMessage(msg, wParam, lParam);
-		break;
-	case WM_KEYDOWN:
-	case WM_KEYUP:
-	case WM_SYSKEYUP:
-	case WM_SYSKEYDOWN:
-		Keyboard::ProcessMessage(msg, wParam, lParam);
-		break;
-	case WM_SETFOCUS:
-	case WM_KILLFOCUS:
-		Keyboard::Get().Reset();
-		break;
-	}	
-
+	msgBuf.AddMessage(hWnd, msg, wParam, lParam);
 	return true;
 }
 

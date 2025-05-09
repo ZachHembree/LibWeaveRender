@@ -9,7 +9,7 @@
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandlerEx(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, ImGuiIO& io);
 
 using namespace Weave;
 using namespace Weave::D3D11;
@@ -43,14 +43,25 @@ ImGuiHandler::~ImGuiHandler()
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+	s_pInstance = nullptr;
 }
 
 void ImGuiHandler::Setup(CtxImm& ctx)
 {
 	if (ImGui::GetCurrentContext() != nullptr)
 	{
+		// Pass through buffered Win32 events
+		const auto& messages = win32Buf.GetMessages();
+
+		for (const auto& msg : messages)
+			ImGui_ImplWin32_WndProcHandlerEx(msg.hWnd, msg.msg, msg.wParam, msg.lParam, ImGui::GetIO());
+
+		// Check input capture
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiStyle& style = ImGui::GetStyle();
+
+		wantsKeyboard = io.WantCaptureKeyboard;
+		wantsMouse = io.WantCaptureMouse;
 
 		// Update DPI scaling
 		vec2 scale = GetWindow().GetNormMonitorDPI();
@@ -157,11 +168,11 @@ bool ImGuiHandler::OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam)
 {
 	if (ImGui::GetCurrentContext() != nullptr)
 	{
-		ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+		// Record messages to be played back on the render thread
+		win32Buf.AddMessage(hWnd, msg, wParam, lParam);
 
 		// Intercept input messages when requested
-		const ImGuiIO& io = ImGui::GetIO();
-		bool isInterrupting = false;
+		bool isInterrupting = false;		
 
 		switch (msg)
 		{
@@ -178,14 +189,14 @@ bool ImGuiHandler::OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam)
 		case WM_XBUTTONDOWN:
 		case WM_XBUTTONUP:
 		case WM_MOUSEHOVER:
-			if (io.WantCaptureMouse)
+			if (wantsMouse)
 				isInterrupting = true;
 			[[fallthrough]];
 		case WM_KEYDOWN:
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 		case WM_SYSKEYDOWN:
-			if (io.WantCaptureKeyboard)
+			if (wantsKeyboard)
 				isInterrupting = true;
 		}
 
