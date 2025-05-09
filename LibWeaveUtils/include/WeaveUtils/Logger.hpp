@@ -1,5 +1,6 @@
 #pragma once
 #include <sstream>
+#include <fstream>
 #include <mutex>
 #include <atomic>
 #include <thread>

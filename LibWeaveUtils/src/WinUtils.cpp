@@ -33,6 +33,9 @@ namespace Weave
 
 	void GetMultiByteString_UTF16LE_TO_UTF8(wstring_view src, string& dst)
 	{
+		if (src.empty())
+			return;
+
 		size_t dstSize = GetMultiByteSize_UTF16LE_TO_UTF8(src);
 		dst.resize(dst.length() + dstSize, '\0');
 
@@ -54,6 +57,9 @@ namespace Weave
 
 	void GetWideString_UTF8_TO_UTF16LE(string_view src, wstring& dst)
 	{
+		if (src.empty())
+			return;
+
 		size_t dstSize = GetWideSize_UTF8_TO_UTF16LE(src);
 		dst.resize(dst.length() + dstSize, '\0');
 
