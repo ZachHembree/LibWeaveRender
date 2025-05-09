@@ -1,5 +1,7 @@
 #pragma once
 #include <atomic>
+#include <thread>
+#include <shared_mutex>
 #include <unordered_map>
 #include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/WindowComponentBase.hpp"
@@ -211,6 +213,10 @@ namespace Weave::D3D11
 		Sampler& GetDefaultSampler(string_view name) const;
 
 	private:
+		std::jthread renderThread;
+		std::atomic<bool> canRun;
+		std::shared_mutex renderMutex;
+
 		mutable std::unordered_map<uint, ComputeInstance> defaultCompute;
 		mutable std::unordered_map<uint, Material> defaultMaterials;
 		std::unordered_map<string_view, Mesh> defaultMeshes;
@@ -235,7 +241,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Updates the state of the renderer
 		/// </summary>
-		void Update() override;
+		void RenderUpdate();
 
 		/// <summary>
 		/// Handles event messages from the Win32 API

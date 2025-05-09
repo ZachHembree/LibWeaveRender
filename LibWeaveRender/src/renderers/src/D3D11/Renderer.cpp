@@ -28,6 +28,7 @@ Renderer::Renderer(MinWindow& parent) :
 	pDefaultShaders(new ShaderLibrary(*this, GetBuiltInShaders())),
 	useDefaultDS(true),
 	canRender(true),
+	canRun(false),
 	isFsAllowed(true),
 	pFrameTimer(new FrameTimer()),
 	targetFPS(0)
@@ -48,9 +49,28 @@ Renderer::Renderer(MinWindow& parent) :
 	pFrameTimer->SetTargetFrameTimeNS(GetTimeHZtoNS(180));
 
 	WV_LOG_INFO() << "Renderer Init";
+
+	renderThread = std::jthread([this] 
+	{
+		WV_LOG_INFO() << "Renderer Thread Init";
+		canRun = true;
+
+		while (canRun)
+		{
+			std::shared_lock lock(renderMutex);
+			RenderUpdate();
+		}
+	});
 }
 
-Renderer::~Renderer() = default;
+Renderer::~Renderer()
+{
+	if (canRun)
+	{
+		canRun = false;
+		std::unique_lock lock(renderMutex);
+	}
+}
 
 Device& Renderer::GetDevice() { return *pDev; }
 
@@ -271,7 +291,7 @@ void Renderer::UpdateSwap()
 		pFrameTimer->SetTargetFrameTimeNS(GetTimeHZtoNS(targetFPS));
 }
 
-void Renderer::Update()
+void Renderer::RenderUpdate()
 {
 	// Mark frame start
 	pFrameTimer->BeginPresent();
