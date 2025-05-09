@@ -9,6 +9,12 @@ RenderComponentBase::RenderComponentBase(Renderer& renderer, uint priority) :
 	Renderer::CompBaseT(renderer, priority)
 { }
 
+void RenderComponentBase::Setup(CtxImm& ctx) {}
+
+void RenderComponentBase::Draw(CtxImm& ctx) {}
+
+void RenderComponentBase::AfterDraw(CtxImm& ctx) {}
+
 Renderer& RenderComponentBase::GetRenderer() { return *pParent; }
 
 Device& RenderComponentBase::GetDevice() { return pParent->GetDevice(); }

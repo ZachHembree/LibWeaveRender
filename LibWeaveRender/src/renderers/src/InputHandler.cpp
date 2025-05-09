@@ -11,8 +11,8 @@ InputHandler* InputHandler::s_pHandler;
 std::atomic<bool> InputHandler::s_IsEnabled = true;
 
 InputHandler::InputHandler(MinWindow& parent, Renderer& rnd) :
-	WindowComponentBase(parent, 1),
-	pRenderHook(&rnd.CreateComponent<RenderHook>(1)),
+	WindowComponentBase(parent, WndCompPriorities::InputUpdate - 1),
+	pRenderHook(&rnd.CreateComponent<RenderHook>(RenderOrders::BeforeUI)),
 	lastMousePos(0),
 	keyboard(new Keyboard()),
 	mouse(new Mouse())
@@ -20,7 +20,10 @@ InputHandler::InputHandler(MinWindow& parent, Renderer& rnd) :
 	pRenderHook->SetCallback(RenderStages::Setup, [this](CtxImm& ctx) { Setup(ctx); });
 }
 
-InputHandler::~InputHandler() = default;
+InputHandler::~InputHandler()
+{
+	s_pHandler = nullptr;
+}
 
 void InputHandler::Init(Renderer& rnd)
 {

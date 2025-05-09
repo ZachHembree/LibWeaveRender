@@ -18,9 +18,9 @@ ImGuiHandler* ImGuiHandler::s_pInstance;
 bool ImGuiHandler::enableDemoWindow = false;
 
 ImGuiHandler::ImGuiHandler(MinWindow& parent, Renderer& renderer) :
-	WindowComponentBase(parent, 0),
+	WindowComponentBase(parent, WndCompPriorities::BeforeInput),
 	pRenderer(&renderer),
-	pRenderHook(&renderer.CreateComponent<RenderHook>(1000)),
+	pRenderHook(&renderer.CreateComponent<RenderHook>(RenderOrders::DrawUI + 1)),
 	isInitialized(true),
 	frameNum(0)
 { 

@@ -10,11 +10,6 @@
 #include "Resources/DisplayOutput.hpp"
 #include "RenderModes.hpp"
 
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "D3DCompiler.lib")
-#pragma comment(lib, "Dxgi.lib")
-#pragma comment(lib, "runtimeobject.lib")
-
 namespace Weave
 {
 	class FrameTimer;
@@ -46,6 +41,10 @@ namespace Weave::D3D11
 	/// </summary>
 	using RenderCompHandle = std::unique_ptr<RenderComponentBase>;
 
+	/// <summary>
+	/// D3D11 renderer main class extending WindowComponentBase. Lifetime managed by a MinWindow instance. 
+	/// Rendering and render component updates occur on a separate thread.
+	/// </summary>
 	class Renderer : public WindowComponentBase, public ComponentManagerBase<Renderer, RenderComponentBase>
 	{
 	public:

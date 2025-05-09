@@ -8,6 +8,20 @@ namespace Weave
 	class MinWindow;
 
 	/// <summary>
+	/// Defines a set of shared window component update priorities
+	/// </summary>
+	namespace WndCompPriorities
+	{
+		constexpr uint InputUpdate = 1000;
+		constexpr uint BeforeInput = InputUpdate - 100;
+		constexpr uint AfterInput = InputUpdate + 100;
+
+		constexpr uint PaintUpdate = 2000;
+		constexpr uint BeforePaint = PaintUpdate - 100;
+		constexpr uint AfterPaint = PaintUpdate + 100;
+	}
+
+	/// <summary>
 	/// Base class for MinWindow components
 	/// </summary>
 	class WindowComponentBase : public ComponentManagerBase<MinWindow, WindowComponentBase>::ComponentBase

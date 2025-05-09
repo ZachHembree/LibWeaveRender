@@ -13,12 +13,17 @@
 #include "D3D11/ShaderLibrary.hpp"
 #include "D3D11/RenderComponent.hpp"
 
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "D3DCompiler.lib")
+#pragma comment(lib, "Dxgi.lib")
+#pragma comment(lib, "runtimeobject.lib")
+
 using namespace Weave;
 using namespace Weave::D3D11;
 using namespace Weave::Effects;
 
 Renderer::Renderer(MinWindow& parent) :
-	WindowComponentBase(parent, 10),
+	WindowComponentBase(parent, WndCompPriorities::PaintUpdate),
 	pDev(new Device(*this)), // Create *pDev and context
 	pSwap(new SwapChain(*pDev)), // Create swap chain for window
 	pDefaultDS(new DepthStencilTexture()),

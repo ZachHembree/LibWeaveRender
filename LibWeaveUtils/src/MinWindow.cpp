@@ -28,7 +28,9 @@ MinWindow::MinWindow() :
 	lastPos(0),
 	lastSize(0),
 	canSysSleep(true),
-	canDispSleep(true)
+	canDispSleep(true),
+	pStyleOverride(nullptr),
+	style(WndStyle(0))
 { }
 
 MinWindow::MinWindow(

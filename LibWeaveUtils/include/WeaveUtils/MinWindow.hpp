@@ -71,6 +71,7 @@ namespace Weave
 
 	/// <summary>
 	/// Defines a style override for a custom non-client area for MinWindow to be painted by the client.
+	/// Single writer thread safe.
 	/// </summary>
 	class WndStyleOverride
 	{

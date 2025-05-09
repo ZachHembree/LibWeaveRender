@@ -24,7 +24,21 @@ namespace Weave::D3D11
 	};
 
 	/// <summary>
-	/// Base class for Renderer components
+	/// Defines a set of shared draw ordering constants
+	/// </summary>
+	namespace RenderOrders
+	{
+		constexpr uint DrawEarly = 1000;
+		constexpr uint Draw = 2000;
+		constexpr uint DrawPost = 3000;
+
+		constexpr uint DrawUI = 3000;
+		constexpr uint BeforeUI = DrawUI - 100;
+		constexpr uint AfterUI = DrawUI + 100;
+	}
+
+	/// <summary>
+	/// Base class for Renderer components. Updates on main render thread, separate from the main application thread.
 	/// </summary>
 	class RenderComponentBase : public ComponentManagerBase<Renderer, RenderComponentBase>::ComponentBase
 	{
@@ -33,15 +47,18 @@ namespace Weave::D3D11
 		/// Updates before draw, but after the state and resources for the previous
 		/// frame have been cleaned up.
 		/// </summary>
-		virtual void Setup(CtxImm& ctx) { }
+		virtual void Setup(CtxImm& ctx);
 
-		virtual void Draw(CtxImm& ctx) { }
+		/// <summary>
+		/// Main draw update function
+		/// </summary>
+		virtual void Draw(CtxImm& ctx);
 
 		/// <summary>
 		/// Called after swap chain present but before any resources have been released
 		/// or cleaned up.
 		/// </summary>
-		virtual void AfterDraw(CtxImm& ctx) { }
+		virtual void AfterDraw(CtxImm& ctx);
 
 		/// <summary>
 		/// Returns reference to the renderer this component is attached to
@@ -74,7 +91,7 @@ namespace Weave::D3D11
 		const MinWindow& GetWindow() const;
 
 	protected:
-		RenderComponentBase(Renderer& renderer, uint priority = 10);
+		RenderComponentBase(Renderer& renderer, uint priority = RenderOrders::Draw);
 
 	};
 
