@@ -115,6 +115,8 @@ MinWindow::MinWindow(
 
 	// Initial draw and show window
 	RepaintWindow();
+
+	limiter.SetTargetTickTimeNS(GetTimeHZtoNS(200));
 }
 
 MinWindow::MinWindow(
@@ -222,6 +224,8 @@ void MinWindow::RepaintWindow()
 
 void MinWindow::UpdateComponents()
 {
+	limiter.BeginTick();
+
 	// Update thread execution state
 	DWORD execFlags = ES_CONTINUOUS;
 
@@ -234,8 +238,12 @@ void MinWindow::UpdateComponents()
 	SetThreadExecutionState(execFlags);
 	CompSpan comps = GetComponents();
 
+	limiter.WaitTick();
+
 	for (WindowComponentBase* pComp : comps)
 		pComp->Update();
+
+	limiter.EndTick();
 }
 
 bool MinWindow::GetIsFullScreen() const { return isFullscreen; }
@@ -430,6 +438,12 @@ bool MinWindow::PollWindowMessages(MSG& wndMsg)
 	return true;
 }
 
+double MinWindow::GetTickRateHZ() const { return GetTimeNStoHZ(limiter.GetTargetTickTimeNS()); }
+
+void MinWindow::SetTickRateHZ(double timeHZ) { limiter.SetTargetTickTimeNS(GetTimeHZtoNS(timeHZ)); }
+
+double MinWindow::GetAvgTickRateHZ() const { return GetTimeNStoHZ(limiter.GetAverageTickTimeNS()); }
+
 slong MinWindow::OnWndMessage(HWND window, uint msg, ulong wParam, slong lParam)
 {
 	std::optional<slong> result;
@@ -580,7 +594,9 @@ std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, uint msg, ulong
 			const ivec2 cursorPos(hitPos.x - pos.x, hitPos.y - pos.y);
 			const ivec2 padding = pStyleOverride->GetPadding();
 
-			if (AllTrue(cursorPos > ivec2(0) && cursorPos < size))
+			if (isFullscreen)
+				HTCLIENT;
+			else if (AllTrue(cursorPos > ivec2(0) && cursorPos < size))
 			{
 				const ivec2 innerMax = size - padding;
 

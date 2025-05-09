@@ -2,10 +2,10 @@
 #include <atomic>
 #include <mutex>
 #include <shared_mutex>
-#include "WeaveUtils/GlobalUtils.hpp"
-#include "WeaveUtils/Math.hpp"
-#include "ComponentManagerBase.hpp"
 #include "WinUtils.hpp"
+#include "Math.hpp"
+#include "ComponentManagerBase.hpp"
+#include "TickLimiter.hpp"
 
 namespace Weave
 {
@@ -152,6 +152,21 @@ namespace Weave
 			/// Updates main Window loop until the application exits. To be run once from the owning thread.
 			/// </summary>
 			void RunMessageLoop(MSG& msg);
+
+			/// <summary>
+			/// Returns the target tick rate in ticks per second or hertz
+			/// </summary>
+			double GetTickRateHZ() const;
+
+			/// <summary>
+			/// Sets the target tick rate in ticks per second or hertz
+			/// </summary>
+			void SetTickRateHZ(double timeHZ);
+
+			/// <summary>
+			/// Returns the average actual tick rate in ticks per second or hertz
+			/// </summary>
+			double GetAvgTickRateHZ() const;
 
 			/// <summary>
 			/// Returns the contents of the titlebar
@@ -337,6 +352,8 @@ namespace Weave
 			wstring name;
 			HINSTANCE hInst;
 			std::atomic<bool> isInitialized;
+
+			TickLimiter limiter;
 			bool isMoving;
 			ulong timerID;
 
