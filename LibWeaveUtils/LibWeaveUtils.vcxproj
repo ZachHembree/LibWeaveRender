@@ -28,6 +28,7 @@
     <ClInclude Include="include\WeaveUtils\StatsRecorder.hpp" />
     <ClInclude Include="include\WeaveUtils\StringIDBuilder.hpp" />
     <ClInclude Include="include\WeaveUtils\StringSpan.hpp" />
+    <ClInclude Include="include\WeaveUtils\TickLimiter.hpp" />
     <ClInclude Include="include\WeaveUtils\VectorSpan.hpp" />
     <ClInclude Include="src\pch.hpp" />
     <ClInclude Include="include\WeaveUtils\Serialization.hpp" />
@@ -55,6 +56,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\TickLimiter.cpp" />
     <ClCompile Include="src\WeaveException.cpp" />
     <ClCompile Include="src\Math.cpp" />
     <ClCompile Include="src\WinUtils.cpp" />

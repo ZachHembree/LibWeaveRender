@@ -329,7 +329,7 @@ void Renderer::RenderUpdate()
 
 	// Present frame
 	const bool canSync = pSwap->GetSyncMode() == VSyncRenderModes::TripleBuffered;
-	pSwap->Present(pFrameTimer->WaitPresent(canSync));
+	pSwap->Present(pFrameTimer->WaitPresent(canSync, slong(2E5)));
 	ctx.EndFrame();
 
 	AfterDraw(ctx);
