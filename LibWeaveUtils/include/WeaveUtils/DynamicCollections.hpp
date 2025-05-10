@@ -8,6 +8,7 @@
 #include <concepts>
 #include "GlobalUtils.hpp"
 #include "WeaveException.hpp"
+#include <span>
 
 // Defines type aliases for templated IDynamicArray types
 #define DEF_DYN_ARR_TRAITS(BASE) \
@@ -233,6 +234,11 @@ namespace Weave
 				seed ^= std::hash<T>{}(value)+0x9e3779b9 + (seed << 6) + (seed >> 2);
 			return seed;
 		}
+
+		/// <summary>
+		/// Implicitly converts the collection into a non-owning view of std::span
+		/// </summary>
+		operator std::span<T>() { return std::span<T>(GetData(), GetLength()); }
 	};
 
 	/// <summary>

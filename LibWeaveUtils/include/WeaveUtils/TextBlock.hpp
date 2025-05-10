@@ -178,11 +178,11 @@ namespace Weave
         /// <summary>
         /// Returns a string view interface representing the range
         /// </summary>
-        operator string_view() const { return string_view(pStart, length); }
+        operator string_view() const { return string_view(this->data(), this->size()); }
 
         friend std::ostream& operator<<(std::ostream& os, const TextBlock& text)
         {
-            return os.write(text.pStart, text.length);
+            return os.write(text.data(), text.size());
         }
     };
 }

@@ -23,7 +23,7 @@ TextBlock::TextBlock() : Span()
 TextBlock::TextBlock(const char* pStart, size_t length) : Span(pStart, length)
 {
     if (length > 0 && GetBack() == '\0')
-        this->length--;
+        *this = TextBlock(pStart, length - 1);
 }
 
 TextBlock::TextBlock(const char* pStart, const char* pEnd) : 
@@ -52,8 +52,8 @@ bool TextBlock::StartsWith(const string_view & substr) const { return StartsWith
 /// </summary>
 bool TextBlock::StartsWith(const char* substr, size_t subLen) const 
 {
-    if (subLen <= length)
-        return memcmp(substr, this->pStart, subLen) == 0;
+    if (subLen <= this->size())
+        return memcmp(substr, this->data(), subLen) == 0;
     else
         return false;
 }
@@ -83,7 +83,7 @@ int TextBlock::FindCount(const char ch, const char* pStart) const
     int count = 0;
 
     if (pStart == nullptr)
-        pStart = this->pStart;
+        pStart = this->data();
 
     size_t remLen = UnsignedDelta(&GetBack(), pStart);
 
@@ -116,7 +116,7 @@ const char* TextBlock::Find(const string_view& substr, const char* pStart) const
 /// </summary>
 const char* TextBlock::Find(const TextBlock& substr, const char* pStart) const
 {
-    return Find(substr.pStart, (int)substr.length, pStart);
+    return Find(substr.data(), (int)substr.size(), pStart);
 }
 
 /// <summary>
@@ -144,7 +144,7 @@ const char* TextBlock::Find(const string_view& substr, const char* pStart)
 const char* TextBlock::Find(const char* substr, size_t subLen, const char* pStart) const
 {
     if (pStart == nullptr)
-        pStart = this->pStart;
+        pStart = this->data();
 
     size_t remLen = UnsignedDelta(&GetBack(), pStart);
 
@@ -220,7 +220,7 @@ TextBlock TextBlock::GetLastWord(const char* pStart, const string_view& breakFil
 const char* TextBlock::Find(const char* substr, size_t subLen, const char* pStart)
 {
     if (pStart == nullptr)
-        pStart = this->pStart;
+        pStart = this->data();
 
     size_t remLen = UnsignedDelta(&GetBack(), pStart);
 
@@ -317,10 +317,10 @@ const char* TextBlock::Find(const char ch, const char* pStart)
 /// </summary>
 void TextBlock::CopyTo(char* dst, size_t maxLength) const
 {
-    size_t len = std::min(length, maxLength),
+    size_t len = std::min(this->size(), maxLength),
         end = std::min(len - 1, maxLength - 1);
 
-    memcpy(dst, pStart, len);
+    memcpy(dst, this->data(), len);
     dst[end] = '\0';
 }
 
@@ -329,7 +329,7 @@ void TextBlock::CopyTo(char* dst, size_t maxLength) const
 /// </summary>
 string TextBlock::ToString()
 {
-    return string(pStart, length);
+    return string(this->data(), this->size());
 }
 
 /// <summary>

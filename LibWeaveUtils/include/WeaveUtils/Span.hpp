@@ -33,52 +33,45 @@ namespace Weave
 	/// A non-owning view of a contiguous section of an array
 	/// </summary>
 	template<typename T>
-	class Span : public IDynamicArray<T>
+	class Span : public IDynamicArray<T>, protected std::span<T>
 	{
 	public:
 		DEF_DYN_ARR_TRAITS(IDynamicArray<T>)
 		MAKE_DEF_MOVE_COPY(Span);
 
-		Span() : pStart(nullptr), length(0)
-		{ }
+		Span() = default;
 
 		explicit Span(T* pStart) :
-			pStart(pStart), length(1)
+			std::span<T>(pStart, 1)
 		{ }
 
 		Span(T* pStart, size_t length) : 
-			pStart(pStart), length(length)
+			std::span<T>(pStart, length)
 		{ }
 
 		Span(T* pStart, const T* pEnd) :
-			pStart(pStart), 
-			length(UnsignedDelta(pEnd + 1, pStart) / sizeof(T))
+			std::span<T>(pStart, UnsignedDelta(pEnd + 1, pStart) / sizeof(T))
 		{ }
 
 		Span(T* pStart, size_t offset, size_t length) :
-			pStart(pStart + offset),
-			length(length)
+			std::span<T>(pStart + offset, length)
 		{ }
 
 		explicit Span(IDynamicArray<T>& arr) :
-			pStart(arr.GetData()),
-			length(arr.GetLength())
+			std::span<T>(arr.GetData(), arr.GetLength())
 		{ }
 
 		explicit Span(std::span<T>& other) :
-			pStart(other.data()),
-			length(other.size())
+			std::span<T>(other)
 		{ }
 
 		explicit Span(std::vector<T>& other) :
-			pStart(other.data()),
-			length(other.size())
+			std::span<T>(other.data(), other.size())
 		{ }
 
 		template<size_t N>
-		explicit Span(std::array<T, N>& arr) :
-			pStart(arr.data()), 
-			length(arr.size())
+		explicit Span(std::array<T, N>& other) :
+			std::span<T>(other.data(), other.size())
 		{ }
 
 		~Span() = default;
@@ -86,53 +79,44 @@ namespace Weave
 		/// <summary>
 		/// Returns the length of the span
 		/// </summary>
-		size_t GetLength() const override { return length; }
+		size_t GetLength() const override { return this->size(); }
 
 		/// <summary>
 		/// Returns a copy of the pointer to the backing the array.
 		/// </summary>
-		T* GetData() override { return pStart; }
+		T* GetData() override { return this->data(); }
 
 		/// <summary>
 		/// Returns a const copy of the pointer to the backing the array.
 		/// </summary>
-		const T* GetData() const override { return pStart; }
+		const T* GetData() const override { return this->data(); }
 
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
-		iterator begin() override { return iterator(pStart); }
+		iterator begin() override { return iterator(this->data()); }
 
 		/// <summary>
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
-		iterator end() override { return iterator(pStart + length); }
+		iterator end() override { return iterator(this->data() + this->size()); }
 
 		/// <summary>
 		/// Returns iterator pointing to the start of the collection
 		/// </summary>
-		const_iterator begin() const override { return const_iterator(pStart); }
+		const_iterator begin() const override { return const_iterator(this->data()); }
 
 		/// <summary>
 		/// Returns iterator pointing to the end of the collection
 		/// </summary>
-		const_iterator end() const override { return const_iterator(pStart + length); }
+		const_iterator end() const override { return const_iterator(this->data() + this->size()); }
 
 		/// <summary>
 		/// Provides indexed access to array member references.
 		/// </summary>
 		T& operator[](size_t index) override
 		{
-#if _CONTAINER_DEBUG_LEVEL > 0
-			if (index >= length)
-			{
-				char buffer[100];
-				sprintf_s(buffer, 100, "Array index out of range. Index: %tu, Length %tu", index, length);
-
-				throw std::exception(buffer);
-			}
-#endif
-			return pStart[index];
+			return GetArrayAtIndex(this->data(), index, this->size());
 		}
 
 		/// <summary>
@@ -140,23 +124,8 @@ namespace Weave
 		/// </summary>
 		const T& operator[](size_t index) const override
 		{
-#if _CONTAINER_DEBUG_LEVEL > 0
-			if (index >= length)
-			{
-				char buffer[100];
-				sprintf_s(buffer, 100, "Array index out of range. Index: %tu, Length %tu", index, length);
-
-				throw std::exception(buffer);
-			}
-#endif
-			return pStart[index];
+			return GetArrayAtIndex(this->data(), index, this->size());
 		}
-
-		operator std::span<T>() { return std::span<T>(pStart, length); }
-
-	protected:
-		T* pStart;
-		size_t length;
 	};
 }
 

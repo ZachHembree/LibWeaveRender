@@ -23,7 +23,7 @@
     <ClInclude Include="include\WeaveUtils\GenericMain.hpp" />
     <ClInclude Include="include\WeaveUtils\AsyncWin32Buffer.hpp" />
     <ClInclude Include="include\WeaveUtils\Logger.hpp" />
-    <ClInclude Include="include\WeaveUtils\MutexSpan.h" />
+    <ClInclude Include="include\WeaveUtils\MutexSpan.hpp" />
     <ClInclude Include="include\WeaveUtils\ObjectPool.hpp" />
     <ClInclude Include="include\WeaveUtils\GlobalUtils.hpp" />
     <ClInclude Include="include\WeaveUtils\StatsRecorder.hpp" />

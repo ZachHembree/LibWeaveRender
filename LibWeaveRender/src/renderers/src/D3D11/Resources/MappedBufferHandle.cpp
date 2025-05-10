@@ -22,7 +22,7 @@ uint MappedBufferHandle::GetRowPitch() const { return msr.rowPitch; }
 
 uint MappedBufferHandle::GetDepthPitch() const { return msr.depthPitch; }
 
-uint MappedBufferHandle::GetByteSize() const { return (uint)length; }
+uint MappedBufferHandle::GetByteSize() const { return (uint)GetLength(); }
 
 static uint GetTotalExtent(uivec3 dim, MappedSubresource msr)
 {
