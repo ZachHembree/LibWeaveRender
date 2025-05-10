@@ -42,7 +42,7 @@ namespace Weave
 				priority(priority)
 			{ }
 
-			virtual ~ComponentBase() {}
+			virtual ~ComponentBase() = default;
 
 			/// <summary>
 			/// Checks if the component is registered with a manager.
@@ -54,6 +54,16 @@ namespace Weave
 				else
 					return id != InvalidID && this->pParent == pParent;
 			}
+
+			/// <summary>
+			/// Returns a pointer to the component's parent
+			/// </summary>
+			ParentT* GetParent() { return pParent; }
+
+			/// <summary>
+			/// Returns a pointer to the component's parent
+			/// </summary>
+			const ParentT* GetParent() const { return pParent; }
 
 			/// <summary>
 			/// Gets the update priority of the component. Lower values update sooner.
@@ -70,12 +80,56 @@ namespace Weave
 		/// <summary>
 		/// Unique pointer managing the lifetime of a component.
 		/// </summary>
-		using CompHandle = std::unique_ptr<ComponentT>;
+		using ComponentPtr = std::unique_ptr<ComponentT>;
 
 		/// <summary>
 		/// Alias for the type of this manager's components
 		/// </summary>
 		using CompBaseT = ComponentBase;
+
+		/// <summary>
+		/// Move-only component pointer wrapper that automatically unregisters the component on destruction.
+		/// </summary>
+		template<typename T>
+		class ComponentHandle
+		{
+		public:
+			MAKE_MOVE_ONLY(ComponentHandle);
+
+			ComponentHandle() :
+				pComp(nullptr)
+			{ }
+
+			ComponentHandle(T* pComp) :
+				pComp(pComp)
+			{ }
+
+			~ComponentHandle()
+			{
+				if (pComp != nullptr)
+				{
+					if (pComp->GetIsRegistered())
+						pComp->GetParent()->UnregisterComponent(*pComp);
+				}
+			}
+
+			T* operator->() { return pComp; }
+
+			const T* operator->() const { return pComp; }
+
+			T* operator*() { return pComp; }
+
+			const T* operator*() const { return pComp; }
+
+		private:
+			T* pComp;
+		};
+
+		/// <summary>
+		/// ComponentHandle alias
+		/// </summary>
+		template<typename T>
+		using HandleT = ComponentHandle<T>;
 
 		/// <summary>
 		/// Constructs and registers a new parent object component in place. Thread safe.
@@ -84,7 +138,7 @@ namespace Weave
 		T& CreateComponent(ArgTs&&... args)
 		{
 			ParentT* pParent = static_cast<ParentT*>(this);
-			ComponentT* pComp = RegisterComponent(CompHandle(new T(*pParent, std::forward<ArgTs>(args)...)));
+			ComponentT* pComp = RegisterComponent(ComponentPtr(new T(*pParent, std::forward<ArgTs>(args)...)));
 			WV_ASSERT(pComp != nullptr);
 			return static_cast<T&>(*pComp);
 		}
@@ -96,7 +150,7 @@ namespace Weave
 		void CreateComponent(T*& pDerived, ArgTs&&... args)
 		{
 			ParentT* pParent = static_cast<ParentT*>(this);
-			ComponentT* pBase = RegisterComponent(CompHandle(new T(*pParent, std::forward<ArgTs>(args)...)));
+			ComponentT* pBase = RegisterComponent(ComponentPtr(new T(*pParent, std::forward<ArgTs>(args)...)));
 			WV_ASSERT(pBase != nullptr);
 			pDerived = static_cast<T*>(pBase);
 		}
@@ -104,7 +158,7 @@ namespace Weave
 		/// <summary>
 		/// Transfers ownership of the component to the parent object and registers it. Thread safe.
 		/// </summary>
-		ComponentT* RegisterComponent(CompHandle&& pComp)
+		ComponentT* RegisterComponent(ComponentPtr&& pComp)
 		{
 			WV_CHECK_MSG(!pComp->GetIsRegistered(this),
 				"Cannot register a component that is already registered to another parent.");
@@ -112,7 +166,7 @@ namespace Weave
 			std::unique_lock<std::mutex>(queueMutex);
 			pComp->pParent = static_cast<ParentT*>(this);
 			pComp->id = PendingID;
-			CompHandle& newHandle = regQueues[activeQueue].EmplaceBack(std::move(pComp));
+			ComponentPtr& newHandle = regQueues[activeQueue].EmplaceBack(std::move(pComp));
 
 			return newHandle.get();
 		}
@@ -161,11 +215,11 @@ namespace Weave
 		}
 
 	private:
-		std::array<UniqueVector<CompHandle>, 2> regQueues;
+		std::array<UniqueVector<ComponentPtr>, 2> regQueues;
 		std::atomic<uint> activeQueue, inactiveQueue;
 		std::mutex queueMutex;
 
-		UniqueVector<CompHandle> components;
+		UniqueVector<ComponentPtr> components;
 		UniqueVector<ComponentT*> sortedComps;
 		std::mutex compMutex;
 		bool isCompSortingStale;
@@ -186,7 +240,7 @@ namespace Weave
 		void UpdateComponentIDs()
 		{
 			SwapActiveQueues();
-			UniqueVector<CompHandle>& newComps = regQueues[inactiveQueue];
+			UniqueVector<ComponentPtr>& newComps = regQueues[inactiveQueue];
 			std::unique_lock<std::mutex>(compMutex);
 
 			// Remove nulls and compact
@@ -204,7 +258,7 @@ namespace Weave
 			// Add pending components
 			if (!newComps.IsEmpty())
 			{
-				for (CompHandle& comp : newComps)
+				for (ComponentPtr& comp : newComps)
 					components.Add(std::move(comp));
 
 				newComps.Clear();
