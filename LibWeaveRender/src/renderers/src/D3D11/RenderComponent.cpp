@@ -17,15 +17,15 @@ void RenderComponentBase::AfterDraw(CtxImm& ctx) {}
 
 Renderer& RenderComponentBase::GetRenderer() { return *pParent; }
 
-Device& RenderComponentBase::GetDevice() { return pParent->GetDevice(); }
+Device& RenderComponentBase::GetDevice() { return (*pParent).GetDevice(); }
 
-MinWindow& RenderComponentBase::GetWindow() { return pParent->GetWindow(); }
+MinWindow& RenderComponentBase::GetWindow() { return (*pParent).GetWindow(); }
 
 const Renderer& RenderComponentBase::GetRenderer() const { return *pParent; }
 
-const Device& RenderComponentBase::GetDevice() const { return pParent->GetDevice(); }
+const Device& RenderComponentBase::GetDevice() const { return (*pParent).GetDevice(); }
 
-const MinWindow& RenderComponentBase::GetWindow() const { return pParent->GetWindow(); }
+const MinWindow& RenderComponentBase::GetWindow() const { return (*pParent).GetWindow(); }
 
 RenderHook::RenderHook(Renderer& renderer, uint priority) :
 	RenderComponentBase(renderer, priority)

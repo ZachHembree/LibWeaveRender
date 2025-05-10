@@ -1,13 +1,14 @@
 #pragma once
+#include <atomic>
+#include <mutex>
 #include "GlobalUtils.hpp"
 #include "DynamicCollections.hpp"
-#include "Span.hpp"
-#include <algorithm>
+#include "MutexSpan.hpp"
 
 namespace Weave
 {
 	/// <summary>
-	/// Base class template for managing components associated with a parent object. Not thread safe.
+	/// Base class template for managing components associated with a parent object. Thread safe.
 	/// </summary>
 	/// <typeparam name="ParentT">The type of the parent object that owns the components.</typeparam>
 	/// <typeparam name="ComponentT">The base type of the components being managed.</typeparam>
@@ -15,6 +16,9 @@ namespace Weave
 	class ComponentManagerBase
 	{
 	public:
+		static constexpr uint InvalidID = -1;
+		static constexpr uint PendingID = -2;
+
 		/// <summary>
 		/// Base class for all components managed by ComponentManagerBase.
 		/// </summary>
@@ -22,7 +26,7 @@ namespace Weave
 		{
 		public:
 			MAKE_IMMOVABLE(ComponentBase);
-			friend ComponentManagerBase;
+			friend ComponentManagerBase;			
 
 			/// <summary>
 			/// Alias for manager base type managing this component
@@ -46,9 +50,9 @@ namespace Weave
 			bool GetIsRegistered(const ComponentManagerBase* pParent = nullptr)
 			{
 				if (pParent == nullptr)
-					return id != uint(-1) && this->pParent != nullptr;
+					return id != InvalidID && this->pParent != nullptr;
 				else
-					return id != uint(-1) && this->pParent == pParent;
+					return id != InvalidID && this->pParent == pParent;
 			}
 
 			/// <summary>
@@ -57,9 +61,9 @@ namespace Weave
 			uint GetPriority() const { return priority; }
 
 		protected:
-			ParentT* pParent;
+			std::atomic<ParentT*> pParent;
 		private:
-			uint id;
+			std::atomic<uint> id;
 			uint priority;
 		};
 
@@ -74,7 +78,7 @@ namespace Weave
 		using CompBaseT = ComponentBase;
 
 		/// <summary>
-		/// Constructs and registers a new parent object component in place. Not thread safe.
+		/// Constructs and registers a new parent object component in place. Thread safe.
 		/// </summary>
 		template <typename T, typename... ArgTs>
 		T& CreateComponent(ArgTs&&... args)
@@ -86,7 +90,7 @@ namespace Weave
 		}
 
 		/// <summary>
-		/// Constructs and registers a new parent object component in place. Not thread safe.
+		/// Constructs and registers a new parent object component in place. Thread safe.
 		/// </summary>
 		template <typename T, typename... ArgTs>
 		void CreateComponent(T*& pDerived, ArgTs&&... args)
@@ -98,63 +102,82 @@ namespace Weave
 		}
 
 		/// <summary>
-		/// Transfers ownership of the component to the parent object and registers it. Not thread safe.
+		/// Transfers ownership of the component to the parent object and registers it. Thread safe.
 		/// </summary>
 		ComponentT* RegisterComponent(CompHandle&& pComp)
 		{
 			WV_CHECK_MSG(!pComp->GetIsRegistered(this),
 				"Cannot register a component that is already registered to another parent.");
 
-			pComp->id = (uint)components.GetLength();
+			std::unique_lock<std::mutex>(queueMutex);
 			pComp->pParent = static_cast<ParentT*>(this);
-			CompHandle& newHandle = components.EmplaceBack(std::move(pComp));
+			pComp->id = PendingID;
+			CompHandle& newHandle = regQueues[activeQueue].EmplaceBack(std::move(pComp));
 
-			isCompSortingStale = true;
 			return newHandle.get();
 		}
 
 		/// <summary>
-		/// Unregisters the component from the parent object and destroys it. Not thread safe.
+		/// Unregisters the component from the parent object and destroys it. Thread safe.
+		/// Contends lock with GetComponents().
 		/// </summary>
 		void UnregisterComponent(ComponentT& component)
 		{
 			WV_CHECK_MSG(component.GetIsRegistered(this),
 				"Attempted to remove a component that did not belong to the parent object");
-			WV_ASSERT_MSG(component.id != uint(-1) && component.id < components.GetLength(), "Component ID invalid.");
+
+			std::unique_lock<std::mutex>(compMutex);
+			WV_ASSERT_MSG(component.id != InvalidID && component.id < components.GetLength(), "Component ID invalid.");
 
 			if (components[component.id].get() == &component)
 			{
 				const uint lastID = component.id;
-				component.id = uint(-1);
+				component.id = InvalidID;
 				component.pParent = nullptr;
 				components[lastID].reset();
 				areCompIDsStale = true;
 			}
 		}
 	protected:
-		using CompSpan = Span<ComponentT*>;
+		using CompSpan = MutexSpan<ComponentT*>;
 
 		ComponentManagerBase() :
 			isCompSortingStale(false),
-			areCompIDsStale(false)
+			areCompIDsStale(false),
+			activeQueue(0),
+			inactiveQueue(1)
 		{ }
 
 		virtual ~ComponentManagerBase() = default;
 
 		/// <summary>
-		/// Returns a span of components sorted by priority
+		/// Returns a temporary span of components, sorted by priority. Protected by a mutex 
+		/// for the lifetime of the span. Contends lock with UnregisterComponent().
 		/// </summary>
 		CompSpan GetComponents()
 		{
 			UpdateComponentIDs();
-			return CompSpan(sortedComps.GetData(), sortedComps.GetLength());
+			return CompSpan(sortedComps, compMutex);
 		}
 
 	private:
+		std::array<UniqueVector<CompHandle>, 2> regQueues;
+		std::atomic<uint> activeQueue, inactiveQueue;
+		std::mutex queueMutex;
+
 		UniqueVector<CompHandle> components;
 		UniqueVector<ComponentT*> sortedComps;
+		std::mutex compMutex;
 		bool isCompSortingStale;
 		bool areCompIDsStale;
+
+		void SwapActiveQueues()
+		{
+			std::unique_lock<std::mutex>(queueMutex);
+			const uint lastQueue = activeQueue;
+			activeQueue = inactiveQueue.load();
+			inactiveQueue = lastQueue;
+		}
 
 		/// <summary>
 		/// Updates internal component lists: removes nulls, resorts by priority, and updates component IDs.
@@ -162,17 +185,29 @@ namespace Weave
 		/// </summary>
 		void UpdateComponentIDs()
 		{
+			SwapActiveQueues();
+			UniqueVector<CompHandle>& newComps = regQueues[inactiveQueue];
+			std::unique_lock<std::mutex>(compMutex);
+
 			// Remove nulls and compact
 			if (areCompIDsStale)
 			{
 				for (sint i = (sint)components.GetLength() - 1; i >= 0; i--)
 				{
 					if (components[i].get() == nullptr)
-					{
 						components.RemoveAt(i);
-					}
 				}
 
+				isCompSortingStale = true;
+			}
+
+			// Add pending components
+			if (!newComps.IsEmpty())
+			{
+				for (CompHandle& comp : newComps)
+					components.Add(std::move(comp));
+
+				newComps.Clear();
 				isCompSortingStale = true;
 			}
 
