@@ -2,6 +2,7 @@
 #include "Math.hpp"
 #include "DynamicCollections.hpp"
 #include <array>
+#include <span>
 
 /*
 	Allocates temporary stack allocated array with alloca and assigns it to an exiting span.
@@ -29,16 +30,16 @@ while (0)
 namespace Weave
 { 
 	/// <summary>
-	/// Represents a contiguous section of a fixed length array
+	/// A non-owning view of a contiguous section of an array
 	/// </summary>
 	template<typename T>
 	class Span : public IDynamicArray<T>
 	{
 	public:
 		DEF_DYN_ARR_TRAITS(IDynamicArray<T>)
+		MAKE_DEF_MOVE_COPY(Span);
 
-		Span() : 
-			pStart(nullptr), length(0)
+		Span() : pStart(nullptr), length(0)
 		{ }
 
 		explicit Span(T* pStart) :
@@ -54,26 +55,33 @@ namespace Weave
 			length(UnsignedDelta(pEnd + 1, pStart) / sizeof(T))
 		{ }
 
-		Span(T* pMain, size_t offset, size_t length) :
-			pStart(pMain + offset),
+		Span(T* pStart, size_t offset, size_t length) :
+			pStart(pStart + offset),
 			length(length)
 		{ }
 
+		explicit Span(IDynamicArray<T>& arr) :
+			pStart(arr.GetData()),
+			length(arr.GetLength())
+		{ }
+
+		explicit Span(std::span<T>& other) :
+			pStart(other.data()),
+			length(other.size())
+		{ }
+
+		explicit Span(std::vector<T>& other) :
+			pStart(other.data()),
+			length(other.size())
+		{ }
+
 		template<size_t N>
-		Span(std::array<T, N>& arr) :
+		explicit Span(std::array<T, N>& arr) :
 			pStart(arr.data()), 
 			length(arr.size())
 		{ }
 
-		Span(const Span& other) = default;
-
-		Span(Span&& other) = default;
-
 		~Span() = default;
-
-		Span& operator=(const Span& other) = default;
-
-		Span& operator=(Span&& other) = default;
 
 		/// <summary>
 		/// Returns the length of the span
@@ -144,9 +152,11 @@ namespace Weave
 			return pStart[index];
 		}
 
-		protected:
-			T* pStart;
-			size_t length;
+		operator std::span<T>() { return std::span<T>(pStart, length); }
+
+	protected:
+		T* pStart;
+		size_t length;
 	};
 }
 
