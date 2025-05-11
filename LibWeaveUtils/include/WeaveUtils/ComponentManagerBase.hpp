@@ -180,6 +180,10 @@ namespace Weave
 			WV_CHECK_MSG(component.GetIsRegistered(this),
 				"Attempted to remove a component that did not belong to the parent object");
 
+			// Can't unregister pending components
+			if (component.id == PendingID)
+				UpdateComponentIDs();
+
 			std::unique_lock<std::mutex>(compMutex);
 			WV_ASSERT_MSG(component.id != InvalidID && component.id < components.GetLength(), "Component ID invalid.");
 

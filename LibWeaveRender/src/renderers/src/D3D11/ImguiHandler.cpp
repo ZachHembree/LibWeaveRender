@@ -72,24 +72,6 @@ void ImGuiHandler::Setup(CtxImm& ctx)
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 
-		// Manually update display size and cursor position
-		const Renderer& rnd = *pRenderer;
-		const MinWindow& wnd = rnd.GetWindow();
-		const ivec2 cursorPos = wnd.GetGlobalCursorPos() - wnd.GetBodyPos();
-		const vec2 vpSize = (rnd.GetWindowRenderMode() == WindowRenderModes::ExclusiveFS) ?
-			(vec2)wnd.GetMonitorResolution() : (vec2)rnd.GetOutputResolution();
-		const float aspectRatio = vpSize.y / vpSize.x;
-		const vec2 normPos = (1.0f / vpSize.y) * vec2(cursorPos.x * aspectRatio, cursorPos.y);
-
-		const vec2 dispSize = rnd.GetOutputResolution();
-		const vec2 setMousePos = (normPos * dispSize);
-
-		if (dispSize != vec2(0))
-			io.DisplaySize = ImVec2(dispSize.x, dispSize.y);
-
-		if (setMousePos != vec2(0))
-			io.AddMousePosEvent(setMousePos.x, setMousePos.y);
-
 		ImGui::NewFrame();
 
 		if (enableDemoWindow)
