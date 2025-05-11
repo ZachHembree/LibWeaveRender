@@ -601,6 +601,15 @@ std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, uint msg, ulong
 			}
 			break;
 		}
+		case WM_SETCURSOR:
+		{
+			if (LOWORD(lParam) == HTCLIENT)
+			{
+				SetCursor(LoadCursor(NULL, IDC_ARROW));
+				return 0;
+			}
+			break;
+		}
 		case WM_NCHITTEST:
 		{
 			POINTS hitPos = MAKEPOINTS(lParam);
