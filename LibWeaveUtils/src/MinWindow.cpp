@@ -467,6 +467,7 @@ slong MinWindow::OnWndMessage(HWND window, uint msg, ulong wParam, slong lParam)
 		if (msg != WM_CLOSE && isInitialized)
 		{
 			CompSpan comps = GetComponents();
+
 			for (WindowComponentBase* pComp : comps)
 			{
 				// Allow earlier components to intercept messages from later components
@@ -509,19 +510,31 @@ void MinWindow::TrackState(HWND hWnd, uint msg, ulong wParam, slong lParam)
 		isFullscreen = lParam > 0;
 
 		if (isFullscreen)
-		{
+		{		
+			const uivec2 res = GetMonitorResolution();
+			const ivec2 pos = GetMonitorPosition();
 			lastPos = GetPos();
 			lastSize = GetSize();
 
 			SetStyle(WndStyle(WS_VISIBLE | WS_POPUP, 0));
-			SetSize(GetMonitorResolution());
-			SetPos(GetMonitorPosition());
+			WIN_CHECK_NZ_LAST(SetWindowPos(
+				hWnd,
+				HWND_TOP,
+				pos.x, pos.y,
+				res.x, res.y,
+				SWP_FRAMECHANGED
+			));
 		}
 		else
 		{
 			SetStyle(style);
-			SetSize(lastSize);
-			SetPos(lastPos);
+			WIN_CHECK_NZ_LAST(SetWindowPos(
+				hWnd,
+				HWND_TOP,
+				lastPos.x, lastPos.y,
+				lastSize.x, lastSize.y,
+				SWP_FRAMECHANGED
+			));
 		}
 		break;
 	}
