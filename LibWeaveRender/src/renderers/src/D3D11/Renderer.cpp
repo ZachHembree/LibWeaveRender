@@ -34,6 +34,7 @@ Renderer::Renderer(MinWindow& parent) :
 	useDefaultDS(true),
 	canRender(true),
 	canRun(false),
+	isPaused(false),
 	isFsAllowed(true),
 	pFrameTimer(new FrameTimer()),
 	targetFPS(0)
@@ -62,20 +63,24 @@ Renderer::Renderer(MinWindow& parent) :
 
 		while (canRun)
 		{
-			std::shared_lock lock(renderMutex);
+			if (!isPaused)
+			{
+				std::unique_lock lock(renderMutex);
 			RenderUpdate();
+		}
+			else
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			}
 		}
 	});
 }
 
 Renderer::~Renderer()
 {
-	if (canRun)
-	{
 		canRun = false;
 		std::unique_lock lock(renderMutex);
 	}
-}
 
 Device& Renderer::GetDevice() { return *pDev; }
 
@@ -224,6 +229,8 @@ bool Renderer::OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam)
 		break;
 	}
 	case WM_SIZE:
+		isPaused = wParam != SIZE_MINIMIZED;
+
 		if (isFsAllowed && wParam == SIZE_MINIMIZED)
 		{
 			isFsAllowed = false;
@@ -304,7 +311,10 @@ void Renderer::RenderUpdate()
 
 	// If rendering is explicitly disabled, skip everything else
 	if (!canRender)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		return;
+	}
 
 	CtxImm& ctx = pDev->GetContext();
 

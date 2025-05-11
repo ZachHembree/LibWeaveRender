@@ -124,6 +124,6 @@ void RTHandle::Clear(
 	vec4 color
 )
 {
-	if (ppRTV != nullptr)
+	if (ppRTV != nullptr && *ppRTV != nullptr)
 		ctx.ClearRenderTarget(*this, color);
 }

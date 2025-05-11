@@ -214,7 +214,8 @@ namespace Weave::D3D11
 	private:
 		std::jthread renderThread;
 		std::atomic<bool> canRun;
-		std::shared_mutex renderMutex;
+		std::atomic<bool> isPaused;
+		std::mutex renderMutex;
 
 		mutable std::unordered_map<uint, ComputeInstance> defaultCompute;
 		mutable std::unordered_map<uint, Material> defaultMaterials;
