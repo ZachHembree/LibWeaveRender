@@ -63,15 +63,8 @@ Renderer::Renderer(MinWindow& parent) :
 
 		while (canRun)
 		{
-			if (!isPaused)
-			{
-				std::unique_lock lock(renderMutex);
+			std::unique_lock lock(renderMutex);
 			RenderUpdate();
-		}
-			else
-			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(10));
-			}
 		}
 	});
 }
@@ -229,7 +222,7 @@ bool Renderer::OnWndMessage(HWND hWnd, uint msg, ulong wParam, slong lParam)
 		break;
 	}
 	case WM_SIZE:
-		isPaused = wParam != SIZE_MINIMIZED;
+		isPaused = wParam == SIZE_MINIMIZED;
 
 		if (isFsAllowed && wParam == SIZE_MINIMIZED)
 		{
@@ -310,7 +303,7 @@ void Renderer::RenderUpdate()
 	UpdateSwap();
 
 	// If rendering is explicitly disabled, skip everything else
-	if (!canRender)
+	if (isPaused || !canRender)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		return;

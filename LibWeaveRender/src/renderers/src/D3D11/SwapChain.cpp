@@ -306,10 +306,14 @@ bool SwapChain::GetIsFullscreen() const { return !fsDesc.Windowed; }
 
 void SwapChain::SetFullscreen(bool isFullscreen, bool isOccluded)
 {
+	MinWindow& wnd = GetRenderer().GetWindow();
 	fsDesc.Windowed = !isFullscreen;
 
 	if (isInitialized)
 	{
+		if (!isOccluded && isFullscreen)
+			wnd.SetFullScreen(true);
+
 		// Enable/disable exclusive full screen mode
 		D3D_ASSERT_HR(pSwap->SetFullscreenState(isFullscreen, nullptr));
 
@@ -321,7 +325,10 @@ void SwapChain::SetFullscreen(bool isFullscreen, bool isOccluded)
 			// Use explicit display modes for exclusive full screen
 			SetDisplayMode(GetDisplayMode());
 		else // Use current monitor resolution for windowed modes
-			ResizeBuffers(GetRenderer().GetWindow().GetMonitorResolution());
+			ResizeBuffers(wnd.GetMonitorResolution());
+	
+		if (!isOccluded && !isFullscreen)
+			wnd.SetFullScreen(false);
 	}
 }
 
