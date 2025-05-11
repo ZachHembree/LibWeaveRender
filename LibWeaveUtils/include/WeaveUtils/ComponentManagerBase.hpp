@@ -193,7 +193,7 @@ namespace Weave
 			}
 		}
 	protected:
-		using CompSpan = MutexSpan<ComponentT*>;
+		using CompSpan = MutexSpan<ComponentT*, std::recursive_mutex>;
 
 		ComponentManagerBase() :
 			isCompSortingStale(false),
@@ -221,7 +221,7 @@ namespace Weave
 
 		UniqueVector<ComponentPtr> components;
 		UniqueVector<ComponentT*> sortedComps;
-		std::mutex compMutex;
+		std::recursive_mutex compMutex;
 		bool isCompSortingStale;
 		bool areCompIDsStale;
 
@@ -241,7 +241,7 @@ namespace Weave
 		{
 			SwapActiveQueues();
 			UniqueVector<ComponentPtr>& newComps = regQueues[inactiveQueue];
-			std::unique_lock<std::mutex>(compMutex);
+			std::unique_lock<std::recursive_mutex>(compMutex);
 
 			// Remove nulls and compact
 			if (areCompIDsStale)
