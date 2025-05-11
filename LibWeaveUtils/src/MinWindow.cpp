@@ -76,7 +76,7 @@ MinWindow::MinWindow(
 	}
 
 	// Register window class
-	WIN_ASSERT_NZ_LAST(RegisterClassEx(&wc));
+	WIN_ASSERT_NZ_LAST(RegisterClassExW(&wc));
 	
 	RECT wr;
 	wr.left = 50;
@@ -147,7 +147,7 @@ MinWindow::~MinWindow()
 	{
 		std::unique_lock lock(wndMutex);
 		isInitialized = false;
-		UnregisterClass(name.data(), hInst);
+		UnregisterClassW(name.data(), hInst);
 		DestroyWindow(hWnd);
 	}
 }
@@ -191,10 +191,10 @@ WndStyle MinWindow::GetStyle() const
 {
 	WndStyle style;
 
-	style.x = (DWORD)GetWindowLongPtr(hWnd, GWL_STYLE);
+	style.x = (DWORD)GetWindowLongPtrW(hWnd, GWL_STYLE);
 	WIN_ASSERT_NZ_LAST(style.x);
 
-	style.y = (DWORD)GetWindowLongPtr(hWnd, GWL_EXSTYLE);
+	style.y = (DWORD)GetWindowLongPtrW(hWnd, GWL_EXSTYLE);
 	WIN_ASSERT_NZ_LAST(style.y);
 
 	return style;
@@ -204,10 +204,10 @@ bool MinWindow::GetIsStyleOverridden() const { return pStyleOverride != nullptr;
 
 void MinWindow::SetStyle(WndStyle style)
 {
-	WIN_CHECK_NZ_LAST(SetWindowLongPtr(hWnd, GWL_STYLE, style.x));
+	WIN_CHECK_NZ_LAST(SetWindowLongPtrW(hWnd, GWL_STYLE, style.x));
 
 	if (style.y != 0L)
-		WIN_CHECK_NZ_LAST(SetWindowLongPtr(hWnd, GWL_EXSTYLE, style.y));
+		WIN_CHECK_NZ_LAST(SetWindowLongPtrW(hWnd, GWL_EXSTYLE, style.y));
 
 	RepaintWindow();
 }
@@ -254,7 +254,7 @@ void MinWindow::SetFullScreen(bool value)
 {
 	if (value != isFullscreen)
 	{
-		WIN_CHECK_NZ_LAST(PostMessageW(hWnd, WM_FULLSCREEN, 0, value));
+		WIN_CHECK_NZ_LAST(SendMessageW(hWnd, WM_FULLSCREEN, 0, value));
 	}
 }
 
@@ -262,7 +262,7 @@ uivec2 MinWindow::GetSize() const { return wndSize; }
 
 void MinWindow::SetSize(uivec2 size)
 {
-	WIN_CHECK_NZ_LAST(PostMessageW(hWnd, WM_SIZE, 0, MAKELPARAM(size.x, size.y)));
+	WIN_CHECK_NZ_LAST(SendMessageW(hWnd, WM_SIZE, 0, MAKELPARAM(size.x, size.y)));
 }
 
 uivec2 MinWindow::GetBodySize() const { return bodySize; }
@@ -271,7 +271,7 @@ ivec2 MinWindow::GetPos() const { return wndPos; }
 
 void MinWindow::SetPos(ivec2 pos)
 {
-	WIN_CHECK_NZ_LAST(PostMessageW(hWnd, WM_MOVE, 0, MAKELPARAM(pos.x, pos.y)));
+	WIN_CHECK_NZ_LAST(SendMessageW(hWnd, WM_MOVE, 0, MAKELPARAM(pos.x, pos.y)));
 }
 
 ivec2 MinWindow::GetBodyPos() const { return bodyPos; }
@@ -345,12 +345,12 @@ void MinWindow::SetActiveMonitor(HMONITOR newMon)
 	const bool wasFullscreen = isFullscreen;
 
 	if (wasFullscreen)
-		SetFullScreen(false);
+		WIN_CHECK_NZ_LAST(SendMessageW(hWnd, WM_FULLSCREEN, 0, false));
 
-	SetPos(pos);
+	WIN_CHECK_NZ_LAST(SendMessageW(hWnd, WM_MOVE, 0, MAKELPARAM(pos.x, pos.y)));
 
 	if (wasFullscreen)
-		SetFullScreen(true);
+		WIN_CHECK_NZ_LAST(SendMessageW(hWnd, WM_FULLSCREEN, 0, true));
 }
 
 WndMonConfig MinWindow::GetActiveMonitorConfig() const { return GetMonitorConfig(GetActiveMonitor()); }
@@ -428,13 +428,13 @@ void MinWindow::CloseWindow() { PostMessageW(hWnd, WM_CLOSE, 0, 0); }
 bool MinWindow::PollWindowMessages(MSG& wndMsg)
 {
 	// Process windows events
-	if (PeekMessage(&wndMsg, nullptr, 0, 0, PM_REMOVE))
+	if (PeekMessageW(&wndMsg, nullptr, 0, 0, PM_REMOVE))
 	{
 		if (wndMsg.message == WM_QUIT)
 			return false;
 
 		TranslateMessage(&wndMsg);
-		DispatchMessage(&wndMsg);
+		DispatchMessageW(&wndMsg);
 	}
 
 	return true;
@@ -448,6 +448,9 @@ double MinWindow::GetAvgTickRateHZ() const { return GetTimeNStoHZ(limiter.GetAve
 
 slong MinWindow::OnWndMessage(HWND window, uint msg, ulong wParam, slong lParam)
 {
+	if (msg == WM_NULL)
+		return 0;
+
 	std::optional<slong> result;
 
 #ifdef NDEBUG
@@ -459,12 +462,13 @@ slong MinWindow::OnWndMessage(HWND window, uint msg, ulong wParam, slong lParam)
 		// Non-client override
 		if (!result.has_value() && pStyleOverride != nullptr)
 			result = TryHandleOverrideNC(hWnd, msg, wParam, lParam);
-		
+
 		TrackState(hWnd, msg, wParam, lParam);
 
 		// Pass messages through to components
-		if (msg != WM_CLOSE && isInitialized)
-		{
+		if (static bool isUpdating = false; !isUpdating && msg != WM_CLOSE && isInitialized)
+		{	
+			isUpdating = true;
 			CompSpan comps = GetComponents();
 
 			for (WindowComponentBase* pComp : comps)
@@ -473,6 +477,8 @@ slong MinWindow::OnWndMessage(HWND window, uint msg, ulong wParam, slong lParam)
 				if (!pComp->OnWndMessage(hWnd, msg, wParam, lParam))
 					break;
 			}
+
+			isUpdating = false;
 		}
 #ifdef NDEBUG
 	}
@@ -543,7 +549,7 @@ std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, uint msg, ulong
 				HWND_TOP,
 				0, 0,
 				size.x, size.y,
-				SWP_NOREPOSITION | SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED
+				SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE
 			));
 			return 0;
 		}
@@ -552,10 +558,10 @@ std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, uint msg, ulong
 			const POINTS& pos = MAKEPOINTS(lParam);
 			WIN_CHECK_NZ_LAST(SetWindowPos(
 				hWnd,
-				0,
+				HWND_TOP,
 				pos.x, pos.y,
 				0, 0,
-				SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
+				SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE
 			));
 			return 0;
 		}
@@ -598,7 +604,7 @@ std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, uint msg, ulong
 		{
 			if (LOWORD(lParam) == HTCLIENT)
 			{
-				SetCursor(LoadCursor(NULL, IDC_ARROW));
+				SetCursor(LoadCursorW(NULL, IDC_ARROW));
 				return 0;
 			}
 			break;
@@ -618,10 +624,13 @@ std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, uint msg, ulong
 				const ivec2 innerMax = size - padding;
 
 				// Corners
-				if (cursorPos.x < padding.x && cursorPos.y < padding.y)		return HTTOPLEFT;
-				if (cursorPos.x > innerMax.x && cursorPos.y < padding.y)	return HTTOPRIGHT;
-				if (cursorPos.x < padding.x && cursorPos.y > innerMax.y)	return HTBOTTOMLEFT;
-				if (cursorPos.x > innerMax.x && cursorPos.y > innerMax.y)	return HTBOTTOMRIGHT;
+				if (!IsZoomed(hWnd))
+				{
+					if (cursorPos.x < padding.x && cursorPos.y < padding.y)		return HTTOPLEFT;
+					if (cursorPos.x > innerMax.x && cursorPos.y < padding.y)	return HTTOPRIGHT;
+					if (cursorPos.x < padding.x && cursorPos.y > innerMax.y)	return HTBOTTOMLEFT;
+					if (cursorPos.x > innerMax.x && cursorPos.y > innerMax.y)	return HTBOTTOMRIGHT;
+				}
 
 				// Edges
 				if (cursorPos.x < padding.x)	return HTLEFT;
@@ -704,7 +713,6 @@ std::optional<slong> MinWindow::TryHandleMove(HWND hWnd, uint msg, ulong wParam,
 		if (isMoving)
 		{
 			UpdateComponents();
-			RepaintWindow();
 		}
 		break;
 	case WM_DESTROY:
@@ -746,20 +754,20 @@ slong CALLBACK MinWindow::HandleWindowSetup(HWND hWnd, uint msg, ulong wParam, s
 		MinWindow* wndPtr = static_cast<MinWindow*>(pData->lpCreateParams);
 
 		// Add pointer to user data field
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(wndPtr));
+		SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(wndPtr));
 
 		// Switch to main message forwarding proceedure
-		SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&WindowMessageHandler));
+		SetWindowLongPtrW(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&WindowMessageHandler));
 		
 		return wndPtr->OnWndMessage(hWnd, msg, wParam, lParam);
 	}
 	else
-		return DefWindowProc(hWnd, msg, wParam, lParam);
+		return DefWindowProcW(hWnd, msg, wParam, lParam);
 }
 
 slong CALLBACK MinWindow::WindowMessageHandler(HWND hWnd, uint msg, ulong wParam, slong lParam)
 {
-	MinWindow* const wndPtr = reinterpret_cast<MinWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	MinWindow* const wndPtr = reinterpret_cast<MinWindow*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
 	return wndPtr->OnWndMessage(hWnd, msg, wParam, lParam);
 }
 
