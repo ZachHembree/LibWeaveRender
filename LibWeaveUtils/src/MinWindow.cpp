@@ -460,8 +460,7 @@ slong MinWindow::OnWndMessage(HWND window, uint msg, ulong wParam, slong lParam)
 		if (!result.has_value() && pStyleOverride != nullptr)
 			result = TryHandleOverrideNC(hWnd, msg, wParam, lParam);
 		
-		if (!result.has_value())
-			TrackState(hWnd, msg, wParam, lParam);
+		TrackState(hWnd, msg, wParam, lParam);
 
 		// Pass messages through to components
 		if (msg != WM_CLOSE && isInitialized)
@@ -505,39 +504,10 @@ void MinWindow::TrackState(HWND hWnd, uint msg, ulong wParam, slong lParam)
 	case WM_CLOSE: // Window closed, normal exit
 		PostQuitMessage(0);
 		break;
-	case WM_FULLSCREEN:
-	{
-		isFullscreen = lParam > 0;
-
-		if (isFullscreen)
-		{		
-			const uivec2 res = GetMonitorResolution();
-			const ivec2 pos = GetMonitorPosition();
-			lastPos = GetPos();
-			lastSize = GetSize();
-
-			SetStyle(WndStyle(WS_VISIBLE | WS_POPUP, 0));
-			WIN_CHECK_NZ_LAST(SetWindowPos(
-				hWnd,
-				HWND_TOP,
-				pos.x, pos.y,
-				res.x, res.y,
-				SWP_FRAMECHANGED
-			));
-		}
-		else
-		{
-			SetStyle(style);
-			WIN_CHECK_NZ_LAST(SetWindowPos(
-				hWnd,
-				HWND_TOP,
-				lastPos.x, lastPos.y,
-				lastSize.x, lastSize.y,
-				SWP_FRAMECHANGED
-			));
-		}
+	case WM_MOVE:
+	case WM_SIZE:
+		UpdateSize();
 		break;
-	}
 	case WM_ACTIVATE:
 	case WM_SETFOCUS:
 	case WM_MOUSEACTIVATE:
@@ -545,7 +515,6 @@ void MinWindow::TrackState(HWND hWnd, uint msg, ulong wParam, slong lParam)
 	case WM_NCMOUSEMOVE:
 	case WM_MOUSEHOVER:
 	case WM_MOUSEMOVE:
-
 		if (!isMousedOver)
 			TrackMouseEvent(pMouseTrackEvent.get());
 
@@ -566,6 +535,30 @@ std::optional<slong> MinWindow::TryHandleOverrideNC(HWND window, uint msg, ulong
 		case WM_NCCALCSIZE:
 		case WM_NCPAINT:
 			return 0;
+		case WM_SIZE:
+		{
+			const POINTS& size = MAKEPOINTS(lParam);
+			WIN_CHECK_NZ_LAST(SetWindowPos(
+				hWnd,
+				HWND_TOP,
+				0, 0,
+				size.x, size.y,
+				SWP_NOREPOSITION | SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED
+			));
+			return 0;
+		}
+		case WM_MOVE:
+		{
+			const POINTS& pos = MAKEPOINTS(lParam);
+			WIN_CHECK_NZ_LAST(SetWindowPos(
+				hWnd,
+				0,
+				pos.x, pos.y,
+				0, 0,
+				SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
+			));
+			return 0;
+		}
 		case WM_GETMINMAXINFO:
 		{
 			MINMAXINFO* pInfo = (MINMAXINFO*)lParam;
@@ -662,30 +655,37 @@ std::optional<slong> MinWindow::TryHandleMove(HWND hWnd, uint msg, ulong wParam,
 {
 	switch (msg)
 	{
-	case WM_SIZE:
+	case WM_FULLSCREEN:
 	{
-		const POINTS& size = MAKEPOINTS(lParam);
-		WIN_CHECK_NZ_LAST(SetWindowPos(
-			hWnd,
-			HWND_TOP,
-			0, 0,
-			size.x, size.y,
-			SWP_NOREPOSITION | SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED
-		));
-		UpdateSize();
-		return 0;
-	}
-	case WM_MOVE:
-	{
-		const POINTS& pos = MAKEPOINTS(lParam);
-		WIN_CHECK_NZ_LAST(SetWindowPos(
-			hWnd,
-			0,
-			pos.x, pos.y,
-			0, 0,
-			SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
-		));
-		UpdateSize();
+		isFullscreen = lParam > 0;
+
+		if (isFullscreen)
+		{
+			const uivec2 res = GetMonitorResolution();
+			const ivec2 pos = GetMonitorPosition();
+			lastPos = GetPos();
+			lastSize = GetSize();
+
+			SetStyle(WndStyle(WS_VISIBLE | WS_POPUP, 0));
+			WIN_CHECK_NZ_LAST(SetWindowPos(
+				hWnd,
+				HWND_TOP,
+				pos.x, pos.y,
+				res.x, res.y,
+				SWP_FRAMECHANGED
+			));
+		}
+		else
+		{
+			SetStyle(style);
+			WIN_CHECK_NZ_LAST(SetWindowPos(
+				hWnd,
+				HWND_TOP,
+				lastPos.x, lastPos.y,
+				lastSize.x, lastSize.y,
+				SWP_FRAMECHANGED
+			));
+		}
 		return 0;
 	}
 	case WM_ENTERSIZEMOVE:
