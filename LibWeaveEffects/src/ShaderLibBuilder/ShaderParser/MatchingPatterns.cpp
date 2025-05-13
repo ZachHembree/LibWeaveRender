@@ -293,10 +293,6 @@ static MatchNode GetVarPatterns(const CapturePattern& typeCap = {})
                             LexBlockTypes::CloseParentheses,
                             LexBlockTypes::SemicolonSeparator
                         },
-                        {
-                            typeCap,
-                            CapturePattern { TokenTypes::VarIdent, SymbolTypes::AmbigFuncVarDecl }
-                        },
                     },
                 },
             },
