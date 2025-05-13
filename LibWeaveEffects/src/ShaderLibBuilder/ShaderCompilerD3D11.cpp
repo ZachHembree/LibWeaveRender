@@ -190,18 +190,27 @@ static void GetPrecompShaderD3D11(
 		&errors
 	);
 
-	// Validate
-	if (FAILED(hr))
+	if (errors.Get() != nullptr)
 	{
-		if (errors.Get() != nullptr)
-			FX_THROW("{}", (char*)errors->GetBufferPointer());
+		Span<char> status((char*)errors->GetBufferPointer(), errors->GetBufferSize());
+		// Remove first trailing line break
+		for (sint i = (sint)status.GetLength() - 1; i >= 0; i--)
+		{
+			if (status[i] == '\n')
+			{
+				status[i] = ' ';
+				break;
+			}
+		}
+
+		// Validate
+		if (FAILED(hr))
+			FX_THROW("{}", status.GetData());
 		else
-			FX_THROW("Unknown compiler error");
+			WV_LOG_WARN() << status.GetData();
 	}
-	else if (errors.Get() != nullptr)
-	{
-		WV_LOG_INFO() << (char*)errors->GetBufferPointer();
-	}
+	else if (FAILED(hr))
+		FX_THROW("Unknown compiler error");
 
 	def.fileStringID = builder.GetOrAddStringID(srcFile);
 	def.nameID = builder.GetOrAddStringID(mainName);
@@ -305,31 +314,34 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 			D3D11_SHADER_BUFFER_DESC cbufDesc;
 			WIN_CHECK_HR(cbuf.GetDesc(&cbufDesc));
 
-			Vector<uint> constIDbuf = builder.GetTmpIDBuffer();
-			ConstBufDef constants;
-			constants.stringID = builder.GetOrAddStringID(string_view(cbufDesc.Name));
-			constants.size = cbufDesc.Size;
-			
-			for (uint j = 0; j < cbufDesc.Variables; j++)
+			if (cbufDesc.Type == D3D_SIT_CBUFFER)
 			{
-				ID3D11ShaderReflectionVariable& var = *cbuf.GetVariableByIndex(j);
-				D3D11_SHADER_VARIABLE_DESC varDesc;
-				WIN_CHECK_HR(var.GetDesc(&varDesc));
+				Vector<uint> constIDbuf = builder.GetTmpIDBuffer();
+				ConstBufDef constants;
+				constants.stringID = builder.GetOrAddStringID(string_view(cbufDesc.Name));
+				constants.size = cbufDesc.Size;
 
-				ConstDef varDef;
-				varDef.stringID = builder.GetOrAddStringID(string_view(varDesc.Name));
-				varDef.offset = varDesc.StartOffset;
-				varDef.size = varDesc.Size;
+				for (uint j = 0; j < cbufDesc.Variables; j++)
+				{
+					ID3D11ShaderReflectionVariable& var = *cbuf.GetVariableByIndex(j);
+					D3D11_SHADER_VARIABLE_DESC varDesc;
+					WIN_CHECK_HR(var.GetDesc(&varDesc));
 
-				constIDbuf.EmplaceBack(builder.GetOrAddConstant(varDef));
+					ConstDef varDef;
+					varDef.stringID = builder.GetOrAddStringID(string_view(varDesc.Name));
+					varDef.offset = varDesc.StartOffset;
+					varDef.size = varDesc.Size;
+
+					constIDbuf.EmplaceBack(builder.GetOrAddConstant(varDef));
+				}
+
+				constants.layoutID = builder.GetOrAddIDGroup(constIDbuf);
+				groupIDbuf.EmplaceBack(builder.GetOrAddConstantBuffer(constants));
+				builder.ReturnTmpIDBuffer(std::move(constIDbuf));
 			}
-
-			constants.layoutID = builder.GetOrAddIDGroup(constIDbuf);
-			groupIDbuf.EmplaceBack(builder.GetOrAddConstantBuffer(constants));
-			builder.ReturnTmpIDBuffer(std::move(constIDbuf));
 		}
 
-		def.cbufGroupID = builder.GetOrAddIDGroup(groupIDbuf);
+		def.cbufGroupID = !groupIDbuf.IsEmpty() ? builder.GetOrAddIDGroup(groupIDbuf) : -1;
 		builder.ReturnTmpIDBuffer(std::move(groupIDbuf));
 	}
 	else
@@ -341,11 +353,8 @@ static void GetConstantBuffers(ID3D11ShaderReflection* pReflect, const D3D11_SHA
 /// </summary>
 static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DESC& shaderDesc, ShaderDef& def, ShaderRegistryBuilder& builder)
 {
-	// Constant buffers are considered resources, but handled separately
-	const int resourceCount = (int)shaderDesc.BoundResources - (int)shaderDesc.ConstantBuffers;
-	
 	// Resources
-	if (resourceCount > 0)
+	if (shaderDesc.BoundResources > 0)
 	{
 		Vector<uint> idBuf = builder.GetTmpIDBuffer();
 		uint resIndex = 0;
@@ -367,7 +376,7 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 			}
 		}
 
-		def.resLayoutID = builder.GetOrAddIDGroup(idBuf);
+		def.resLayoutID = !idBuf.IsEmpty() ? builder.GetOrAddIDGroup(idBuf) : -1;
 		builder.ReturnTmpIDBuffer(std::move(idBuf));
 	}
 	else
