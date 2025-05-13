@@ -200,6 +200,10 @@ static void GetPrecompShaderD3D11(
 		else
 			FX_THROW("Unknown compiler error");
 	}
+	else if (errors.Get() != nullptr)
+	{
+		WV_LOG_INFO() << (char*)errors->GetBufferPointer();
+	}
 
 	def.fileStringID = builder.GetOrAddStringID(srcFile);
 	def.nameID = builder.GetOrAddStringID(mainName);
