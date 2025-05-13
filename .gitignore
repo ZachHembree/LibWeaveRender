@@ -375,3 +375,5 @@ EffectPreprocessor/output_debug.bin
 EffectPreprocessor/ShaderTest.wfx
 
 *.code-workspace
+
+EffectPreprocessor/DebugShaders.hpp

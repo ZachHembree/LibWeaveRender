@@ -118,8 +118,12 @@ namespace Weave::Effects
                     case '}':
                     case ']':
                     case ')':
-                        EndContainer();
-                        break;
+                        if (*pPos != '<' || GetCanCloseTemplate())
+                        {
+                            EndContainer();
+                            break;
+                        }
+                        [[fallthrough]];
                     case '>':
                         if (GetCanCloseTemplate())
                         {
@@ -252,6 +256,27 @@ namespace Weave::Effects
             SetState(blockIndex - 1);
     }
 
+    void BlockAnalyzer::RevertTemplate()
+    {
+        if (const LexBlock* top = GetTopContainer(); top->GetHasFlags(LexBlockTypes::OpenAngleBrackets))
+        {
+            uint idx = containers.GetBack();
+
+            // It may be necessary to revert multiple containers
+            for (uint i = (uint)containers.GetLength() - 1; i >= 0; i--)
+            {
+                const uint id = containers[i];
+
+                if (blocks[id].GetHasFlags(LexBlockTypes::OpenAngleBrackets))
+                    idx = id;
+                else
+                    break;
+            }
+
+            RevertContainer(idx);
+        }
+    }
+
     void BlockAnalyzer::StartContainer()
     {
         LexBlockTypes delimType = GetDelimiterType(*pPos);
@@ -261,13 +286,11 @@ namespace Weave::Effects
 
         // If an unfinished angle bracket container is on the stack, revert it if a different container
         // type is started. More restrictive than a normal parser, but should be an acceptable simplification.
-        if (!GetHasFlags(delimType, LexBlockTypes::OpenAngleBrackets))
+        if (!GetHasFlags(delimType, LexBlockTypes::OpenAngleBrackets) && !containers.IsEmpty())
         { 
-            const LexBlock* top = GetTopContainer();
-
-            if (top != nullptr && top->GetHasFlags(LexBlockTypes::OpenAngleBrackets))
+            if (const LexBlock* top = GetTopContainer(); top->GetHasFlags(LexBlockTypes::OpenAngleBrackets))
             {
-                RevertContainer(containers.GetBack());
+                RevertTemplate();
                 return;
             }
         }
@@ -287,7 +310,7 @@ namespace Weave::Effects
         // before it was ready. It will need to be reverted and reclassified.
         if (pCont->GetHasFlags(LexBlockTypes::OpenAngleBrackets) && (*pPos != '>'))
         {
-            RevertContainer(containers.GetBack());
+            RevertTemplate();
         }
         // Normal bounding {}, [], () or <> containers, closed in last-in, first-out order.
         else

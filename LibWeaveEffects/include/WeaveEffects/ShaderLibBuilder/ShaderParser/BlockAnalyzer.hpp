@@ -127,6 +127,8 @@ namespace Weave::Effects
             src(src)
         { }
 
+        bool GetHasAnyFlag(LexBlockTypes flag) const { return (uint)(type & flag) > 0; }
+
         bool GetHasFlags(LexBlockTypes flag) const { return (type & flag) == flag; }
 
         int GetLastLine() const { return startLine + lineCount; }
@@ -176,6 +178,8 @@ namespace Weave::Effects
         void SetState(int blockIndex);
 
         void RevertContainer(int blockIndex);
+
+        void RevertTemplate();
 
         bool GetCanOpenTemplate() const;
 
