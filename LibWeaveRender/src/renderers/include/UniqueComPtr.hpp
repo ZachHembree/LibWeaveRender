@@ -114,12 +114,7 @@ namespace Weave
         /// <summary>
         /// Returns a pointer to pointer for the underlying ComPtr storage, but does not release the interface.
         /// </summary>
-        [[nodiscard]] T* const* GetAddressOf() noexcept requires ComPtrType<T> { return &pCom; }
-
-        /// <summary>
-        /// Returns a pointer to pointer for the underlying ComPtr storage, but does not release the interface.
-        /// </summary>
-        [[nodiscard]] T* const* const GetAddressOf() const noexcept requires ComPtrType<T> { return &pCom; }
+        [[nodiscard]] T* const* GetAddressOf() const noexcept requires ComPtrType<T> { return &pCom; }
 
         /// <summary>
         /// Releases the underlying interface and returns a pointer to pointer for the ComPtr storage.

@@ -18,6 +18,14 @@ ComputeInstance::ComputeInstance(ShaderVariantManager& lib, uint nameID, uint vI
 	SetVariantID(vID);
 }
 
+void ComputeInstance::SetComputeBuffer(uint nameID, IShaderResource& buf) { pRes->SetSRV(nameID, buf); }
+
+void ComputeInstance::SetComputeBuffer(string_view name, IShaderResource& buf) { SetComputeBuffer(GetStringID(name), buf); }
+
+void ComputeInstance::SetRWComputeBuffer(uint nameID, IUnorderedAccess& buf) { pRes->SetUAV(nameID, buf); }
+
+void ComputeInstance::SetRWComputeBuffer(string_view name, IUnorderedAccess& buf) { SetRWComputeBuffer(GetStringID(name), buf); }
+
 void ComputeInstance::Dispatch(CtxBase& ctx, ivec3 groups) { ctx.Dispatch(GetShader(), groups, *pRes); }
 
 void  ComputeInstance::Dispatch(CtxBase& ctx, ivec2 groups) { Dispatch(ctx, ivec3(groups.x, groups.y, 1)); }

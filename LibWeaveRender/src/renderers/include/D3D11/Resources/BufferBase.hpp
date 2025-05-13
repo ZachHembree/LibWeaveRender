@@ -1,4 +1,5 @@
 #pragma once
+#include "WeaveUtils/DynamicCollections.hpp"
 #include "ResourceBase.hpp"
 #include "../D3D11Utils.hpp"
 
@@ -70,7 +71,9 @@ namespace Weave::D3D11
 			ResourceAccessFlags cpuAccess, 
 			Device& device, 
 			const void* data, 
-			const uint byteSize);
+			uint byteSize,
+			uint miscFlags = 0,
+			uint structStride = 0);
 
 		virtual ~BufferBase();
 	};

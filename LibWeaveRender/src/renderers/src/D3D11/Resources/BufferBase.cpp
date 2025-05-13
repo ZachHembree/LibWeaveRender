@@ -18,14 +18,18 @@ BufferBase::BufferBase(
 	ResourceAccessFlags cpuAccess, 
 	Device& dev, 
 	const void* data, 
-	const uint byteSize
+	const uint byteSize,
+	uint miscFlags,
+	uint structStride
 ) :
 	ResourceBase(dev),
 	desc({
-		.byteWidth= byteSize,
+		.byteWidth = (uint)GetAlignedByteSize(byteSize, g_ConstantBufferAlignment),
 		.usage = usage,
 		.bindFlags = type,
-		.cpuAccessFlags = cpuAccess
+		.cpuAccessFlags = cpuAccess,
+		.miscFlags = miscFlags,
+		.structuredStride = (uint)GetAlignedByteSize(structStride, g_ConstantBufferAlignment)
 	})
 {
 	D3D_ASSERT_MSG(byteSize > 0, "Buffer size cannot be 0.");

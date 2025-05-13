@@ -125,8 +125,6 @@ static ShaderTypes GetResourceType(const D3D11_SHADER_INPUT_BIND_DESC& resDesc)
 		break;
 	}
 
-	flags |= ShaderTypes::ReadOnly;
-
 	switch (resDesc.Type)
 	{
 	case D3D_SIT_SAMPLER:
@@ -134,15 +132,15 @@ static ShaderTypes GetResourceType(const D3D11_SHADER_INPUT_BIND_DESC& resDesc)
 		break;
 	case D3D_SIT_UAV_RWTYPED:
 		flags |= ShaderTypes::RandomRW;
-		flags &= ~ShaderTypes::ReadOnly;
 		break;
 	case D3D_SIT_STRUCTURED:
-		flags |= ShaderTypes::Structured;
+		flags |= ShaderTypes::ReadOnly | ShaderTypes::Structured;
 		break;
 	case D3D_SIT_UAV_RWSTRUCTURED:
 		flags |= ShaderTypes::RandomRW | ShaderTypes::Structured;
-		flags &= ~ShaderTypes::ReadOnly;
 		break;
+	default:
+		flags |= ShaderTypes::ReadOnly;
 	}
 
 	return flags;
@@ -345,7 +343,7 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 {
 	// Constant buffers are considered resources, but handled separately
 	const int resourceCount = (int)shaderDesc.BoundResources - (int)shaderDesc.ConstantBuffers;
-
+	
 	// Resources
 	if (resourceCount > 0)
 	{

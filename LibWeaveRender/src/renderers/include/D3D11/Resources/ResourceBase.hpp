@@ -78,7 +78,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns interface to resource view
 		/// </summary>
-		virtual ID3D11ShaderResourceView* const* const GetSRVAddress() const = 0;
+		virtual ID3D11ShaderResourceView* const* GetSRVAddress() const = 0;
 	};
 
 	/// <summary>
@@ -148,7 +148,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Read-only pointer to pointer for Render Target view
 		/// </summary>
-		virtual ID3D11RenderTargetView* const* const GetAddressRTV() = 0;
+		virtual ID3D11RenderTargetView* const* GetAddressRTV() = 0;
 
 		/// <summary>
 		/// Clears the render target to the given color

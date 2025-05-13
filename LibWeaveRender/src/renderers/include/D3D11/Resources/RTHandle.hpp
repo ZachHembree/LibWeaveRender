@@ -112,7 +112,7 @@ namespace Weave::D3D11
 		/// </summary>
 		ID3D11RenderTargetView* GetRTV() override;
 
-		ID3D11RenderTargetView* const* const GetAddressRTV() override;
+		ID3D11RenderTargetView* const* GetAddressRTV() override;
 
 		/// <summary>
 		/// Clears the render target to the given color

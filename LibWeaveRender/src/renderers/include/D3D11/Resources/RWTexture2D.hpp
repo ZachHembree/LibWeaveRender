@@ -45,7 +45,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Binds the render target to the output merger
 		/// </summary>
-		ID3D11RenderTargetView* const* const GetAddressRTV() override;
+		ID3D11RenderTargetView* const* GetAddressRTV() override;
 
 		/// <summary>
 		/// Clears the texture to the given color

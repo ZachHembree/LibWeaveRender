@@ -76,7 +76,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns interface to resource view
 		/// </summary>
-		ID3D11ShaderResourceView* const* const GetSRVAddress() const override;
+		ID3D11ShaderResourceView* const* GetSRVAddress() const override;
 
 		/// <summary>
 		/// Updates texture with contents of a scratch image, assuming compatible formats.

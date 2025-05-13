@@ -114,7 +114,7 @@ ID3D11UnorderedAccessView* const* RWTexture2D::GetAddressUAV() { return pUAV.Get
 
 ID3D11RenderTargetView* RWTexture2D::GetRTV() { return pRTV.Get(); }
 
-ID3D11RenderTargetView* const* const RWTexture2D::GetAddressRTV() { return pRTV.GetAddressOf(); }
+ID3D11RenderTargetView* const* RWTexture2D::GetAddressRTV() { return pRTV.GetAddressOf(); }
 
 void RWTexture2D::Clear(CtxBase& ctx, vec4 color)
 {

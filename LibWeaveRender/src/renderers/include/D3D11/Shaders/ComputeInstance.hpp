@@ -16,6 +16,14 @@ namespace Weave::D3D11
 
 		ComputeInstance(ShaderVariantManager& lib, uint nameID, uint vID);
 
+		void SetComputeBuffer(uint nameID, IShaderResource& buf);
+
+		void SetComputeBuffer(string_view name, IShaderResource& buf);
+
+		void SetRWComputeBuffer(uint nameID, IUnorderedAccess& buf);
+
+		void SetRWComputeBuffer(string_view name, IUnorderedAccess& buf);
+
 		void Dispatch(CtxBase& ctx, ivec3 groups);
 
 		void Dispatch(CtxBase& ctx, ivec2 groups);

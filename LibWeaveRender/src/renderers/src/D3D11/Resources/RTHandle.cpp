@@ -117,7 +117,7 @@ vec2 RTHandle::GetRenderScale() const
 
 ID3D11RenderTargetView* RTHandle::GetRTV() { return *ppRTV; }
 
-ID3D11RenderTargetView* const* const RTHandle::GetAddressRTV() { return ppRTV; }
+ID3D11RenderTargetView* const* RTHandle::GetAddressRTV() { return ppRTV; }
 
 void RTHandle::Clear(
 	CtxBase& ctx,
