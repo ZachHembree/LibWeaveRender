@@ -29,22 +29,22 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns a new material using the given effect
 		/// </summary>
-		Material GetMaterial(uint effectNameID);
+		Material GetMaterial(uint effectNameID)  const;
 
 		/// <summary>
 		/// Returns a new Compute shader instance using the given shader name
 		/// </summary>
-		ComputeInstance GetComputeInstance(uint nameID);
+		ComputeInstance GetComputeInstance(uint nameID) const;
 
 		/// <summary>
 		/// Returns a new material using the given effect
 		/// </summary>
-		Material GetMaterial(string_view effectName);
+		Material GetMaterial(string_view effectName)  const;
 
 		/// <summary>
 		/// Returns a new Compute shader instance using the given shader name
 		/// </summary>
-		ComputeInstance GetComputeInstance(string_view name);
+		ComputeInstance GetComputeInstance(string_view name) const;
 
 	private:
 		std::unique_ptr<ShaderVariantManager> pManager;
