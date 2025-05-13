@@ -44,9 +44,9 @@ namespace Weave
 	/// Runtime std::format wrapper.
 	/// </summary>
 	template<typename... FmtArgs>
-	inline void VFormat(string_view fmt, FmtArgs&&... args)
+	inline string VFormat(string_view fmt, FmtArgs&&... args)
 	{
-		std::vformat(fmt, std::make_format_args(args...));
+		return std::vformat(fmt, std::make_format_args(args...));
 	}
 
 	/// <summary>
