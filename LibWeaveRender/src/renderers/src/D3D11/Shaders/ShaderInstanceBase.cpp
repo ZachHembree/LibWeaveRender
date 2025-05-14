@@ -26,13 +26,13 @@ void ShaderInstanceBase::SetConstant(uint nameID, const Span<byte>& newValue) { 
 
 void ShaderInstanceBase::SetConstant(string_view name, const Span<byte>& newValue) { pRes->SetConstant(GetStringID(name), newValue); }
 
-void ShaderInstanceBase::SetSampler(uint stringID, Sampler& samp) { pRes->SetSampler(stringID, samp); }
+void ShaderInstanceBase::SetSampler(uint stringID, const Sampler& samp) { pRes->SetSampler(stringID, samp); }
 
-void ShaderInstanceBase::SetSampler(string_view name, Sampler& samp) { SetSampler(GetStringID(name), samp); }
+void ShaderInstanceBase::SetSampler(string_view name, const Sampler& samp) { SetSampler(GetStringID(name), samp); }
 
-void ShaderInstanceBase::SetTexture(uint stringID, IShaderResource& tex) { pRes->SetSRV(stringID, tex); }
+void ShaderInstanceBase::SetTexture(uint stringID, const IShaderResource& tex) { pRes->SetSRV(stringID, tex); }
 
-void ShaderInstanceBase::SetTexture(string_view name, IShaderResource& tex) { SetTexture(GetStringID(name), tex); }
+void ShaderInstanceBase::SetTexture(string_view name, const IShaderResource& tex) { SetTexture(GetStringID(name), tex); }
 
 void ShaderInstanceBase::SetRWTexture(uint stringID, IUnorderedAccess& rwTex) { pRes->SetUAV(stringID, rwTex); }
 

@@ -22,14 +22,14 @@ namespace Weave::D3D11
 	/// Binds one or more sampler states to a specific shader stage in the Direct3D 11 pipeline.
 	/// This function abstracts the stage-specific SetSamplers calls (e.g., VSSetSamplers, PSSetSamplers).
 	/// </summary>
-	void SetSamplers(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<Sampler*> res);
+	void SetSamplers(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<const Sampler*> res);
 
 	/// <summary>
 	/// Binds one or more shader resource views (SRVs) to a specific shader stage in the Direct3D 11 pipeline.
 	/// SRVs provide shader access to resources like textures and buffers. This function abstracts
 	/// the stage-specific SetShaderResources calls (e.g., VSSetShaderResources, PSSetShaderResources).
 	/// </summary>
-	void SetShaderResources(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<IShaderResource*> res);
+	void SetShaderResources(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<const IShaderResource*> res);
 
 	/// <summary>
 	/// Binds one or more unordered access views (UAVs) to the D3D11 compute pipeline, providing random read-write access

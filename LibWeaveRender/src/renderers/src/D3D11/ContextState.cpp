@@ -252,7 +252,7 @@ bool ContextState::TryUpdateInputLayout(ID3D11InputLayout* pLayout)
 		return false;
 }
 
-const Span<Sampler*> ContextState::StageState::GetSamplers(sint offset, uint extent) const
+const Span<const Sampler*> ContextState::StageState::GetSamplers(sint offset, uint extent) const
 {
 	return GetVariableSpan(samplers, sampCount, offset, extent);
 }
@@ -262,7 +262,7 @@ const Span<ID3D11Buffer*> ContextState::StageState::GetCBuffers(sint offset, uin
 	return GetVariableSpan(cbuffers, cbufCount, offset, extent);
 }
 
-const Span<IShaderResource*> ContextState::StageState::GetSRVs(sint offset, uint extent) const
+const Span<const IShaderResource*> ContextState::StageState::GetSRVs(sint offset, uint extent) const
 {
 	return GetVariableSpan(srvs, srvCount, offset, extent);
 }
@@ -424,15 +424,15 @@ const Span<ID3D11Buffer*> ContextState::TryUpdateResources(ShadeStages stage, ID
 	return Span(ss.cbuffers.GetData(), extent);
 }
 
-const Span<Sampler*> ContextState::TryUpdateResources(ShadeStages stage, const ResourceSet::SamplerList& resSrc, const SamplerMap* pResMap)
+const Span<const Sampler*> ContextState::TryUpdateResources(ShadeStages stage, const ResourceSet::SamplerList& resSrc, const SamplerMap* pResMap)
 {
 	ContextState::StageState& ss = stages[(uint)stage];
-	Span<Sampler*> newRes;
+	Span<const Sampler*> newRes;
 
 	if (pResMap != nullptr && pResMap->GetCount() > 0)
 	{
 		// Map resources into temporary array
-		ALLOCA_SPAN_SET(newRes, pResMap->GetCount(), Sampler*);
+		ALLOCA_SPAN_SET(newRes, pResMap->GetCount(), const Sampler*);
 		pResMap->GetResources(resSrc, newRes);
 	}
 
@@ -441,19 +441,19 @@ const Span<Sampler*> ContextState::TryUpdateResources(ShadeStages stage, const R
 	return Span(ss.samplers.GetData(), extent);
 }
 
-const Span<IShaderResource*> ContextState::TryUpdateResources(ShadeStages stage, const ResourceSet::SRVList& resSrc, const ResourceViewMap* pResMap)
+const Span<const IShaderResource*> ContextState::TryUpdateResources(ShadeStages stage, const ResourceSet::SRVList& resSrc, const ResourceViewMap* pResMap)
 {
 	ContextState::StageState& ss = stages[(uint)stage];
-	Span<IShaderResource*> newRes;
+	Span<const IShaderResource*> newRes;
 
 	if (pResMap != nullptr && pResMap->GetCount() > 0)
 	{
 		// Map resources into temporary array
-		ALLOCA_SPAN_SET(newRes, pResMap->GetCount(), IShaderResource*);
+		ALLOCA_SPAN_SET(newRes, pResMap->GetCount(), const IShaderResource*);
 		pResMap->GetResources(resSrc, newRes);
 	}
 
-	if (Span<IShaderResource*>(ss.srvs.GetData(), ss.srvCount) == newRes)
+	if (Span<const IShaderResource*>(ss.srvs.GetData(), ss.srvCount) == newRes)
 		return {};
 
 	// Update and track usage

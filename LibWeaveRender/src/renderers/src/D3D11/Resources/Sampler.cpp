@@ -29,6 +29,6 @@ Sampler::Sampler(Device& dev,
 	Sampler(dev, filter, mode, mode, mode)
 { }
 
-ID3D11SamplerState* Sampler::Get() { return pSamp.Get(); }
+ID3D11SamplerState* Sampler::Get() const { return pSamp.Get(); }
 
-ID3D11SamplerState* const* Sampler::GetAddressOf() { return pSamp.GetAddressOf(); }
+ID3D11SamplerState* const* Sampler::GetAddressOf() const { return pSamp.GetAddressOf(); }

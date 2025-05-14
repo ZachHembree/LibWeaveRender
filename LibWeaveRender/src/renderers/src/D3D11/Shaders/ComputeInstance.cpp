@@ -31,9 +31,9 @@ void ComputeInstance::SetKernel(uint nameID)
 
 void ComputeInstance::SetKernel(string_view name) { SetKernel(GetStringID(name)); }
 
-void ComputeInstance::SetComputeBuffer(uint nameID, IShaderResource& buf) { pRes->SetSRV(nameID, buf); }
+void ComputeInstance::SetComputeBuffer(uint nameID, const IShaderResource& buf) { pRes->SetSRV(nameID, buf); }
 
-void ComputeInstance::SetComputeBuffer(string_view name, IShaderResource& buf) { SetComputeBuffer(GetStringID(name), buf); }
+void ComputeInstance::SetComputeBuffer(string_view name, const IShaderResource& buf) { SetComputeBuffer(GetStringID(name), buf); }
 
 void ComputeInstance::SetRWComputeBuffer(uint nameID, IUnorderedAccess& buf) { pRes->SetUAV(nameID, buf); }
 

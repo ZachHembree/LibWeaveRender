@@ -33,9 +33,9 @@ namespace Weave::D3D11
 		/// </summary>
 		void SetKernel(string_view name);
 
-		void SetComputeBuffer(uint nameID, IShaderResource& buf);
+		void SetComputeBuffer(uint nameID, const IShaderResource& buf);
 
-		void SetComputeBuffer(string_view name, IShaderResource& buf);
+		void SetComputeBuffer(string_view name, const IShaderResource& buf);
 
 		void SetRWComputeBuffer(uint nameID, IUnorderedAccess& buf);
 

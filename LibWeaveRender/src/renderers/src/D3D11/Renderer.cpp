@@ -197,7 +197,7 @@ ComputeInstance& Renderer::GetDefaultCompute(string_view name) const
 
 Mesh& Renderer::GetDefaultMesh(string_view name) const { return const_cast<Mesh&>(defaultMeshes.at(name)); }
 
-Sampler& Renderer::GetDefaultSampler(string_view name) const { return const_cast<Sampler&>(defaultSamplers.at(name)); }
+const Sampler& Renderer::GetDefaultSampler(string_view name) const { return const_cast<const Sampler&>(defaultSamplers.at(name)); }
 
 /*
 	Core rendering functions

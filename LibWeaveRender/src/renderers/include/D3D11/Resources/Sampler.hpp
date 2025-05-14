@@ -26,12 +26,12 @@ namespace Weave::D3D11
         /// <summary>
         /// Returns pointer to COM interface
         /// </summary>
-        ID3D11SamplerState* Get();
+        ID3D11SamplerState* Get() const;
 
         /// <summary>
         /// Returns pointer to COM interface pointer
         /// </summary>
-        ID3D11SamplerState* const* GetAddressOf();
+        ID3D11SamplerState* const* GetAddressOf() const;
 
 	private:
         UniqueComPtr<ID3D11SamplerState> pSamp;

@@ -209,7 +209,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns reference to a default texture sampler
 		/// </summary>
-		Sampler& GetDefaultSampler(string_view name) const;
+		const Sampler& GetDefaultSampler(string_view name) const;
 
 	private:
 		std::jthread renderThread;

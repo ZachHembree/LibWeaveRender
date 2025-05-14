@@ -26,8 +26,8 @@ namespace Weave::D3D11
 			T* pView;
 		};
 
-		using SamplerList = IDynamicArray<ResView<Sampler>>;
-		using SRVList = IDynamicArray<ResView<IShaderResource>>;
+		using SamplerList = IDynamicArray<ResView<const Sampler>>;
+		using SRVList = IDynamicArray<ResView<const IShaderResource>>;
 		using UAVList = IDynamicArray<ResView<IUnorderedAccess>>;
 		using ConstantData = IDynamicArray<Span<byte>>;
 
@@ -96,9 +96,9 @@ namespace Weave::D3D11
 
 		ResourceSet& operator=(ResourceSet&&) noexcept;
 
-		void SetSampler(uint stringID, Sampler& samp);
+		void SetSampler(uint stringID, const Sampler& samp);
 
-		void SetSRV(uint stringID, IShaderResource& srv);
+		void SetSRV(uint stringID, const IShaderResource& srv);
 
 		void SetUAV(uint stringID, IUnorderedAccess& uav);
 
@@ -121,14 +121,14 @@ namespace Weave::D3D11
 		{
 			constants.Clear();
 			sampMap.Clear();
-			textures.Clear();
-			rwTextures.Clear();
+			srvMap.Clear();
+			uavMap.Clear();
 		}
 
 	private:	
 		ConstantGroup constants;
-		ViewMap<Sampler> sampMap;
-		ViewMap<IShaderResource> textures;
-		ViewMap<IUnorderedAccess> rwTextures;
+		ViewMap<const Sampler> sampMap;
+		ViewMap<const IShaderResource> srvMap;
+		ViewMap<IUnorderedAccess> uavMap;
 	};
 }

@@ -53,7 +53,7 @@ namespace Weave::D3D11
 		&ID3D11DeviceContext::CSSetSamplers
 	};
 
-	void SetSamplers(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<Sampler*> res)
+	void SetSamplers(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<const Sampler*> res)
 	{
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
 		D3D_ASSERT_MSG((startSlot + res.GetLength()) <= D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, 
@@ -82,7 +82,7 @@ namespace Weave::D3D11
 		&ID3D11DeviceContext::CSSetShaderResources
 	};
 
-	void SetShaderResources(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<IShaderResource*> res)
+	void SetShaderResources(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<const IShaderResource*> res)
 	{
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
 		D3D_ASSERT_MSG((startSlot + res.GetLength()) <= D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, 

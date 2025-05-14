@@ -14,19 +14,19 @@ ResourceSet::ResourceSet(ResourceSet&&) noexcept = default;
 
 ResourceSet& ResourceSet::operator=(ResourceSet&&) noexcept = default;
 
-void ResourceSet::SetSampler(uint stringID, Sampler& samp) { sampMap.SetResource(stringID, &samp); }
+void ResourceSet::SetSampler(uint stringID, const Sampler& samp) { sampMap.SetResource(stringID, &samp); }
 
-void ResourceSet::SetSRV(uint stringID, IShaderResource& srv) { textures.SetResource(stringID, &srv); }
+void ResourceSet::SetSRV(uint stringID, const IShaderResource& srv) { srvMap.SetResource(stringID, &srv); }
 
-void ResourceSet::SetUAV(uint stringID, IUnorderedAccess& uav) { rwTextures.SetResource(stringID, &uav); }
+void ResourceSet::SetUAV(uint stringID, IUnorderedAccess& uav) { uavMap.SetResource(stringID, &uav); }
 
 void ResourceSet::SetConstant(uint stringID, const Span<byte>& newValue) { constants.SetValue(stringID, newValue); }
 
 const ResourceSet::SamplerList& ResourceSet::GetSamplers() const { return sampMap.data; }
 
-const ResourceSet::SRVList& ResourceSet::GetSRVs() const { return textures.data; }
+const ResourceSet::SRVList& ResourceSet::GetSRVs() const { return srvMap.data; }
 
-const ResourceSet::UAVList& ResourceSet::GetUAVs() const { return rwTextures.data; }
+const ResourceSet::UAVList& ResourceSet::GetUAVs() const { return uavMap.data; }
 
 uint ResourceSet::GetConstantCount() const { return (uint)constants.constants.GetLength(); }
 

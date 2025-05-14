@@ -17,9 +17,9 @@ namespace Weave::D3D11
 
 		ID3D11Buffer* const* GetAddressOf();
 
-		ID3D11Resource* GetResource() override;
+		ID3D11Resource* GetResource() const override;
 
-		ID3D11Resource* const* GetResAddress() override;
+		ID3D11Resource* const* GetResAddress() const override;
 
 		/// <summary>
 		/// Returns the total size of the buffer in bytes.

@@ -112,22 +112,22 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Sets global sampler
 		/// </summary>
-		void SetSampler(uint stringID, Sampler& samp);
+		void SetSampler(uint stringID, const Sampler& samp);
 
 		/// <summary>
 		/// Sets global sampler
 		/// </summary>
-		void SetSampler(string_view name, Sampler& samp);
+		void SetSampler(string_view name, const Sampler& samp);
 
 		/// <summary>
 		/// Sets global texture
 		/// </summary>
-		void SetTexture(uint stringID, IShaderResource& tex);
+		void SetTexture(uint stringID, const IShaderResource& tex);
 
 		/// <summary>
 		/// Sets global texture 
 		/// </summary>
-		void SetTexture(string_view name, IShaderResource& tex);
+		void SetTexture(string_view name, const IShaderResource& tex);
 
 		/// <summary>
 		/// Sets global random access texture/buffer

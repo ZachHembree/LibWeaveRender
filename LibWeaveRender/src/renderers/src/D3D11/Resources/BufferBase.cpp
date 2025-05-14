@@ -51,9 +51,9 @@ ID3D11Buffer* BufferBase::Get() { return pBuf.Get(); }
 
 ID3D11Buffer* const* BufferBase::GetAddressOf() { return pBuf.GetAddressOf(); }
 
-ID3D11Resource* BufferBase::GetResource() { return Get(); }
+ID3D11Resource* BufferBase::GetResource() const { return pBuf.Get(); }
 
-ID3D11Resource* const* BufferBase::GetResAddress() { return reinterpret_cast<ID3D11Resource* const*>(GetAddressOf()); }
+ID3D11Resource* const* BufferBase::GetResAddress() const { return reinterpret_cast<ID3D11Resource* const*>(pBuf.GetAddressOf()); }
 
 uint BufferBase::GetSize() const { return desc.byteWidth; }
 

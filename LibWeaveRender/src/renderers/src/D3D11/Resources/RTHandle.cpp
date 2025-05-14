@@ -38,9 +38,9 @@ ResourceBindFlags RTHandle::GetBindFlags() const { return ResourceBindFlags::Ren
 
 ResourceAccessFlags RTHandle::GetAccessFlags() const { return ResourceAccessFlags::None; }
 
-ID3D11Resource* RTHandle::GetResource() { return *ppRes; }
+ID3D11Resource* RTHandle::GetResource() const { return *ppRes; }
 
-ID3D11Resource* const* RTHandle::GetResAddress() { return ppRes; }
+ID3D11Resource* const* RTHandle::GetResAddress() const { return ppRes; }
 
 uivec2 RTHandle::GetSize() const
 {

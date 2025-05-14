@@ -70,14 +70,14 @@ namespace Weave::D3D11
 		std::unordered_map<uint, uint> resourceMap;
 	};
 
-	class SamplerMap : public ResourceMap<Sampler, ShaderTypes::Sampler>
+	class SamplerMap : public ResourceMap<const Sampler, ShaderTypes::Sampler>
 	{
-		using ResourceMap<Sampler, ShaderTypes::Sampler>::ResourceMap;
+		using ResourceMap<const Sampler, ShaderTypes::Sampler>::ResourceMap;
 	};
 
-	class ResourceViewMap : public ResourceMap<IShaderResource, ShaderTypes::ReadOnly>
+	class ResourceViewMap : public ResourceMap<const IShaderResource, ShaderTypes::ReadOnly>
 	{ 
-		using ResourceMap<IShaderResource, ShaderTypes::ReadOnly>::ResourceMap;
+		using ResourceMap<const IShaderResource, ShaderTypes::ReadOnly>::ResourceMap;
 	};
 
 	class UnorderedAccessMap : public ResourceMap<IUnorderedAccess, ShaderTypes::RandomRW>

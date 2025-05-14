@@ -61,12 +61,12 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns interface to resource
 		/// </summary>
-		ID3D11Resource* GetResource() override;
+		ID3D11Resource* GetResource() const override;
 
 		/// <summary>
 		/// Returns pointer to interface pointer field
 		/// </summary>
-		ID3D11Resource* const* GetResAddress() override;
+		ID3D11Resource* const* GetResAddress() const override;
 
 		/// <summary>
 		/// Loads WIC-compatible image into a buffer

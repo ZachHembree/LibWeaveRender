@@ -437,8 +437,8 @@ void CtxBase::SetTextureData(ITexture2DBase& dst, const IDynamicArray<byte>& src
 }
 
 static void ValidateResourceBounds(
-	IColorBuffer2D& src,
-	IColorBuffer2D& dst,
+	const IColorBuffer2D& src,
+	const IColorBuffer2D& dst,
 	ivec4& srcBox,
 	ivec4& dstBox,
 	bool canRescale = false)
@@ -479,7 +479,7 @@ static void ValidateResourceBounds(
 	}
 }
 
-static bool CanDirectCopy(ITexture2DBase& src, ITexture2DBase& dst, const ivec4& srcBox, const ivec4& dstBox)
+static bool CanDirectCopy(const ITexture2DBase& src, const ITexture2DBase& dst, const ivec4& srcBox, const ivec4& dstBox)
 {
 	if (srcBox != ivec4(0) || dstBox != ivec4(0))
 	{
@@ -497,7 +497,7 @@ static bool CanDirectCopy(ITexture2DBase& src, ITexture2DBase& dst, const ivec4&
 	}
 }
 
-static void CopySubresource(ID3D11DeviceContext* pCtx, ITexture2DBase& src, ITexture2DBase& dst, ivec4& srcBox, ivec4& dstBox)
+static void CopySubresource(ID3D11DeviceContext* pCtx, const ITexture2DBase& src, ITexture2DBase& dst, ivec4& srcBox, ivec4& dstBox)
 {
 	if (srcBox != ivec4(0) || dstBox != ivec4(0))
 	{
@@ -533,15 +533,15 @@ void CtxBase::ReturnMappedBufferHandle(MappedBufferHandle&& handle)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void CtxBase::Blit(IResizeableTexture2D& src, IRWTexture2D& dst)
+void CtxBase::Blit(const IResizeableTexture2D& src, IRWTexture2D& dst)
 {
-	Blit(static_cast<ITexture2D&>(src), dst, ivec4(src.GetRenderSize(), src.GetRenderOffset()));
+	Blit(static_cast<const ITexture2D&>(src), dst, ivec4(src.GetRenderSize(), src.GetRenderOffset()));
 }
 
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void CtxBase::Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
+void CtxBase::Blit(const ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
 {
 	if (srcBox == ivec4(0))
 		srcBox = ivec4(src.GetSize(), 0, 0);
@@ -593,7 +593,7 @@ void CtxBase::Blit(ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void CtxBase::Blit(ITexture2D& src, IResizeableTexture2D& dst, ivec4 srcBox)
+void CtxBase::Blit(const ITexture2D& src, IResizeableTexture2D& dst, ivec4 srcBox)
 {
 	Blit(
 		src,
@@ -606,7 +606,7 @@ void CtxBase::Blit(ITexture2D& src, IResizeableTexture2D& dst, ivec4 srcBox)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void CtxBase::Blit(IResizeableTexture2D& src, ITexture2D& dst, ivec4 dstBox)
+void CtxBase::Blit(const IResizeableTexture2D& src, ITexture2D& dst, ivec4 dstBox)
 {
 	Blit(
 		src,
@@ -619,7 +619,7 @@ void CtxBase::Blit(IResizeableTexture2D& src, ITexture2D& dst, ivec4 dstBox)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void CtxBase::Blit(IResizeableTexture2D& src, IResizeableTexture2D& dst)
+void CtxBase::Blit(const IResizeableTexture2D& src, IResizeableTexture2D& dst)
 {
 	Blit(
 		src,
@@ -632,7 +632,7 @@ void CtxBase::Blit(IResizeableTexture2D& src, IResizeableTexture2D& dst)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void CtxBase::Blit(ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox, ivec4 dstBox)
+void CtxBase::Blit(const ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox, ivec4 dstBox)
 {
 	D3D_CHECK_MSG(CanDirectCopy(src, dst, srcBox, dstBox), "Failed to copy texture. Destination incompatible with source.");
 	ValidateResourceBounds(src, dst, srcBox, dstBox);
@@ -642,7 +642,7 @@ void CtxBase::Blit(ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox, ivec4
 /// <summary>
 /// Copies the contents of a texture to a render target
 /// </summary>
-void CtxBase::Blit(IResizeableTexture2D& src, IRenderTarget& dst)
+void CtxBase::Blit(const IResizeableTexture2D& src, IRenderTarget& dst)
 {
 	Blit(src, dst, ivec4(src.GetRenderSize(), src.GetRenderOffset()));
 }
@@ -650,7 +650,7 @@ void CtxBase::Blit(IResizeableTexture2D& src, IRenderTarget& dst)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void CtxBase::Blit(ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
+void CtxBase::Blit(const ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 {
 	ivec4 dstBox(dst.GetRenderSize(), dst.GetRenderOffset());
 

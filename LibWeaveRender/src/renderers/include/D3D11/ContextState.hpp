@@ -56,24 +56,24 @@ namespace Weave::D3D11
 			const ShaderVariantBase* pShader;
 			ulong drawCount;
 
-			UniqueArray<Sampler*> samplers;
+			UniqueArray<const Sampler*> samplers;
 			uint sampCount;
 
 			UniqueArray<ID3D11Buffer*> cbuffers;
 			uint cbufCount;
 
-			UniqueArray<IShaderResource*> srvs;
+			UniqueArray<const IShaderResource*> srvs;
 			uint srvCount;
 
 			StageState();
 
 			void Reset();
 
-			const Span<Sampler*> GetSamplers(sint offset = 0, uint extent = (uint)-1) const;
+			const Span<const Sampler*> GetSamplers(sint offset = 0, uint extent = (uint)-1) const;
 
 			const Span<ID3D11Buffer*> GetCBuffers(sint offset = 0, uint extent = (uint)-1) const;
 
-			const Span<IShaderResource*> GetSRVs(sint offset = 0, uint extent = (uint)-1) const;
+			const Span<const IShaderResource*> GetSRVs(sint offset = 0, uint extent = (uint)-1) const;
 		};
 
 		/// <summary>
@@ -227,13 +227,13 @@ namespace Weave::D3D11
 		/// Updates resources bound in the state cache and returns the resource range affected that 
 		/// requires update.
 		/// </summary>
-		const Span<Sampler*> TryUpdateResources(ShadeStages stage, const ResourceSet::SamplerList& resSrc, const SamplerMap* pMap);
+		const Span<const Sampler*> TryUpdateResources(ShadeStages stage, const ResourceSet::SamplerList& resSrc, const SamplerMap* pMap);
 
 		/// <summary>
 		/// Updates resources bound in the state cache and returns the resource range affected that 
 		/// requires update.
 		/// </summary>
-		const Span<IShaderResource*> TryUpdateResources(ShadeStages stage, const ResourceSet::SRVList& resSrc, const ResourceViewMap* pMap);
+		const Span<const IShaderResource*> TryUpdateResources(ShadeStages stage, const ResourceSet::SRVList& resSrc, const ResourceViewMap* pMap);
 
 		/// <summary>
 		/// Updates resources bound in the state cache and returns the resource range affected that 

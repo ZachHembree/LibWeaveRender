@@ -83,7 +83,7 @@ const Texture2DDesc& Texture2DBase::GetDescription() const { return desc; }
 /// <summary>
 /// Returns interface to resource
 /// </summary>
-ID3D11Resource* Texture2DBase::GetResource() { return pRes.Get(); }
+ID3D11Resource* Texture2DBase::GetResource() const { return pRes.Get(); }
 
 void Texture2DBase::LoadImageWIC(wstring_view file, ScratchImage& buffer)
 {
@@ -100,4 +100,4 @@ void Texture2DBase::LoadImageWIC(wstring_view file, ScratchImage& buffer)
 /// </summary>
 bool Texture2DBase::GetIsValid() const { return pDev != nullptr && pRes.Get() != nullptr; }
 
-ID3D11Resource* const* Texture2DBase::GetResAddress() { return reinterpret_cast<ID3D11Resource* const*>(pRes.GetAddressOf()); }
+ID3D11Resource* const* Texture2DBase::GetResAddress() const { return reinterpret_cast<ID3D11Resource* const*>(pRes.GetAddressOf()); }

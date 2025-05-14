@@ -15,12 +15,12 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns a pointer to the resource interface
 		/// </summary>
-		virtual ID3D11Resource* GetResource() = 0;
+		virtual ID3D11Resource* GetResource() const = 0;
 
 		/// <summary>
 		/// Returns a pointer to the resource field address
 		/// </summary>
-		virtual ID3D11Resource* const* GetResAddress() = 0;
+		virtual ID3D11Resource* const* GetResAddress() const = 0;
 	};
 
 	class ResourceBase : public virtual IResource, public DeviceChild
