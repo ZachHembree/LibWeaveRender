@@ -1,12 +1,28 @@
 #pragma once
 #include "WeaveUtils/Span.hpp"
 #include "ResourceBase.hpp"
-#include "Sampler.hpp"
+#include "ConstantHandle.hpp"
 #include <unordered_map>
 
 namespace Weave::D3D11
 {
+	class Sampler;
 	class ConstantGroupMap;
+
+	struct ConstantGroup
+	{
+		UniqueVector<byte> data;
+		// Const data layout
+		UniqueVector<ConstantDesc> constants;
+		// stringID -> const Index
+		std::unordered_map<uint, uint> stringConstMap;
+
+		const ConstantDesc& GetOrAddValue(uint stringID, uint size);
+
+		void SetValue(uint stringID, const Span<byte>& newValue);
+
+		void Clear();
+	};
 
 	/// <summary>
 	/// A reusable variable-length map for associating arbitrary resources with an Effect or Shader
@@ -69,27 +85,6 @@ namespace Weave::D3D11
 			}
 		};
 
-		struct Constant
-		{
-			uint stringID;
-			uint size;
-			// Position in byte vector
-			uint offset;
-		};
-
-		struct ConstantGroup
-		{
-			UniqueVector<byte> data;
-			// Const data layout
-			UniqueVector<Constant> constants;
-			// stringID -> const Index
-			std::unordered_map<uint, uint> stringConstMap;
-
-			void SetValue(uint stringID, const Span<byte>& newValue);
-
-			void Clear();
-		};
-
 		ResourceSet();
 
 		ResourceSet(ResourceSet&&) noexcept;
@@ -126,6 +121,8 @@ namespace Weave::D3D11
 		}
 
 	private:	
+		friend ConstantDescHandle;
+
 		ConstantGroup constants;
 		ViewMap<const Sampler> sampMap;
 		ViewMap<const IShaderResource> srvMap;

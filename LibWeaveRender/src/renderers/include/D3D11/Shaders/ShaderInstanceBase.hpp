@@ -2,6 +2,7 @@
 #include "WeaveUtils/Span.hpp"
 #include "../Resources/ResourceBase.hpp"
 #include "../Resources/Sampler.hpp"
+#include "../Resources/ConstantHandle.hpp"
 
 namespace Weave::D3D11
 {
@@ -38,6 +39,18 @@ namespace Weave::D3D11
 		/// Returns the string corresponding to the given ID
 		/// </summary>
 		string_view GetString(uint stringID) const;
+
+		/// <summary>
+		/// Returns a strongly typed constant wrapper for the given constant
+		/// </summary>
+		template<typename T>
+		ConstantHandle<T> GetConstant(uint nameID) { WV_ASSERT(pRes.get() != nullptr); return ConstantHandle<T>(nameID, *pRes.get()); }
+
+		/// <summary>
+		/// Returns a strongly typed constant wrapper for the given constant
+		/// </summary>
+		template<typename T>
+		ConstantHandle<T> GetConstant(string_view name) { return GetConstant<T>(GetStringID(name)); }
 
 		/// <summary>
 		/// Sets the value corresponding to the given name to the

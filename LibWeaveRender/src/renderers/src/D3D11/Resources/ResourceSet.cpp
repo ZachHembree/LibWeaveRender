@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "D3D11/Resources/Sampler.hpp"
 #include "D3D11/Resources/ResourceSet.hpp"
 #include "D3D11/Resources/ConstantGroupMap.hpp"
 
@@ -30,33 +31,38 @@ const ResourceSet::UAVList& ResourceSet::GetUAVs() const { return uavMap.data; }
 
 uint ResourceSet::GetConstantCount() const { return (uint)constants.constants.GetLength(); }
 
-void ResourceSet::ConstantGroup::SetValue(uint stringID, const Span<byte>& newValue)
+const ConstantDesc& ConstantGroup::GetOrAddValue(uint stringID, uint size)
 {
 	const auto& it = stringConstMap.find(stringID);
 
 	if (it != stringConstMap.end()) // Update value
 	{
-		const Constant& value = constants[it->second];
-		WV_ASSERT_MSG(newValue.GetLength() == value.size, "Constant size does not match existing value");
-		memcpy(&data[value.offset], newValue.GetData(), newValue.GetLength());
+		return constants[it->second];
 	}
 	else // Add new value
 	{
 		const uint index = (uint)constants.GetLength();
 		const uint offset = (uint)data.GetLength();
-		const uint size = (uint)newValue.GetLength();
 
 		// Add constant descriptor
 		constants.EmplaceBack(stringID, size, offset);
 		// Map stringID -> constant desc index
 		stringConstMap.emplace(stringID, index);
-		// Write value to contiguous vector buffer
-		data.Reserve(offset + size);
-		std::copy(newValue.begin(), newValue.end(), std::back_inserter(data));
+		// Allocate new constant
+		data.Resize(offset + size);
+
+		return constants.GetBack();
 	}
 }
 
-void ResourceSet::ConstantGroup::Clear()
+void ConstantGroup::SetValue(uint stringID, const Span<byte>& newValue)
+{
+	const ConstantDesc& value = GetOrAddValue(stringID, (uint)newValue.GetLength());
+	WV_ASSERT_MSG(newValue.GetLength() == value.size, "Constant size does not match existing value");
+	memcpy(&data[value.offset], newValue.GetData(), (uint)newValue.GetLength());
+}
+
+void ConstantGroup::Clear()
 {
 	data.Clear();
 	constants.Clear();

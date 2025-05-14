@@ -17,8 +17,8 @@ namespace Weave::D3D11
 	class ConstantGroupMap
 	{
 	public:
-		using GroupData = ResourceSet::ConstantGroup;
-		using ConstantData = ResourceSet::Constant;
+		using GroupData = ConstantGroup;
+		using ConstantData = ConstantDesc;
 		using Data = IDynamicArray<Span<byte>>;
 
 		MAKE_MOVE_ONLY(ConstantGroupMap)
