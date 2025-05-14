@@ -16,6 +16,23 @@ namespace Weave::D3D11
 
 		ComputeInstance(ShaderVariantManager& lib, uint nameID, uint vID);
 
+		/// <summary>
+		/// Returns the shader's thread group dimensions
+		/// </summary>
+		uivec3 GetThreadGroupSize() const;
+
+		/// <summary>
+		/// Remaps the instance to the shader kernel with the given name within the same ShaderLibrary.
+		/// Retains resource and flag configurations.
+		/// </summary>
+		void SetKernel(uint nameID);
+
+		/// <summary>
+		/// Remaps the instance to the shader kernel with the given name within the same ShaderLibrary.
+		/// Retains resource and flag configurations.
+		/// </summary>
+		void SetKernel(string_view name);
+
 		void SetComputeBuffer(uint nameID, IShaderResource& buf);
 
 		void SetComputeBuffer(string_view name, IShaderResource& buf);

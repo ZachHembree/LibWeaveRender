@@ -10,13 +10,26 @@ using namespace Weave::D3D11;
 
 DEF_DEST_MOVE(ComputeInstance);
 
-ComputeInstance::ComputeInstance() = default;
+ComputeInstance::ComputeInstance() :
+	pCS(nullptr)
+{ }
 
 ComputeInstance::ComputeInstance(ShaderVariantManager& lib, uint nameID, uint vID)  : 
 	ShaderInstanceBase(lib, nameID, vID), pCS(nullptr)
 { 
 	SetVariantID(vID);
 }
+
+uivec3 ComputeInstance::GetThreadGroupSize() const { return GetShader().GetDefinition().GetThreadGroupSize(); }
+
+void ComputeInstance::SetKernel(uint nameID)
+{
+	const uint shaderID = pLib->GetLibMap().TryGetShaderID(nameID, vID);
+	pCS = &pLib->GetShader<ComputeShaderVariant>(shaderID);
+	this->nameID = nameID;
+}
+
+void ComputeInstance::SetKernel(string_view name) { SetKernel(GetStringID(name)); }
 
 void ComputeInstance::SetComputeBuffer(uint nameID, IShaderResource& buf) { pRes->SetSRV(nameID, buf); }
 
@@ -49,8 +62,8 @@ void ComputeInstance::SetVariantID(uint vID)
 {
 	if (pCS != nullptr && vID != this->vID)
 	{ 
-		const uint effectID = pLib->GetLibMap().TryGetShaderID(nameID, vID);
-		pCS = &pLib->GetShader<ComputeShaderVariant>(effectID);
+		const uint shaderID = pLib->GetLibMap().TryGetShaderID(nameID, vID);
+		pCS = &pLib->GetShader<ComputeShaderVariant>(shaderID);
 		this->vID = vID;
 	}
 }
