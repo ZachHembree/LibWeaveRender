@@ -2,13 +2,20 @@
 #include "WeaveUtils/Span.hpp"
 #include "../Resources/ResourceBase.hpp"
 #include "../Resources/Sampler.hpp"
-#include "../Resources/ConstantHandle.hpp"
+#include "../Resources/ResourceHandles.hpp"
+#include "../Resources/ComputeBuffer.hpp"
 
 namespace Weave::D3D11
 {
 	class ShaderVariantManager;
 	class EffectVariant;
 	class ResourceSet;
+
+	using TextureHandle = ResourceHandle<const ITexture2D, const IShaderResource>;
+	using RWTextureHandle = ResourceHandle<IRWTexture2D, IUnorderedAccess>;
+	using ComputeBufferHandle = ResourceHandle<const ComputeBuffer, const IShaderResource>;
+	using RWComputeBufferHandle = ResourceHandle<ComputeBuffer, IUnorderedAccess>;
+	using SamplerHandle = ResourceHandle<const Sampler, const Sampler>;
 
 	class ShaderInstanceBase
 	{
@@ -123,6 +130,16 @@ namespace Weave::D3D11
 		}
 
 		/// <summary>
+		/// Returns a read/writable handle for the sampler slot with the given name
+		/// </summary>
+		SamplerHandle GetSampler(uint stringID);
+
+		/// <summary>
+		/// Returns a read/writable handle for the sampler slot with the given name
+		/// </summary>
+		SamplerHandle GetSampler(string_view name);
+
+		/// <summary>
 		/// Sets global sampler
 		/// </summary>
 		void SetSampler(uint stringID, const Sampler& samp);
@@ -133,6 +150,16 @@ namespace Weave::D3D11
 		void SetSampler(string_view name, const Sampler& samp);
 
 		/// <summary>
+		/// Returns a read/writable handle for the SRV slot with the given name
+		/// </summary>
+		TextureHandle GetTexture(uint stringID);
+
+		/// <summary>
+		/// Returns a read/writable handle for the SRV slot with the given name
+		/// </summary>
+		TextureHandle GetTexture(string_view name);
+
+		/// <summary>
 		/// Sets global texture
 		/// </summary>
 		void SetTexture(uint stringID, const IShaderResource& tex);
@@ -141,6 +168,16 @@ namespace Weave::D3D11
 		/// Sets global texture 
 		/// </summary>
 		void SetTexture(string_view name, const IShaderResource& tex);
+
+		/// <summary>
+		/// Returns a read/writable handle for the UAV slot with the given name
+		/// </summary>
+		RWTextureHandle GetRWTexture(uint stringID);
+
+		/// <summary>
+		/// Returns a read/writable handle for the UAV slot with the given name
+		/// </summary>
+		RWTextureHandle GetRWTexture(string_view name);
 
 		/// <summary>
 		/// Sets global random access texture/buffer

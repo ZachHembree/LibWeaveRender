@@ -6,9 +6,6 @@
 using namespace Weave;
 using namespace Weave::D3D11;
 
-template<typename T>
-using ResView = ResourceSet::ResView<T>;
-
 ResourceSet::ResourceSet() = default;
 
 ResourceSet::ResourceSet(ResourceSet&&) noexcept = default;
@@ -31,7 +28,7 @@ const ResourceSet::UAVList& ResourceSet::GetUAVs() const { return uavMap.data; }
 
 uint ResourceSet::GetConstantCount() const { return (uint)constants.constants.GetLength(); }
 
-const ConstantDesc& ConstantGroup::GetOrAddValue(uint stringID, uint size)
+const ConstantDesc& ConstantGroupBuffer::GetOrAddValue(uint stringID, uint size)
 {
 	const auto& it = stringConstMap.find(stringID);
 
@@ -55,14 +52,14 @@ const ConstantDesc& ConstantGroup::GetOrAddValue(uint stringID, uint size)
 	}
 }
 
-void ConstantGroup::SetValue(uint stringID, const Span<byte>& newValue)
+void ConstantGroupBuffer::SetValue(uint stringID, const Span<byte>& newValue)
 {
 	const ConstantDesc& value = GetOrAddValue(stringID, (uint)newValue.GetLength());
 	WV_ASSERT_MSG(newValue.GetLength() == value.size, "Constant size does not match existing value");
 	memcpy(&data[value.offset], newValue.GetData(), (uint)newValue.GetLength());
 }
 
-void ConstantGroup::Clear()
+void ConstantGroupBuffer::Clear()
 {
 	data.Clear();
 	constants.Clear();

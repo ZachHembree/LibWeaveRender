@@ -1,7 +1,7 @@
 #pragma once
 #include "WeaveUtils/Span.hpp"
 #include "ResourceBase.hpp"
-#include "ConstantHandle.hpp"
+#include "ResourceHandles.hpp"
 #include <unordered_map>
 
 namespace Weave::D3D11
@@ -9,7 +9,7 @@ namespace Weave::D3D11
 	class Sampler;
 	class ConstantGroupMap;
 
-	struct ConstantGroup
+	struct ConstantGroupBuffer
 	{
 		UniqueVector<byte> data;
 		// Const data layout
@@ -30,66 +30,32 @@ namespace Weave::D3D11
 	class ResourceSet
 	{
 	public:		
-		MAKE_NO_COPY(ResourceSet)
-
-		/// <summary>
-		/// Stores a pointer to a resource view paired with a stringID
-		/// </summary>
-		template<typename T>
-		struct ResView
-		{
-			uint stringID;
-			T* pView;
-		};
-
-		using SamplerList = IDynamicArray<ResView<const Sampler>>;
-		using SRVList = IDynamicArray<ResView<const IShaderResource>>;
-		using UAVList = IDynamicArray<ResView<IUnorderedAccess>>;
+		using SamplerList = IDynamicArray<ResNamePair<const Sampler>>;
+		using SRVList = IDynamicArray<ResNamePair<const IShaderResource>>;
+		using UAVList = IDynamicArray<ResNamePair<IUnorderedAccess>>;
 		using ConstantData = IDynamicArray<Span<byte>>;
 
-		/// <summary>
-		/// Stores mappings for string ID <-> view lookup
-		/// </summary>
-		template<typename T>
-		struct ViewMap
-		{
-			UniqueVector<ResView<T>> data;
-			// stringID -> index
-			std::unordered_map<uint, uint> stringViewMap;
-
-			/// <summary>
-			/// Updates or adds the resource with the given string ID
-			/// </summary>
-			void SetResource(uint stringID, T* pValue)
-			{
-				const auto& it = stringViewMap.find(stringID);
-
-				if (it != stringViewMap.end())
-				{
-					data[it->second].pView = pValue;
-				}
-				else
-				{
-					stringViewMap.emplace(stringID, (uint)data.GetLength());
-					data.EmplaceBack(stringID, pValue);
-				}
-			}
-
-			/// <summary>
-			/// Resets the collection
-			/// </summary>
-			void Clear()
-			{
-				data.Clear();
-				stringViewMap.clear();
-			}
-		};
+		MAKE_NO_COPY(ResourceSet)
 
 		ResourceSet();
 
 		ResourceSet(ResourceSet&&) noexcept;
 
 		ResourceSet& operator=(ResourceSet&&) noexcept;
+
+		ResourceHandle<const Sampler, const Sampler> GetSampler(uint stringID) 
+		{ 
+			return ResourceHandle<const Sampler, const Sampler>(stringID, sampMap); 
+		}
+
+		template<typename HandleT>
+		HandleT GetSRV(uint stringID) { return HandleT(stringID, srvMap); }
+
+		template<typename HandleT>
+		HandleT GetUAV(uint stringID) { return HandleT(stringID, uavMap); }
+
+		template<typename T>
+		ConstantHandle<T> GetConstant(uint stringID) { return ConstantHandle<T>(*this, stringID); }
 
 		void SetSampler(uint stringID, const Sampler& samp);
 
@@ -123,9 +89,9 @@ namespace Weave::D3D11
 	private:	
 		friend ConstantDescHandle;
 
-		ConstantGroup constants;
-		ViewMap<const Sampler> sampMap;
-		ViewMap<const IShaderResource> srvMap;
-		ViewMap<IUnorderedAccess> uavMap;
+		ConstantGroupBuffer constants;
+		ResViewBuffer<const Sampler> sampMap;
+		ResViewBuffer<const IShaderResource> srvMap;
+		ResViewBuffer<IUnorderedAccess> uavMap;
 	};
 }

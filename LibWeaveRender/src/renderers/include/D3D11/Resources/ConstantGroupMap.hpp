@@ -17,7 +17,7 @@ namespace Weave::D3D11
 	class ConstantGroupMap
 	{
 	public:
-		using GroupData = ConstantGroup;
+		using GroupData = ConstantGroupBuffer;
 		using ConstantData = ConstantDesc;
 		using Data = IDynamicArray<Span<byte>>;
 

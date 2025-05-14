@@ -15,7 +15,7 @@ namespace Weave::D3D11
 	class ResourceMap
 	{
 	public:
-		using ViewT = ResourceSet::ResView<T>;
+		using ViewT = ResNamePair<T>;
 		using DataT = IDynamicArray<ViewT>;
 		static constexpr ShaderTypes Type = TypeEnum;
 

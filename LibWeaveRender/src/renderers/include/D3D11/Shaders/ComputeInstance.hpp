@@ -33,9 +33,23 @@ namespace Weave::D3D11
 		/// </summary>
 		void SetKernel(string_view name);
 
+		/// <summary>
+		/// Returns a read/writable handle for the UAV slot with the given name
+		/// </summary>
+		ComputeBufferHandle GetComputeBuffer(uint nameID);
+
+		/// <summary>
+		/// Returns a read/writable handle for the UAV slot with the given name
+		/// </summary>
+		ComputeBufferHandle GetComputeBuffer(string_view name);
+
 		void SetComputeBuffer(uint nameID, const IShaderResource& buf);
 
 		void SetComputeBuffer(string_view name, const IShaderResource& buf);
+
+		RWComputeBufferHandle GetRWComputeBuffer(uint nameID);
+
+		RWComputeBufferHandle GetRWComputeBuffer(string_view name);
 
 		void SetRWComputeBuffer(uint nameID, IUnorderedAccess& buf);
 

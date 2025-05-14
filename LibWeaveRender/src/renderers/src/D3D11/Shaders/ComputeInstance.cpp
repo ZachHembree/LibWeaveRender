@@ -31,9 +31,17 @@ void ComputeInstance::SetKernel(uint nameID)
 
 void ComputeInstance::SetKernel(string_view name) { SetKernel(GetStringID(name)); }
 
+ComputeBufferHandle ComputeInstance::GetComputeBuffer(uint nameID) { return pRes->GetSRV<ComputeBufferHandle>(nameID); }
+
+ComputeBufferHandle ComputeInstance::GetComputeBuffer(string_view name) { return pRes->GetSRV<ComputeBufferHandle>(GetStringID(name)); }
+
 void ComputeInstance::SetComputeBuffer(uint nameID, const IShaderResource& buf) { pRes->SetSRV(nameID, buf); }
 
 void ComputeInstance::SetComputeBuffer(string_view name, const IShaderResource& buf) { SetComputeBuffer(GetStringID(name), buf); }
+
+RWComputeBufferHandle ComputeInstance::GetRWComputeBuffer(uint nameID) { return pRes->GetUAV<RWComputeBufferHandle>(nameID); }
+
+RWComputeBufferHandle ComputeInstance::GetRWComputeBuffer(string_view name) { return pRes->GetUAV<RWComputeBufferHandle>(GetStringID(name)); }
 
 void ComputeInstance::SetRWComputeBuffer(uint nameID, IUnorderedAccess& buf) { pRes->SetUAV(nameID, buf); }
 
