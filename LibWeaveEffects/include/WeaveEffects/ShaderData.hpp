@@ -583,6 +583,15 @@ namespace Weave::Effects
 	{
 		return GetDeserializedLibDef(string_view(reinterpret_cast<const char*>(&arr[0]), N));
 	}
+
+	/// <summary>
+	/// Deserializes a uint64_t / Weave::ulong array into a ShaderLibDef
+	/// </summary>
+	template <std::size_t N>
+	constexpr ShaderLibDef GetDeserializedLibDef(const ulong(&arr)[N]) noexcept
+	{
+		return GetDeserializedLibDef(string_view(reinterpret_cast<const char*>(&arr[0]), 8 * N));
+	}
 }
 
 #include "WeaveEffects/ShaderLibBuilder/ShaderDataHashes.hpp"
