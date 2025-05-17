@@ -44,15 +44,15 @@ namespace Weave::Effects
 		filePath = std::string_view();
 		isInitialized = false;
 
+		variantDefineSet.clear();
+		variantModes.Clear();
+		variantFlags.Clear();
+
 		textBuf.clear();
 		macroStarts.Clear();
 		sysIncludeStarts.Clear();
 		includeStarts.Clear();
-
-		variantDefineSet.clear();
-
-		variantModes.Clear();
-		variantFlags.Clear();
+	
 		pEntrypoints = nullptr;
 
 		AddVariantMode("__DEFAULT_SHADER_MODE__");
