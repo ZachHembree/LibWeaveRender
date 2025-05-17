@@ -165,7 +165,7 @@ static const std::unordered_map<string_view, OptionHandlerFunc> s_OptionMap
 
 /**
  * @brief Converts binary data from a stringstream into a C++ header file format
- * (constexpr uint64_t array).
+ * (constexpr uint64_t array). Assumes little endian encoding.
  * @param name The base name for the C++ variable (e.g., "MyLibrary").
  * @param binStream[in,out] The stringstream containing the binary data. It will be cleared
  * and overwritten with the header content.
@@ -189,19 +189,20 @@ static void ConvertBinaryToHeader(string_view name, std::stringstream& binStream
 
     for (size_t i = 0; i < (packedSize - 1); i++)
     {
-        ulong& value = *((ulong*)&binaryData[8 * i]);
+        uint64_t value;
+        memcpy(&value, &binaryData[8 * i], sizeof(uint64_t));
 
         binStream << "0x" << std::hex << value << ",";
 
-        if (i > 0 && i % 4 == 0)
+        if (i > 0 && i % 5 == 0)
             binStream << std::endl;
     }
 
-    const size_t trailingStart = binaryData.size() - (binaryData.size() % 8);
+    const size_t trailingStart = 8 * (packedSize - 1);
     ulong lastValue = 0;
 
     for (size_t i = trailingStart; i < binaryData.size(); i++)
-        lastValue |= ((ulong)binaryData[i] << (8 * i));
+        lastValue |= ((ulong)binaryData[i] << (8 * (i - trailingStart)));
 
     binStream << "0x" << std::hex << lastValue << std::endl;
     binStream << "};";
@@ -526,7 +527,7 @@ static DynamicArray<string_view> GetArgs(int argc, char* argv[])
             "--input", "*.wfx",
             "--output", "output_debug",
             "--feature-level", "5_0",
-             "-m",
+             "-hm",
         };
     }
     else
