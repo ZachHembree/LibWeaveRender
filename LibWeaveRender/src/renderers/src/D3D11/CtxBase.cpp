@@ -165,12 +165,19 @@ void CtxBase::UnbindVertexBuffers(sint startSlot, uint count)
 {
 	if (const uint extent = pState->TryResetVertexBuffers(startSlot, count); extent > 0)
 	{
-		pCtx->IASetVertexBuffers(
-			startSlot, count, 
-			&pState->GetVertexBuffers()[startSlot], 
-			&pState->GetVertStrides()[startSlot], 
-			&pState->GetVertOffsets()[startSlot]
-		);
+		if (pState->GetVertexBuffers().GetLength() > 0)
+		{
+			pCtx->IASetVertexBuffers(
+				startSlot, count,
+				&pState->GetVertexBuffers()[startSlot],
+				&pState->GetVertStrides()[startSlot],
+				&pState->GetVertOffsets()[startSlot]
+			);
+		}
+		else
+		{
+			pCtx->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
+		}
 	}
 }
 
@@ -314,6 +321,7 @@ void CtxBase::SetActiveStages(ActiveShaderMask activeShaders)
 
 void CtxBase::Dispatch(const ComputeShaderVariant& cs, ivec3 groups, const ResourceSet& res) 
 {
+	Reset();
 	BindShader(cs, res);
 	pCtx->Dispatch(groups.x, groups.y, groups.z);
 }

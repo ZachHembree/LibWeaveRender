@@ -523,9 +523,9 @@ void ContextState::LogInvalidStateTransitions(RWConflictDesc conflict)
 
 		WV_LOG_DEBUG() << "A conflicting resource usage was specified during the setup phase.\n"
 			<< GetUsageName(conflict.lastUsage) << " (slot: " << conflict.slot << ")"
-			<< " in " << lastName << " stage: " << GetStageName(conflict.lastStage)
+			<< " in " << lastName << " (stage: " << GetStageName(conflict.lastStage) << ")"
 			<< " conflicts with " << GetUsageName(conflict.nextUsage)
-			<< " in " << nextName << " stage: " << GetStageName(conflict.nextStage);
+			<< " in " << nextName << " (stage: " << GetStageName(conflict.nextStage) << ")";
 	}
 }
 
