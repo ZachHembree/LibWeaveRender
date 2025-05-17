@@ -302,9 +302,17 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
     // Write the final data (binary or header text) to the output file
     WriteBinary(output, streamBuf);
 
+    // Get combined variant count
+    uint vCount = 0;
+
+    for (uint i = 0; i < shaderLib.pRepos->GetLength(); i++)
+        vCount += (uint)shaderLib.pRepos->at(i).variants.GetLength();
+
     // Log success and statistics
     WV_LOG_INFO() << "Successfully wrote library to: " << output;
     WV_LOG_INFO() << "  Library Stats:";
+    WV_LOG_INFO() << "    Repos: " << shaderLib.pRepos->GetLength();
+    WV_LOG_INFO() << "    Variants: " << vCount;
     WV_LOG_INFO() << "    Shaders:   " << (shaderLib.regHandle.pShaders ? shaderLib.regHandle.pShaders->GetLength() : 0);
     WV_LOG_INFO() << "    Effects:   " << (shaderLib.regHandle.pEffects ? shaderLib.regHandle.pEffects->GetLength() : 0);
     WV_LOG_INFO() << "    Constants: " << (shaderLib.regHandle.pConstants ? shaderLib.regHandle.pConstants->GetLength() : 0);
