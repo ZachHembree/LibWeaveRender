@@ -32,7 +32,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{8e328ed7-fcc1-41d5-ab9e-42a658758fb5}</ProjectGuid>
     <RootNamespace>RPFXPreprocessor</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
     <ProjectName>EffectPreprocessor</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
