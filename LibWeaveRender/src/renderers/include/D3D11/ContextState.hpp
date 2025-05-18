@@ -341,7 +341,7 @@ namespace Weave::D3D11
 		UniqueArray<Viewport> viewports;
 		uint vpCount;
 
-		std::unordered_map<const IResource*, UsageDesc> resUsageMap;
+		std::unordered_map<const ID3D11Resource*, UsageDesc> resUsageMap;
 		UniqueVector<RWConflictDesc> conflictBuffer;
 		bool isInitialized;
 

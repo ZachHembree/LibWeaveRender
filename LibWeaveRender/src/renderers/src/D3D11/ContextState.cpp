@@ -302,7 +302,7 @@ void ContextState::UpdateUsageMap(ShadeStages stage, const Span<ResT*> stateRes,
 
 		if (stateRes[slot] != nullptr && stateRes[slot] != pNext)
 		{
-			const auto it = resUsageMap.find(stateRes[slot]);
+			const auto& it = resUsageMap.find(stateRes[slot]->GetResource());
 
 			if (it != resUsageMap.end())
 			{
@@ -311,7 +311,7 @@ void ContextState::UpdateUsageMap(ShadeStages stage, const Span<ResT*> stateRes,
 				desc.ResetUsage(stage);
 
 				if (desc.IsEmpty())
-					resUsageMap.erase(stateRes[slot]);
+					resUsageMap.erase(stateRes[slot]->GetResource());
 			}
 		}
 	}
@@ -321,7 +321,7 @@ void ContextState::UpdateUsageMap(ShadeStages stage, const Span<ResT*> stateRes,
 	{
 		if (newRes[slot] != nullptr)
 		{
-			const auto it = resUsageMap.find(newRes[slot]);
+			const auto& it = resUsageMap.find(newRes[slot]->GetResource());
 
 			// Add usage to existing description and buffer any resulting conflicts
 			if (it != resUsageMap.end())
@@ -330,7 +330,7 @@ void ContextState::UpdateUsageMap(ShadeStages stage, const Span<ResT*> stateRes,
 				desc.SetUsage(stage, UsageT, slot, conflictBuffer);
 			}
 			else
-				resUsageMap.emplace(newRes[slot], UsageDesc(stage, UsageT, slot));
+				resUsageMap.emplace(newRes[slot]->GetResource(), UsageDesc(stage, UsageT, slot));
 		}
 	}
 }
@@ -453,9 +453,6 @@ const Span<const IShaderResource*> ContextState::TryUpdateResources(ShadeStages 
 		pResMap->GetResources(resSrc, newRes);
 	}
 
-	if (Span<const IShaderResource*>(ss.srvs.GetData(), ss.srvCount) == newRes)
-		return {};
-
 	// Update and track usage
 	UpdateUsageMap<RWResourceUsages::ShaderResourceView>(stage, Span(ss.srvs.GetData(), ss.srvCount), newRes);
 
@@ -474,9 +471,6 @@ const Span<IUnorderedAccess*> ContextState::TryUpdateResources(const ResourceSet
 		ALLOCA_SPAN_SET(newRes, pResMap->GetCount(), IUnorderedAccess*);
 		pResMap->GetResources(resSrc, newRes);
 	}
-
-	if (Span<IUnorderedAccess*>(uavs.GetData(), uavCount) == newRes)
-		return {};
 
 	// Update and track usage
 	UpdateUsageMap<RWResourceUsages::UnorderedAccessView>(ShadeStages::Compute, Span(uavs.GetData(), uavCount), newRes);
@@ -607,7 +601,6 @@ RWResourceUsages ContextState::UsageDesc::GetUsage(ShadeStages stage) const { re
 uint ContextState::UsageDesc::SetUsage(ShadeStages stage, RWResourceUsages usage, uint slot, Vector<RWConflictDesc>& conflictBuffer)
 {
 	uint conflictCount = 0;
-	D3D_ASSERT(!IsEmpty());
 
 	const bool isWriting = (usage & RWResourceUsages::Write) == RWResourceUsages::Write;
 
