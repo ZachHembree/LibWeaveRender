@@ -32,6 +32,15 @@ namespace Weave::D3D11
 		/// </summary>
 		ID3D11UnorderedAccessView* const* GetAddressUAV() override;
 
+		/// <summary>
+		/// Writes the given data set to the compute buffer
+		/// </summary>
+		template<typename T>
+		void SetData(CtxBase& ctx, const IDynamicArray<T>& data)
+		{
+			SetData(ctx, Span<byte>((byte*)data.GetData(), GetArrSize(data)));
+		}
+
 	private:
 		UniqueComPtr<ID3D11ShaderResourceView> pSRV;
 		UniqueComPtr<ID3D11UnorderedAccessView> pUAV;
