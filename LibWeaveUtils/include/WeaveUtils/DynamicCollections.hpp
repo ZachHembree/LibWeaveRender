@@ -291,12 +291,6 @@ namespace Weave
 	inline bool operator!=(const IDynamicArray<T>& left, const IDynamicArray<T>& right) { return !GetIsArrDataEqual(left, right); }
 
 	/// <summary>
-	/// Returns the size of the array in bytes
-	/// </summary>
-	template<typename T>
-	inline size_t GetArrSize(const std::vector<T>& arr) { return arr.size() * sizeof(T); }
-
-	/// <summary>
 	/// Fills an array with all zeroes. Only valid if T is plain old data.
 	/// </summary>
 	template<typename T> requires std::is_trivial_v<T>
