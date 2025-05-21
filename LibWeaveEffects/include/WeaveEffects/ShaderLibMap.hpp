@@ -175,7 +175,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Returns variantID with the given flag set to the given value.
 		/// </summary>
-		uint SetFlags(uint nameID, bool value, uint vID) const;
+		uint SetFlag(uint nameID, bool value, uint vID) const;
 
 		/// <summary>
 		/// Returns variantID with the given mode

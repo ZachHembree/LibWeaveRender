@@ -338,7 +338,7 @@ void ShaderLibMap::GetDefines(uint vID, Vector<string_view>& defines) const
 	}
 }
 
-uint ShaderLibMap::SetFlags(uint flags, bool value, uint vID) const 
+uint ShaderLibMap::SetFlag(uint flags, bool value, uint vID) const 
 {
 	FX_CHECK_MSG(vID != -1, "Variant ID invalid");
 	const uint repoIndex = GetRepoIndex(vID);
@@ -352,7 +352,7 @@ uint ShaderLibMap::SetFlags(uint flags, bool value, uint vID) const
 	else
 		configFlags &= ~flags;
 
-	return GetConfigIndex(configFlags, configMode, fvCount);
+	return PackVariantID(repoIndex, GetConfigIndex(configFlags, configMode, fvCount));
 }
 
 uint ShaderLibMap::SetFlag(string_view name, bool value, uint vID) const 
@@ -360,7 +360,7 @@ uint ShaderLibMap::SetFlag(string_view name, bool value, uint vID) const
 	uint id = -1;
 
 	if (GetStringMap().TryGetStringID(name, id))
-		return SetFlags(TryGetFlag(id, vID), value, vID);
+		return SetFlag(TryGetFlag(id, vID), value, vID);
 	else
 		return -1;
 }
