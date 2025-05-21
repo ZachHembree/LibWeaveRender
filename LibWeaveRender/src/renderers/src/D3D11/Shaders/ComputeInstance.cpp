@@ -24,9 +24,14 @@ uivec3 ComputeInstance::GetThreadGroupSize() const { return GetShader().GetDefin
 
 void ComputeInstance::SetKernel(uint nameID)
 {
+	if (this->nameID == nameID)
+		return;
+
+	vID = pLib->GetLibMap().ResetVariant(0);
+	this->nameID = nameID;
+
 	const uint shaderID = pLib->GetLibMap().TryGetShaderID(nameID, vID);
 	pCS = &pLib->GetShader<ComputeShaderVariant>(shaderID);
-	this->nameID = nameID;
 }
 
 void ComputeInstance::SetKernel(string_view name) { SetKernel(GetStringID(name)); }
@@ -47,11 +52,11 @@ void ComputeInstance::SetRWComputeBuffer(uint nameID, IUnorderedAccess& buf) { p
 
 void ComputeInstance::SetRWComputeBuffer(string_view name, IUnorderedAccess& buf) { SetRWComputeBuffer(GetStringID(name), buf); }
 
-void ComputeInstance::Dispatch(CtxBase& ctx, ivec3 groups) { ctx.Dispatch(GetShader(), groups, *pRes); }
+void ComputeInstance::Dispatch(CtxBase& ctx, uivec3 groups) { ctx.Dispatch(GetShader(), groups, *pRes); }
 
-void  ComputeInstance::Dispatch(CtxBase& ctx, ivec2 groups) { Dispatch(ctx, ivec3(groups.x, groups.y, 1)); }
+void  ComputeInstance::Dispatch(CtxBase& ctx, uivec2 groups) { Dispatch(ctx, uivec3(groups.x, groups.y, 1)); }
 
-void  ComputeInstance::Dispatch(CtxBase& ctx, int groups) { Dispatch(ctx, ivec3(groups, 1, 1)); }
+void  ComputeInstance::Dispatch(CtxBase& ctx, uint groupX, uint groupY, uint groupZ) { Dispatch(ctx, uivec3(groupX, groupY, groupZ)); }
 
 const ComputeShaderVariant& ComputeInstance::GetShader() const 
 { 

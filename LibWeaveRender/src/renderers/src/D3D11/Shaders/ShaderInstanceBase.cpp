@@ -91,6 +91,6 @@ void ShaderInstanceBase::SetMode(string_view name) { SetVariantID(pLib->GetLibMa
 
 void ShaderInstanceBase::ResetMode() { SetVariantID(pLib->GetLibMap().ResetMode(vID)); }
 
-void ShaderInstanceBase::ResetDefines() { SetVariantID(pLib->GetLibMap().ResetVariant(0)); }
+void ShaderInstanceBase::ResetDefines() { SetVariantID(pLib->GetLibMap().ResetVariant(vID)); }
 
 void ShaderInstanceBase::GetDefines(Vector<uint>& nameIDs) const { pLib->GetLibMap().GetDefines(vID, nameIDs); }

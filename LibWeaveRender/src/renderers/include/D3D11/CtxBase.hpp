@@ -170,7 +170,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Dispatches a compute shader with the given number of thread groups and resources
 		/// </summary>
-		void Dispatch(const ComputeShaderVariant& cs, ivec3 groups, const ResourceSet& res);
+		void Dispatch(const ComputeShaderVariant& cs, uivec3 groups, const ResourceSet& res);
 
 		/// <summary>
 		/// Draws an indexed, non-instanced triangle meshes using the given material

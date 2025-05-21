@@ -319,7 +319,7 @@ void CtxBase::SetActiveStages(ActiveShaderMask activeShaders)
 	}
 }
 
-void CtxBase::Dispatch(const ComputeShaderVariant& cs, ivec3 groups, const ResourceSet& res) 
+void CtxBase::Dispatch(const ComputeShaderVariant& cs, uivec3 groups, const ResourceSet& res) 
 {
 	BindShader(cs, res);
 	pCtx->Dispatch(groups.x, groups.y, groups.z);

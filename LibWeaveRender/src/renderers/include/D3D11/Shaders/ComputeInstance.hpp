@@ -22,14 +22,14 @@ namespace Weave::D3D11
 		uivec3 GetThreadGroupSize() const;
 
 		/// <summary>
-		/// Remaps the instance to the shader kernel with the given name within the same ShaderLibrary.
-		/// Retains resource and flag configurations.
+		/// Remaps the instance to the shader kernel with the given name within the same effect file. 
+		/// Retains resources and resets defines.
 		/// </summary>
 		void SetKernel(uint nameID);
 
 		/// <summary>
-		/// Remaps the instance to the shader kernel with the given name within the same ShaderLibrary.
-		/// Retains resource and flag configurations.
+		/// Remaps the instance to the shader kernel with the given name within the same effect file. 
+		/// Retains resources and resets defines.
 		/// </summary>
 		void SetKernel(string_view name);
 
@@ -55,11 +55,11 @@ namespace Weave::D3D11
 
 		void SetRWComputeBuffer(string_view name, IUnorderedAccess& buf);
 
-		void Dispatch(CtxBase& ctx, ivec3 groups);
+		void Dispatch(CtxBase& ctx, uivec3 groups);
 
-		void Dispatch(CtxBase& ctx, ivec2 groups);
+		void Dispatch(CtxBase& ctx, uivec2 groups);
 
-		void Dispatch(CtxBase& ctx, int groups);
+		void Dispatch(CtxBase& ctx, uint groupX, uint groupY = 1, uint groupZ = 1);
 
 	protected:
 		mutable const ComputeShaderVariant* pCS;
