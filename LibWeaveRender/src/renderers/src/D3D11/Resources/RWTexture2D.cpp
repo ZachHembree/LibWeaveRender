@@ -41,28 +41,7 @@ RWTexture2D::RWTexture2D(
 	renderScale(1),
 	renderOffset(0)
 {
-	if (pRes.Get() != nullptr)
-	{
-		// SRV
-		D3D11_SHADER_RESOURCE_VIEW_DESC vDesc = {};
-		vDesc.Format = (DXGI_FORMAT)desc.format;
-		vDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		vDesc.Texture2D.MostDetailedMip = 0;
-		vDesc.Texture2D.MipLevels = desc.mipLevels;
-
-		D3D_CHECK_HR(dev->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
-
-		// UAV
-		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-		uavDesc.Format = (DXGI_FORMAT)format;
-		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
-		uavDesc.Texture2D.MipSlice = 0;
-
-		D3D_CHECK_HR(dev->CreateUnorderedAccessView(pRes.Get(), &uavDesc, &pUAV));
-
-		// RTV
-		D3D_CHECK_HR(dev->CreateRenderTargetView(pRes.Get(), nullptr, &pRTV));
-	}
+	Init();
 }
 
 RWTexture2D::RWTexture2D(Device& dev,
@@ -102,6 +81,32 @@ RWTexture2D::RWTexture2D(
 	)
 { }
 
+void RWTexture2D::Init()
+{
+	if (pRes.Get() != nullptr)
+	{
+		// SRV
+		D3D11_SHADER_RESOURCE_VIEW_DESC vDesc = {};
+		vDesc.Format = (DXGI_FORMAT)desc.format;
+		vDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		vDesc.Texture2D.MostDetailedMip = 0;
+		vDesc.Texture2D.MipLevels = desc.mipLevels;
+
+		D3D_CHECK_HR(GetDevice()->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
+
+		// UAV
+		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = (DXGI_FORMAT)desc.format;
+		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+		uavDesc.Texture2D.MipSlice = 0;
+
+		D3D_CHECK_HR(GetDevice()->CreateUnorderedAccessView(pRes.Get(), &uavDesc, &pUAV));
+
+		// RTV
+		D3D_CHECK_HR(GetDevice()->CreateRenderTargetView(pRes.Get(), nullptr, &pRTV));
+	}
+}
+
 /// <summary>
 /// Returns pointer to UAV interface
 /// </summary>
@@ -123,24 +128,12 @@ void RWTexture2D::Clear(CtxBase& ctx, vec4 color)
 
 void RWTexture2D::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
 {
-	if (srcDim == GetSize())
-	{
-		ctx.SetTextureData(*this, src, pixStride, srcDim);
-	}
-	else
-	{
-		pRes.Reset();
-		*this = std::move(RWTexture2D(
-			GetDevice(),
-			srcDim,
-			(void*)src.GetData(),
-			(UINT)pixStride,
-			GetFormat(),
-			desc.mipLevels
-		));
-	}
+	if (AnyTrue(srcDim > GetSize()))
+		Reset(srcDim);
 
-	pRes->GetDesc(reinterpret_cast<D3D11_TEXTURE2D_DESC*>(&desc));
+	SetRenderSize(srcDim);
+	ctx.SetTextureData(*this, src, pixStride, srcDim);
+	this->pixelStride = pixStride;
 }
 
 RWTexture2D RWTexture2D::FromImageWIC(Device& dev, wstring_view file)

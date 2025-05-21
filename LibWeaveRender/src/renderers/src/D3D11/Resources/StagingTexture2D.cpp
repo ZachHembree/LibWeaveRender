@@ -48,6 +48,8 @@ StagingTexture2D::StagingTexture2D(Device& dev, ivec2 dim, void* data,
 	)
 { }
 
+void StagingTexture2D::Init() {}
+
 /// <summary>
 /// Updates texture with contents of a scratch image, assuming compatible formats.
 /// Allocates new Texture2D if the dimensions aren't the same.
@@ -62,33 +64,6 @@ void StagingTexture2D::SetTextureWIC(CtxBase& ctx, wstring_view file, DirectX::S
 	Span srcBytes(img.pixels, totalBytes);
 
 	SetTextureData(ctx, srcBytes, pixStride, dim);
-}
-
-/// <summary>
-/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
-/// Allocates new Texture2D if the dimensions aren't the same.
-/// </summary>
-void StagingTexture2D::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, ivec2 srcDim)
-{
-	const ivec2 dstSize = GetSize();
-
-	if (srcDim.x <= dstSize.x && srcDim.y <= dstSize.y)
-	{
-		ctx.SetTextureData(*this, src, pixStride, srcDim);
-	}
-	else
-	{
-		pRes.Reset();
-		*this = std::move(StagingTexture2D(
-			GetDevice(),
-			srcDim,
-			(void*)src.GetData(),
-			(UINT)pixStride,
-			GetFormat(),
-			desc.mipLevels,
-			GetAccessFlags()
-		));
-	}
 }
 
 /// <summary>

@@ -73,18 +73,7 @@ namespace Weave::D3D11
 
 		/// <summary>
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
-		/// Allocates new Texture2D if the dimensions aren't the same.
-		/// </summary>
-		template<typename T>
-		void SetTextureData(CtxBase& ctx, IDynamicArray<T>& src, uivec2 dim)
-		{
-			Span<byte> srcBytes(reinterpret_cast<byte*>(src.GetData()), GetArrSize(src));
-			SetTextureData(ctx, srcBytes, sizeof(T), dim);
-		}
-
-		/// <summary>
-		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
-		/// Allocates new Texture2D if the dimensions aren't the same.
+		/// Allocates new Texture2D if the dimensions are larger than the maximum.
 		/// </summary>
 		void SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim) override;
 
@@ -105,5 +94,7 @@ namespace Weave::D3D11
 			void* data = nullptr,
 			uint stride = 0
 		);
+
+		void Init() override;
 	};
 }

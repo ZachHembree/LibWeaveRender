@@ -36,16 +36,7 @@ Texture2D::Texture2D(
 		data, stride
 	)
 {
-	if (pRes.Get() != nullptr)
-	{
-		D3D11_SHADER_RESOURCE_VIEW_DESC vDesc = {};
-		vDesc.Format = (DXGI_FORMAT)desc.format;
-		vDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		vDesc.Texture2D.MostDetailedMip = 0;
-		vDesc.Texture2D.MipLevels = desc.mipLevels;
-
-		D3D_CHECK_HR(dev->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
-	}
+	Init();
 }
 
 Texture2D::Texture2D(
@@ -88,13 +79,21 @@ Texture2D::Texture2D(
 	)
 { }
 
-/// <summary>
-/// Returns true if the texture is immutable
-/// </summary>
-bool Texture2D::GetIsReadOnly() const
+void Texture2D::Init()
 {
-	return GetUsage() == ResourceUsages::Immutable;
+	if (pRes.Get() != nullptr)
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC vDesc = {};
+		vDesc.Format = (DXGI_FORMAT)desc.format;
+		vDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		vDesc.Texture2D.MostDetailedMip = 0;
+		vDesc.Texture2D.MipLevels = desc.mipLevels;
+
+		D3D_CHECK_HR(GetDevice()->CreateShaderResourceView(pRes.Get(), &vDesc, &pSRV));
+	}
 }
+
+bool Texture2D::GetIsReadOnly() const { return GetUsage() == ResourceUsages::Immutable; }
 
 ID3D11ShaderResourceView* Texture2D::GetSRV() const { return pSRV.Get(); }
 
@@ -110,29 +109,6 @@ void Texture2D::SetTextureWIC(CtxBase& ctx, wstring_view file, ScratchImage& buf
 	Span srcBytes(img.pixels, totalBytes);
 
 	SetTextureData(ctx, srcBytes, pixStride, dim);
-}
-
-void Texture2D::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
-{
-	if (srcDim == GetSize())
-	{
-		ctx.SetTextureData(*this, src, pixStride, srcDim);
-		this->pixelStride = pixStride;
-	}
-	else
-	{
-		pRes.Reset();
-		*this = std::move(Texture2D(
-			GetDevice(),
-			srcDim,
-			GetFormat(),
-			GetUsage(),
-			GetBindFlags(),
-			GetAccessFlags(),
-			desc.mipLevels,
-			(void*)src.GetData(), (uint)pixStride
-		));
-	}
 }
 
 Texture2D Texture2D::FromImageWIC(Device& dev, wstring_view file, bool isReadOnly)

@@ -1,4 +1,5 @@
 #pragma once
+#include "WeaveUtils/Span.hpp"
 #include "ResourceBase.hpp"
 #include "../D3D11Utils.hpp"
 
@@ -69,6 +70,23 @@ namespace Weave::D3D11
 		ID3D11Resource* const* GetResAddress() const override;
 
 		/// <summary>
+		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
+		/// Allocates new Texture2D if the dimensions aren't the same.
+		/// </summary>
+		template<typename T>
+		void SetTextureData(CtxBase& ctx, const IDynamicArray<T>& src, uivec2 dim)
+		{
+			Span<byte> srcBytes(reinterpret_cast<byte*>(src.GetData()), GetArrSize(src));
+			SetTextureData(ctx, srcBytes, sizeof(T), dim);
+		}
+
+		/// <summary>
+		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
+		/// Allocates new Texture2D if the dimensions aren't the same.
+		/// </summary>
+		virtual void SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 dim);
+
+		/// <summary>
 		/// Loads WIC-compatible image into a buffer
 		/// (BMP, GIF, ICO, JPEG, PNG, TIFF)
 		/// </summary>
@@ -102,5 +120,12 @@ namespace Weave::D3D11
 		);
 
 		virtual ~Texture2DBase();
+
+		virtual void Init() = 0;
+
+		/// <summary>
+		/// Allocates a new texture with the given dimensions and resets the contents
+		/// </summary>
+		virtual void Reset(uivec2 dim = uivec2(-1));
 	};
 }

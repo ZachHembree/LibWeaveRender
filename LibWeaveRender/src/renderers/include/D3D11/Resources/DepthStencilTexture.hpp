@@ -60,5 +60,8 @@ namespace Weave::D3D11
 		UniqueComPtr<ID3D11DepthStencilState> pState;
 		UniqueComPtr<ID3D11DepthStencilView> pDSV;
 		vec2 range;
+		TexCmpFuncs depthCmp;
+
+		void Init() override;
 	};
 }

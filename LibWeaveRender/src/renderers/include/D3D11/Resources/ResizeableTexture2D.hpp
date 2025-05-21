@@ -96,23 +96,6 @@ namespace Weave::D3D11
 			wstring_view file
 		);
 
-		/// <summary>
-		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
-		/// Allocates new Texture2D if the dimensions aren't the same.
-		/// </summary>
-		template<typename T>
-		void SetTextureData(CtxBase& ctx, const IDynamicArray<T>& src, uivec2 dim)
-		{
-			Span<byte> srcBytes(reinterpret_cast<byte*>(src.GetData()), GetArrSize(src));
-			SetTextureData(ctx, srcBytes, sizeof(T), dim);
-		}
-
-		/// <summary>
-		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
-		/// Allocates new Texture2D if the dimensions aren't the same.
-		/// </summary>
-		void SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 dim) override;
-
 	protected:
 		mutable vec2 renderOffset;
 		mutable vec2 renderScale;

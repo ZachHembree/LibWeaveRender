@@ -58,6 +58,15 @@ Texture2DBase::Texture2DBase(
 
 Texture2DBase::Texture2DBase() : desc({}) {}
 
+void Texture2DBase::Reset(uivec2 dim)
+{
+	if (dim != uivec2(-1))
+		desc.size = dim;
+
+	D3D_CHECK_HR(GetDevice()->CreateTexture2D(desc.GetD3DPtr(), nullptr, &pRes));
+	Init();
+}
+
 uivec3 Texture2DBase::GetDimensions() const { return uivec3(desc.size.x, desc.size.y, 1u); }
 
 uivec2 Texture2DBase::GetSize() const { return desc.size; }
@@ -85,6 +94,15 @@ const Texture2DDesc& Texture2DBase::GetDescription() const { return desc; }
 /// </summary>
 ID3D11Resource* Texture2DBase::GetResource() const { return pRes.Get(); }
 
+void Texture2DBase::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
+{
+	if (srcDim != GetSize())
+		Reset(srcDim);
+
+	ctx.SetTextureData(*this, src, pixStride, srcDim);
+	this->pixelStride = pixStride;
+}
+
 void Texture2DBase::LoadImageWIC(wstring_view file, ScratchImage& buffer)
 {
 	D3D_CHECK_HR(LoadFromWICFile(
@@ -95,9 +113,6 @@ void Texture2DBase::LoadImageWIC(wstring_view file, ScratchImage& buffer)
 	));
 }
 
-/// <summary>
-/// Returns true if the object is valid and has been initialized
-/// </summary>
 bool Texture2DBase::GetIsValid() const { return pDev != nullptr && pRes.Get() != nullptr; }
 
 ID3D11Resource* const* Texture2DBase::GetResAddress() const { return reinterpret_cast<ID3D11Resource* const*>(pRes.GetAddressOf()); }

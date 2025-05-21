@@ -20,24 +20,9 @@ DepthStencilTexture::DepthStencilTexture(
 	TexCmpFuncs depthCmp
 ) :
 	Texture2DBase(dev, dim, format, usage, ResourceBindFlags::DepthStencil ),
-	range(range)
-{
-	// State
-	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-	dsDesc.DepthEnable = true;
-	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsDesc.DepthFunc = (D3D11_COMPARISON_FUNC)depthCmp;
-
-	D3D_CHECK_HR(dev->CreateDepthStencilState(&dsDesc, &pState));
-
-	// View
-	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
-	descDSV.Format = (DXGI_FORMAT)format;
-	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	descDSV.Texture2D.MipSlice = 0u;
-
-	D3D_CHECK_HR(dev->CreateDepthStencilView(pRes.Get(), &descDSV, &pDSV));
-}
+	range(range),
+	depthCmp(depthCmp)
+{ Init(); }
 
 void DepthStencilTexture::SetRange(vec2 range)
 {
@@ -58,4 +43,23 @@ ID3D11DepthStencilView* const* DepthStencilTexture::GetDSVAddress() { return pDS
 void DepthStencilTexture::Clear(CtxBase& ctx, DSClearFlags clearFlags, float depthClear, byte stencilClear )
 {
 	ctx.ClearDepthStencil(*this, clearFlags, depthClear, stencilClear);
+}
+
+void DepthStencilTexture::Init()
+{
+	// State
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = (D3D11_COMPARISON_FUNC)depthCmp;
+
+	D3D_CHECK_HR(GetDevice()->CreateDepthStencilState(&dsDesc, &pState));
+
+	// View
+	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
+	descDSV.Format = (DXGI_FORMAT)desc.format;
+	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	descDSV.Texture2D.MipSlice = 0u;
+
+	D3D_CHECK_HR(GetDevice()->CreateDepthStencilView(pRes.Get(), &descDSV, &pDSV));
 }

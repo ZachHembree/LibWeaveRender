@@ -140,30 +140,6 @@ vec2 ResizeableTexture2D::GetRenderScale() const
 	return renderScale;
 }
 
-void ResizeableTexture2D::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
-{
-	const uivec2 currentSize = GetSize();
-
-	if (srcDim.x <= currentSize.x && srcDim.y <= currentSize.y)
-	{
-		ctx.SetTextureData(*this, src, pixStride, srcDim, GetRenderOffset());
-	}
-	else
-	{
-		pRes.Reset();
-		*this = std::move(ResizeableTexture2D(
-			GetDevice(),
-			srcDim,
-			GetFormat(),
-			GetUsage(),
-			GetBindFlags(),
-			GetAccessFlags(),
-			desc.mipLevels,
-			(void*)src.GetData(), (uint)pixStride
-		));
-	}
-}
-
 ResizeableTexture2D ResizeableTexture2D::FromImageWIC(Device& dev, wstring_view file)
 {
 	ScratchImage buf;
