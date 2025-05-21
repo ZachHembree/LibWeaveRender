@@ -71,21 +71,11 @@ bool ShaderInstanceBase::GetIsDefined(uint nameID) const { return pLib->GetLibMa
 
 bool ShaderInstanceBase::GetIsDefined(string_view name) const { return pLib->GetLibMap().GetIsDefined(name, vID); }
 
-void ShaderInstanceBase::SetFlag(uint nameID, bool value) 
-{
-	const ShaderLibMap& map = pLib->GetLibMap();
-	const uint flag = map.TryGetFlag(nameID, vID);
-	SetVariantID(map.SetFlags(flag, value, vID));
-}
+void ShaderInstanceBase::SetFlag(uint nameID, bool value) { SetVariantID(pLib->GetLibMap().SetFlag(nameID, value, vID)); }
 
 void ShaderInstanceBase::SetFlag(string_view name, bool value) { SetVariantID(pLib->GetLibMap().SetFlag(name, value, vID)); }
 
-void ShaderInstanceBase::SetMode(uint nameID) 
-{ 
-	const ShaderLibMap& map = pLib->GetLibMap();
-	const uint mode = map.TryGetModeID(nameID, vID);
-	SetVariantID(pLib->GetLibMap().SetMode(mode, vID)); 
-}
+void ShaderInstanceBase::SetMode(uint nameID) { SetVariantID(pLib->GetLibMap().SetMode(nameID, vID)); }
 
 void ShaderInstanceBase::SetMode(string_view name) { SetVariantID(pLib->GetLibMap().SetMode(name, vID)); }
 

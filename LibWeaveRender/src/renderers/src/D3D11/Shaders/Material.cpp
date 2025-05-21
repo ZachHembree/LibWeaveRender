@@ -40,6 +40,8 @@ const EffectVariant& Material::GetEffect() const
 
 void Material::SetVariantID(uint vID)
 {
+	D3D_ASSERT_MSG(vID != uint(-1), "Cannot set invalid variant");
+
 	if (pEffect != nullptr && vID != this->vID)
 	{ 
 		const uint effectID = pLib->GetLibMap().TryGetEffectID(nameID, vID);

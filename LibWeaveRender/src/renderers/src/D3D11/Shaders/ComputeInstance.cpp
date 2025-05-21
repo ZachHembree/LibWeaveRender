@@ -27,7 +27,7 @@ void ComputeInstance::SetKernel(uint nameID)
 	if (this->nameID == nameID)
 		return;
 
-	vID = pLib->GetLibMap().ResetVariant(0);
+	vID = pLib->GetLibMap().ResetVariant(vID);
 	this->nameID = nameID;
 
 	const uint shaderID = pLib->GetLibMap().TryGetShaderID(nameID, vID);
@@ -73,6 +73,8 @@ const ComputeShaderVariant& ComputeInstance::GetShader() const
 
 void ComputeInstance::SetVariantID(uint vID)
 {
+	D3D_ASSERT_MSG(vID != uint(-1), "Cannot set invalid variant");
+
 	if (pCS != nullptr && vID != this->vID)
 	{ 
 		const uint shaderID = pLib->GetLibMap().TryGetShaderID(nameID, vID);
