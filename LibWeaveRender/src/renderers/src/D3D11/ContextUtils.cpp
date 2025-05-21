@@ -53,19 +53,13 @@ namespace Weave::D3D11
 		&ID3D11DeviceContext::CSSetSamplers
 	};
 
-	void SetSamplers(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<const Sampler*> res)
+	void SetSamplers(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<ID3D11SamplerState*> res)
 	{
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
 		D3D_ASSERT_MSG((startSlot + res.GetLength()) <= D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, 
 			"Sampler slot limit exceeded: {}", (startSlot + res.GetLength()));
 
-		Span<ID3D11SamplerState*> views;
-		ALLOCA_SPAN_SET(views, res.GetLength(), ID3D11SamplerState*);
-
-		for (uint i = 0; i < res.GetLength(); i++)
-			views[i] = res[i] != nullptr ? res[i]->Get() : nullptr;
-
-		(pCtx->*s_SamplerSetters[(int)stage])(startSlot, (uint)res.GetLength(), views.GetData());
+		(pCtx->*s_SamplerSetters[(int)stage])(startSlot, (uint)res.GetLength(), res.GetData());
 	}
 
 	/*
@@ -82,34 +76,22 @@ namespace Weave::D3D11
 		&ID3D11DeviceContext::CSSetShaderResources
 	};
 
-	void SetShaderResources(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<const IShaderResource*> res)
+	void SetShaderResources(ID3D11DeviceContext* pCtx, ShadeStages stage, uint startSlot, const Span<ID3D11ShaderResourceView*> srvs)
 	{
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
-		D3D_ASSERT_MSG((startSlot + res.GetLength()) <= D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, 
-			"Resource view count exceeded: {}", (startSlot + res.GetLength()));
+		D3D_ASSERT_MSG((startSlot + srvs.GetLength()) <= D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT,
+			"Resource view count exceeded: {}", (startSlot + srvs.GetLength()));
 
-		Span<ID3D11ShaderResourceView*> views;
-		ALLOCA_SPAN_SET(views, res.GetLength(), ID3D11ShaderResourceView*);
-
-		for (uint i = 0; i < res.GetLength(); i++)
-			views[i] = res[i] != nullptr ? res[i]->GetSRV() : nullptr;
-
-		(pCtx->*s_ResViewSetters[(int)stage])(startSlot, (uint)res.GetLength(), views.GetData());
+		(pCtx->*s_ResViewSetters[(int)stage])(startSlot, (uint)srvs.GetLength(), srvs.GetData());
 	}
 
-	void CSSetUnorderedAccessViews(ID3D11DeviceContext* pCtx, uint startSlot, const Span<IUnorderedAccess*> uavs, const uint* pInitialCounts)
+	void CSSetUnorderedAccessViews(ID3D11DeviceContext* pCtx, uint startSlot, const Span<ID3D11UnorderedAccessView*> uavs, const uint* pInitialCounts)
 	{
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
 		D3D_ASSERT_MSG((startSlot + uavs.GetLength()) <= D3D11_1_UAV_SLOT_COUNT,
 			"Resource view count exceeded: {}", (startSlot + uavs.GetLength()));
 		
-		Span<ID3D11UnorderedAccessView*> views;
-		ALLOCA_SPAN_SET(views, uavs.GetLength(), ID3D11UnorderedAccessView*);
-
-		for (uint i = 0; i < uavs.GetLength(); i++)
-			views[i] = uavs[i] != nullptr ? uavs[i]->GetUAV() : nullptr;
-
-		pCtx->CSSetUnorderedAccessViews(startSlot, (uint)uavs.GetLength(), views.GetData(), pInitialCounts);
+		pCtx->CSSetUnorderedAccessViews(startSlot, (uint)uavs.GetLength(), uavs.GetData(), pInitialCounts);
 	}
 
 	/*
@@ -172,19 +154,12 @@ namespace Weave::D3D11
 		s_ShaderSetters[(int)stage](pCtx, pShader, ppClassInstances, numClassInstances);
 	}
 
-	void OMSetRenderTargets(ID3D11DeviceContext* pCtx, const Span<IRenderTarget*> rtvs, IDepthStencil* pDepthStencil)
+	void OMSetRenderTargets(ID3D11DeviceContext* pCtx, const Span<ID3D11RenderTargetView*> rtvs, ID3D11DepthStencilView* pDSV)
 	{
 		D3D_ASSERT_MSG(pCtx != nullptr, "Attempted to dereference a null device context");
 		D3D_ASSERT_MSG((rtvs.GetLength()) <= D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
 			"Render target limit exceeded: {}", (rtvs.GetLength()));
 
-		ID3D11DepthStencilView* pDSV = pDepthStencil != nullptr ? pDepthStencil->GetDSV() : nullptr;
-		Span<ID3D11RenderTargetView*> views;
-		ALLOCA_SPAN_SET(views, rtvs.GetLength(), ID3D11RenderTargetView*);
-
-		for (uint i = 0; i < rtvs.GetLength(); i++)
-			views[i] = rtvs[i] != nullptr ? rtvs[i]->GetRTV() : nullptr;
-
-		pCtx->OMSetRenderTargets((uint)rtvs.GetLength(), views.GetData(), pDSV);
+		pCtx->OMSetRenderTargets((uint)rtvs.GetLength(), rtvs.GetData(), pDSV);
 	}
 }

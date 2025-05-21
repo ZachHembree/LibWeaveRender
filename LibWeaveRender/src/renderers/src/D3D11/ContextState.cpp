@@ -57,7 +57,9 @@ ContextState::ContextState() :
 	topology(PrimTopology::UNDEFINED),
 	pInputLayout(nullptr),
 	pIndexBuffer(nullptr),
-	pDepthStencil(nullptr),
+	pDSResource(nullptr),
+	pDSV(nullptr),
+	pDSS(nullptr),
 	pBlendState(nullptr),
 	pRasterState(nullptr),
 	rtCount(0),
@@ -80,6 +82,7 @@ ContextState::StageState::StageState() :
 	samplers(D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, nullptr),
 	cbuffers(D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, nullptr),
 	srvs(D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, nullptr),
+	srvResources(D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, nullptr),
 	sampCount(0),
 	cbufCount(0),
 	srvCount(0),
@@ -96,12 +99,14 @@ void ContextState::StageState::Reset()
 
 void ContextState::Init()
 {
-	rtvs = UniqueArray<IRenderTarget*>(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, nullptr);
+	rtvs = UniqueArray<ID3D11RenderTargetView*>(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, nullptr);
+	rtvResources = UniqueArray<const ID3D11Resource*>(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, nullptr);
 	viewports = UniqueArray<Viewport>(D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE);
 	vertexBuffers = UniqueArray<ID3D11Buffer*>(D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, nullptr);
 	vbStrides = UniqueArray<uint>(D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, 0);
 	vbOffsets = UniqueArray<uint>(D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, 0);
-	uavs = UniqueArray<IUnorderedAccess*>(D3D11_1_UAV_SLOT_COUNT, nullptr);
+	uavs = UniqueArray<ID3D11UnorderedAccessView*>(D3D11_1_UAV_SLOT_COUNT, nullptr);
+	uavResources = UniqueArray<const ID3D11Resource*>(D3D11_1_UAV_SLOT_COUNT, nullptr);
 
 	stages = UniqueArray<StageState>(g_ShadeStageCount);
 
@@ -116,7 +121,10 @@ void ContextState::Reset()
 	topology = PrimTopology::UNDEFINED;
 	pInputLayout = nullptr;
 	pIndexBuffer = nullptr;
-	pDepthStencil = nullptr;
+	pDSResource = nullptr;
+	pDSV = nullptr;
+	pDSS = nullptr;
+	depthStencilRange = vec2(0);
 	pBlendState = nullptr;
 	pRasterState = nullptr;
 
@@ -149,9 +157,7 @@ void ContextState::IncrementDraw() { drawCount++; }
 
 const ContextState::StageState& ContextState::GetStage(ShadeStages stage) const { return stages[(int)stage]; }
 
-const Span<IRenderTarget*> ContextState::GetRenderTargets() const { return GetConstSpan(&rtvs[0], rtCount); }
-
-IDepthStencil* ContextState::GetDepthStencil() const { return pDepthStencil; }
+const Span<ID3D11RenderTargetView*> ContextState::GetRenderTargets() const { return GetConstSpan(&rtvs[0], rtCount); }
 
 const Span<Viewport> ContextState::GetViewports() { return Span(viewports.GetData(), vpCount); }
 
@@ -184,7 +190,7 @@ uint ContextState::TryUpdateVertexBuffers(IDynamicArray<VertexBuffer>& vertBuffe
 
 	for (uint i = 0; i < newCount; i++)
 	{
-		ID3D11Buffer* pVB = vertBuffers[i].Get();
+		ID3D11Buffer* pVB = vertBuffers[i].GetBuffer();
 
 		if (pVB != vbState[i])
 		{
@@ -252,7 +258,7 @@ bool ContextState::TryUpdateInputLayout(ID3D11InputLayout* pLayout)
 		return false;
 }
 
-const Span<const Sampler*> ContextState::StageState::GetSamplers(sint offset, uint extent) const
+const Span<ID3D11SamplerState*> ContextState::StageState::GetSamplers(sint offset, uint extent) const
 {
 	return GetVariableSpan(samplers, sampCount, offset, extent);
 }
@@ -262,21 +268,21 @@ const Span<ID3D11Buffer*> ContextState::StageState::GetCBuffers(sint offset, uin
 	return GetVariableSpan(cbuffers, cbufCount, offset, extent);
 }
 
-const Span<const IShaderResource*> ContextState::StageState::GetSRVs(sint offset, uint extent) const
+const Span<ID3D11ShaderResourceView*> ContextState::StageState::GetSRVs(sint offset, uint extent) const
 {
 	return GetVariableSpan(srvs, srvCount, offset, extent);
 }
 
-const Span<IUnorderedAccess*> ContextState::CSGetUAVs(sint offset, uint extent) const
+const Span<ID3D11UnorderedAccessView*> ContextState::CSGetUAVs(sint offset, uint extent) const
 {
 	return GetVariableSpan(uavs, uavCount, offset, extent);
 }
 
-ID3D11DepthStencilView* ContextState::GetDepthStencilView() const { return pDepthStencil != nullptr ? pDepthStencil->GetDSV() : nullptr; }
+ID3D11DepthStencilView* ContextState::GetDepthStencilView() const { return pDSV; }
 
-ID3D11DepthStencilState* ContextState::GetDepthStencilState() const { return pDepthStencil != nullptr ? pDepthStencil->GetState() : nullptr; }
+ID3D11DepthStencilState* ContextState::GetDepthStencilState() const { return pDSS; }
 
-vec2 ContextState::GetDepthStencilRange() const { return pDepthStencil != nullptr ? pDepthStencil->GetRange() : vec2(0); }
+vec2 ContextState::GetDepthStencilRange() const { return depthStencilRange; }
 
 bool ContextState::TrySetShader(ShadeStages stage, const ShaderVariantBase* pShader)
 {
@@ -292,17 +298,27 @@ bool ContextState::TrySetShader(ShadeStages stage, const ShaderVariantBase* pSha
 		return false;
 }
 
+template<typename ViewT, typename ResT>
+static ViewT* GetViewPtr(ResT* pRes)
+{
+	return pRes != nullptr ? static_cast<ViewT*>(*pRes) : nullptr;
+}
+
+template<typename ViewT, typename ResT>
+static ViewT* GetViewPtr(ResT& res) { return static_cast<ViewT*>(res); }
+
 template<RWResourceUsages UsageT, typename ResT>
-void ContextState::UpdateUsageMap(ShadeStages stage, const Span<ResT*> stateRes, const IDynamicArray<ResT*>& newRes)
+requires std::is_convertible_v<ResT, ID3D11Resource*>
+void ContextState::UpdateUsageMap(ShadeStages stage, const Span<const ID3D11Resource*> stateRes, const IDynamicArray<ResT*>& newRes)
 {
 	// Reset usage on changed slots
 	for (uint slot = 0; slot < stateRes.GetLength(); slot++)
 	{
-		const ResT* pNext = (slot < newRes.GetLength()) ? newRes[slot] : nullptr;
+		const ID3D11Resource* pNext = (slot < newRes.GetLength()) ? GetViewPtr<const ID3D11Resource>(newRes[slot]) : nullptr;
 
 		if (stateRes[slot] != nullptr && stateRes[slot] != pNext)
 		{
-			const auto& it = resUsageMap.find(stateRes[slot]->GetResource());
+			const auto& it = resUsageMap.find(stateRes[slot]);
 
 			if (it != resUsageMap.end())
 			{
@@ -311,7 +327,7 @@ void ContextState::UpdateUsageMap(ShadeStages stage, const Span<ResT*> stateRes,
 				desc.ResetUsage(stage);
 
 				if (desc.IsEmpty())
-					resUsageMap.erase(stateRes[slot]->GetResource());
+					resUsageMap.erase(stateRes[slot]);
 			}
 		}
 	}
@@ -321,7 +337,7 @@ void ContextState::UpdateUsageMap(ShadeStages stage, const Span<ResT*> stateRes,
 	{
 		if (newRes[slot] != nullptr)
 		{
-			const auto& it = resUsageMap.find(newRes[slot]->GetResource());
+			const auto& it = resUsageMap.find(*newRes[slot]);
 
 			// Add usage to existing description and buffer any resulting conflicts
 			if (it != resUsageMap.end())
@@ -330,13 +346,13 @@ void ContextState::UpdateUsageMap(ShadeStages stage, const Span<ResT*> stateRes,
 				desc.SetUsage(stage, UsageT, slot, conflictBuffer);
 			}
 			else
-				resUsageMap.emplace(newRes[slot]->GetResource(), UsageDesc(stage, UsageT, slot));
+				resUsageMap.emplace(*newRes[slot], UsageDesc(stage, UsageT, slot));
 		}
 	}
 }
 
-template<typename ResT>
-static uint UpdateResources(IDynamicArray<ResT>& stateRes, uint& stateCount, const IDynamicArray<ResT>& newRes, sint startSlot = 0)
+template<typename ViewT, typename ResT>
+static uint UpdateResources(IDynamicArray<ViewT*>& stateRes, uint& stateCount, IDynamicArray<ResT>& newRes, sint startSlot = 0)
 {
 	const uint oldCount = stateCount;
 	const uint newCount = (uint)newRes.GetLength() + startSlot;
@@ -345,7 +361,9 @@ static uint UpdateResources(IDynamicArray<ResT>& stateRes, uint& stateCount, con
 
 	// Write new resources to state cache
 	Span dstSpan(&stateRes[startSlot], newRes.GetLength());
-	ArrMemCopy(dstSpan, newRes);
+
+	for (uint i = 0; i < newRes.GetLength(); i++)
+		dstSpan[i] = GetViewPtr<ViewT>(newRes[i]);
 
 	// Set extra range to null
 	if (oldCount > newCount)
@@ -354,18 +372,32 @@ static uint UpdateResources(IDynamicArray<ResT>& stateRes, uint& stateCount, con
 	return updateExtent;
 }
 
-bool ContextState::TryUpdateRenderTargets(IDynamicArray<IRenderTarget*>& newRes, uint startSlot)
+template<typename ViewT, typename ResT>
+static uint UpdateResources(IDynamicArray<ViewT*>& stateRes, IDynamicArray<const ID3D11Resource*>& rawRes, uint& stateCount, 
+	IDynamicArray<ResT>& newRes, sint startSlot = 0)
 {
-	if ((startSlot < rtCount) && Span<IRenderTarget*>(&rtvs[startSlot], rtCount - startSlot) == newRes)
-		return false;
+	const uint updateExtent = UpdateResources(stateRes, stateCount, newRes, startSlot);
 
-	// Update and track usage
-	UpdateUsageMap<RWResourceUsages::RenderTargetView>(ShadeStages::Pixel, Span(&rtvs[startSlot], newRes.GetLength()), newRes);
+	for (uint i = 0; i < updateExtent; i++)
+	{
+		if (newRes.GetData() != nullptr && i < newRes.GetLength())
+			rawRes[i + startSlot] = GetViewPtr<const ID3D11Resource>(newRes[i]);
+		else
+			rawRes[i + startSlot] = nullptr;
+	}
 
-	return (UpdateResources(rtvs, rtCount, newRes, startSlot) > 0);
+	return updateExtent;
 }
 
-bool ContextState::TryUpdateViewports()
+bool ContextState::TryUpdateRenderTargets(IDynamicArray<IRenderTarget*>& newRes, uint startSlot)
+{
+	// Update and track usage
+	UpdateUsageMap<RWResourceUsages::RenderTargetView>(ShadeStages::Pixel, Span(&rtvResources[startSlot], newRes.GetLength()), newRes);
+
+	return (UpdateResources(rtvs, rtvResources, rtCount, newRes, startSlot) > 0);
+}
+
+bool ContextState::TryUpdateViewports(const IDynamicArray<IRenderTarget*>& newRTVs, uint startSlot)
 {
 	const vec2 depthRange = GetDepthStencilRange();
 	bool wasChanged = false;
@@ -375,7 +407,7 @@ bool ContextState::TryUpdateViewports()
 		if (rtvs[i] == nullptr)
 			continue;
 
-		const IRenderTarget& rt = *rtvs[i];
+		const IRenderTarget& rt = *newRTVs[i];
 		Viewport vp
 		{
 			.offset = rt.GetRenderOffset(),
@@ -383,9 +415,9 @@ bool ContextState::TryUpdateViewports()
 			.zDepth = depthRange
 		};
 
-		if (vp != viewports[i])
+		if (vp != viewports[i + startSlot])
 		{
-			viewports[i] = vp;
+			viewports[i + startSlot] = vp;
 			wasChanged = true;
 		}
 	}
@@ -396,35 +428,43 @@ bool ContextState::TryUpdateViewports()
 
 bool ContextState::TryUpdateDepthStencil(IDepthStencil* pDepthStencil)
 {
-	if (this->pDepthStencil == pDepthStencil)
-		return false;
+	if (pDepthStencil != nullptr)
+	{
+		if (this->pDSV == *pDepthStencil && this->pDSS == pDepthStencil->GetState()
+			&& depthStencilRange == pDepthStencil->GetRange())
+		{ return false; }
 
-	// Update and track usage
-	UpdateUsageMap<RWResourceUsages::DepthStencilView>(ShadeStages::Pixel, Span(&this->pDepthStencil), Span(&pDepthStencil));
+		// Update and track usage
+		UpdateUsageMap<RWResourceUsages::DepthStencilView>(ShadeStages::Pixel, Span(&this->pDSResource), Span(&pDepthStencil));
 
-	this->pDepthStencil = pDepthStencil;
-	return true;
+		pDSV = *pDepthStencil;
+		pDSResource = *pDepthStencil;
+		pDSS = pDepthStencil->GetState();
+		depthStencilRange = pDepthStencil->GetRange();
+
+		return true;
+	}
+	else
+	{
+		const bool wasNull = pDSV == nullptr;
+		pDSV = nullptr;
+		pDSResource = nullptr;
+		pDSS = nullptr;
+		depthStencilRange = vec2(0);
+
+		return !wasNull;
+	}
 }
 
 const Span<ID3D11Buffer*> ContextState::TryUpdateResources(ShadeStages stage, IDynamicArray<ConstantBuffer>& cbufs)
 {
 	ContextState::StageState& ss = stages[(uint)stage];
-	Span<ID3D11Buffer*> newCbufs;
 
-	if (cbufs.GetLength() > 0)
-	{
-		ALLOCA_SPAN_SET(newCbufs, cbufs.GetLength(), ID3D11Buffer*);
-
-		// Retrieve D3D pointers
-		for (uint i = 0; i < cbufs.GetLength(); i++)
-			newCbufs[i] = cbufs[i].Get();
-	}
-
-	const uint extent = UpdateResources(ss.cbuffers, ss.cbufCount, newCbufs);
+	const uint extent = UpdateResources(ss.cbuffers, ss.cbufCount, cbufs);
 	return Span(ss.cbuffers.GetData(), extent);
 }
 
-const Span<const Sampler*> ContextState::TryUpdateResources(ShadeStages stage, const ResourceSet::SamplerList& resSrc, const SamplerMap* pResMap)
+const Span<ID3D11SamplerState*> ContextState::TryUpdateResources(ShadeStages stage, const ResourceSet::SamplerList& resSrc, const SamplerMap* pResMap)
 {
 	ContextState::StageState& ss = stages[(uint)stage];
 	Span<const Sampler*> newRes;
@@ -441,7 +481,7 @@ const Span<const Sampler*> ContextState::TryUpdateResources(ShadeStages stage, c
 	return Span(ss.samplers.GetData(), extent);
 }
 
-const Span<const IShaderResource*> ContextState::TryUpdateResources(ShadeStages stage, const ResourceSet::SRVList& resSrc, const ResourceViewMap* pResMap)
+const Span<ID3D11ShaderResourceView*> ContextState::TryUpdateResources(ShadeStages stage, const ResourceSet::SRVList& resSrc, const ResourceViewMap* pResMap)
 {
 	ContextState::StageState& ss = stages[(uint)stage];
 	Span<const IShaderResource*> newRes;
@@ -454,14 +494,14 @@ const Span<const IShaderResource*> ContextState::TryUpdateResources(ShadeStages 
 	}
 
 	// Update and track usage
-	UpdateUsageMap<RWResourceUsages::ShaderResourceView>(stage, Span(ss.srvs.GetData(), ss.srvCount), newRes);
+	UpdateUsageMap<RWResourceUsages::ShaderResourceView>(stage, Span(ss.srvResources.GetData(), ss.srvCount), newRes);
 
 	// Populate the state cache based on the mapped resources
-	const uint extent = UpdateResources(ss.srvs, ss.srvCount, newRes);
+	const uint extent = UpdateResources(ss.srvs, ss.srvResources, ss.srvCount, newRes);
 	return Span(ss.srvs.GetData(), extent);
 }
 
-const Span<IUnorderedAccess*> ContextState::TryUpdateResources(const ResourceSet::UAVList& resSrc, const UnorderedAccessMap* pResMap)
+const Span<ID3D11UnorderedAccessView*> ContextState::TryUpdateResources(const ResourceSet::UAVList& resSrc, const UnorderedAccessMap* pResMap)
 {
 	Span<IUnorderedAccess*> newRes;
 
@@ -473,10 +513,10 @@ const Span<IUnorderedAccess*> ContextState::TryUpdateResources(const ResourceSet
 	}
 
 	// Update and track usage
-	UpdateUsageMap<RWResourceUsages::UnorderedAccessView>(ShadeStages::Compute, Span(uavs.GetData(), uavCount), newRes);
+	UpdateUsageMap<RWResourceUsages::UnorderedAccessView>(ShadeStages::Compute, Span(uavResources.GetData(), uavCount), newRes);
 
 	// Populate the state cache based on the mapped resources
-	const uint extent = UpdateResources(uavs, uavCount, newRes);
+	const uint extent = UpdateResources(uavs, uavResources, uavCount, newRes);
 	return Span(uavs.GetData(), extent);
 }
 
@@ -542,21 +582,25 @@ ContextState::ConflictState ContextState::TryResolveConflicts()
 			{			
 				StageState& ss = stages[(uint)conflict.lastStage];
 				ss.srvs[conflict.slot] = nullptr;
+				ss.srvResources[conflict.slot] = nullptr;
 				state.srvsExtent[(uint)conflict.lastStage] = (byte)ss.srvCount;
 				break;
 			}
 			case RWResourceUsages::UnorderedAccessView:
 			{
 				uavs[conflict.slot] = nullptr;
+				uavResources[conflict.slot] = nullptr;
 				state.uavsExtent = (byte)uavCount;
 				break;
 			}
 			case RWResourceUsages::RenderTargetView:
 				rtvs[conflict.slot] = nullptr;
+				rtvResources[conflict.slot] = nullptr;
 				state.rtvExtent = (byte)rtCount;
 				break;
 			case RWResourceUsages::DepthStencilView:
-				pDepthStencil = nullptr;
+				pDSV = nullptr;
+				pDSResource = nullptr;
 				state.rtvExtent = (byte)rtCount;
 				break;
 			}

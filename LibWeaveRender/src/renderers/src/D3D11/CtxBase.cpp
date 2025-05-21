@@ -36,7 +36,7 @@ void CtxBase::BindDepthStencilBuffer(IDepthStencil& depthStencil)
 	{
 		HandleConflicts();
 		pCtx->OMSetDepthStencilState(pState->GetDepthStencilState(), 1u);
-		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
+		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencilView());
 	}
 }
 
@@ -45,7 +45,7 @@ void CtxBase::UnbindDepthStencilBuffer()
 	if (pState->TryUpdateDepthStencil(nullptr))
 	{
 		pCtx->OMSetDepthStencilState(pState->GetDepthStencilState(), 1u);
-		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
+		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencilView());
 	}
 }
 
@@ -73,10 +73,10 @@ void CtxBase::BindRenderTargets(IDynamicArray<IRenderTarget*>& rts, sint startSl
 	if (pState->TryUpdateRenderTargets(rts, startSlot))
 	{
 		HandleConflicts();
-		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
+		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencilView());
 	}
 
-	if (pState->TryUpdateViewports())
+	if (pState->TryUpdateViewports(rts, startSlot))
 	{
 		const Span<Viewport> viewports = pState->GetViewports();
 		pCtx->RSSetViewports((uint)viewports.GetLength(), (D3D11_VIEWPORT*)&viewports[0]);
@@ -98,10 +98,10 @@ void CtxBase::BindRenderTargets(IDynamicArray<IRenderTarget*>& rts, IDepthStenci
 	if (wasDsChanged || wasRtvChanged)
 	{
 		HandleConflicts();
-		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
+		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencilView());
 	}
 		
-	if (pState->TryUpdateViewports())
+	if (pState->TryUpdateViewports(rts, startSlot))
 	{
 		const Span<Viewport> viewports = pState->GetViewports();
 		pCtx->RSSetViewports((uint)viewports.GetLength(), (D3D11_VIEWPORT*)&viewports[0]);
@@ -127,7 +127,7 @@ void CtxBase::UnbindRenderTargets(sint startSlot, uint count)
 		ALLOCA_SPAN_SET_NULL(nullRTs, count, IRenderTarget*);
 
 	if (pState->TryUpdateRenderTargets(nullRTs, startSlot))
-		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
+		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencilView());
 }
 
 void CtxBase::SetPrimitiveTopology(PrimTopology topology)
@@ -183,7 +183,7 @@ void CtxBase::UnbindVertexBuffers(sint startSlot, uint count)
 
 void CtxBase::BindIndexBuffer(IndexBuffer& indexBuffer, uint byteOffset)
 {
-	if (pState->TryUpdateIndexBuffer(indexBuffer.Get()))
+	if (pState->TryUpdateIndexBuffer(indexBuffer.GetBuffer()))
 	{
 		pCtx->IASetIndexBuffer(pState->GetIndexBuffer(), (DXGI_FORMAT)indexBuffer.GetFormat(), byteOffset);
 	}
@@ -229,7 +229,7 @@ void CtxBase::HandleConflicts()
 			CSSetUnorderedAccessViews(pCtx.Get(), 0, pState->CSGetUAVs(0, conflicts.uavsExtent), nullptr);
 
 		if (conflicts.rtvExtent > 0)
-			OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
+			OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencilView());
 	}
 }
 
@@ -348,14 +348,14 @@ void CtxBase::Draw(IDynamicArray<Mesh>& meshes, Material& mat)
 
 static void WriteBufferSubresource(ID3D11DeviceContext& ctx, BufferBase& dst, const IDynamicArray<byte>& src)
 {
-	ctx.UpdateSubresource(dst.Get(), 0, nullptr, src.GetData(), 0, 0);
+	ctx.UpdateSubresource(dst.GetBuffer(), 0, nullptr, src.GetData(), 0, 0);
 }
 
 static void WriteBufferMapUnmap(ID3D11DeviceContext& ctx, BufferBase& dst, const IDynamicArray<byte>& src)
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
 	D3D_CHECK_HR(ctx.Map(
-		dst.Get(),
+		dst.GetBuffer(),
 		0u,
 		D3D11_MAP_WRITE_DISCARD,
 		0u,
@@ -363,7 +363,7 @@ static void WriteBufferMapUnmap(ID3D11DeviceContext& ctx, BufferBase& dst, const
 	));
 
 	memcpy(msr.pData, src.GetData(), dst.GetSize());
-	ctx.Unmap(dst.Get(), 0u);
+	ctx.Unmap(dst.GetBuffer(), 0u);
 }
 
 void CtxBase::SetBufferData(BufferBase& dst, const IDynamicArray<byte>& src)
@@ -679,7 +679,7 @@ void CtxBase::Blit(const ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 	bool wasVpSet = false;
 
 	// Manually set render target if it isn't already set
-	if (&dst != pState->GetRenderTargets()[0])
+	if (dst != pState->GetRenderTargets()[0])
 	{
 		pCtx->OMSetRenderTargets(1, dst.GetAddressRTV(), nullptr);
 		wasRtvSet = true;
@@ -708,7 +708,7 @@ void CtxBase::Blit(const ITexture2D& src, IRenderTarget& dst, ivec4 srcBox)
 
 	// Manually restore previous state if changed
 	if (wasRtvSet)
-		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencil());
+		OMSetRenderTargets(pCtx.Get(), pState->GetRenderTargets(), pState->GetDepthStencilView());
 
 	if (wasVpSet)
 	{

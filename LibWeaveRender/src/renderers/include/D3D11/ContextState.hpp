@@ -56,24 +56,25 @@ namespace Weave::D3D11
 			const ShaderVariantBase* pShader;
 			ulong drawCount;
 
-			UniqueArray<const Sampler*> samplers;
+			UniqueArray<ID3D11SamplerState*> samplers;
 			uint sampCount;
 
 			UniqueArray<ID3D11Buffer*> cbuffers;
 			uint cbufCount;
 
-			UniqueArray<const IShaderResource*> srvs;
+			UniqueArray<ID3D11ShaderResourceView*> srvs;
+			UniqueArray<const ID3D11Resource*> srvResources;
 			uint srvCount;
 
 			StageState();
 
 			void Reset();
 
-			const Span<const Sampler*> GetSamplers(sint offset = 0, uint extent = (uint)-1) const;
+			const Span<ID3D11SamplerState*> GetSamplers(sint offset = 0, uint extent = (uint)-1) const;
 
 			const Span<ID3D11Buffer*> GetCBuffers(sint offset = 0, uint extent = (uint)-1) const;
 
-			const Span<const IShaderResource*> GetSRVs(sint offset = 0, uint extent = (uint)-1) const;
+			const Span<ID3D11ShaderResourceView*> GetSRVs(sint offset = 0, uint extent = (uint)-1) const;
 		};
 
 		/// <summary>
@@ -136,9 +137,7 @@ namespace Weave::D3D11
 		/// </summary>
 		const StageState& GetStage(ShadeStages stage) const;
 
-		const Span<IRenderTarget*> GetRenderTargets() const;
-
-		IDepthStencil* GetDepthStencil() const;
+		const Span<ID3D11RenderTargetView*> GetRenderTargets() const;
 
 		const Span<Viewport> GetViewports();
 
@@ -152,7 +151,7 @@ namespace Weave::D3D11
 
 		const Span<uint> GetVertOffsets() const;
 
-		const Span<IUnorderedAccess*> CSGetUAVs(sint offset = 0, uint extent = (uint)-1) const;
+		const Span<ID3D11UnorderedAccessView*> CSGetUAVs(sint offset = 0, uint extent = (uint)-1) const;
 
 		/// <summary>
 		/// Returns interface to depth stencil resource view
@@ -215,7 +214,7 @@ namespace Weave::D3D11
 		/// Automatically updates viewports to align with DRS area specified by Weave RT objects and 
 		/// returns true if changes were made
 		/// </summary>
-		bool TryUpdateViewports();
+		bool TryUpdateViewports(const IDynamicArray<IRenderTarget*>& newRTVs, uint startSlot);
 
 		/// <summary>
 		/// Updates resources bound in the state cache and returns the resource range affected that 
@@ -227,19 +226,19 @@ namespace Weave::D3D11
 		/// Updates resources bound in the state cache and returns the resource range affected that 
 		/// requires update.
 		/// </summary>
-		const Span<const Sampler*> TryUpdateResources(ShadeStages stage, const ResourceSet::SamplerList& resSrc, const SamplerMap* pMap);
+		const Span<ID3D11SamplerState*> TryUpdateResources(ShadeStages stage, const ResourceSet::SamplerList& resSrc, const SamplerMap* pMap);
 
 		/// <summary>
 		/// Updates resources bound in the state cache and returns the resource range affected that 
 		/// requires update.
 		/// </summary>
-		const Span<const IShaderResource*> TryUpdateResources(ShadeStages stage, const ResourceSet::SRVList& resSrc, const ResourceViewMap* pMap);
+		const Span<ID3D11ShaderResourceView*> TryUpdateResources(ShadeStages stage, const ResourceSet::SRVList& resSrc, const ResourceViewMap* pMap);
 
 		/// <summary>
 		/// Updates resources bound in the state cache and returns the resource range affected that 
 		/// requires update.
 		/// </summary>
-		const Span<IUnorderedAccess*> TryUpdateResources(const ResourceSet::UAVList& resSrc, const UnorderedAccessMap* pMap);
+		const Span<ID3D11UnorderedAccessView*> TryUpdateResources(const ResourceSet::UAVList& resSrc, const UnorderedAccessMap* pMap);
 
 		/// <summary>
 		/// Attempts to resolve any conflicts in cache by setting them to null. Returns a state object with counters
@@ -328,14 +327,19 @@ namespace Weave::D3D11
 		UniqueArray<uint> vbStrides;
 		UniqueArray<uint> vbOffsets;
 
-		IDepthStencil* pDepthStencil;
+		const ID3D11Resource* pDSResource;
+		ID3D11DepthStencilView* pDSV;
+		ID3D11DepthStencilState* pDSS;
+		vec2 depthStencilRange;
 		ID3D11BlendState* pBlendState;
 		ID3D11RasterizerState* pRasterState;
 
-		UniqueArray<IUnorderedAccess*> uavs;
+		UniqueArray<ID3D11UnorderedAccessView*> uavs;
+		UniqueArray<const ID3D11Resource*> uavResources;
 		uint uavCount;
 
-		UniqueArray<IRenderTarget*> rtvs;
+		UniqueArray<ID3D11RenderTargetView*> rtvs;
+		UniqueArray<const ID3D11Resource*> rtvResources;
 		uint rtCount;
 
 		UniqueArray<Viewport> viewports;
@@ -346,7 +350,8 @@ namespace Weave::D3D11
 		bool isInitialized;
 
 		template<RWResourceUsages UsageT, typename ResT>
-		void UpdateUsageMap(ShadeStages stage, const Span<ResT*> stateRes, const IDynamicArray<ResT*>& newRes);
+		requires std::is_convertible_v<ResT, ID3D11Resource*>
+		void UpdateUsageMap(ShadeStages stage, const Span<const ID3D11Resource*> stateRes, const IDynamicArray<ResT*>& newRes);
 
 		void LogInvalidStateTransitions(RWConflictDesc conflict);
 	};
