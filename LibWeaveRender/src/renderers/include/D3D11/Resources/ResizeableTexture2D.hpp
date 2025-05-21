@@ -88,6 +88,13 @@ namespace Weave::D3D11
 		vec2 GetRenderScale() const override;
 
 		/// <summary>
+		/// Sets the texture to the given dimensions. If the dimensions are greater than the size of the 
+		/// underlying buffer, a new texture will be allocated and the old contents discarded.
+		/// Returns true if the texture was reallocaated.
+		/// </summary>
+		bool Resize(uivec2 newDim, Formats format = Formats::UNKNOWN);
+
+		/// <summary>
 		/// Initializes new Texture2D from WIC-compatible image 
 		/// (BMP, GIF, ICO, JPEG, PNG, TIFF)
 		/// </summary>

@@ -21,7 +21,7 @@ namespace Weave::D3D11
 
 		RWTexture2D(
 			Device& dev,
-			Formats format,
+			Formats format = Formats::R8G8B8A8_UNORM,
 			uivec2 dim = uivec2(0),
 			uint mipLevels = 1u
 		);

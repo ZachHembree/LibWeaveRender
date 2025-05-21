@@ -43,25 +43,31 @@ Texture2DBase::Texture2DBase(
 	desc.sampleDesc.count = 1;
 	desc.sampleDesc.quality = 0;
 
-	if (data != nullptr)
-	{ 
-		D3D11_SUBRESOURCE_DATA initData = {};
-		initData.pSysMem = data;
-		initData.SysMemPitch = dim.x * stride;
-		D3D_CHECK_HR(GetDevice()->CreateTexture2D(desc.GetD3DPtr(), &initData, &pRes));
-	}
-	else if (dim.x != 0 && dim.y != 0)
+	if (dim.x != 0 && dim.y != 0)
 	{
-		D3D_CHECK_HR(GetDevice()->CreateTexture2D(desc.GetD3DPtr(), nullptr, &pRes));
+		if (data != nullptr)
+		{
+			D3D11_SUBRESOURCE_DATA initData = {};
+			initData.pSysMem = data;
+			initData.SysMemPitch = dim.x * stride;
+			D3D_CHECK_HR(GetDevice()->CreateTexture2D(desc.GetD3DPtr(), &initData, &pRes));
+		}
+		else
+		{
+			D3D_CHECK_HR(GetDevice()->CreateTexture2D(desc.GetD3DPtr(), nullptr, &pRes));
+		}
 	}
 }
 
 Texture2DBase::Texture2DBase() : desc({}) {}
 
-void Texture2DBase::Reset(uivec2 dim)
+void Texture2DBase::Reset(uivec2 dim, Formats format)
 {
 	if (dim != uivec2(-1))
 		desc.size = dim;
+
+	if (format != Formats::UNKNOWN)
+		desc.format = (DXGI_FORMAT)format;
 
 	D3D_CHECK_HR(GetDevice()->CreateTexture2D(desc.GetD3DPtr(), nullptr, &pRes));
 	Init();

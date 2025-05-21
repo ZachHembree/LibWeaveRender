@@ -140,6 +140,20 @@ vec2 ResizeableTexture2D::GetRenderScale() const
 	return renderScale;
 }
 
+bool ResizeableTexture2D::Resize(uivec2 newDim, Formats format)
+{
+	bool wasReset = false;
+
+	if ((format != Formats::UNKNOWN && GetFormat() != format) || AnyTrue(newDim > GetSize()))
+	{
+		Reset(newDim, format);
+		wasReset = true;
+	}
+
+	SetRenderSize(newDim);
+	return wasReset;
+}
+
 ResizeableTexture2D ResizeableTexture2D::FromImageWIC(Device& dev, wstring_view file)
 {
 	ScratchImage buf;

@@ -97,6 +97,11 @@ namespace Weave::D3D11
 		/// </summary>
 		bool GetIsValid() const override;
 
+		/// <summary>
+		/// Allocates a new texture with the given dimensions and resets the contents
+		/// </summary>
+		void Reset(uivec2 dim = uivec2(-1), Formats newFormat = Formats::UNKNOWN);
+
 	protected:
 		DECL_MOVE_ONLY(Texture2DBase);
 
@@ -108,7 +113,7 @@ namespace Weave::D3D11
 
 		Texture2DBase(
 			Device& dev,
-			uivec2 dim,
+			uivec2 dim = uivec2(0),
 			Formats format = Formats::R8G8B8A8_UNORM,
 			ResourceUsages usage = ResourceUsages::Default,
 			ResourceBindFlags bindFlags = ResourceBindFlags::ShaderResource,
@@ -122,10 +127,5 @@ namespace Weave::D3D11
 		virtual ~Texture2DBase();
 
 		virtual void Init() = 0;
-
-		/// <summary>
-		/// Allocates a new texture with the given dimensions and resets the contents
-		/// </summary>
-		virtual void Reset(uivec2 dim = uivec2(-1));
 	};
 }
