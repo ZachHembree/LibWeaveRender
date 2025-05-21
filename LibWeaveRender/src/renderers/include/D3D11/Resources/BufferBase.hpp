@@ -10,21 +10,23 @@ namespace Weave::D3D11
 	/// <summary>
 	/// Abstract base for GPU buffer types
 	/// </summary>
-	class BufferBase : public ResourceBase
+	class BufferBase : public ResourceBase, public virtual IBuffer
 	{
 	public:
-		ID3D11Buffer* Get();
-
-		ID3D11Buffer* const* GetAddressOf();
+		ID3D11Buffer* GetBuffer();
 
 		ID3D11Resource* GetResource() const override;
-
-		ID3D11Resource* const* GetResAddress() const override;
 
 		/// <summary>
 		/// Returns the total size of the buffer in bytes.
 		/// </summary>
 		uint GetSize() const;
+
+		/// <summary>
+		/// Returns the dimensions of the underlying buffer. Non-applicable dimensions are 
+		/// always set to 1. For 1D buffers, Y == 1 and Z == 1.
+		/// </summary>
+		uivec3 GetDimensions() const override;
 
 		/// <summary>
 		/// Specifies how/if the CPU accesses the buffer
@@ -46,6 +48,8 @@ namespace Weave::D3D11
 		/// an exception.
 		/// </summary>
 		void SetRawData(CtxBase& ctx, const IDynamicArray<byte>& data);
+
+		operator ID3D11Buffer* () { return GetBuffer(); }
 
 	protected:
 		DECL_MOVE_ONLY(BufferBase);

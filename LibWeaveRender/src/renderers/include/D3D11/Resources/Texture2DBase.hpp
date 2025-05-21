@@ -65,11 +65,6 @@ namespace Weave::D3D11
 		ID3D11Resource* GetResource() const override;
 
 		/// <summary>
-		/// Returns pointer to interface pointer field
-		/// </summary>
-		ID3D11Resource* const* GetResAddress() const override;
-
-		/// <summary>
 		/// Updates texture with contents of an arbitrary pixel data buffer, assuming compatible formats.
 		/// Allocates new Texture2D if the dimensions aren't the same.
 		/// </summary>

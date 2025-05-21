@@ -17,10 +17,7 @@ namespace Weave::D3D11
 		/// </summary>
 		virtual ID3D11Resource* GetResource() const = 0;
 
-		/// <summary>
-		/// Returns a pointer to the resource field address
-		/// </summary>
-		virtual ID3D11Resource* const* GetResAddress() const = 0;
+		operator ID3D11Resource*() const { return GetResource(); }
 	};
 
 	class ResourceBase : public virtual IResource, public DeviceChild
@@ -61,7 +58,7 @@ namespace Weave::D3D11
 		/// Returns the dimensions of the underlying buffer. Non-applicable dimensions are 
 		/// always set to 1. For 1D buffers, Y == 1 and Z == 1.
 		/// </summary>
-		virtual uivec3 GetDimensions() const = 0;
+		virtual uivec3 GetDimensions() const = 0;		
 	};
 
 	/// <summary>
@@ -79,6 +76,8 @@ namespace Weave::D3D11
 		/// Returns interface to resource view
 		/// </summary>
 		virtual ID3D11ShaderResourceView* const* GetSRVAddress() const = 0;
+
+		operator ID3D11ShaderResourceView* () const { return GetSRV(); }
 	};
 
 	/// <summary>
@@ -154,6 +153,8 @@ namespace Weave::D3D11
 		/// Clears the render target to the given color
 		/// </summary>
 		virtual void Clear(CtxBase& ctx, vec4 color = vec4(0)) = 0;
+
+		operator ID3D11RenderTargetView* () { return GetRTV(); }
 	};
 
 	/// <summary>
@@ -171,6 +172,8 @@ namespace Weave::D3D11
 		/// Returns pointer to UAV pointer field
 		/// </summary>
 		virtual ID3D11UnorderedAccessView* const* GetAddressUAV() = 0;
+
+		operator ID3D11UnorderedAccessView* () { return GetUAV(); }
 	};
 
 	/// <summary>
@@ -217,6 +220,8 @@ namespace Weave::D3D11
 			float depthClear = 1.0f,
 			byte stencilClear = 0
 		) = 0;
+
+		operator ID3D11DepthStencilView* () { return GetDSV(); }
 	};
 
 	/// <summary>

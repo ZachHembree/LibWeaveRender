@@ -95,9 +95,6 @@ ResourceAccessFlags Texture2DBase::GetAccessFlags() const { return desc.cpuAcces
 
 const Texture2DDesc& Texture2DBase::GetDescription() const { return desc; }
 
-/// <summary>
-/// Returns interface to resource
-/// </summary>
 ID3D11Resource* Texture2DBase::GetResource() const { return pRes.Get(); }
 
 void Texture2DBase::SetTextureData(CtxBase& ctx, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim)
@@ -120,5 +117,3 @@ void Texture2DBase::LoadImageWIC(wstring_view file, ScratchImage& buffer)
 }
 
 bool Texture2DBase::GetIsValid() const { return pDev != nullptr && pRes.Get() != nullptr; }
-
-ID3D11Resource* const* Texture2DBase::GetResAddress() const { return reinterpret_cast<ID3D11Resource* const*>(pRes.GetAddressOf()); }

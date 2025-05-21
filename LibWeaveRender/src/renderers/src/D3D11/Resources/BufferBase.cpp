@@ -24,12 +24,12 @@ BufferBase::BufferBase(
 ) :
 	ResourceBase(dev),
 	desc({
-		.byteWidth = (uint)GetAlignedByteSize(byteSize, g_ConstantBufferAlignment),
+		.byteWidth = byteSize,
 		.usage = usage,
 		.bindFlags = type,
 		.cpuAccessFlags = cpuAccess,
 		.miscFlags = miscFlags,
-		.structuredStride = (uint)GetAlignedByteSize(structStride, g_ConstantBufferAlignment)
+		.structuredStride = structStride
 	})
 {
 	D3D_ASSERT_MSG(byteSize > 0, "Buffer size cannot be 0.");
@@ -47,15 +47,13 @@ BufferBase::BufferBase(
 
 BufferBase::~BufferBase() = default;
 
-ID3D11Buffer* BufferBase::Get() { return pBuf.Get(); }
-
-ID3D11Buffer* const* BufferBase::GetAddressOf() { return pBuf.GetAddressOf(); }
+ID3D11Buffer* BufferBase::GetBuffer() { return pBuf.Get(); }
 
 ID3D11Resource* BufferBase::GetResource() const { return pBuf.Get(); }
 
-ID3D11Resource* const* BufferBase::GetResAddress() const { return reinterpret_cast<ID3D11Resource* const*>(pBuf.GetAddressOf()); }
-
 uint BufferBase::GetSize() const { return desc.byteWidth; }
+
+uivec3 BufferBase::GetDimensions() const { return uivec3(GetSize(), 1, 1); }
 
 ResourceUsages BufferBase::GetUsage() const { return desc.usage; }
 

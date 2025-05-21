@@ -52,7 +52,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns a pointer to the resource field address
 		/// </summary>
-		ID3D11Resource* const* GetResAddress() const override;
+		ID3D11Resource* const* GetResAddress() const;
 
 		/// <summary>
 		/// Returns the dimensions of the 2D texture

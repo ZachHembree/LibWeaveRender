@@ -33,6 +33,8 @@ namespace Weave::D3D11
         /// </summary>
         ID3D11SamplerState* const* GetAddressOf() const;
 
+        operator ID3D11SamplerState*() const;
+
 	private:
         UniqueComPtr<ID3D11SamplerState> pSamp;
 	};
