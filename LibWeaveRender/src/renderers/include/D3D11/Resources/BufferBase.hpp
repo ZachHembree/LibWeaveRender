@@ -45,7 +45,7 @@ namespace Weave::D3D11
 		/// Writes the given data to the buffer. Writing to an unsupported buffer type will throw
 		/// an exception.
 		/// </summary>
-		void SetData(CtxBase& ctx, const IDynamicArray<byte>& data);
+		void SetRawData(CtxBase& ctx, const IDynamicArray<byte>& data);
 
 	protected:
 		DECL_MOVE_ONLY(BufferBase);

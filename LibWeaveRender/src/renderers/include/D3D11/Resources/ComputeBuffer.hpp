@@ -38,7 +38,7 @@ namespace Weave::D3D11
 		template<typename T>
 		void SetData(CtxBase& ctx, const IDynamicArray<T>& data)
 		{
-			SetData(ctx, Span<byte>((byte*)data.GetData(), GetArrSize(data)));
+			SetRawData(ctx, Span<byte>((byte*)data.GetData(), GetArrSize(data)));
 		}
 
 	private:

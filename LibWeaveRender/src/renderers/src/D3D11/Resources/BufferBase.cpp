@@ -63,7 +63,7 @@ ResourceBindFlags BufferBase::GetBindFlags() const { return desc.bindFlags; }
 
 ResourceAccessFlags BufferBase::GetAccessFlags() const { return desc.cpuAccessFlags; }
 
-void BufferBase::SetData(CtxBase& ctx, const IDynamicArray<byte>& data)
+void BufferBase::SetRawData(CtxBase& ctx, const IDynamicArray<byte>& data)
 {
 	ctx.SetBufferData(*this, data);
 }
