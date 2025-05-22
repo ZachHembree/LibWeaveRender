@@ -71,17 +71,21 @@ Renderer::Renderer(MinWindow& parent) :
 
 Renderer::~Renderer()
 {
-		canRun = false;
-		std::unique_lock lock(renderMutex);
-	}
-
-Device& Renderer::GetDevice() { return *pDev; }
+	canRun = false;
+	std::unique_lock lock(renderMutex);
+}
 
 /*
 	General purpose public utilities
 */
 
+Device& Renderer::GetDevice() { return *pDev; }
+
 IRenderTarget& Renderer::GetBackBuffer() { return pSwap->GetBackBuf(); }
+
+const Device& Renderer::GetDevice() const { return *pDev; }
+
+const IRenderTarget& Renderer::GetBackBuffer() const { return pSwap->GetBackBuf(); }
 
 ulong Renderer::GetFrameNumber() const { return pFrameTimer->GetFrameCount(); }
 

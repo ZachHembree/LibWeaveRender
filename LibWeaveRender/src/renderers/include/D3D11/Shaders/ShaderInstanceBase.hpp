@@ -60,21 +60,20 @@ namespace Weave::D3D11
 		ConstantHandle<T> GetConstant(string_view name) { return GetConstant<T>(GetStringID(name)); }
 
 		/// <summary>
-		/// Sets the value corresponding to the given name to the
-		/// given value.
+		/// Writes the given raw binary to the corresponding shader constant. Validates size, but is not type safe.
 		/// </summary>
 		void SetConstant(uint nameID, const Span<byte>& newValue);
 
 		/// <summary>
-		/// Sets the value corresponding to the given name to the
-		/// given value.
+		/// Writes the given value to the corresponding named shader constant. Validates size, not type. The value given 
+		/// must match the value declared in the shader.
 		/// </summary>
 		template<typename T>
 		void SetConstant(uint nameID, const T& value) { SetConstant(nameID, {(byte*)&value, sizeof(T)}); }
 
 		/// <summary>
-		/// Sets the value corresponding to the given name to the
-		/// given value.
+		/// Writes the given value to the corresponding named shader constant. Validates size, not type. The value given 
+		/// must match the value declared in the shader.
 		/// </summary>
 		template<>
 		void SetConstant<mat4>(uint nameID, const mat4& value)
@@ -84,8 +83,8 @@ namespace Weave::D3D11
 		}
 
 		/// <summary>
-		/// Sets the value corresponding to the given name to the
-		/// given value.
+		/// Writes the given value to the corresponding named shader constant. Validates size, not type. The value given 
+		/// must match the value declared in the shader.
 		/// </summary>
 		template<>
 		void SetConstant<mat3>(uint nameID, const mat3& value)
@@ -95,21 +94,20 @@ namespace Weave::D3D11
 		}
 
 		/// <summary>
-		/// Sets the value corresponding to the given name to the
-		/// given value.
+		/// Writes the given raw binary to the corresponding shader constant. Validates size, but is not type safe.
 		/// </summary>
 		void SetConstant(string_view name, const Span<byte>& newValue);
 
 		/// <summary>
-		/// Sets the value corresponding to the given name to the
-		/// given value.
+		/// Writes the given value to the corresponding named shader constant. Validates size, not type. The value given 
+		/// must match the value declared in the shader.
 		/// </summary>
 		template<typename T>
 		void SetConstant(string_view name, const T& value) { SetConstant(name, {(byte*)&value, sizeof(T)}); }
 
 		/// <summary>
-		/// Sets the value corresponding to the given name to the
-		/// given value.
+		/// Writes the given value to the corresponding named shader constant. Validates size, not type. The value given 
+		/// must match the value declared in the shader.
 		/// </summary>
 		template<>
 		void SetConstant<mat4>(string_view name, const mat4& value)
@@ -119,8 +117,8 @@ namespace Weave::D3D11
 		}
 
 		/// <summary>
-		/// Sets the value corresponding to the given name to the
-		/// given value.
+		/// Writes the given value to the corresponding named shader constant. Validates size, not type. The value given 
+		/// must match the value declared in the shader.
 		/// </summary>
 		template<>
 		void SetConstant<mat3>(string_view name, const mat3& value)

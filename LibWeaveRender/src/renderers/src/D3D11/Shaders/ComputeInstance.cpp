@@ -27,8 +27,8 @@ void ComputeInstance::SetKernel(uint nameID)
 	if (this->nameID == nameID)
 		return;
 
-	vID = pLib->GetLibMap().ResetVariant(vID);
 	this->nameID = nameID;
+	vID = pLib->GetLibMap().TryGetDefaultShaderVariant(nameID);
 
 	const uint shaderID = pLib->GetLibMap().TryGetShaderID(nameID, vID);
 	pCS = &pLib->GetShader<ComputeShaderVariant>(shaderID);
@@ -57,6 +57,21 @@ void ComputeInstance::Dispatch(CtxBase& ctx, uivec3 groups) { ctx.Dispatch(GetSh
 void  ComputeInstance::Dispatch(CtxBase& ctx, uivec2 groups) { Dispatch(ctx, uivec3(groups.x, groups.y, 1)); }
 
 void  ComputeInstance::Dispatch(CtxBase& ctx, uint groupX, uint groupY, uint groupZ) { Dispatch(ctx, uivec3(groupX, groupY, groupZ)); }
+
+void ComputeInstance::DispatchThreads(CtxBase& ctx, uivec3 threads) 
+{ 
+	ctx.Dispatch(GetShader(), ceil(vec3(threads) / vec3(GetThreadGroupSize())), *pRes);
+}
+
+void  ComputeInstance::DispatchThreads(CtxBase& ctx, uivec2 threads) 
+{
+	DispatchThreads(ctx, uivec3(threads.x, threads.y, 1)); 
+}
+
+void  ComputeInstance::DispatchThreads(CtxBase& ctx, uint threadsX, uint threadsY, uint threadsZ) 
+{
+	DispatchThreads(ctx, uivec3(threadsX, threadsY, threadsZ)); 
+}
 
 const ComputeShaderVariant& ComputeInstance::GetShader() const 
 { 

@@ -63,6 +63,16 @@ namespace Weave::D3D11
 		IRenderTarget& GetBackBuffer();
 
 		/// <summary>
+		/// Returns the interface to the device the renderer is running on
+		/// </summary>
+		const Device& GetDevice() const;
+
+		/// <summary>
+		/// Returns a handle to the swap chain's back buffer
+		/// </summary>
+		const IRenderTarget& GetBackBuffer() const;
+
+		/// <summary>
 		/// Returns the current frame number
 		/// </summary>
 		ulong GetFrameNumber() const;
