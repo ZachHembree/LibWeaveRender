@@ -11,10 +11,7 @@ using namespace Weave::D3D11;
 
 DEF_DEST_MOVE(RWTexture2D);
 
-RWTexture2D::RWTexture2D() :
-	renderScale(1),
-	renderOffset(0)
-{ }
+RWTexture2D::RWTexture2D() = default;
 
 RWTexture2D::RWTexture2D(
 	Device& dev,
@@ -37,9 +34,7 @@ RWTexture2D::RWTexture2D(
 		mipLevels,
 		data,
 		stride
-	),
-	renderScale(1),
-	renderOffset(0)
+	)
 {
 	Init();
 }

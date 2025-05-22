@@ -80,8 +80,6 @@ namespace Weave::D3D11
 	private:
 		UniqueComPtr<ID3D11UnorderedAccessView> pUAV;
 		UniqueComPtr<ID3D11RenderTargetView> pRTV;
-		mutable vec2 renderOffset;
-		mutable vec2 renderScale;
 
 		RWTexture2D(
 			Device& dev,
