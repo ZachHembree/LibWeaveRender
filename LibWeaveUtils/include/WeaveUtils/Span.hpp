@@ -57,20 +57,16 @@ namespace Weave
 			std::span<T>(pStart + offset, length)
 		{ }
 
-		explicit Span(IDynamicArray<T>& arr) :
+		Span(IDynamicArray<T>& arr) :
 			std::span<T>(arr.GetData(), arr.GetLength())
 		{ }
 
-		explicit Span(std::span<T>& other) :
+		Span(std::span<T>& other) :
 			std::span<T>(other)
 		{ }
 
-		explicit Span(std::vector<T>& other) :
-			std::span<T>(other.data(), other.size())
-		{ }
-
 		template<size_t N>
-		explicit Span(std::array<T, N>& other) :
+		Span(std::array<T, N>& other) :
 			std::span<T>(other.data(), other.size())
 		{ }
 
