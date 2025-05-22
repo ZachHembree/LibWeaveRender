@@ -371,7 +371,6 @@ void CtxBase::SetBufferData(BufferBase& dst, const IDynamicArray<byte>& src)
 	if (dst.GetSize() > 0)
 	{
 		D3D_ASSERT_MSG(dst.GetUsage() != ResourceUsages::Immutable, "Cannot update Buffers without write access.");
-		D3D_ASSERT_MSG(src.GetLength() == dst.GetSize(), "Buffer data source and destination size must be the same.");
 
 		if (dst.GetUsage() == ResourceUsages::Dynamic)
 			WriteBufferMapUnmap(*pCtx.Get(), dst, src);
@@ -572,7 +571,7 @@ void CtxBase::Blit(const ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
 		cs.SetRWTexture("DstTex", dst);
 		cs.SetConstant("SrcOffset", ivec2(srcBox.z, srcBox.w));
 		cs.SetConstant("DstOffset", ivec2(dstBox.z, dstBox.w));
-		cs.Dispatch(*this, { dstBox.x, dstBox.y });
+		cs.DispatchThreads(*this, { dstBox.x, dstBox.y });
 	}
 	else
 	{
@@ -593,7 +592,7 @@ void CtxBase::Blit(const ITexture2D& src, IRWTexture2D& dst, ivec4 srcBox)
 		cs.SetConstant("SrcOffset", ivec2(srcBox.z, srcBox.w));
 		cs.SetConstant("DstOffset", ivec2(dstBox.z, dstBox.w));
 		cs.SetConstant("DstTexelSize", dst.GetRenderTexelSize());
-		cs.Dispatch(*this, { dstBox.x, dstBox.y });
+		cs.DispatchThreads(*this, { dstBox.x, dstBox.y });
 	}
 }
 
