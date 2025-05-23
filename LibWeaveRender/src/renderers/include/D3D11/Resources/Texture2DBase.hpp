@@ -10,7 +10,7 @@ namespace DirectX
 
 namespace Weave::D3D11
 {
-	class Texture2DBase : public virtual ITexture2DBase, public ResourceBase
+	class Texture2DBase : public virtual IColorBuffer2D, public ResourceBase
 	{
 	public:
 		/// <summary>

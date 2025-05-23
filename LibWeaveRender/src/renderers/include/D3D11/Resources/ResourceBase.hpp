@@ -177,18 +177,12 @@ namespace Weave::D3D11
 	};
 
 	/// <summary>
-	/// Interface for 2D Textures, without resource views
-	/// </summary>
-	class ITexture2DBase : public virtual IResource, public virtual IColorBuffer2D
-	{ };
-
-	/// <summary>
 	/// Interface for 2D Textures, with SRVs
 	/// </summary>
-	class ITexture2D : public virtual ITexture2DBase, public IShaderResource
+	class ITexture2D : public virtual IColorBuffer2D, public IShaderResource
 	{ };
 
-	class IDepthStencil : public virtual ITexture2DBase
+	class IDepthStencil : public virtual IColorBuffer2D
 	{
 	public:
 		/// <summary>

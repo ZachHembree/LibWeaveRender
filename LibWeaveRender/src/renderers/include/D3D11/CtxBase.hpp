@@ -190,7 +190,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Writes data to the specified subregion. Data outside subregion undefined.
 		/// </summary>
-		void SetTextureData(ITexture2DBase& dst, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim, uivec2 dstOffset = uivec2(0));
+		void SetTextureData(IColorBuffer2D& dst, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim, uivec2 dstOffset = uivec2(0));
 
 		/// <summary>
 		/// Returns the buffer handle and unmaps it from the CPU.
@@ -225,7 +225,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Copies the contents of one texture to another
 		/// </summary>
-		void Blit(const ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox = ivec4(0), ivec4 dstBox = ivec4(0));
+		void Blit(const IColorBuffer2D& src, IColorBuffer2D& dst, ivec4 srcBox = ivec4(0), ivec4 dstBox = ivec4(0));
 
 		/// <summary>
 		/// Copies the contents of a texture to a render target

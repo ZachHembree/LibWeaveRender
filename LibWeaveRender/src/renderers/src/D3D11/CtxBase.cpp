@@ -430,7 +430,7 @@ static void WriteTexMapUnmap(ID3D11DeviceContext& ctx, ID3D11Resource& dst, cons
 	ctx.Unmap(&dst, 0u);
 }
 
-void CtxBase::SetTextureData(ITexture2DBase& dst, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim, uivec2 dstOffset)
+void CtxBase::SetTextureData(IColorBuffer2D& dst, const IDynamicArray<byte>& src, uint pixStride, uivec2 srcDim, uivec2 dstOffset)
 {
 	D3D_CHECK_MSG(dst.GetUsage() != ResourceUsages::Immutable, "Cannot update Textures without write access.");
 	const uivec2 dstSize = dst.GetSize();
@@ -486,7 +486,7 @@ static void ValidateResourceBounds(
 	}
 }
 
-static bool CanDirectCopy(const ITexture2DBase& src, const ITexture2DBase& dst, const ivec4& srcBox, const ivec4& dstBox)
+static bool CanDirectCopy(const IColorBuffer2D& src, const IColorBuffer2D& dst, const ivec4& srcBox, const ivec4& dstBox)
 {
 	if (srcBox != ivec4(0) || dstBox != ivec4(0))
 	{
@@ -504,7 +504,7 @@ static bool CanDirectCopy(const ITexture2DBase& src, const ITexture2DBase& dst, 
 	}
 }
 
-static void CopySubresource(ID3D11DeviceContext* pCtx, const ITexture2DBase& src, ITexture2DBase& dst, ivec4& srcBox, ivec4& dstBox)
+static void CopySubresource(ID3D11DeviceContext* pCtx, const IColorBuffer2D& src, IColorBuffer2D& dst, ivec4& srcBox, ivec4& dstBox)
 {
 	if (srcBox != ivec4(0) || dstBox != ivec4(0))
 	{
@@ -639,7 +639,7 @@ void CtxBase::Blit(const IResizeableTexture2D& src, IResizeableTexture2D& dst)
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>
-void CtxBase::Blit(const ITexture2DBase& src, ITexture2DBase& dst, ivec4 srcBox, ivec4 dstBox)
+void CtxBase::Blit(const IColorBuffer2D& src, IColorBuffer2D& dst, ivec4 srcBox, ivec4 dstBox)
 {
 	D3D_CHECK_MSG(CanDirectCopy(src, dst, srcBox, dstBox), "Failed to copy texture. Destination incompatible with source.");
 	ValidateResourceBounds(src, dst, srcBox, dstBox);
