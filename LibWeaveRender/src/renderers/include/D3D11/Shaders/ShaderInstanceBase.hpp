@@ -75,22 +75,11 @@ namespace Weave::D3D11
 		/// Writes the given value to the corresponding named shader constant. Validates size, not type. The value given 
 		/// must match the value declared in the shader.
 		/// </summary>
-		template<>
-		void SetConstant<mat4>(uint nameID, const mat4& value)
+		template<glm::length_t C, glm::length_t R, typename T, glm::qualifier Q>
+		void SetConstant(uint nameID, const glm::mat<C, R, T, Q>& value)
 		{
-			const mat4 x = transpose(value);
-			SetConstant(nameID, {(byte*)&x, sizeof(mat4)});
-		}
-
-		/// <summary>
-		/// Writes the given value to the corresponding named shader constant. Validates size, not type. The value given 
-		/// must match the value declared in the shader.
-		/// </summary>
-		template<>
-		void SetConstant<mat3>(uint nameID, const mat3& value)
-		{
-			const mat3 x = transpose(value);
-			SetConstant(nameID, {(byte*)&x, sizeof(mat3)});
+			const glm::mat<C, R, T, Q> x = transpose(value);
+			SetConstant(nameID, {(byte*)&x, sizeof(glm::mat<C, R, T, Q>)});
 		}
 
 		/// <summary>
@@ -109,22 +98,11 @@ namespace Weave::D3D11
 		/// Writes the given value to the corresponding named shader constant. Validates size, not type. The value given 
 		/// must match the value declared in the shader.
 		/// </summary>
-		template<>
-		void SetConstant<mat4>(string_view name, const mat4& value)
+		template<glm::length_t C, glm::length_t R, typename T, glm::qualifier Q>
+		void SetConstant(string_view name, const glm::mat<C, R, T, Q>& value)
 		{
-			const mat4 x = transpose(value);
-			SetConstant(name, {(byte*)&x, sizeof(mat4)});
-		}
-
-		/// <summary>
-		/// Writes the given value to the corresponding named shader constant. Validates size, not type. The value given 
-		/// must match the value declared in the shader.
-		/// </summary>
-		template<>
-		void SetConstant<mat3>(string_view name, const mat3& value)
-		{
-			const mat3 x = transpose(value);
-			SetConstant(name, {(byte*)&x, sizeof(mat3)});
+			const glm::mat<C, R, T, Q> x = transpose(value);
+			SetConstant(name, {(byte*)&x, sizeof(glm::mat<C, R, T, Q>)});
 		}
 
 		/// <summary>

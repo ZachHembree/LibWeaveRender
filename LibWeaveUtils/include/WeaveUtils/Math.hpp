@@ -1,6 +1,7 @@
 #pragma once
 #define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_SWIZZLE 
+#define GLM_FORCE_LEFT_HANDED
 
 #include "GlobalUtils.hpp"
 #include <algorithm>
