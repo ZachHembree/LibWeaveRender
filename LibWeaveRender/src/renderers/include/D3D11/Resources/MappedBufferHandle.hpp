@@ -10,12 +10,14 @@ namespace Weave::D3D11
 
 	/// <summary>
 	/// Provides temporary access to a mapped resource buffer as a 1D contiguous span.
-	/// Must be returned to the owning resource after use.
+	/// Automatically unmaps resource on destruction.
 	/// </summary>
 	class MappedBufferHandle : public DataBufferSpan<IBuffer, byte>
 	{
 	public:
 		MappedBufferHandle();
+
+		~MappedBufferHandle();
 
 		MappedBufferHandle(MappedBufferHandle&&) noexcept;
 
@@ -50,9 +52,12 @@ namespace Weave::D3D11
 
 	protected:
 		friend CtxImm;
-		MappedSubresource msr;
-		uint subresIndex;	
 
-		MappedBufferHandle(IBuffer& parent, MappedSubresource msr);
+		MappedSubresource msr;
+		CtxBase* pContext;
+
+		MappedBufferHandle(CtxBase& ctx, IBuffer& parent, const MappedSubresource& msr);
+
+		void UpdateExtent();
 	};
 }

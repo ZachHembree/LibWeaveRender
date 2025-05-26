@@ -1,6 +1,6 @@
 #pragma once
+#include <functional>
 #include "CtxBase.hpp"
-#include "Resources/MappedBufferHandle.hpp"
 
 namespace Weave::D3D11
 {
@@ -22,7 +22,15 @@ namespace Weave::D3D11
 		/// </summary>
 		MappedBufferHandle GetMappedBufferHandle(IBuffer& buffer);
 
+		/// <summary>
+		/// Starts a non-blocking asynchronous readback of the given buffer with a callback to 
+		/// be invoked when the buffer is ready.
+		/// </summary>
+		void BeginAsyncBufferRead(IBuffer& buffer, const ReadCallback& callbackFunc) override;
+
 	private:
+		UniqueVector<std::pair<MappedBufferHandle, ReadCallback>> readbackQueue;
+
 		friend Renderer;
 		void EndFrame();
 	};

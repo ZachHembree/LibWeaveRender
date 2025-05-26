@@ -379,3 +379,5 @@ EffectPreprocessor/ShaderTest.wfx
 EffectPreprocessor/DebugShaders.hpp
 
 EffectPreprocessor/output_debug.hpp
+
+EffectPreprocessor/ComputeUtils.fxh

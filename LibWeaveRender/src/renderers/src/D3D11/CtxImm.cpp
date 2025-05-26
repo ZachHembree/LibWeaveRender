@@ -32,7 +32,8 @@ MappedBufferHandle CtxImm::GetMappedBufferHandle(IBuffer& buf)
 	if ((uint)(buf.GetAccessFlags() & ResourceAccessFlags::Write))
 		mapFlags = (D3D11_MAP)(mapFlags | D3D11_MAP_WRITE);
 
-	MappedSubresource msr;
+	MappedSubresource msr = {};
+
 	D3D_CHECK_HR(pCtx->Map(
 		buf.GetResource(),
 		0u,
@@ -41,7 +42,27 @@ MappedBufferHandle CtxImm::GetMappedBufferHandle(IBuffer& buf)
 		msr.GetD3DPtr()
 	));
 
-	return MappedBufferHandle(buf, msr);
+	return MappedBufferHandle(*this, buf, msr);
+}
+
+void CtxImm::BeginAsyncBufferRead(IBuffer& buf, const ReadCallback& callbackFunc)
+{
+	MappedSubresource msr = {};
+	
+	HRESULT hr = pCtx->Map(
+		buf.GetResource(),
+		0u,
+		D3D11_MAP_READ,
+		D3D11_MAP_FLAG_DO_NOT_WAIT,
+		msr.GetD3DPtr()
+	);
+
+	if (hr == S_OK)
+		callbackFunc(MappedBufferHandle(*this, buf, msr));
+	else if (hr == DXGI_ERROR_WAS_STILL_DRAWING)
+		readbackQueue.EmplaceBack(MappedBufferHandle(*this, buf, msr), callbackFunc);
+	else
+		D3D_THROW("Buffer readback failed.");
 }
 
 void CtxImm::EndFrame()
@@ -51,4 +72,26 @@ void CtxImm::EndFrame()
 
 	for (int i = 0; i < g_ShadeStageCount; i++)
 		pState->TrySetShader((ShadeStages)i, nullptr);
+
+	for (ptrdiff_t i = readbackQueue.GetLength() - 1; i >= 0; i--)
+	{
+		auto& rb = readbackQueue[i];
+
+		HRESULT hr = pCtx->Map(
+			rb.first.GetParent().GetResource(),
+			0u,
+			D3D11_MAP_READ,
+			D3D11_MAP_FLAG_DO_NOT_WAIT,
+			rb.first.msr.GetD3DPtr()
+		);
+
+		if (hr == S_OK)
+		{
+			rb.first.UpdateExtent();
+			rb.second(rb.first);
+			readbackQueue.RemoveAt(i);
+		}
+		else if (hr != DXGI_ERROR_WAS_STILL_DRAWING)
+			D3D_THROW("Buffer readback failed.");
+	}
 }

@@ -4,6 +4,7 @@
 #include "WeaveUtils/Span.hpp"
 #include "Resources/DeviceChild.hpp"
 #include "Resources/ResourceBase.hpp"
+#include "Resources/MappedBufferHandle.hpp"
 
 namespace Weave::D3D11
 {
@@ -38,7 +39,7 @@ namespace Weave::D3D11
 	class CtxBase : public DeviceChild
 	{
 	public:
-
+		using ReadCallback = std::function<void(const MappedBufferHandle& handle)>;
 		using ActiveShaderMask = std::array<bool, 5>;
 
 		/// <summary>
@@ -181,6 +182,12 @@ namespace Weave::D3D11
 		/// Draws a group of indexed, non-instanced triangle meshes using the given material
 		/// </summary>
 		void Draw(IDynamicArray<Mesh>& meshes, Material& mat);
+
+		/// <summary>
+		/// Starts a non-blocking asynchronous readback of the given buffer with a callback to 
+		/// be invoked when the buffer is ready.
+		/// </summary>
+		virtual void BeginAsyncBufferRead(IBuffer& buffer, const ReadCallback& callbackFunc) = 0;
 
 		/// <summary>
 		/// Fully overwrites the contents of the buffer with the given data
