@@ -537,6 +537,26 @@ void CtxBase::ReturnMappedBufferHandle(MappedBufferHandle&& handle)
 	pCtx->Unmap(handle.GetParent().GetResource(), 0u);
 }
 
+void CtxBase::Blit(const BufferBase& src, BufferBase& dst)
+{
+	D3D11_BOX srcBB =
+	{
+		.left = 0u,
+		.top = 0u,
+		.front = 0u,
+		.right = src.GetByteSize(),
+		.bottom = 1u,
+		.back = 1u
+	};
+
+	pCtx->CopySubresourceRegion(
+		dst.GetResource(), 0u,
+		0u, 0u, 0u, // Dst start bounds
+		src.GetResource(), 0u,
+		&srcBB
+	);
+}
+
 /// <summary>
 /// Copies the contents of one texture to another
 /// </summary>

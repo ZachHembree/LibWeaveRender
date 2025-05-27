@@ -20,12 +20,12 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns the total size of the buffer in bytes.
 		/// </summary>
-		uint GetByteSize() const;
+		virtual uint GetByteSize() const;
 
 		/// <summary>
 		/// Resizes the buffer to the given capacity in bytes. Existing contents are discarded.
 		/// </summary>
-		void SetCapacityBytes(uint byteSize);
+		virtual void SetByteSize(uint byteSize);
 
 		/// <summary>
 		/// Returns the dimensions of the underlying buffer. Non-applicable dimensions are 

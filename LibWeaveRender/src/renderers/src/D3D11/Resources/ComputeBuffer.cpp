@@ -10,18 +10,19 @@ DEF_DEST_MOVE(ComputeBuffer);
 
 ComputeBuffer::ComputeBuffer() = default;
 
-ComputeBuffer::ComputeBuffer(Device& device) :
+ComputeBuffer::ComputeBuffer(Device& device, uint typeSize) :
 	ComputeBufferBase(
 		ResourceBindFlags::UnorderedAccess | ResourceBindFlags::ShaderResource,
 		ResourceUsages::Default,
 		ResourceAccessFlags::None,
-		device
+		device,
+		typeSize
 	)
 {
 	Init();
 }
 
-ComputeBuffer::ComputeBuffer(Device& device, const uint count, const uint typeSize, const void* data) :
+ComputeBuffer::ComputeBuffer(Device& device, uint count, uint typeSize, const void* data) :
 	ComputeBufferBase(
 		ResourceBindFlags::UnorderedAccess | ResourceBindFlags::ShaderResource,
 		ResourceUsages::Default,
@@ -45,21 +46,24 @@ ID3D11UnorderedAccessView* const* ComputeBuffer::GetAddressUAV() { return pUAV.G
 
 void ComputeBuffer::Init()
 {
-	// SRV
-	D3D11_SHADER_RESOURCE_VIEW_DESC vDesc = {};
-	vDesc.Format = (DXGI_FORMAT)Formats::UNKNOWN;
-	vDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-	vDesc.Buffer.FirstElement = 0;
-	vDesc.Buffer.NumElements = count;
+	if (pBuf != nullptr)
+	{
+		// SRV
+		D3D11_SHADER_RESOURCE_VIEW_DESC vDesc = {};
+		vDesc.Format = (DXGI_FORMAT)Formats::UNKNOWN;
+		vDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+		vDesc.Buffer.FirstElement = 0;
+		vDesc.Buffer.NumElements = count;
 
-	D3D_CHECK_HR(GetDevice()->CreateShaderResourceView(pBuf.Get(), &vDesc, &pSRV));
+		D3D_CHECK_HR(GetDevice()->CreateShaderResourceView(pBuf.Get(), &vDesc, &pSRV));
 
-	// UAV
-	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-	uavDesc.Format = (DXGI_FORMAT)Formats::UNKNOWN;
-	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-	uavDesc.Buffer.FirstElement = 0;
-	uavDesc.Buffer.NumElements = count;
+		// UAV
+		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = (DXGI_FORMAT)Formats::UNKNOWN;
+		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+		uavDesc.Buffer.FirstElement = 0;
+		uavDesc.Buffer.NumElements = count;
 
-	D3D_CHECK_HR(GetDevice()->CreateUnorderedAccessView(pBuf.Get(), &uavDesc, &pUAV));
+		D3D_CHECK_HR(GetDevice()->CreateUnorderedAccessView(pBuf.Get(), &uavDesc, &pUAV));
+	}
 }

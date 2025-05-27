@@ -18,6 +18,7 @@
 #include "../src/renderers/include/D3D11/Mesh.hpp"
 #include "../src/renderers/include/D3D11/Resources/RWTexture2D.hpp"
 #include "../src/renderers/include/D3D11/Resources/ComputeBuffer.hpp"
+#include "../src/renderers/include/D3D11/Resources/StagingComputeBuffer.hpp"
 #include "../src/renderers/include/D3D11/Resources/StagingTexture2D.hpp"
 #include "../src/renderers/include/D3D11/Resources/Sampler.hpp"
 #include "../src/renderers/include/D3D11/Resources/DepthStencilTexture.hpp"

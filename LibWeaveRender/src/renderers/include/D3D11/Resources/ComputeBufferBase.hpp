@@ -19,6 +19,16 @@ namespace Weave::D3D11
 		uint GetCapacity() const;
 
 		/// <summary>
+		/// Returns the size of the buffer in bytes
+		/// </summary>
+		uint GetByteSize() const override;
+
+		/// <summary>
+		/// Returns the maximum capacity of the buffer in bytes
+		/// </summary>
+		uint GetCapacityBytes() const;
+
+		/// <summary>
 		/// Sets the maximum number of elements that cna be stored in the compute buffer. Will 
 		/// allocate a new buffer and destroy previous contents if the size changes.
 		/// </summary>
@@ -76,8 +86,8 @@ namespace Weave::D3D11
 			ResourceUsages usage,
 			ResourceAccessFlags cpuAccess, 
 			Device& device, 
-			const uint typeSize = 0,
-			const uint count = 0, 
+			uint typeSize = 0,
+			uint count = 0, 
 			const void* data = nullptr
 		);
 	};

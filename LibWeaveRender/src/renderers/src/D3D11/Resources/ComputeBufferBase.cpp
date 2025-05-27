@@ -17,8 +17,8 @@ ComputeBufferBase::ComputeBufferBase(
 	ResourceUsages usage,
 	ResourceAccessFlags cpuAccess,
 	Device& device,
-	const uint typeSize,
-	const uint count,
+	uint typeSize,
+	uint count,
 	const void* data
 ) :
 	BufferBase(
@@ -37,14 +37,18 @@ uint ComputeBufferBase::GetLength() const { return count; }
 
 uint ComputeBufferBase::GetCapacity() const { return desc.byteWidth / desc.structuredStride; }
 
+uint ComputeBufferBase::GetByteSize() const { return count * desc.structuredStride; }
+
+uint ComputeBufferBase::GetCapacityBytes() const { return desc.byteWidth; }
+
 void ComputeBufferBase::SetCapacity(uint count, uint typeSize)
 {
 	if (typeSize == 0)
 		typeSize = desc.structuredStride;
 
-	SetCapacityBytes(count * typeSize);
-	this->count = count;
 	desc.structuredStride = typeSize;
+	this->count = count;
+	SetByteSize(count * typeSize);
 }
 
 void ComputeBufferBase::Resize(uint count, uint typeSize) 
@@ -52,8 +56,15 @@ void ComputeBufferBase::Resize(uint count, uint typeSize)
 	if (typeSize == 0)
 		typeSize = desc.structuredStride;
 
+	desc.structuredStride = typeSize;
+
 	if (count > this->count)
-		SetCapacity(count, typeSize);
+	{
+		this->count = count;
+		SetByteSize(count * typeSize);
+	}
+	else
+		this->count = count;
 }
 
 uint ComputeBufferBase::GetStructureStride() const { return desc.structuredStride; }

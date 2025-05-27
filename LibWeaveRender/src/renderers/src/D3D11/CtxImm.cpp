@@ -56,11 +56,12 @@ void CtxImm::BeginAsyncBufferRead(IBuffer& buf, const ReadCallback& callbackFunc
 		D3D11_MAP_FLAG_DO_NOT_WAIT,
 		msr.GetD3DPtr()
 	);
+	MappedBufferHandle handle(*this, buf, msr);
 
 	if (hr == S_OK)
-		callbackFunc(MappedBufferHandle(*this, buf, msr));
+		callbackFunc(handle);
 	else if (hr == DXGI_ERROR_WAS_STILL_DRAWING)
-		readbackQueue.EmplaceBack(MappedBufferHandle(*this, buf, msr), callbackFunc);
+		readbackQueue.EmplaceBack(std::move(handle), callbackFunc);
 	else
 		D3D_THROW("Buffer readback failed.");
 }

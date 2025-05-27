@@ -50,6 +50,26 @@ namespace Weave::D3D11
 		/// </summary>
 		uint GetByteSize() const;
 
+		/// <summary>
+		/// Returns a row of data as a span of the given subtype
+		/// </summary>
+		template<typename T>
+		Span<T> GetRowAs(uint row = 0, uint slice = 0)
+		{
+			const uint offset = slice * msr.depthPitch + msr.rowPitch * row;
+			return Span<T>(reinterpret_cast<T*>(&this->at(offset)), pParent->GetDimensions().x);
+		}
+
+		/// <summary>
+		/// Returns a row of data as a span of the given subtype
+		/// </summary>
+		template<typename T>
+		const Span<T> GetRowAs(uint row = 0, uint slice = 0) const
+		{
+			const uint offset = slice * msr.depthPitch + msr.rowPitch * row;
+			return Span<T>((T*)(&this->at(offset)), pParent->GetDimensions().x);
+		}
+
 	protected:
 		friend CtxImm;
 

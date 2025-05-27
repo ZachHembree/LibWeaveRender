@@ -58,7 +58,7 @@ namespace Weave::D3D11
 		/// Returns the dimensions of the underlying buffer. Non-applicable dimensions are 
 		/// always set to 1. For 1D buffers, Y == 1 and Z == 1.
 		/// </summary>
-		virtual uivec3 GetDimensions() const = 0;		
+		virtual uivec3 GetDimensions() const = 0;
 	};
 
 	/// <summary>

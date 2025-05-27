@@ -57,7 +57,7 @@ ID3D11Resource* BufferBase::GetResource() const { return pBuf.Get(); }
 
 uint BufferBase::GetByteSize() const { return desc.byteWidth; }
 
-void BufferBase::SetCapacityBytes(uint byteSize)
+void BufferBase::SetByteSize(uint byteSize)
 {
 	if (byteSize == desc.byteWidth)
 		return;

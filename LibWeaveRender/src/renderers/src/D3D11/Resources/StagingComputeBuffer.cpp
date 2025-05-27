@@ -10,16 +10,17 @@ DEF_DEST_MOVE(StagingComputeBuffer);
 
 StagingComputeBuffer::StagingComputeBuffer() = default;
 
-StagingComputeBuffer::StagingComputeBuffer(Device& device) :
+StagingComputeBuffer::StagingComputeBuffer(Device& device, uint typeSize) :
 	ComputeBufferBase(
 		ResourceBindFlags::None,
 		ResourceUsages::Staging,
 		ResourceAccessFlags::ReadWrite,
-		device
+		device,
+		typeSize
 	)
 { }
 
-StagingComputeBuffer::StagingComputeBuffer(Device& device, const uint count, const uint typeSize, const void* data) :
+StagingComputeBuffer::StagingComputeBuffer(Device& device, uint count, uint typeSize, const void* data) :
 	ComputeBufferBase(
 		ResourceBindFlags::None,
 		ResourceUsages::Staging,

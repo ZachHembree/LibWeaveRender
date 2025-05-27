@@ -10,7 +10,7 @@ namespace Weave::D3D11
 
 		StagingComputeBuffer();
 
-		StagingComputeBuffer(Device& device);
+		StagingComputeBuffer(Device& device, const uint typeSize = 0);
 
 		StagingComputeBuffer(Device& device, const uint count, const uint typeSize, const void* data = nullptr);
 

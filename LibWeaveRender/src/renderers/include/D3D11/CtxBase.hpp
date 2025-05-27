@@ -26,6 +26,7 @@ namespace Weave::D3D11
 	class BufferBase;
 	class IndexBuffer;
 	class VertexBuffer;
+	class ComputeBufferBase;
 	class MappedBufferHandle;
 
 	class ResourceSet;
@@ -203,6 +204,11 @@ namespace Weave::D3D11
 		/// Returns the buffer handle and unmaps it from the CPU.
 		/// </summary>
 		void ReturnMappedBufferHandle(MappedBufferHandle&& handle);
+
+		/// <summary>
+		/// Copies the contents of one buffer to another
+		/// </summary>
+		void Blit(const BufferBase& src, BufferBase& dst);
 
 		/// <summary>
 		/// Copies the contents of one texture to another

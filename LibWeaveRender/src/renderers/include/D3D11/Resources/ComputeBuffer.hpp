@@ -10,9 +10,9 @@ namespace Weave::D3D11
 
 		ComputeBuffer();
 
-		ComputeBuffer(Device& device);
+		ComputeBuffer(Device& device, uint typeSize);
 
-		ComputeBuffer(Device& device, const uint count, const uint typeSize, const void* data = nullptr);
+		ComputeBuffer(Device& device, uint count, uint typeSize, const void* data = nullptr);
 
 		/// <summary>
 		/// Returns interface to resource view
