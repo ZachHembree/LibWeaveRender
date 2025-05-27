@@ -11,6 +11,9 @@
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="ImGuiFileDialog\ImGuiFileDialog.cpp" />
+    <ClCompile Include="implot\implot.cpp" />
+    <ClCompile Include="implot\implot_items.cpp" />
+    <ClCompile Include="implot\implot_demo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\backends\imgui_impl_dx11.h" />
@@ -24,5 +27,7 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="ImGuiFileDialog\ImGuiFileDialog.h" />
     <ClInclude Include="ImGuiFileDialog\ImGuiFileDialogConfig.h" />
+    <ClInclude Include="implot\implot.h" />
+    <ClInclude Include="implot\implot_internal.h" />
   </ItemGroup>
 </Project>

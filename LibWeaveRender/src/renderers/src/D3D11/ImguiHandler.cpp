@@ -6,6 +6,7 @@
 #include "D3D11/ImGuiHandler.hpp"
 
 #include <imgui.h>
+#include <implot.h>
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 
@@ -28,6 +29,7 @@ ImGuiHandler::ImGuiHandler(MinWindow& parent, Renderer& renderer) :
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImPlot::CreateContext();
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplWin32_Init(GetWindow().GetWndHandle());	
@@ -43,6 +45,7 @@ ImGuiHandler::~ImGuiHandler()
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+	ImPlot::DestroyContext();
 	s_pInstance = nullptr;
 }
 

@@ -5,7 +5,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\cereal\include;$(SolutionDir)libs;$(SolutionDir)libs\imgui\imgui;$(SolutionDir)libs\imgui\imgui-filebrowser;$(SolutionDir)libs\imgui\imgui\backends;$(SolutionDir)libs\glm;$(SolutionDir)libs\imgui\ImGuiFileDialog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\cereal\include;$(SolutionDir)libs;$(SolutionDir)libs\imgui\imgui;$(SolutionDir)libs\imgui\imgui-filebrowser;$(SolutionDir)libs\imgui\imgui\backends;$(SolutionDir)libs\glm;$(SolutionDir)libs\imgui\ImGuiFileDialog;$(SolutionDir)libs\imgui\implot;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>
