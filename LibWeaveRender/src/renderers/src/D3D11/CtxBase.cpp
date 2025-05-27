@@ -363,13 +363,13 @@ static void WriteBufferMapUnmap(ID3D11DeviceContext& ctx, BufferBase& dst, const
 		&msr
 	));
 
-	memcpy(msr.pData, src.GetData(), dst.GetSize());
+	memcpy(msr.pData, src.GetData(), dst.GetByteSize());
 	ctx.Unmap(dst.GetBuffer(), 0u);
 }
 
 void CtxBase::SetBufferData(BufferBase& dst, const IDynamicArray<byte>& src)
 {
-	if (dst.GetSize() > 0)
+	if (dst.GetByteSize() > 0)
 	{
 		D3D_ASSERT_MSG(dst.GetUsage() != ResourceUsages::Immutable, "Cannot update Buffers without write access.");
 

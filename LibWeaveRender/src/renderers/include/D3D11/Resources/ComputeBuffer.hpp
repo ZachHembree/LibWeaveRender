@@ -1,14 +1,16 @@
 #pragma once
-#include "BufferBase.hpp"
+#include "ComputeBufferBase.hpp"
 
 namespace Weave::D3D11
 {
-	class ComputeBuffer : public BufferBase, public IUnorderedAccess, public IShaderResource
+	class ComputeBuffer : public ComputeBufferBase, public IUnorderedAccess, public IShaderResource
 	{
 	public:
 		DECL_DEST_MOVE(ComputeBuffer);
 
 		ComputeBuffer();
+
+		ComputeBuffer(Device& device);
 
 		ComputeBuffer(Device& device, const uint count, const uint typeSize, const void* data = nullptr);
 
@@ -44,5 +46,7 @@ namespace Weave::D3D11
 	private:
 		UniqueComPtr<ID3D11ShaderResourceView> pSRV;
 		UniqueComPtr<ID3D11UnorderedAccessView> pUAV;
+
+		void Init() override;
 	};
 }
