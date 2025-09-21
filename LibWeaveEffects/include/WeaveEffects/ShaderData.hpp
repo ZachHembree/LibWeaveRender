@@ -405,6 +405,9 @@ namespace Weave::Effects
 		/// </summary>
 		SpanVector<byte> binSpans;
 
+		/// <summary>
+		/// Represents a serializable, non-owning view to all unique shader data in the registry
+		/// </summary>
 		struct Handle
 		{
 			const IDynamicArray<ConstDef>* pConstants;
@@ -415,8 +418,29 @@ namespace Weave::Effects
 			const IDynamicArray<EffectDef>* pEffects;
 			const SpanVector<uint>* pIDGroups;
 			const SpanVector<byte>* pBinSpans;
+
+			/// <summary>
+			/// Returns a deep copy of the definition data
+			/// </summary>
+			ShaderRegistryDef GetCopy() const
+			{
+				return 
+				{
+					.constants = Vector(*pConstants),
+					.cbufDefs = Vector(*pCBufDefs),
+					.ioElements = Vector(*pIOElements),
+					.resources = Vector(*pResources),
+					.shaders = Vector(*pShaders),
+					.effects = Vector(*pEffects),
+					.idGroups = *pIDGroups,
+					.binSpans = *pBinSpans
+				};
+			}
 		};
 
+		/// <summary>
+		/// Returns a serializable, non-owning view to all unique shader data in the registry
+		/// </summary>
 		Handle GetHandle() const
 		{
 			return
@@ -550,14 +574,34 @@ namespace Weave::Effects
 		/// </summary>
 		StringIDMapDef stringIDs;
 
+		/// <summary>
+		/// Represents a serializable, non-owning view of the definition data
+		/// </summary>
 		struct Handle
 		{
 			const PlatformDef* pPlatform;
 			const IDynamicArray<VariantRepoDef>* pRepos;
 			const ShaderRegistryDef::Handle regHandle;
 			const StringIDMapDef::Handle strMapHandle;
+
+			/// <summary>
+			/// Returns a deep copy of the definition data
+			/// </summary>
+			ShaderLibDef GetCopy() const
+			{
+				return 
+				{
+					.platform = *pPlatform,
+					.repos = DynamicArray(*pRepos),
+					.regData = regHandle.GetCopy(),
+					.stringIDs = strMapHandle.GetCopy()
+				};
+			}
 		};
 
+		/// <summary>
+		/// Returns a serializable, non-owning view of the definition data
+		/// </summary>
 		Handle GetHandle() const
 		{
 			return 

@@ -13,10 +13,6 @@ namespace Weave
     {
         static constexpr uint INVALID_ID = -1;
 
-        MAKE_DEF_MOVE_COPY(StringIDMapDef)
-
-        StringIDMapDef() = default;
-
         /// <summary>
         /// Alternating starting indices + string length. ID == index / 2
         /// </summary>
@@ -27,12 +23,30 @@ namespace Weave
         /// </summary>
         string stringData;
 
+        /// <summary>
+        /// Represents a serializable, non-owning view to the underlying definition data
+        /// </summary>
         struct Handle
         {
             const Vector<uint>* pSubstrings;
             const string* pStringData;
+
+            /// <summary>
+            /// Returns a deep copy of the definition data
+            /// </summary>
+            StringIDMapDef GetCopy() const
+            {
+                return 
+                {
+                    .substrings = *pSubstrings,
+                    .stringData = *pStringData
+                };
+            }
         };
 
+        /// <summary>
+        /// Returns a serializable, non-owning view to the underlying definition data
+        /// </summary>
         Handle GetHandle() const
         {
             return 
