@@ -5,6 +5,8 @@ VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "libs\imgui\imgui.vcxproj", "{91549B16-F49B-4BEE-9747-E24A22F7C7E8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlibstatic", "libs\zlib\vs2022\zlibstatic.vcxproj", "{5105F247-E52D-3235-909B-3B9BE2957CD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{91549B16-F49B-4BEE-9747-E24A22F7C7E8}.Release|x64.Build.0 = Release|x64
 		{91549B16-F49B-4BEE-9747-E24A22F7C7E8}.Release|x86.ActiveCfg = Release|Win32
 		{91549B16-F49B-4BEE-9747-E24A22F7C7E8}.Release|x86.Build.0 = Release|Win32
+		{5105F247-E52D-3235-909B-3B9BE2957CD2}.Debug|x64.ActiveCfg = Debug|x64
+		{5105F247-E52D-3235-909B-3B9BE2957CD2}.Debug|x64.Build.0 = Debug|x64
+		{5105F247-E52D-3235-909B-3B9BE2957CD2}.Debug|x86.ActiveCfg = Debug|x64
+		{5105F247-E52D-3235-909B-3B9BE2957CD2}.Debug|x86.Build.0 = Debug|x64
+		{5105F247-E52D-3235-909B-3B9BE2957CD2}.Release|x64.ActiveCfg = Release|x64
+		{5105F247-E52D-3235-909B-3B9BE2957CD2}.Release|x64.Build.0 = Release|x64
+		{5105F247-E52D-3235-909B-3B9BE2957CD2}.Release|x86.ActiveCfg = Release|x64
+		{5105F247-E52D-3235-909B-3B9BE2957CD2}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

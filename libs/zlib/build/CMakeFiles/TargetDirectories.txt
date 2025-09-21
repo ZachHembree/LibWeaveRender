@@ -1,0 +1,8 @@
+C:/Users/zhemb/source/repos/LibWeaveRender/libs/zlib/build/CMakeFiles/zlib.dir
+C:/Users/zhemb/source/repos/LibWeaveRender/libs/zlib/build/CMakeFiles/zlibstatic.dir
+C:/Users/zhemb/source/repos/LibWeaveRender/libs/zlib/build/CMakeFiles/example.dir
+C:/Users/zhemb/source/repos/LibWeaveRender/libs/zlib/build/CMakeFiles/minigzip.dir
+C:/Users/zhemb/source/repos/LibWeaveRender/libs/zlib/build/CMakeFiles/RUN_TESTS.dir
+C:/Users/zhemb/source/repos/LibWeaveRender/libs/zlib/build/CMakeFiles/INSTALL.dir
+C:/Users/zhemb/source/repos/LibWeaveRender/libs/zlib/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/zhemb/source/repos/LibWeaveRender/libs/zlib/build/CMakeFiles/ZERO_CHECK.dir
