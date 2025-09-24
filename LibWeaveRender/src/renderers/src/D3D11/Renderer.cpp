@@ -90,7 +90,7 @@ const IRenderTarget& Renderer::GetBackBuffer() const { return pSwap->GetBackBuf(
 
 ulong Renderer::GetFrameNumber() const { return pFrameTimer->GetFrameCount(); }
 
-const ShaderLibrary& Renderer::RegisterShaderLibrary(const ShaderLibDef& def) 
+const ShaderLibrary& Renderer::RegisterShaderLibrary(const ShaderLibDef::Handle& def) 
 { 
 	const ShaderLibrary& lib = shaderLibs.EmplaceBack(ShaderLibrary(*this, def));
 

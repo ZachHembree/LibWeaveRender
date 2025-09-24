@@ -194,7 +194,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Creates a shader library by copying the given definition and registers it with the renderer
 		/// </summary>
-		const ShaderLibrary& RegisterShaderLibrary(const ShaderLibDef& def);
+		const ShaderLibrary& RegisterShaderLibrary(const ShaderLibDef::Handle& def);
 
 		/// <summary>
 		/// Creates a shader library by moving the given definition and registers it with the renderer

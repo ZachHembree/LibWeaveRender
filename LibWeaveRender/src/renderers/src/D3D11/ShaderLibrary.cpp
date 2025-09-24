@@ -13,7 +13,7 @@ DEF_DEST_MOVE(ShaderLibrary);
 
 ShaderLibrary::ShaderLibrary() = default;
 
-ShaderLibrary::ShaderLibrary(Renderer& renderer, const ShaderLibDef& def) :
+ShaderLibrary::ShaderLibrary(Renderer& renderer, const ShaderLibDef::Handle& def) :
 	pManager(new ShaderVariantManager(renderer.GetDevice(), def))
 { }
 

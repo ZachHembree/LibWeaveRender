@@ -52,14 +52,14 @@ string_view ShaderLibMap::GetName() const { return name; }
 
 const StringIDMap& ShaderLibMap::GetStringMap() const { return pRegMap->GetStringMap(); }
 
-ShaderLibMap::ShaderLibMap(const ShaderLibDef& def) :
-	name(def.name),
-	platform(def.platform),
-	variantShaderMaps(def.repos.GetLength()),
-	variantFlagMaps(def.repos.GetLength()),
-	variantModeMaps(def.repos.GetLength()),
-	variantRepos(def.repos),
-	pRegMap(new ShaderRegistryMap(def.stringIDs, def.regData))
+ShaderLibMap::ShaderLibMap(const ShaderLibDef::Handle& def) :
+	name(*def.pName),
+	platform(*def.pPlatform),
+	variantShaderMaps(def.pRepos->GetLength()),
+	variantFlagMaps(def.pRepos->GetLength()),
+	variantModeMaps(def.pRepos->GetLength()),
+	variantRepos(*def.pRepos),
+	pRegMap(new ShaderRegistryMap(def.strMapHandle, def.regHandle))
 {
 	InitMaps();
 }

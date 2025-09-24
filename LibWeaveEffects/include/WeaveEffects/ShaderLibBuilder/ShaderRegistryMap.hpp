@@ -13,7 +13,7 @@ namespace Weave::Effects
 	public:
 		MAKE_NO_COPY(ShaderRegistryMap)
 
-		ShaderRegistryMap(const StringIDMapDef& strDef, const ShaderRegistryDef& def);
+		ShaderRegistryMap(const StringIDMapDef::Handle& strDef, const ShaderRegistryDef::Handle& def);
 
 		ShaderRegistryMap(StringIDMapDef&& strDef, ShaderRegistryDef&& def);
 

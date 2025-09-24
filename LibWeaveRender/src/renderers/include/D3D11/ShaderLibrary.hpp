@@ -17,7 +17,7 @@ namespace Weave::D3D11
 
 		ShaderLibrary();
 
-		ShaderLibrary(Renderer& renderer, const ShaderLibDef& def);
+		ShaderLibrary(Renderer& renderer, const ShaderLibDef::Handle& def);
 
 		ShaderLibrary(Renderer& renderer, ShaderLibDef&& def);
 

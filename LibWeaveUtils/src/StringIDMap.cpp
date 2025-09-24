@@ -9,8 +9,8 @@ void StringIDMapDef::Clear()
     stringData.clear();
 }
 
-StringIDMap::StringIDMap(const StringIDMapDef& def) :
-    pDef(new StringIDMapDef(def))
+StringIDMap::StringIDMap(const StringIDMapDef::Handle& def) :
+    pDef(new StringIDMapDef(def.GetCopy()))
 {
     InitMapData();
 }

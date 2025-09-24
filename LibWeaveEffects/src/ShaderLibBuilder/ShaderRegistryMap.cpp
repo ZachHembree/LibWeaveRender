@@ -6,8 +6,8 @@
 using namespace Weave;
 using namespace Weave::Effects;
 
-ShaderRegistryMap::ShaderRegistryMap(const StringIDMapDef& strDef, const ShaderRegistryDef& def) :
-	pRegDef(new ShaderRegistryDef(def)),
+ShaderRegistryMap::ShaderRegistryMap(const StringIDMapDef::Handle& strDef, const ShaderRegistryDef::Handle& def) :
+	pRegDef(new ShaderRegistryDef(def.GetCopy())),
 	stringMap(strDef)
 { }
 

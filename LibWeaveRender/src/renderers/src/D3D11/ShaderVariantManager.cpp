@@ -9,7 +9,7 @@ ShaderVariantManager::ShaderVariantManager() :
 	pDev(nullptr)
 { }
 
-ShaderVariantManager::ShaderVariantManager(Device& device, const ShaderLibDef& def) :
+ShaderVariantManager::ShaderVariantManager(Device& device, const ShaderLibDef::Handle& def) :
 	pDev(&device),
 	libMap(def)
 { }

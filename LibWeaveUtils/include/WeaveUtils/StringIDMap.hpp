@@ -69,7 +69,7 @@ namespace Weave
 
         static constexpr uint INVALID_ID = StringIDMapDef::INVALID_ID;
 
-        explicit StringIDMap(const StringIDMapDef& def);
+        explicit StringIDMap(const StringIDMapDef::Handle& def);
 
         explicit StringIDMap(StringIDMapDef&& def);
 

@@ -15,7 +15,7 @@ namespace Weave::Effects
 
 		ShaderLibMap();
 
-		ShaderLibMap(const ShaderLibDef& def);
+		ShaderLibMap(const ShaderLibDef::Handle& def);
 
 		ShaderLibMap(ShaderLibDef&& def);
 
