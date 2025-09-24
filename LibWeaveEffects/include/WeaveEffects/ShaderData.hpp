@@ -500,19 +500,6 @@ namespace Weave::Effects
 		PlatformTargets target;
 	};
 
-	struct VariantRepoSrc
-	{
-		/// <summary>
-		/// Name of the repo
-		/// </summary>
-		string name;
-
-		/// <summary>
-		/// File the library was compiled from
-		/// </summary>
-		string path;
-	};
-
 	/// <summary>
 	/// Serializable collection of effect and shader variants compiled from the same
 	/// effect file.
@@ -520,9 +507,9 @@ namespace Weave::Effects
 	struct VariantRepoDef
 	{
 		/// <summary>
-		/// Source file and name used to create the repo
+		/// File the repo was compiled from
 		/// </summary>
-		VariantRepoSrc src;
+		string path;
 
 		/// <summary>
 		/// Flag names used for static shader variant generation
@@ -541,18 +528,15 @@ namespace Weave::Effects
 	};
 
 	/// <summary>
-	/// A collection of independent shader libraries from at least one effect file
-	/// </summary>
-	struct ShaderLibSrc
-	{
-		DynamicArray<VariantRepoSrc> srcFiles;
-	};
-
-	/// <summary>
 	/// Serializable collection of shaders and their variants from one or more source files
 	/// </summary>
 	struct ShaderLibDef
 	{
+		/// <summary>
+		/// Name of the library
+		/// </summary>
+		string name;
+
 		/// <summary>
 		/// Describes the platform targeted during compilation
 		/// </summary>
@@ -579,6 +563,7 @@ namespace Weave::Effects
 		/// </summary>
 		struct Handle
 		{
+			const string* pName;
 			const PlatformDef* pPlatform;
 			const IDynamicArray<VariantRepoDef>* pRepos;
 			const ShaderRegistryDef::Handle regHandle;
@@ -591,6 +576,7 @@ namespace Weave::Effects
 			{
 				return 
 				{
+					.name = *pName,
 					.platform = *pPlatform,
 					.repos = DynamicArray(*pRepos),
 					.regData = regHandle.GetCopy(),
@@ -606,6 +592,7 @@ namespace Weave::Effects
 		{
 			return 
 			{
+				.pName = &name,
 				.pPlatform = &platform,
 				.pRepos = &repos,
 				.regHandle = regData.GetHandle(),

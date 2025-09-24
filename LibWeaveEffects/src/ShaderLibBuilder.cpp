@@ -29,13 +29,12 @@ ShaderLibBuilder::ShaderLibBuilder() :
 
 ShaderLibBuilder::~ShaderLibBuilder() = default;
 
-void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_view libSrc)
+void ShaderLibBuilder::AddRepo(string_view repoPath, string_view libSrc)
 {
 	const uint repoID = (uint)repos.GetLength() << g_VariantGroupOffset;
 	VariantRepoDef& lib = repos.EmplaceBack();
-	lib.src.name = name;
-	lib.src.path = libPath;
-	pVariantGen->SetSrc(libPath, libSrc);
+	lib.path = repoPath;
+	pVariantGen->SetSrc(repoPath, libSrc);
 
 	for (uint configID = 0; configID < pVariantGen->GetVariantCount(); configID++)
 	{
@@ -65,13 +64,13 @@ void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_vie
 		{
 			const uint resCount = pShaderRegistry->GetUniqueResCount();
 
-			pAnalyzer->AnalyzeSource(libPath, pBuf->libText);
+			pAnalyzer->AnalyzeSource(repoPath, pBuf->libText);
 			pTable->ParseBlocks(*pAnalyzer);
 
 			// Shaders
 			GetEntryPoints();
 			lib.variants[configID].shaders = DynamicArray<ShaderVariantDef>(entrypoints.GetLength());
-			GetShaderDefs(libPath, lib.variants[configID].shaders, vID);
+			GetShaderDefs(repoPath, lib.variants[configID].shaders, vID);
 
 			// Effects
 			GetEffects();
@@ -102,10 +101,17 @@ void ShaderLibBuilder::AddRepo(string_view name, string_view libPath, string_vie
 	}
 }
 
+void ShaderLibBuilder::SetName(string_view newName)
+{
+	name.clear();
+	name.append(newName);
+}
+
 ShaderLibDef::Handle ShaderLibBuilder::GetDefinition() const
 {
 	return
 	{
+		.pName = &name,
 		.pPlatform = &platform,
 		.pRepos = &repos,
 		.regHandle = pShaderRegistry->GetDefinition(),
@@ -378,6 +384,7 @@ void ShaderLibBuilder::Clear()
 	repos.Clear();
 	pVariantGen->Clear();
 	pShaderRegistry->Clear();
+	name.clear();
 }
 
 void ShaderLibBuilder::ClearVariant()

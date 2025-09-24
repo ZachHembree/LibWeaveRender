@@ -78,25 +78,13 @@ namespace Weave::Effects
 	template <class Archive>
 	inline void serialize(Archive& ar, VariantRepoDef& def)
 	{
-		ar(def.src, def.flagIDs, def.modeIDs, def.variants);
-	}
-
-	template <class Archive>
-	inline void serialize(Archive& ar, VariantRepoSrc& def)
-	{
-		ar(def.name, def.path);
-	}
-
-	template <class Archive>
-	inline void serialize(Archive& ar, ShaderLibSrc& def)
-	{
-		ar(def.srcFiles);
+		ar(def.path, def.flagIDs, def.modeIDs, def.variants);
 	}
 
 	template <class Archive>
 	inline void save(Archive& ar, const ShaderLibDef::Handle& def)
 	{
-		ar(*def.pPlatform, *def.pRepos, def.regHandle, def.strMapHandle);
+		ar(*def.pName, *def.pPlatform, *def.pRepos, def.regHandle, def.strMapHandle);
 	}
 
 	template <class Archive>
@@ -112,7 +100,7 @@ namespace Weave::Effects
 	template <class Archive>
 	inline void load(Archive& ar, ShaderLibDef& def)
 	{
-		ar(def.platform, def.repos, def.regData, def.stringIDs);
+		ar(def.name, def.platform, def.repos, def.regData, def.stringIDs);
 	}
 
 	template <class Archive>

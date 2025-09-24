@@ -8,6 +8,7 @@
 #include "WeaveUtils/GenericMain.hpp"
 #include "WeaveUtils/Stopwatch.hpp"
 #include "WeaveEffects/ShaderLibBuilder.hpp"
+#include "WeaveEffects/ShaderDataSerialization.hpp"
 #include "FXHelpText.hpp"
 
 namespace fs = std::filesystem;
@@ -288,6 +289,8 @@ static void WriteBinary(const fs::path& outputPath, const std::stringstream& ss)
  */
 static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::stringstream& streamBuf, const fs::path& output)
 {
+    libBuilder.SetName(name);
+
     ShaderLibDef::Handle shaderLib = libBuilder.GetDefinition();
     streamBuf.str({});
     streamBuf.clear();
@@ -303,30 +306,10 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
     // Write the final data (binary or header text) to the output file
     WriteBinary(output, streamBuf);
 
-    // Get combined variant count
-    uint vCount = 0;
-
-    for (uint i = 0; i < shaderLib.pRepos->GetLength(); i++)
-        vCount += (uint)shaderLib.pRepos->at(i).variants.GetLength();
-
     // Log success and statistics
     WV_LOG_INFO() << "Successfully wrote library to: " << output;
-    WV_LOG_INFO() << "  Library Stats:";
-    WV_LOG_INFO() << "    Repos: " << shaderLib.pRepos->GetLength();
-    WV_LOG_INFO() << "    Variants: " << vCount;
-    WV_LOG_INFO() << "    Shaders:   " << (shaderLib.regHandle.pShaders ? shaderLib.regHandle.pShaders->GetLength() : 0);
-    WV_LOG_INFO() << "    Effects:   " << (shaderLib.regHandle.pEffects ? shaderLib.regHandle.pEffects->GetLength() : 0);
-    WV_LOG_INFO() << "    Constants: " << (shaderLib.regHandle.pConstants ? shaderLib.regHandle.pConstants->GetLength() : 0);
-    WV_LOG_INFO() << "    Resources: " << (shaderLib.regHandle.pResources ? shaderLib.regHandle.pResources->GetLength() : 0);
-
-    if (shaderLib.pPlatform) 
-    {
-        WV_LOG_INFO() << "  Platform Info:";
-        WV_LOG_INFO() << "    Compiler:     " << shaderLib.pPlatform->compilerVersion;
-        WV_LOG_INFO() << "    Feature Level:" << shaderLib.pPlatform->featureLevel;
-    }
-    else
-        WV_LOG_WARN() << "  Platform info not available in ShaderLibDef.";
+    auto descLog = WV_LOG_INFO();
+    libBuilder.WriteDescriptionString(descLog);
 
     libBuilder.Clear();
 }
@@ -395,7 +378,7 @@ static void CreateLibrary()
         string inputPathString = inFile.string(); // Full path string for builder context
 
         // Preprocess and add to library builder
-        libBuilder.AddRepo(baseName, inputPathString, streamBuf.view());
+        libBuilder.AddRepo(inputPathString, streamBuf.view());
 
         // If not merging, write out a separate library file for each input
         if (!isMerging)
@@ -410,7 +393,7 @@ static void CreateLibrary()
             else 
             {
                 // Output dir specified
-                if (fs::is_directory(outPath)) 
+                if (fs::is_directory(outPath))
                 {
                     // Write into the directory using the input filename
                     currentOutFile = outPath / inFile.filename();

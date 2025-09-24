@@ -242,7 +242,7 @@ namespace Weave::Effects
 		HashableVector<UniqueVector<ConstDef>, ResourceType::Constant> constants;
 		HashableVector<UniqueVector<ConstBufDef>, ResourceType::ConstantBuffer> cbufDefs;
 		HashableVector<UniqueVector<IOElementDef>, ResourceType::IOElement> ioElements;
-		HashableVector< UniqueVector<ResourceDef>, ResourceType::Resource> resources;
+		HashableVector<UniqueVector<ResourceDef>, ResourceType::Resource> resources;
 
 		HashableVector<UniqueVector<ShaderDef>, ResourceType::Shader> shaders;
 		HashableVector<UniqueVector<EffectDef>, ResourceType::Effect> effects;

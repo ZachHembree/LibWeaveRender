@@ -1,8 +1,8 @@
 #pragma once
 #include <unordered_map>
 #include <memory>
+#include "WeaveEffects/ShaderData.hpp"
 #include "WeaveEffects/ShaderLibBuilder/ShaderEntrypoint.hpp"
-#include "WeaveEffects/ShaderDataSerialization.hpp"
 
 namespace Weave::Effects
 {
@@ -32,7 +32,12 @@ namespace Weave::Effects
 		/// Preprocesses the given effect source file and adds it to the builder.
 		/// Invalidates definition handles.
 		/// </summary>
-		void AddRepo(string_view name, string_view libPath, string_view libSrc);
+		void AddRepo(string_view repoPath, string_view libSrc);
+
+		/// <summary>
+		/// Sets the name for the library being built.
+		/// </summary>
+		void SetName(string_view name);
 
 		/// <summary>
 		/// Sets target graphics API
@@ -60,6 +65,33 @@ namespace Weave::Effects
 		/// </summary>
 		void Clear();
 
+		/// <summary>
+		/// Appends a description of the current definition to a stringstream-like object
+		/// </summary>
+		template<typename StreamT>
+		requires IsStreamLike<StreamT>
+		void WriteDescriptionString(StreamT& output)
+		{
+			const ShaderLibDef::Handle shaderLib = GetDefinition();
+
+			// Get combined variant count
+			uint vCount = 0;
+
+			for (uint i = 0; i < shaderLib.pRepos->GetLength(); i++)
+				vCount += (uint)shaderLib.pRepos->at(i).variants.GetLength();
+
+			output << "Library Stats:";
+			output << "\n  Repos: " << shaderLib.pRepos->GetLength();
+			output << "\n  Variants: " << vCount;
+			output << "\n  Shaders: " << (shaderLib.regHandle.pShaders ? shaderLib.regHandle.pShaders->GetLength() : 0);
+			output << "\n  Effects: " << (shaderLib.regHandle.pEffects ? shaderLib.regHandle.pEffects->GetLength() : 0);
+			output << "\n  Constants: " << (shaderLib.regHandle.pConstants ? shaderLib.regHandle.pConstants->GetLength() : 0);
+			output << "\n  Resources: " << (shaderLib.regHandle.pResources ? shaderLib.regHandle.pResources->GetLength() : 0);
+			output << "\nPlatform Info:";
+			output << "\n  Compiler: " << shaderLib.pPlatform->compilerVersion;
+			output << "\n  Feature Level: " << shaderLib.pPlatform->featureLevel;
+		}
+
 	private:
 		struct PassBlock
 		{
@@ -81,6 +113,7 @@ namespace Weave::Effects
 			uint vID;
 		};
 
+		string name;
 		PlatformDef platform;
 		UniqueVector<VariantRepoDef> repos;
 		bool isDebugging;
