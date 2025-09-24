@@ -192,14 +192,49 @@ namespace Weave::D3D11
 		void SetIsDepthStencilEnabled(bool value);
 
 		/// <summary>
-		/// Creates a shader library by copying the given definition
+		/// Creates a shader library by copying the given definition and registers it with the renderer
 		/// </summary>
-		ShaderLibrary CreateShaderLibrary(const ShaderLibDef& def);
+		const ShaderLibrary& RegisterShaderLibrary(const ShaderLibDef& def);
 
 		/// <summary>
-		/// Creates a shader library by moving the given definition
+		/// Creates a shader library by moving the given definition and registers it with the renderer
 		/// </summary>
-		ShaderLibrary CreateShaderLibrary(ShaderLibDef&& def);
+		const ShaderLibrary& RegisterShaderLibrary(ShaderLibDef&& def);
+
+		/// <summary>
+		/// Returns the shader library with the given name
+		/// </summary>
+		const ShaderLibrary& GetShaderLibrary(string_view name) const;
+
+		/// <summary>
+		/// Returns the shader library with the given ID
+		/// </summary>
+		const ShaderLibrary& GetShaderLibrary(uint id) const;
+
+		/// <summary>
+		/// Returns the unique int ID for the shader library with the given name
+		/// </summary>
+		uint GetShaderLibraryID(string_view name) const;
+
+		/// <summary>
+		/// Returns a new material using the given library and effect IDs
+		/// </summary>
+		Material GetMaterial(uint libID, uint effectID)  const;
+
+		/// <summary>
+		/// Returns a new Compute shader instance using the given library and shader IDs
+		/// </summary>
+		ComputeInstance GetComputeInstance(uint libID, uint shaderID) const;
+
+		/// <summary>
+		/// Returns a new material using the given library and effect names
+		/// </summary>
+		Material GetMaterial(string_view libName, string_view effectName)  const;
+
+		/// <summary>
+		/// Returns a new Compute shader instance using the given library and shader names
+		/// </summary>
+		ComputeInstance GetComputeInstance(string_view libName, string_view shaderName) const;
 
 		/// <summary>
 		/// Returns reference to a default material
@@ -239,7 +274,8 @@ namespace Weave::D3D11
 		std::atomic<uivec2> outputRes;
 		uivec2 lastDispMode;
 
-		std::unique_ptr<ShaderLibrary> pDefaultShaders;
+		std::unordered_map<string_view, uint> shaderLibNameMap;
+		Vector<ShaderLibrary> shaderLibs;
 
 		std::atomic<double> targetFPS;
 		std::atomic<bool> useDefaultDS;

@@ -30,7 +30,6 @@ Renderer::Renderer(MinWindow& parent) :
 	fsMode(WindowRenderModes::Windowed),
 	outputRes(GetWindow().GetMonitorResolution()),
 	lastDispMode(-1),
-	pDefaultShaders(new ShaderLibrary(*this, GetBuiltInShaders())),
 	useDefaultDS(true),
 	canRender(true),
 	canRun(false),
@@ -39,6 +38,8 @@ Renderer::Renderer(MinWindow& parent) :
 	pFrameTimer(new FrameTimer()),
 	targetFPS(0)
 { 
+	RegisterShaderLibrary(GetBuiltInShaders());
+
 	MeshDef quadDef = Primitives::GeneratePlane<VertexPos2D>(ivec2(0), 2.0f);
 	defaultMeshes["FSQuad"] = Mesh(*pDev, quadDef);
 
@@ -89,16 +90,74 @@ const IRenderTarget& Renderer::GetBackBuffer() const { return pSwap->GetBackBuf(
 
 ulong Renderer::GetFrameNumber() const { return pFrameTimer->GetFrameCount(); }
 
-ShaderLibrary Renderer::CreateShaderLibrary(const ShaderLibDef& def) { return ShaderLibrary(*this, def); }
+const ShaderLibrary& Renderer::RegisterShaderLibrary(const ShaderLibDef& def) 
+{ 
+	const ShaderLibrary& lib = shaderLibs.EmplaceBack(ShaderLibrary(*this, def));
 
-ShaderLibrary Renderer::CreateShaderLibrary(ShaderLibDef&& def) { return ShaderLibrary(*this, std::move(def)); }
+	D3D_CHECK_MSG(shaderLibNameMap.find(lib.GetName()) == shaderLibNameMap.end(), "Shader library names must be unique.");
+	shaderLibNameMap.emplace(lib.GetName(), (uint)(shaderLibs.GetLength() - 1));
+
+	return lib;
+}
+
+const ShaderLibrary& Renderer::RegisterShaderLibrary(ShaderLibDef&& def) 
+{ 
+	const ShaderLibrary& lib = shaderLibs.EmplaceBack(ShaderLibrary(*this, std::move(def)));
+
+	D3D_CHECK_MSG(shaderLibNameMap.find(lib.GetName()) == shaderLibNameMap.end(), "Shader library names must be unique.");
+	shaderLibNameMap.emplace(lib.GetName(), (uint)(shaderLibs.GetLength() - 1));
+
+	return lib;
+}
+
+const ShaderLibrary& Renderer::GetShaderLibrary(string_view name) const
+{
+	return GetShaderLibrary(GetShaderLibraryID(name));
+}
+
+const ShaderLibrary& Renderer::GetShaderLibrary(uint id) const
+{
+	D3D_CHECK_MSG((id < shaderLibs.GetLength() && shaderLibs[id].GetIsValid()),
+		"Shader Libary ID ({}) is invalid.", id);
+
+	return shaderLibs[id];
+}
+
+uint Renderer::GetShaderLibraryID(string_view name) const
+{
+	const auto& it = shaderLibNameMap.find(name);
+	D3D_CHECK_MSG((!name.empty() && it != shaderLibNameMap.end() && shaderLibs[it->second].GetIsValid()),
+		"Shader Libary Name ({}) is invalid.", name);
+
+	return it->second;
+}
+
+Material Renderer::GetMaterial(uint libID, uint effectID) const
+{
+	return GetShaderLibrary(libID).GetMaterial(effectID);
+}
+
+ComputeInstance Renderer::GetComputeInstance(uint libID, uint shaderID) const
+{
+	return GetShaderLibrary(libID).GetComputeInstance(shaderID);
+}
+
+Material Renderer::GetMaterial(string_view libName, string_view effectName) const
+{
+	return GetShaderLibrary(libName).GetMaterial(effectName);
+}
+
+ComputeInstance Renderer::GetComputeInstance(string_view libName, string_view name) const
+{
+	return GetShaderLibrary(libName).GetComputeInstance(name);
+}
 
 uivec2 Renderer::GetOutputResolution() const { return outputRes; }
 
 void Renderer::SetOutputResolution(ivec2 res) 
 { 
 	if (fsMode != WindowRenderModes::ExclusiveFS)
-		outputRes = res; 
+		outputRes = res;
 }
 
 WindowRenderModes Renderer::GetWindowRenderMode() const { return fsMode; }
@@ -163,7 +222,7 @@ void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
 
 Material& Renderer::GetDefaultMaterial(string_view name) const
 {
-	const StringIDMap& stringMap = pDefaultShaders->GetStringMap();
+	const StringIDMap& stringMap = shaderLibs[0].GetStringMap();
 	uint stringID;
 
 	D3D_CHECK_MSG(stringMap.TryGetStringID(name, stringID), "Default material undefined");
@@ -177,14 +236,14 @@ Material& Renderer::GetDefaultMaterial(string_view name) const
 	}
 	else
 	{
-		const auto& pair = defaultMaterials.emplace(stringID, pDefaultShaders->GetMaterial(stringID));
+		const auto& pair = defaultMaterials.emplace(stringID, shaderLibs[0].GetMaterial(stringID));
 		return pair.first->second;
 	}
 }
 
 ComputeInstance& Renderer::GetDefaultCompute(string_view name) const
 {
-	const StringIDMap& stringMap = pDefaultShaders->GetStringMap();
+	const StringIDMap& stringMap = shaderLibs[0].GetStringMap();
 	uint stringID;
 	D3D_CHECK_MSG(stringMap.TryGetStringID(name, stringID), "Default compute shader undefined");
 
@@ -194,7 +253,7 @@ ComputeInstance& Renderer::GetDefaultCompute(string_view name) const
 		return it->second;
 	else
 	{
-		const auto& pair = defaultCompute.emplace(stringID, pDefaultShaders->GetComputeInstance(stringID));
+		const auto& pair = defaultCompute.emplace(stringID, shaderLibs[0].GetComputeInstance(stringID));
 		return pair.first->second;
 	}
 }

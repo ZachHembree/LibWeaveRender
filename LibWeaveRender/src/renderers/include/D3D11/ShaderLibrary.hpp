@@ -49,7 +49,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns a new Compute shader instance using the given shader name
 		/// </summary>
-		ComputeInstance GetComputeInstance(string_view name) const;
+		ComputeInstance GetComputeInstance(string_view shaderName) const;
 
 		/// <summary>
 		/// Returns true if the library is valid and initialized
