@@ -9,12 +9,6 @@ namespace Weave
 {
     namespace fs = std::filesystem;
 
-    // Requires an object to behave like an ostream accepting strings
-    template<typename StreamT>
-    concept IsStreamLike = requires(StreamT s, const std::string& msg) {
-        { s << msg } -> std::same_as<StreamT&>;
-    };
-
     // Generic main function pointer template used with GenericMain()
     template<typename... FuncArgsT>
     using GenericMainT = void(*)(FuncArgsT...);

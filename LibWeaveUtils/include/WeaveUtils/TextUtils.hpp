@@ -10,6 +10,12 @@ namespace Weave
 	using std::string;
 	using std::wstring;
 
+	// Requires an object to behave like an ostream accepting strings
+	template<typename StreamT>
+	concept IsStreamLike = requires(StreamT s, const std::string & msg) {
+		{ s << msg } -> std::same_as<StreamT&>;
+	};
+
 	/// <summary>
 	/// Appends a c-style formatted string to the given string
 	/// </summary>
