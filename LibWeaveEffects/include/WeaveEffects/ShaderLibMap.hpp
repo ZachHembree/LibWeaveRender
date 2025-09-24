@@ -22,6 +22,11 @@ namespace Weave::Effects
 		~ShaderLibMap();
 
 		/// <summary>
+		/// Returns the name of the shader library
+		/// </summary>
+		string_view GetName() const;
+
+		/// <summary>
 		/// Returns string ID lookup map
 		/// </summary>
 		const StringIDMap& GetStringMap() const;
@@ -227,6 +232,8 @@ namespace Weave::Effects
 			/// </summary>
 			NameIndexMap effects;
 		};
+
+		string name;
 
 		/// <summary>
 		/// Describes the platform targeted during compilation

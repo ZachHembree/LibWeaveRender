@@ -21,6 +21,8 @@ ShaderLibrary::ShaderLibrary(Renderer& renderer, ShaderLibDef&& def) :
 	pManager(new ShaderVariantManager(renderer.GetDevice(), std::move(def)))
 { }
 
+string_view ShaderLibrary::GetName() const { return pManager->GetLibMap().GetName(); }
+
 const StringIDMap& ShaderLibrary::GetStringMap() const { return pManager->GetStringMap(); }
 
 Material ShaderLibrary::GetMaterial(uint effectNameID) const
@@ -38,13 +40,15 @@ ComputeInstance ShaderLibrary::GetComputeInstance(uint nameID) const
 Material ShaderLibrary::GetMaterial(string_view effectName) const
 { 
 	uint id = -1;
-	D3D_CHECK_MSG(GetStringMap().TryGetStringID(effectName, id), "Invalid effect name");
+	D3D_CHECK_MSG(GetStringMap().TryGetStringID(effectName, id), "Invalid effect name ({})", effectName);
 	return GetMaterial(id);
 }
 
 ComputeInstance ShaderLibrary::GetComputeInstance(string_view name) const
 {
 	uint id = -1;
-	D3D_CHECK_MSG(GetStringMap().TryGetStringID(name, id), "Invalid shader name");
+	D3D_CHECK_MSG(GetStringMap().TryGetStringID(name, id), "Invalid shader name ({})", name);
 	return GetComputeInstance(id);
 }
+
+bool ShaderLibrary::GetIsValid() const { return pManager.get() != nullptr; }

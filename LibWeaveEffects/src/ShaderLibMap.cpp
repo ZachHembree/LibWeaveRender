@@ -48,9 +48,12 @@ ShaderLibMap::ShaderLibMap() = default;
 
 ShaderLibMap::~ShaderLibMap() = default;
 
+string_view ShaderLibMap::GetName() const { return name; }
+
 const StringIDMap& ShaderLibMap::GetStringMap() const { return pRegMap->GetStringMap(); }
 
 ShaderLibMap::ShaderLibMap(const ShaderLibDef& def) :
+	name(def.name),
 	platform(def.platform),
 	variantShaderMaps(def.repos.GetLength()),
 	variantFlagMaps(def.repos.GetLength()),
@@ -62,6 +65,7 @@ ShaderLibMap::ShaderLibMap(const ShaderLibDef& def) :
 }
 
 ShaderLibMap::ShaderLibMap(ShaderLibDef&& def) :
+	name(std::move(def.name)),
 	platform(std::move(def.platform)),
 	variantShaderMaps(def.repos.GetLength()),
 	variantFlagMaps(def.repos.GetLength()),
