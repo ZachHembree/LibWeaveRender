@@ -147,6 +147,8 @@ void Weave::DecompressBytes(const ZLibArchive& input, Vector<byte>& output)
     const uint crc = GetCRC32(output);
     WV_CHECK_MSG(crc == input.originalCRC32, "CRC32 mismatch: expected {:08x}, got {:08x}",
         input.originalCRC32, crc);
+    WV_CHECK_MSG(output.GetLength() == input.originalSizeBytes, "Size mismatch: expected {}, got {}",
+        input.originalSizeBytes, output.GetLength());
 }
 
 string_view Weave::ZLibArchive::GetDataAsString() const
