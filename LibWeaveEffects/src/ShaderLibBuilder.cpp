@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.hpp"
+#include <zlib/zlib.h>
 #include "WeaveEffects/ShaderLibBuilder/ShaderParser/BlockAnalyzer.hpp"
 #include "WeaveEffects/ShaderLibBuilder/SymbolTable.hpp"
 #include "WeaveEffects/ShaderLibBuilder/ShaderGenerator.hpp"
@@ -7,6 +8,7 @@
 #include "WeaveEffects/ShaderLibBuilder/VariantPreprocessor.hpp"
 #include "WeaveEffects/ShaderLibBuilder/ShaderRegistryBuilder.hpp"
 #include "WeaveEffects/ShaderLibBuilder.hpp"
+#include "WeaveEffects/Version.hpp"
 
 using namespace Weave::Effects;
 
@@ -21,20 +23,32 @@ ShaderLibBuilder::ShaderLibBuilder() :
 {
 	platform = PlatformDef
 	{
+		.preprocessorVersion = VERSION_STRING,
+		.preprocessorBuild = VERSION_BUILD,
 		.compilerVersion = string(GetCompilerVersionD3D11()),
-		.featureLevel = string("5_0"),
+		.featureLevel = "5_0",
 		.target = PlatformTargets::DirectX11
 	};
 }
 
 ShaderLibBuilder::~ShaderLibBuilder() = default;
 
+static uint GetCRC32(std::string_view data)
+{
+	uLong crc = crc32(0L, Z_NULL, 0);
+	crc = crc32(crc, reinterpret_cast<const Bytef*>(data.data()), (uInt)data.size());
+	return (uint)crc;
+}
+
 void ShaderLibBuilder::AddRepo(string_view repoPath, string_view libSrc)
 {
 	const uint repoID = (uint)repos.GetLength() << g_VariantGroupOffset;
-	VariantRepoDef& lib = repos.EmplaceBack();
-	lib.path = repoPath;
 	pVariantGen->SetSrc(repoPath, libSrc);
+
+	VariantRepoDef& lib = repos.EmplaceBack();
+	lib.sourceSizeBytes = (uint)libSrc.length();
+	lib.sourceCRC = GetCRC32(libSrc);
+	lib.path = repoPath;
 
 	for (uint configID = 0; configID < pVariantGen->GetVariantCount(); configID++)
 	{

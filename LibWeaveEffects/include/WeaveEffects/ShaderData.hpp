@@ -485,6 +485,16 @@ namespace Weave::Effects
 	struct PlatformDef
 	{
 		/// <summary>
+		/// Version string of the RPFX library used to process the shaders
+		/// </summary>
+		string preprocessorVersion;
+
+		/// <summary>
+		/// Effects library build that was used to preprocess the shaders
+		/// </summary>
+		uint preprocessorBuild;
+
+		/// <summary>
 		/// Name and version string of the shader compiler used
 		/// </summary>
 		string compilerVersion;
@@ -510,6 +520,16 @@ namespace Weave::Effects
 		/// File the repo was compiled from
 		/// </summary>
 		string path;
+
+		/// <summary>
+		/// Length of the original source in bytes
+		/// </summary>
+		uint sourceSizeBytes;
+
+		/// <summary>
+		/// CRC32 of the original source code
+		/// </summary>
+		uint sourceCRC;
 
 		/// <summary>
 		/// Flag names used for static shader variant generation

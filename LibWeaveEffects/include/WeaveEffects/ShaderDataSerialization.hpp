@@ -72,13 +72,13 @@ namespace Weave::Effects
 	template <class Archive>
 	inline void serialize(Archive& ar, PlatformDef& def)
 	{
-		ar(def.compilerVersion, def.featureLevel, def.target);
+		ar(def.preprocessorVersion, def.preprocessorBuild, def.compilerVersion, def.featureLevel, def.target);
 	}
 
 	template <class Archive>
 	inline void serialize(Archive& ar, VariantRepoDef& def)
 	{
-		ar(def.path, def.flagIDs, def.modeIDs, def.variants);
+		ar(def.path, def.sourceSizeBytes, def.sourceCRC, def.flagIDs, def.modeIDs, def.variants);
 	}
 
 	template <class Archive>
