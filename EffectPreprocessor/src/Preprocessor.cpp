@@ -7,6 +7,7 @@
 #include "WeaveUtils/Logger.hpp"
 #include "WeaveUtils/GenericMain.hpp"
 #include "WeaveUtils/Stopwatch.hpp"
+#include "WeaveUtils/Compression.hpp"
 #include "WeaveEffects/ShaderLibBuilder.hpp"
 #include "WeaveEffects/ShaderDataSerialization.hpp"
 #include "FXHelpText.hpp"
@@ -200,10 +201,9 @@ static void ConvertBinaryToHeader(string_view name, std::stringstream& binStream
     }
 
     const size_t trailingStart = 8 * (packedSize - 1);
+    const size_t remBytes = (binaryData.size() - trailingStart);
     ulong lastValue = 0;
-
-    for (size_t i = trailingStart; i < binaryData.size(); i++)
-        lastValue |= ((ulong)binaryData[i] << (8 * (i - trailingStart)));
+    memcpy(&lastValue, &binaryData[trailingStart], remBytes);
 
     binStream << "0x" << std::hex << lastValue << std::endl;
     binStream << "};";
@@ -287,17 +287,32 @@ static void WriteBinary(const fs::path& outputPath, const std::stringstream& ss)
  * @param streamBuf: A reusable stringstream buffer for serialization and writing.
  * @param output: The path to the output file.
  */
-static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::stringstream& streamBuf, const fs::path& output)
+static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::stringstream& streamBuf, ZLibArchive& zipBuffer, const fs::path& output)
 {
     libBuilder.SetName(name);
-
     ShaderLibDef::Handle shaderLib = libBuilder.GetDefinition();
-    streamBuf.str({});
-    streamBuf.clear();
-
+    
     // Serialize the library definition into the stringstream buffer
-    Serializer libWriter(streamBuf);
-    libWriter(shaderLib);
+    {
+        streamBuf.str({});
+        streamBuf.clear();
+
+        Serializer libWriter(streamBuf);
+        libWriter(shaderLib);
+    }
+
+    // Compress serialized library into container struct
+    zipBuffer.compressionLevel = 9;
+    CompressBytes(streamBuf.view(), zipBuffer);
+
+    // Serialize container into stream
+    {
+        streamBuf.str({});
+        streamBuf.clear();
+
+        Serializer zipWriter(streamBuf);
+        zipWriter(zipBuffer);
+    }
 
     // Convert serialized binary data to a C++ header if requested
     if (isHeaderLib)
@@ -308,8 +323,10 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
 
     // Log success and statistics
     WV_LOG_INFO() << "Successfully wrote library to: " << output;
+
     auto descLog = WV_LOG_INFO();
     libBuilder.WriteDescriptionString(descLog);
+    descLog << "\nCompression Ratio: " << 100.0f * zipBuffer.GetCompressionRatio() << "%";
 
     libBuilder.Clear();
 }
@@ -323,6 +340,7 @@ static void CreateLibrary()
 {
     ShaderLibBuilder libBuilder;
     std::stringstream streamBuf;
+    ZLibArchive zipBuffer;
 
     // Set default feature level if not provided
     if (featureLevel.empty()) 
@@ -412,7 +430,7 @@ static void CreateLibrary()
                 currentOutFile.replace_extension(".bin");
            
             WV_LOG_INFO() << "Output path for this file: " << currentOutFile;
-            WriteLibrary(baseName, libBuilder, streamBuf, currentOutFile);
+            WriteLibrary(baseName, libBuilder, streamBuf, zipBuffer, currentOutFile);
         }
     }
 
@@ -430,7 +448,7 @@ static void CreateLibrary()
 
         string mergedName = outPath.stem().string(); // Use output filename stem for name
         WV_LOG_INFO() << "Writing merged library: " << outPath;
-        WriteLibrary(mergedName, libBuilder, streamBuf, outPath);
+        WriteLibrary(mergedName, libBuilder, streamBuf, zipBuffer, outPath);
     }
 
     timer.Stop();
