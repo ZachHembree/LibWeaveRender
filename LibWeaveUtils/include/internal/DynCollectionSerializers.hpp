@@ -150,7 +150,7 @@ namespace Weave
 		ar(cereal::make_size_tag(length));
 
 		// Allocate destination
-		dst = ArrT();
+		dst.Clear();
 		dst.Reserve(length);
 
 		// Write deserialized data

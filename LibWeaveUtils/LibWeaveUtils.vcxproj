@@ -32,6 +32,7 @@
     <ClInclude Include="include\WeaveUtils\TickLimiter.hpp" />
     <ClInclude Include="include\WeaveUtils\VectorSpan.hpp" />
     <ClInclude Include="include\WeaveUtils\Version.hpp" />
+    <ClInclude Include="include\WeaveUtils\Compression.hpp" />
     <ClInclude Include="src\pch.hpp" />
     <ClInclude Include="include\WeaveUtils\Serialization.hpp" />
     <ClInclude Include="include\internal\DynCollectionSerializers.hpp" />
@@ -52,6 +53,7 @@
     <ClInclude Include="include\WeaveUtils\StringIDMap.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Compression.cpp" />
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\MinWindow.cpp" />
     <ClCompile Include="src\pch.cpp">

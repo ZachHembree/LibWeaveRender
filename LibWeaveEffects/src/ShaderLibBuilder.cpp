@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.hpp"
-#include <zlib/zlib.h>
+#include "WeaveUtils/Compression.hpp"
 #include "WeaveEffects/ShaderLibBuilder/ShaderParser/BlockAnalyzer.hpp"
 #include "WeaveEffects/ShaderLibBuilder/SymbolTable.hpp"
 #include "WeaveEffects/ShaderLibBuilder/ShaderGenerator.hpp"
@@ -32,13 +32,6 @@ ShaderLibBuilder::ShaderLibBuilder() :
 }
 
 ShaderLibBuilder::~ShaderLibBuilder() = default;
-
-static uint GetCRC32(std::string_view data)
-{
-	uLong crc = crc32(0L, Z_NULL, 0);
-	crc = crc32(crc, reinterpret_cast<const Bytef*>(data.data()), (uInt)data.size());
-	return (uint)crc;
-}
 
 void ShaderLibBuilder::AddRepo(string_view repoPath, string_view libSrc)
 {
