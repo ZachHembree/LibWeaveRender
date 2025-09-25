@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FXHelpText.hpp" />
+    <ClInclude Include="include\Version.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -148,7 +149,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);BUILD_NAME=$(Configuration)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -158,11 +159,11 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;$(SolutionDir)libs\zlib\vs2022\Build\$(Platform)\$(Configuration)\bin\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(SolutionDir)buildIncrementer.ps1" ^
+  -HeaderPath "$(ProjectDir)include\Version.hpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -171,7 +172,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);BUILD_NAME=$(Configuration)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)LibWeaveUtils\include;$(SolutionDir)LibWeaveEffects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -183,11 +184,11 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)LibWeaveUtils\Build\$(Platform)\$(Configuration)\bin\LibWeaveUtils.lib;$(SolutionDir)LibWeaveEffects\Build\$(Platform)\$(Configuration)\bin\LibWeaveEffects.lib;$(SolutionDir)libs\zlib\vs2022\Build\$(Platform)\$(Configuration)\bin\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(SolutionDir)buildIncrementer.ps1" ^
+  -HeaderPath "$(ProjectDir)include\Version.hpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

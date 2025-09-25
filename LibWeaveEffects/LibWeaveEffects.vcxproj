@@ -42,6 +42,7 @@
     <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\SymbolTable.hpp" />
     <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\VariantPreprocessor.hpp" />
     <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\WaveConfig.hpp" />
+    <ClInclude Include="include\WeaveEffects\Version.hpp" />
     <ClInclude Include="src\pch.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -198,7 +199,7 @@ powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);BUILD_NAME=$(Configuration)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
@@ -215,7 +216,9 @@ powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
     <PreBuildEvent>
       <Command>cd $(ProjectDir)
 powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
-  -TablePath "$(ProjectDir)src\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.cpp"</Command>
+  -TablePath "$(ProjectDir)src\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.cpp"
+powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(SolutionDir)buildIncrementer.ps1" ^
+  -HeaderPath "$(ProjectDir)include\WeaveEffects\Version.hpp"</Command>
     </PreBuildEvent>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -230,7 +233,7 @@ powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions);BUILD_NAME=$(Configuration)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
@@ -249,7 +252,9 @@ powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
     <PreBuildEvent>
       <Command>cd $(ProjectDir)
 powershell -ExecutionPolicy Bypass -File "shaderTypeTableGen.ps1"^
-  -TablePath "$(ProjectDir)src\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.cpp"</Command>
+  -TablePath "$(ProjectDir)src\ShaderLibBuilder\ShaderParser\ShaderTypeInfo.cpp"
+powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(SolutionDir)buildIncrementer.ps1" ^
+  -HeaderPath "$(ProjectDir)include\WeaveEffects\Version.hpp"</Command>
     </PreBuildEvent>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>

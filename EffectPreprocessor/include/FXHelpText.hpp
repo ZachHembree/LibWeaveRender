@@ -1,8 +1,9 @@
 #pragma once
 #include <string_view>
+#include "Version.hpp"
 
-constexpr std::string_view g_FX_HelpText = R"HELPTEXT(
-WFX Preprocessor - Shader Library Compiler (v0.1.0)
+constexpr std::string_view g_FX_HelpText = R"(
+WFX Preprocessor - Shader Library Compiler v)" VERSION_STRING R"(
 ----------------------------------------------------
 Preprocesses and compiles Weave Effects (.wfx) shader source files into
 optimized, deployable shader libraries. These libraries can be output as
@@ -85,4 +86,4 @@ NOTES:
     - Detailed logs are written to 'wfxc.log' in the directory where the
       preprocessor is executed. Check this file for detailed error messages.
 
-)HELPTEXT";
+)";

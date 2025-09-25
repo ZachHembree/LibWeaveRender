@@ -148,7 +148,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);BUILD_NAME=$(Configuration)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
@@ -174,7 +174,9 @@
     <PreBuildEvent>
       <Command>$(SolutionDir)EffectPreprocessor\Build\x64\$(Configuration)\bin\wfxc.exe -hm^
     --input "$(ProjectDir)res\*.rpfx"^
-    --output "$(ProjectDir)src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp"</Command>
+    --output "$(ProjectDir)src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp"
+powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(SolutionDir)buildIncrementer.ps1" ^
+  -HeaderPath "$(ProjectDir)include\WeaveRender\Version.hpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -183,7 +185,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NDEBUG;BUILD_NAME=$(Configuration)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -210,7 +212,9 @@
     <PreBuildEvent>
       <Command>$(SolutionDir)EffectPreprocessor\Build\x64\$(Configuration)\bin\wfxc.exe -hm^
     --input "$(ProjectDir)res\*.rpfx"^
-    --output "$(ProjectDir)src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp"</Command>
+    --output "$(ProjectDir)src\renderers\include\D3D11\ShaderSrc\DefaultShaders.hpp"
+powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(SolutionDir)buildIncrementer.ps1" ^
+  -HeaderPath "$(ProjectDir)include\WeaveRender\Version.hpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -269,6 +273,7 @@
   <ItemGroup>
     <ClInclude Include="include\WeaveRender\D3D11.hpp" />
     <ClInclude Include="include\WeaveRender\Imgui.hpp" />
+    <ClInclude Include="include\WeaveRender\Version.hpp" />
     <ClInclude Include="src\pch.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ContextState.hpp" />
     <ClInclude Include="src\renderers\include\D3D11\ContextUtils.hpp" />
