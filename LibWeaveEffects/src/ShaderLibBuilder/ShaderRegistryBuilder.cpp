@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "WeaveEffects/ShaderLibBuilder/ShaderRegistryBuilder.hpp"
+#include "WeaveEffects/ShaderDataHandles.hpp"
 
 using namespace Weave;
 using namespace Weave::Effects;
@@ -33,6 +34,10 @@ void ShaderRegistryBuilder::Clear()
 
 	resCount = 0;
 	uniqueResCount = 0;
+
+	shaderCopyCache.clear();
+	effectCopyCache.clear();
+	pCopySrc = nullptr;
 }
 
 int ShaderRegistryBuilder::GetResourceCount() const { return resCount; }
@@ -57,6 +62,195 @@ uint ShaderRegistryBuilder::GetOrAddEffect(const EffectDef& effect) { return Get
 uint ShaderRegistryBuilder::GetOrAddIDGroup(const IDynamicArray<uint>& idGroup) { return GetOrAddValue(idGroup, idGroups); }
 
 uint ShaderRegistryBuilder::GetOrAddShaderBin(const IDynamicArray<byte>& byteCode) { return GetOrAddValue(byteCode, binSpans); }
+
+/// <summary>
+/// Copies an IOLayout from from a ShaderRegistryMap and maps it into the given registry builder. Returns the layout ID 
+/// for the new layout in the builder.
+/// </summary>
+static uint RemapIOLayout(const std::optional<IOLayoutHandle>& layout, ShaderRegistryBuilder& builder)
+{
+	uint layoutID = -1;
+
+	if (layout.has_value())
+	{
+		Vector<uint> idBuf = builder.GetTmpIDBuffer();
+
+		for (uint i = 0; i < layout->GetLength(); i++)
+		{
+			IOElementDef element = (*layout)[i];
+			string_view name = layout->GetStringMap().GetString(element.semanticID);
+			element.semanticID = builder.GetOrAddStringID(name);
+			idBuf.EmplaceBack(builder.GetOrAddIOElement(element));
+		}
+
+		layoutID = builder.GetOrAddIDGroup(idBuf);
+		builder.ReturnTmpIDBuffer(std::move(idBuf));
+	}
+	
+	return layoutID;
+}
+
+/// <summary>
+/// Remaps a group of constant buffers from another shader registry into the give registry builder
+/// </summary>
+static uint RemapConstants(const std::optional<ConstBufGroupHandle>& group, ShaderRegistryBuilder& builder)
+{
+	uint groupID = -1;
+
+	if (group.has_value())
+	{
+		Vector<uint> groupIDbuf = builder.GetTmpIDBuffer();
+
+		// Remap constant buffers
+		for (uint i = 0; i < group->GetLength(); i++)
+		{
+			ConstBufDefHandle bufHandle = (*group)[i];
+
+			Vector<uint> constIDbuf = builder.GetTmpIDBuffer();
+			ConstBufDef bufDef;
+			bufDef.stringID = builder.GetOrAddStringID(bufHandle.GetName());
+			bufDef.size = bufHandle.GetSize();
+
+			// Remap constants
+			for (uint j = 0; j < bufHandle.GetLength(); j++)
+			{
+				ConstDef varDef = bufHandle[j];
+				string_view varName = bufHandle.GetStringMap().GetString(varDef.stringID);
+				varDef.stringID = builder.GetOrAddStringID(varName);
+				constIDbuf.EmplaceBack(builder.GetOrAddConstant(varDef));
+			}
+
+			bufDef.layoutID = builder.GetOrAddIDGroup(constIDbuf);
+			groupIDbuf.EmplaceBack(builder.GetOrAddConstantBuffer(bufDef));
+			builder.ReturnTmpIDBuffer(std::move(constIDbuf));
+		}
+
+		groupID = !groupIDbuf.IsEmpty() ? builder.GetOrAddIDGroup(groupIDbuf) : -1;
+		builder.ReturnTmpIDBuffer(std::move(groupIDbuf));
+	}
+
+	return groupID;
+}
+
+/// <summary>
+/// Remaps a group of resources (textures/samplers), from another shader registry into the given builder
+/// </summary>
+static uint RemapResources(const std::optional<ResourceGroupHandle>& resources, ShaderRegistryBuilder& builder)
+{
+	uint layoutID = -1;
+
+	if (resources.has_value())
+	{
+		Vector<uint> idBuf = builder.GetTmpIDBuffer();
+
+		for (uint i = 0; i < resources->GetLength(); i++)
+		{
+			ResourceDef res = (*resources)[i];
+			string_view resName = resources->GetStringMap().GetString(res.stringID);
+			res.stringID = builder.GetOrAddStringID(resName);
+			idBuf.EmplaceBack(builder.GetOrAddResource(res));
+		}
+
+		layoutID = !idBuf.IsEmpty() ? builder.GetOrAddIDGroup(idBuf) : -1;
+		builder.ReturnTmpIDBuffer(std::move(idBuf));
+	}
+
+	return layoutID;
+}
+
+uint ShaderRegistryBuilder::GetOrAddShader(const ShaderDefHandle& shaderDef)
+{
+	// Evict copy cache if source changes
+	if (&shaderDef.GetRegistry() != pCopySrc)
+	{
+		shaderCopyCache.clear();
+		effectCopyCache.clear();
+		pCopySrc = &shaderDef.GetRegistry();
+	}
+	
+	// Attempt to remap from copy cache
+	const auto& it = shaderCopyCache.find(shaderDef.GetDefinition());
+
+	if (it != shaderCopyCache.end())
+	{
+		return it->second;
+	}
+	// Full remap
+	else
+	{
+		ShaderDef cpy =
+		{
+			.fileStringID = GetOrAddStringID(shaderDef.GetFilePath()),
+			.byteCodeID = GetOrAddShaderBin(shaderDef.GetBinSrc()),
+			.nameID = GetOrAddStringID(shaderDef.GetName()),
+			.stage = shaderDef.GetStage(),
+			// Reflection
+			.threadGroupSize = shaderDef.GetThreadGroupSize(),
+			// Input/Output params
+			.inLayoutID = RemapIOLayout(shaderDef.GetInLayout(), *this),
+			.outLayoutID = RemapIOLayout(shaderDef.GetOutLayout(), *this),
+			// Textures and resources
+			.resLayoutID = RemapResources(shaderDef.GetResources(), *this),
+			// Constants
+			.cbufGroupID = RemapConstants(shaderDef.GetConstantBuffers(), *this)
+		};
+
+		const uint shaderID = GetOrAddShader(cpy);
+		shaderCopyCache.emplace(shaderDef.GetDefinition(), shaderID);
+		return shaderID;
+	}
+}
+
+uint ShaderRegistryBuilder::GetOrAddEffect(const EffectDefHandle& effectDef)
+{
+	// Evict copy cache if source changes
+	if (&effectDef.GetRegistry() != pCopySrc)
+	{
+		shaderCopyCache.clear();
+		effectCopyCache.clear();
+		pCopySrc = &effectDef.GetRegistry();
+	}
+
+	// Attempt to remap from copy cache
+	const auto& it = effectCopyCache.find(effectDef.GetDefinition());
+
+	if (it != effectCopyCache.end())
+	{
+		return it->second;
+	}
+	// Full remap
+	else
+	{
+		// Remap dependencies
+		Vector<uint> effectPasses = GetTmpIDBuffer();
+		Vector<uint> passBuf = GetTmpIDBuffer();
+
+		for (int i = 0; i < (int)effectDef.GetPassCount(); i++)
+		{
+			for (int j = 0; j < (int)effectDef.GetShaderCount(i); j++)
+			{
+				ShaderDefHandle shader = effectDef.GetShader(i, j);
+				uint shaderID = GetOrAddShader(shader);
+				passBuf.Add(shaderID);
+			}
+
+			effectPasses.Add(GetOrAddIDGroup(passBuf));
+			passBuf.Clear();
+		}
+
+		// Finalize definition
+		EffectDef cpy;
+		cpy.nameID = GetOrAddStringID(effectDef.GetName());
+		cpy.passGroupID = GetOrAddIDGroup(effectPasses);
+		ReturnTmpIDBuffer(std::move(effectPasses));
+		ReturnTmpIDBuffer(std::move(passBuf));
+
+		// Cache result and return
+		const uint effectID = GetOrAddEffect(cpy);
+		effectCopyCache.emplace(cpy, effectID);
+		return effectID;
+	}
+}
 
 // Getter helpers
 const ConstDef& ShaderRegistryBuilder::GetConstant(const uint id) const { return constants.GetValue(id); }

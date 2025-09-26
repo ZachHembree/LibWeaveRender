@@ -73,6 +73,10 @@ namespace std
 
 namespace Weave::Effects
 {
+	class ShaderRegistryMap;
+	class ShaderDefHandle;
+	class EffectDefHandle;
+
 	/// <summary>
 	/// Builds a set of unique shaders, effects and supporting resources and assigns each a unique uint32_t ID
 	/// </summary>
@@ -123,6 +127,16 @@ namespace Weave::Effects
 		uint GetOrAddIDGroup(const IDynamicArray<uint>& idGroup);
 
 		uint GetOrAddShaderBin(const IDynamicArray<byte>& byteCode);
+
+		/* ShaderRegistryMap Copy Utils
+		* Return IDs to equivalent definitions in this registry builder. If the given definition has no equivalent, it will be copied 
+		* into the builder's registry, with new resource and string IDs as needed. Used for copying definitions from a finalized 
+		* ShaderRegistryMap.
+		*/
+
+		uint GetOrAddShader(const ShaderDefHandle& shaderDef);
+
+		uint GetOrAddEffect(const EffectDefHandle& effectDef);
 
 		/* Get(Member) returns an immutable reference to the object corresponding to the given ID. */
 
@@ -252,6 +266,11 @@ namespace Weave::Effects
 
 		int resCount;
 		int uniqueResCount;
+
+		// Temporary conversion cache for copying from a ShaderRegistryMap
+		const ShaderRegistryMap* pCopySrc;
+		std::unordered_map<ShaderDef, uint> shaderCopyCache;
+		std::unordered_map<EffectDef, uint> effectCopyCache;
 
 		template<typename T, typename VecT, ResourceType type>
 		uint GetOrAddValue(const T& newValue, HashableVector<VecT, type>& values)
