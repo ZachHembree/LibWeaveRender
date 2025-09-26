@@ -17,6 +17,8 @@ ConstBufDefHandle::ConstBufDefHandle(const ShaderRegistryMap & map, uint bufID) 
 
 uint ConstBufDefHandle::GetNameID() const { return pDef->stringID; }
 
+string_view ConstBufDefHandle::GetName() const { return pMap->GetString(pDef->stringID); }
+
 uint ConstBufDefHandle::GetSize() const { return pDef->size; }
 
 const ConstDef& ConstBufDefHandle::operator[](ptrdiff_t index) const 
@@ -44,7 +46,11 @@ ShaderDefHandle::ShaderDefHandle(const ShaderRegistryMap& map, uint shaderID) :
 
 uint ShaderDefHandle::GetFilePathID() const { return pDef->fileStringID; }
 
+string_view ShaderDefHandle::GetFilePath() const { return pMap->GetString(pDef->fileStringID); }
+
 uint ShaderDefHandle::GetNameID() const { return pDef->nameID; }
+
+string_view ShaderDefHandle::GetName() const { return pMap->GetString(pDef->nameID); }
 
 ByteSpan ShaderDefHandle::GetBinSrc() const { return pMap->GetByteCode(pDef->byteCodeID); }
 
@@ -52,7 +58,7 @@ ShadeStages ShaderDefHandle::GetStage() const { return pDef->stage; }
 
 tvec3<uint> ShaderDefHandle::GetThreadGroupSize() const { return pDef->threadGroupSize; }
 
-std::optional <IOLayoutHandle> ShaderDefHandle::GetInLayout() const
+std::optional<IOLayoutHandle> ShaderDefHandle::GetInLayout() const
 { 
 	if (pDef->inLayoutID != -1)
 		return IOLayoutHandle(*pMap, pDef->inLayoutID);
@@ -60,7 +66,7 @@ std::optional <IOLayoutHandle> ShaderDefHandle::GetInLayout() const
 		return std::nullopt;
 }
 
-std::optional <IOLayoutHandle> ShaderDefHandle::GetOutLayout() const 
+std::optional<IOLayoutHandle> ShaderDefHandle::GetOutLayout() const 
 { 
 	if (pDef->outLayoutID != -1)
 		return IOLayoutHandle(*pMap, pDef->outLayoutID);
@@ -76,13 +82,17 @@ std::optional<ResourceGroupHandle> ShaderDefHandle::GetResources() const
 		return std::nullopt;
 }
 
-std::optional <ConstBufGroupHandle> ShaderDefHandle::GetConstantBuffers() const
+std::optional<ConstBufGroupHandle> ShaderDefHandle::GetConstantBuffers() const
 { 
 	if (pDef->cbufGroupID != -1)
 		return ConstBufGroupHandle(*pMap, pDef->cbufGroupID);
 	else
 		return std::nullopt;
 }
+
+const ShaderDef& ShaderDefHandle::GetDefinition() const { return *pDef; }
+
+const ShaderRegistryMap& ShaderDefHandle::GetRegistry() const { return *pMap; }
 
 const StringIDMap& ShaderDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
 
@@ -96,6 +106,8 @@ EffectDefHandle::EffectDefHandle(const ShaderRegistryMap& map, uint effectID) :
 {}
 
 uint EffectDefHandle::GetNameID() const { return def.nameID; }
+
+string_view EffectDefHandle::GetName() const { return pMap->GetString(def.nameID); }
 
 ShaderDefHandle EffectDefHandle::GetShader(int pass, int shader) const
 {
@@ -118,6 +130,10 @@ uint EffectDefHandle::GetPassCount() const
 {
 	return (uint)passes.GetLength();
 }
+
+const EffectDef& EffectDefHandle::GetDefinition() const { return def; }
+
+const ShaderRegistryMap& EffectDefHandle::GetRegistry() const { return *pMap; }
 
 const StringIDMap& EffectDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
 

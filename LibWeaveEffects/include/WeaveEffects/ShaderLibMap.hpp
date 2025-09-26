@@ -32,6 +32,21 @@ namespace Weave::Effects
 		const StringIDMap& GetStringMap() const;
 
 		/// <summary>
+		/// Returns an array of all variant repo definitions
+		/// </summary>
+		const IDynamicArray<VariantRepoDef>& GetRepos() const;
+
+		/// <summary>
+		/// Returns all flag IDs used by the variant repo associated with the given ID
+		/// </summary>
+		const IDynamicArray<uint>& GetFlags(uint vID) const;
+
+		/// <summary>
+		/// Returns all mode IDs used by the variant repo associated with the given ID
+		/// </summary>
+		const IDynamicArray<uint>& GetModes(uint vID) const;
+
+		/// <summary>
 		/// Returns the shader by shaderID
 		/// </summary>
 		ShaderDefHandle GetShader(uint shaderID) const;

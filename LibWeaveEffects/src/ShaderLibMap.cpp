@@ -436,3 +436,15 @@ uint ShaderLibMap::GetVariantID(uint repoIndex, uint flagID, uint modeID) const
 {
 	return PackVariantID(repoIndex, GetConfigIndex(flagID, modeID, GetFlagVariantCount(repoIndex)));
 }
+
+const IDynamicArray<VariantRepoDef>& ShaderLibMap::GetRepos() const { return variantRepos; }
+
+const IDynamicArray<uint>& ShaderLibMap::GetFlags(uint vID) const
+{
+	return variantRepos[GetRepoIndex(vID)].flagIDs;
+}
+
+const IDynamicArray<uint>& ShaderLibMap::GetModes(uint vID) const
+{
+	return variantRepos[GetRepoIndex(vID)].modeIDs;
+}

@@ -22,6 +22,11 @@ namespace Weave::Effects
 		uint GetNameID() const;
 
 		/// <summary>
+		/// Returns the name of the constant buffer
+		/// </summary>
+		string_view GetName() const;
+
+		/// <summary>
 		/// Returns total buffer size in bytes
 		/// </summary>
 		uint GetSize() const;
@@ -147,14 +152,24 @@ namespace Weave::Effects
 		ShaderDefHandle(const ShaderRegistryMap& map, uint shaderID);
 
 		/// <summary>
-		/// Returns the string ID associated with the file the shader was compiled rom
+		/// Returns the string ID associated with the file the shader was compiled from
 		/// </summary>
 		uint GetFilePathID() const;
+
+		/// <summary>
+		/// Returns the file path the shader was compiled from
+		/// </summary>
+		string_view GetFilePath() const;
 
 		/// <summary>
 		/// Returns the string ID associated with the shader's name
 		/// </summary>
 		uint GetNameID() const;
+
+		/// <summary>
+		/// Returns the name of the shader
+		/// </summary>
+		string_view GetName() const;
 
 		/// <summary>
 		/// Returns precompiled platform-specific bytecode
@@ -174,12 +189,12 @@ namespace Weave::Effects
 		/// <summary>
 		/// Returns the input layout/signature for the shader
 		/// </summary>
-		std::optional <IOLayoutHandle> GetInLayout() const;
+		std::optional<IOLayoutHandle> GetInLayout() const;
 
 		/// <summary>
 		/// Returns the output/return signature for the shader
 		/// </summary>
-		std::optional <IOLayoutHandle> GetOutLayout() const;
+		std::optional<IOLayoutHandle> GetOutLayout() const;
 
 		/// <summary>
 		/// Returns the unique set of resources required by the shader
@@ -189,7 +204,17 @@ namespace Weave::Effects
 		/// <summary>
 		/// Returns the constant buffers used by the shader
 		/// </summary>
-		std::optional <ConstBufGroupHandle> GetConstantBuffers() const;
+		std::optional<ConstBufGroupHandle> GetConstantBuffers() const;
+
+		/// <summary>
+		/// Returns the raw shader definition
+		/// </summary>
+		const ShaderDef& GetDefinition() const;
+
+		/// <summary>
+		/// Returns the parent registry backing the handle
+		/// </summary>
+		const ShaderRegistryMap& GetRegistry() const;
 
 		/// <summary>
 		/// Map for stringID lookup
@@ -219,6 +244,11 @@ namespace Weave::Effects
 		uint GetNameID() const;
 
 		/// <summary>
+		/// Returns the name of the effect
+		/// </summary>
+		string_view GetName() const;
+
+		/// <summary>
 		/// Returns a shader definition used by the effect for the given pass and index
 		/// </summary>
 		ShaderDefHandle GetShader(int pass, int shader) const;
@@ -237,6 +267,16 @@ namespace Weave::Effects
 		/// Returns the total number of passes
 		/// </summary>
 		uint GetPassCount() const;
+
+		/// <summary>
+		/// Returns raw effect definition
+		/// </summary>
+		const EffectDef& GetDefinition() const;
+
+		/// <summary>
+		/// Returns the parent registry backing the handle
+		/// </summary>
+		const ShaderRegistryMap& GetRegistry() const;
 
 		/// <summary>
 		/// Map for stringID lookup
