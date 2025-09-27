@@ -78,10 +78,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
     <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+    <TargetExt>.temp</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
     <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+    <TargetExt>.temp</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
@@ -178,6 +180,11 @@
 powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(SolutionDir)buildIncrementer.ps1" ^
   -HeaderPath "$(ProjectDir)include\WeaveRender\Version.hpp"</Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>lib /OUT:"$(OutDir)$(TargetName).lib" ^
+  "$(OutDir)$(TargetName)$(TargetExt)" ^
+  "$(SolutionDir)libs\imgui\Build\$(Platform)\$(Configuration)\bin\imgui.lib"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -216,6 +223,11 @@ powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(Solut
 powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(SolutionDir)buildIncrementer.ps1" ^
   -HeaderPath "$(ProjectDir)include\WeaveRender\Version.hpp"</Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>lib /OUT:"$(OutDir)$(TargetName).lib" ^
+  "$(OutDir)$(TargetName)$(TargetExt)" ^
+  "$(SolutionDir)libs\imgui\Build\$(Platform)\$(Configuration)\bin\imgui.lib"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp">

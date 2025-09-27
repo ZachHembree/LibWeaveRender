@@ -140,10 +140,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
     <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <TargetExt>.temp</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>Build\$(Platform)\$(Configuration)\bin\</OutDir>
     <IntDir>Build\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <TargetExt>.temp</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -205,6 +209,17 @@
       <Command>powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(SolutionDir)buildIncrementer.ps1" ^
   -HeaderPath "$(ProjectDir)include\WeaveUtils\Version.hpp"</Command>
     </PreBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PostBuildEvent>
+      <Command>lib /OUT:"$(OutDir)$(ProjectName).lib" ^
+  "$(OutDir)$(TargetName)$(TargetExt)" ^
+  "$(SolutionDir)libs\zlib\vs2022\Build\$(Platform)\$(Configuration)\bin\zlib.lib"</Command>
+    </PostBuildEvent>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -232,6 +247,17 @@
       <Command>powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(SolutionDir)buildIncrementer.ps1" ^
   -HeaderPath "$(ProjectDir)include\WeaveUtils\Version.hpp"</Command>
     </PreBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PostBuildEvent>
+      <Command>lib /OUT:"$(OutDir)$(ProjectName).lib" ^
+  "$(OutDir)$(TargetName)$(TargetExt)" ^
+  "$(SolutionDir)libs\zlib\vs2022\Build\$(Platform)\$(Configuration)\bin\zlib.lib"</Command>
+    </PostBuildEvent>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
