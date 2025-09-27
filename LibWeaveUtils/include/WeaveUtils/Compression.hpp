@@ -3,6 +3,7 @@
 #include "WeaveUtils/TextUtils.hpp"
 #include "WeaveUtils/DynamicCollections.hpp"
 #include "WeaveUtils/Serialization.hpp"
+#include "WeaveUtils/SpanStream.hpp"
 
 namespace Weave
 {
@@ -101,5 +102,29 @@ namespace Weave
         }
 
         return dst.view();
+    }
+
+    /// <summary>
+    /// Deserializes and decompresses an object to the given destination (SerialT).
+    /// </summary>
+    template<typename SerialT>
+    void DeserializeCompressedStream(string_view input, ZLibArchive& archive, Vector<byte>& zipBuffer, SerialT& dst)
+    {
+        // Deserialize zip wrapper
+        {
+            // Interpret input as istream
+            ISpanStream inStream(input);
+            Deserializer zipReader(inStream);
+            zipReader(archive);
+        }
+
+        // Unzip object data
+        DecompressBytes(archive, zipBuffer);
+
+        // Interpret zip buffer as char istream
+        ISpanStream vecStream(Span(reinterpret_cast<char*>(zipBuffer.GetData()), (int)zipBuffer.GetLength()));
+        Deserializer reader(vecStream);
+        // Deserialize decompressed data
+        reader(dst);
     }
 }
