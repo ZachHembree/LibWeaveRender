@@ -178,7 +178,7 @@ namespace Weave::Effects
 		void MergeCacheHits();
 
 		/// <summary>
-		/// Attempts to retrieve a repo from the cache based on it's original source path
+		/// Attempts to retrieve a repo from the cache based on its original source path
 		/// </summary>
 		const VariantRepoDef* TryGetCachedRepo(string_view path) const;
 

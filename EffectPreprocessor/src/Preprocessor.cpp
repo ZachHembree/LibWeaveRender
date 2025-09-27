@@ -13,7 +13,6 @@
 #include "FXHelpText.hpp"
 
 namespace fs = std::filesystem;
-
 using namespace Weave;
 using namespace Weave::Effects;
 
@@ -38,16 +37,29 @@ static string cacheDir;
 // Stores the set of input file paths to process.
 static std::unordered_set<string> inputFiles;
 
-/**
- * @brief Finds all regular files with a specific extension within a directory.
- * @param dir The directory path to search within.
- * @param ext The desired file extension (including the dot, e.g., ".wfx").
- * @param files[out] The set to which found file paths (as strings) will be added.
- */
+//-----------------------------------------------------------------------------
+// Constants
+//-----------------------------------------------------------------------------
+
+// std::format formatting string for shader cache files
+static constexpr string_view s_CacheFileFormat = "{}.cache";
+
+// Default subfolder used when no cache directory is specified, relative to working directory.
+static constexpr string_view s_DefaultCacheSubDir = "wfxc";
+
+// Log file, relative to the working directory
+static constexpr string_view s_LogFile = "wfxc.log";
+
+/// <summary>
+/// Finds all regular files with a specific extension within a directory.
+/// </summary>
+/// <param name="dir">The directory path to search within.</param>
+/// <param name="ext">The desired file extension (including the dot, e.g., ".wfx").</param>
+/// <param name="files">The set to which found file paths (as strings) will be added.</param>
 static void GetFilesByExtension(const fs::path& dir, string_view ext, std::unordered_set<string>& files)
 {
     // Ensure the directory exists before iterating
-    if (!fs::exists(dir) || !fs::is_directory(dir)) 
+    if (!fs::exists(dir) || !fs::is_directory(dir))
     {
         WV_LOG_WARN() << "Directory not found or is not a directory: " << dir;
         return;
@@ -62,14 +74,14 @@ static void GetFilesByExtension(const fs::path& dir, string_view ext, std::unord
     }
 }
 
-/**
- * @brief Helper to read the next argument specifically as a string value for an option.
- * Ensures the option is not specified more than once.
- * @param args The array of command-line arguments.
- * @param pos[in,out] The current position index within the args array. Will be incremented.
- * @param param[out] The string variable to store the parsed argument value.
- * @throws EffectParseException If no argument follows, the next token is an option, or the option was already set.
- */
+/// <summary>
+/// Helper to read the next argument specifically as a string value for an option.
+/// Ensures the option is not specified more than once.
+/// </summary>
+/// <param name="args">The array of command-line arguments.</param>
+/// <param name="pos">The current position index within the args array. Will be incremented.</param>
+/// <param name="param">The string variable to store the parsed argument value.</param>
+/// <exception cref="EffectParseException">If no argument follows, the next token is an option, or the option was already set.</exception>
 static void SetStringParam(const IDynamicArray<string_view>& args, int& pos, string& param)
 {
     int originalPos = pos;
@@ -108,12 +120,12 @@ static void SetOutput(const IDynamicArray<string_view>& args, int& pos) { SetStr
 // Sets the global string for the cache directory/file using SetStringParam.
 static void SetCache(const IDynamicArray<string_view>& args, int& pos) { SetStringParam(args, pos, cacheDir); }
 
-/**
- * @brief Sets the input file(s). Handles single files or wildcard patterns (*.ext).
- * @param args The array of command-line arguments.
- * @param pos[in,out] The current position index within the args array. Will be incremented.
- * @throws EffectParseException If no argument follows, or if wildcard pattern is malformed.
- */
+/// <summary>
+/// Sets the input file(s). Handles single files or wildcard patterns (*.ext).
+/// </summary>
+/// <param name="args">The array of command-line arguments.</param>
+/// <param name="pos">The current position index within the args array. Will be incremented.</param>
+/// <exception cref="EffectParseException">If no argument follows, or if wildcard pattern is malformed.</exception>
 static void SetInput(const IDynamicArray<string_view>& args, int& pos)
 {
     pos++;
@@ -171,13 +183,13 @@ static const std::unordered_map<string_view, OptionHandlerFunc> s_OptionMap
 // Output Generation Utilities
 //-----------------------------------------------------------------------------
 
-/**
- * @brief Converts binary data from a stringstream into a C++ header file format
- * (constexpr uint64_t array). Assumes little endian encoding.
- * @param name The base name for the C++ variable (e.g., "MyLibrary").
- * @param binStream[in,out] The stringstream containing the binary data. It will be cleared
- * and overwritten with the header content.
- */
+/// <summary>
+/// Converts binary data from a stringstream into a C++ header file format
+/// (constexpr uint64_t array).
+/// </summary>
+/// <param name="name">The base name for the C++ variable (e.g., "MyLibrary").</param>
+/// <param name="binStream">The stringstream containing the binary data. It will be cleared
+/// and overwritten with the header content.</param>
 static void ConvertBinaryToHeader(string_view name, std::stringstream& binStream)
 {
     static string binaryData;
@@ -215,12 +227,12 @@ static void ConvertBinaryToHeader(string_view name, std::stringstream& binStream
     binStream << "};";
 }
 
-/**
- * @brief Reads the entire content of a specified file into a stringstream.
- * @param inputPath The path to the input file.
- * @param ss[out] The stringstream to fill with the file content.
- * @throws EffectParseException If the file doesn't exist, isn't a regular file, or cannot be opened.
- */
+/// <summary>
+/// Reads the entire content of a specified file into a stringstream.
+/// </summary>
+/// <param name="inputPath">The path to the input file.</param>
+/// <param name="ss">The stringstream to fill with the file content.</param>
+/// <exception cref="EffectParseException">If the file doesn't exist, isn't a regular file, or cannot be opened.</exception>
 static void GetInput(const fs::path& inputPath, std::stringstream& ss)
 {
     ss.str({});
@@ -235,10 +247,10 @@ static void GetInput(const fs::path& inputPath, std::stringstream& ss)
     ss << inputStream.rdbuf();
 }
 
-/**
- * @brief Ensures the directory structure for the output path exists, creating it if necessary.
- * @param outputPath The full path (including filename) for the output file.
- */
+/// <summary>
+/// Ensures the directory structure for the output path exists, creating it if necessary.
+/// </summary>
+/// <param name="outputPath">The full path (including filename) for the output file.</param>
 static void ValidateOutputDir(const fs::path& outputPath)
 {
     fs::path parentDir = outputPath.parent_path();
@@ -248,29 +260,29 @@ static void ValidateOutputDir(const fs::path& outputPath)
     {
         WV_LOG_INFO() << "Attempting to create output directories: " << parentDir;
 
-        try 
+        try
         {
             if (fs::create_directories(parentDir))
                 WV_LOG_INFO() << "Created output directories: " << parentDir;
             else
                 WV_LOG_WARN() << "Could not create output directories (or they already existed): " << parentDir;
         }
-        catch (const fs::filesystem_error& e) 
+        catch (const fs::filesystem_error& e)
         {
             FX_THROW("Filesystem error creating directory '{}': {}", parentDir.string(), e.what());
         }
     }
 
-    FX_CHECK_MSG(!fs::is_directory(outputPath), 
+    FX_CHECK_MSG(!fs::is_directory(outputPath),
         "Output path specifies an existing directory, but a file is expected: {}", outputPath.string());
 }
 
-/**
- * @brief Writes the content of a stringstream to the specified output file.
- * @param outputPath: The path to the output file.
- * @param ss: The stringstream containing the data to write.
- * @throws EffectParseException If the output file cannot be opened for writing.
- */
+/// <summary>
+/// Writes the content of a stringstream to the specified output file.
+/// </summary>
+/// <param name="outputPath">The path to the output file.</param>
+/// <param name="ss">The stringstream containing the data to write.</param>
+/// <exception cref="EffectParseException">If the output file cannot be opened for writing.</exception>
 static void WriteBinary(const fs::path& outputPath, const std::stringstream& ss)
 {
     ValidateOutputDir(outputPath); // Ensure parent directory exists
@@ -285,43 +297,50 @@ static void WriteBinary(const fs::path& outputPath, const std::stringstream& ss)
 // Core Library Processing Logic
 //-----------------------------------------------------------------------------
 
+/// <summary>
+/// Creates a file path for the a library cache with the given name
+/// </summary>
 static fs::path GetCachePath(string_view libName)
 {
     fs::path cachePath(cacheDir);
-    string cacheName = std::format("tmp_{}.o", libName);
+    string cacheName = std::format(s_CacheFileFormat, libName);
     return (cachePath / cacheName);
 }
 
-static void GetCache(string_view libName, std::stringstream& streamBuf, std::optional<ShaderLibDef>& libCache)
+/// <summary>
+/// Attempts to load the cache file corresponding to the given input, within the configured
+/// cache directory, into the library builder.
+/// </summary>
+static void GetCache(string_view libName, std::stringstream& streamBuf, ShaderLibBuilder& libBuilder)
 {
     fs::path cachePath = GetCachePath(libName);
 
     if (fs::exists(cachePath) && fs::is_regular_file(cachePath))
     {
         GetInput(cachePath, streamBuf);
-        libCache = GetDeserializedLibDef(streamBuf.view());
+        ShaderLibDef libCache = GetDeserializedLibDef(streamBuf.view());
+        libBuilder.SetCache(libCache.GetHandle());
     }
     else
-    {
-        libCache = std::nullopt;
         WV_LOG_INFO() << "No cache found for " << libName << ". Falling back to full compilation...";
-    }
 }
 
-/**
- * @brief Finalizes the shader library, serializes it, optionally converts to a header,
- * and writes it to the specified output file.
- * @param name: The base name for the library (used for header variable naming).
- * @param libBuilder: The ShaderLibBuilder instance containing the compiled library data.
- * @param streamBuf: A reusable stringstream buffer for serialization and writing.
- * @param output: The path to the output file.
- */
-static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::stringstream& streamBuf, ZLibArchive& zipBuffer, const fs::path& output)
+/// <summary>
+/// Finalizes the shader library, serializes it, optionally converts to a header,
+/// and writes it to the specified output file.
+/// </summary>
+/// <param name="name">The base name for the library (used for header variable naming).</param>
+/// <param name="libBuilder">The ShaderLibBuilder instance containing the compiled library data.</param>
+/// <param name="streamBuf">A reusable stringstream buffer for serialization and writing.</param>
+/// <param name="output">The path to the output file.</param>
+static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::stringstream& streamBuf,
+    ZLibArchive& zipBuffer, fs::path output)
 {
+    // Get finished library definition
     libBuilder.SetName(name);
     ShaderLibDef::Handle shaderLib = libBuilder.GetDefinition();
-    
-    // Serialize the library definition into the stringstream buffer
+
+    // Serialize the library definition into the stream buffer
     {
         streamBuf.str({});
         streamBuf.clear();
@@ -334,7 +353,7 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
     zipBuffer.compressionLevel = 9;
     CompressBytes(streamBuf.view(), zipBuffer);
 
-    // Serialize container into stream
+    // Serialize container into stream buffer
     {
         streamBuf.str({});
         streamBuf.clear();
@@ -349,6 +368,9 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
     // Convert serialized binary data to a C++ header if requested
     if (isHeaderLib)
         ConvertBinaryToHeader(name, streamBuf);
+
+    // Set the correct output file extension
+    output.replace_extension(isHeaderLib ? ".hpp" : ".bin");
 
     // Write the final data (binary or header text) to the output file
     WriteBinary(output, streamBuf);
@@ -375,7 +397,7 @@ static void ValidateConfiguration()
     // Set default cache folder if one is not specified
     if (cacheDir.empty())
     {
-        cacheDir = (fs::current_path() / "wfxcCache").string();
+        cacheDir = (fs::current_path() / s_DefaultCacheSubDir).string();
         WV_LOG_INFO() << "Using default cache directory: " << cacheDir;
     }
     else
@@ -384,7 +406,7 @@ static void ValidateConfiguration()
     // Validate output path configuration based on merging status and number of inputs
     if (!outputDir.empty())
     {
-         fs::path outPath(outputDir);
+        fs::path outPath(outputDir);
 
         if (inputFiles.size() > 1)
         {
@@ -410,11 +432,11 @@ static void ValidateConfiguration()
         FX_THROW("Output path (--output <filepath>) is required when merging.");
 }
 
-/**
- * @brief Main function to create the shader library/libraries based on parsed options.
- * Handles reading inputs, configuring the builder, processing files, and writing outputs.
- * @throws EffectParseException If configuration is invalid (e.g., no input, invalid output path).
- */
+/// <summary>
+/// Main function to create the shader library/libraries based on parsed options.
+/// Handles reading inputs, configuring the builder, processing files, and writing outputs.
+/// </summary>
+/// <exception cref="EffectParseException">If configuration is invalid (e.g., no input, invalid output path).</exception>
 static void CreateLibrary()
 {
     ShaderLibBuilder libBuilder;
@@ -426,13 +448,12 @@ static void CreateLibrary()
     libBuilder.SetFeatureLevel(featureLevel);
     libBuilder.SetDebug(isDebugging);
 
-    std::optional<ShaderLibDef> libCache;
     Stopwatch timer;
     timer.Start();
 
-    // Shared cache
+    // Use shared caching
     if (isMerging)
-        GetCache(outPath.stem().string(), streamBuf, libCache);
+        GetCache(outPath.stem().string(), streamBuf, libBuilder);
 
     // Process each input file
     for (const string& inputFileStr : inputFiles)
@@ -446,14 +467,11 @@ static void CreateLibrary()
         string baseName = inFile.stem().string(); // Base name for library/variable naming
         string inputPathString = inFile.string(); // Full path string for builder context
 
-        // Per-input caching
+        // Use per-input caching
         if (!isMerging)
-            GetCache(baseName, streamBuf, libCache);
+            GetCache(baseName, streamBuf, libBuilder);
 
         // Preprocess and add to library builder
-        if (libCache.has_value())
-            libBuilder.SetCache(libCache->GetHandle());
-
         libBuilder.AddRepo(inputPathString, streamBuf.view());
 
         // If not merging, write out a separate library file for each input
@@ -461,7 +479,7 @@ static void CreateLibrary()
         {
             fs::path currentOutFile;
 
-            if (outputDir.empty()) // No output dir specified, place output next to input            
+            if (outputDir.empty()) // No output dir specified, place output next to input
                 currentOutFile = inFile;
             else // Output dir specified
             {
@@ -471,8 +489,6 @@ static void CreateLibrary()
                     currentOutFile = outPath;
             }
 
-            // Set the correct output file extension
-            currentOutFile.replace_extension(isHeaderLib ? ".hpp" : ".bin");
             WriteLibrary(baseName, libBuilder, streamBuf, zipBuffer, currentOutFile);
         }
     }
@@ -480,10 +496,8 @@ static void CreateLibrary()
     // If merging, write the single combined library after processing all inputs
     if (isMerging)
     {
-        // Set the correct extension for the merged file
-        outPath.replace_extension(isHeaderLib ? ".hpp" : ".bin");
         // Use output filename stem for name
-        string mergedName = outPath.stem().string(); 
+        string mergedName = outPath.stem().string();
         WriteLibrary(mergedName, libBuilder, streamBuf, zipBuffer, outPath);
     }
 
@@ -491,10 +505,10 @@ static void CreateLibrary()
     WV_LOG_INFO() << "Total processing time: " << timer.GetElapsedMS() << " ms";
 }
 
-/**
- * @brief Parses command-line arguments using the defined flag and option maps.
- * @throws EffectParseException If an unknown option or flag is encountered, or if arguments are malformed.
- */
+/// <summary>
+/// Parses command-line arguments using the defined flag and option maps.
+/// </summary>
+/// <exception cref="EffectParseException">If an unknown option or flag is encountered, or if arguments are malformed.</exception>
 static void HandleOptions(const IDynamicArray<string_view>& args)
 {
     FX_CHECK_MSG(args.GetLength() > 1, "No arguments provided");
@@ -533,7 +547,7 @@ static void HandleOptions(const IDynamicArray<string_view>& args)
         }
         else // Not an option/flag
         {
-            if (inputFiles.empty()) // Assume first non-option is input (potentially a single file)  
+            if (inputFiles.empty()) // Assume first non-option is input (potentially a single file)
                 inputFiles.emplace(string(arg));
             else if (outputDir.empty()) // Assume second non-option is output directory/file
                 outputDir = arg;
@@ -546,7 +560,7 @@ static void HandleOptions(const IDynamicArray<string_view>& args)
         FX_CHECK_MSG(!inputFiles.empty(), "No input files specified. Use --input <file> or --input <*.ext>.");
 }
 
-// Converts c-string arguments into dynamic array of string_views 
+// Converts c-string arguments into dynamic array of string_views
 static DynamicArray<string_view> GetArgs(int argc, char* argv[])
 {
     DynamicArray<string_view> args(argc);
@@ -564,7 +578,7 @@ static DynamicArray<string_view> GetArgs(int argc, char* argv[])
             "--input", "*.wfx",
             "--output", "output_debug",
             "--feature-level", "5_0",
-             "-hm",
+            "-hm",
         };
     }
     else
@@ -579,15 +593,13 @@ static DynamicArray<string_view> GetArgs(int argc, char* argv[])
     return args;
 }
 
-/**
- * @brief Main control function for CLI execution.
- *
- * Handles argument parsing, logger initialization, and library execution.
- * Uses GenericMain() to wrap each major stage for consistent exception handling.
- *
- * @param args Pre-parsed string_view arguments.
- * @return int Exit code representing success or failure.
- */
+/// <summary>
+/// Main control function for CLI execution.
+/// Handles argument parsing, logger initialization, and library execution.
+/// Uses GenericMain() to wrap each major stage for consistent exception handling.
+/// </summary>
+/// <param name="args">Pre-parsed string_view arguments.</param>
+/// <returns>Exit code representing success or failure.</returns>
 static int RunCLI(const IDynamicArray<string_view>& args)
 {
     // Handle arguments
@@ -612,7 +624,7 @@ static int RunCLI(const IDynamicArray<string_view>& args)
             Logger::AddStream([](string_view str) { std::cout << str; }, true);
         };
 
-        const fs::path logPath = (fs::current_path() / "wfxc.log");
+        const fs::path logPath = (fs::current_path() / s_LogFile);
         exitCode = GenericMain(std::cerr, LogFunc, logPath);
 
         if (exitCode != 0)
@@ -643,15 +655,13 @@ static int RunCLI(const IDynamicArray<string_view>& args)
     return exitCode;
 }
 
-/**
- * @brief Application entry point.
- *
- * Initializes the argument list and delegates execution to the CLI runner.
- *
- * @param argc Argument count.
- * @param argv Argument values.
- * @return int Process exit code.
- */
+/// <summary>
+/// Application entry point.
+/// Initializes the argument list and delegates execution to the CLI runner.
+/// </summary>
+/// <param name="argc">Argument count.</param>
+/// <param name="argv">Argument values.</param>
+/// <returns>Process exit code.</returns>
 int main(int argc, char* argv[])
 {
     const DynamicArray<string_view> args = GetArgs(argc, argv);
