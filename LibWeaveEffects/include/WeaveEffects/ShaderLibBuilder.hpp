@@ -14,6 +14,15 @@ namespace Weave::Effects
 	class ShaderGenerator;
 	class ShaderRegistryBuilder;
 	class ScopeHandle;
+	class ShaderLibMap;
+
+	struct ShaderLibCacheStats
+	{
+		uint cachedRepoCount;
+		uint cachedShaderCount;
+		uint cachedEffectCount;
+		uint cachedResourceCount;
+	};
 
 	/// <summary>
 	/// Generates preprocessed, precompiled shader and effect variants with corresponding
@@ -55,10 +64,16 @@ namespace Weave::Effects
 		void SetDebug(bool isDebugging);
 
 		/// <summary>
+		/// Assigns a preexisting shader library to be used as a cache, allowing definitions to 
+		/// be reused if their source hasn't changed in the cache.
+		/// </summary>
+		void SetCache(const ShaderLibDef::Handle& cachedDef);
+
+		/// <summary>
 		/// Returns a serializable library handle containing all preprocessed source 
 		/// data and their variants added via AddRepo().
 		/// </summary>
-		ShaderLibDef::Handle GetDefinition() const;
+		ShaderLibDef::Handle GetDefinition();
 
 		/// <summary>
 		/// Resets the builder for reuse. Invalidates definition handles.
@@ -107,10 +122,10 @@ namespace Weave::Effects
 			uint passCount;
 		};
 
-		struct VariantSrcBuf
+		struct RepoSrcBuf
 		{
 			string libText;
-			uint vID;
+			uint configID;
 		};
 
 		string name;
@@ -127,7 +142,7 @@ namespace Weave::Effects
 		unique_ptr<ShaderGenerator> pShaderGen;
 
 		// Variant buffers
-		VariantSrcBuf libBufs[4];
+		RepoSrcBuf libBufs[4];
 		uint libBufIndex;
 		string hlslBuf;
 
@@ -141,10 +156,31 @@ namespace Weave::Effects
 		UniqueVector<PassBlock> effectPasses;
 		UniqueVector<uint> effectShaders;
 
+		// Caching
+		ShaderLibCacheStats cacheStats;
+		unique_ptr<ShaderLibMap> pCacheMap;
+		std::unordered_map<string_view, uint> pathRepoMap;
+		Vector<const VariantRepoDef*> cacheHits;
+
 		/// <summary>
-		/// Initializes the library variants and corresponding flags
+		/// Initializes the variant repo and corresponding flags
 		/// </summary>
-		void InitVariants(VariantRepoDef& lib);
+		void InitRepo(VariantRepoDef& lib);
+
+		/// <summary>
+		/// Preprocesses all effects and shaders in the variant repo configuration
+		/// </summary>
+		void AddRepoConfiguration(string_view repoPath, const uint configID, const uint repoID, VariantRepoDef& repo);
+
+		/// <summary>
+		/// Copies unchanged definitions from the cache into the final definition
+		/// </summary>
+		void MergeCacheHits();
+
+		/// <summary>
+		/// Attempts to retrieve a repo from the cache based on it's original source path
+		/// </summary>
+		const VariantRepoDef* TryGetCachedRepo(string_view path) const;
 
 		/// <summary>
 		/// Identifies shaders in the source and buffers their entrypoint symbols

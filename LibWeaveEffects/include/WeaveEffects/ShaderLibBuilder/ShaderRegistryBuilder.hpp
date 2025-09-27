@@ -98,12 +98,22 @@ namespace Weave::Effects
 		/// <summary>
 		/// Returns the total number of resources, not counting strings
 		/// </summary>
-		int GetResourceCount() const;
+		uint GetResourceCount() const;
 
 		/// <summary>
 		/// Returns the total number of unique resources of all types, not counting strings
 		/// </summary>
-		int GetUniqueResCount() const;
+		uint GetUniqueResCount() const;
+
+		/// <summary>
+		/// Returns the total number of unique shaders
+		/// </summary>
+		uint GetShaderCount() const;
+
+		/// <summary>
+		/// Returns the total number of unique effects
+		/// </summary>
+		uint GetEffectCount() const;
 
 		/* GetOrAdd(Member) functions return an integer ID that uniquely corresponds to the given definition.
 		* If a definition has not been seen before, it will be added and a new ID will be generated.
@@ -264,8 +274,8 @@ namespace Weave::Effects
 		HashableVector<SpanVector<uint>, ResourceType::IDGroups> idGroups;
 		HashableVector<SpanVector<byte>, ResourceType::ByteCode> binSpans;
 
-		int resCount;
-		int uniqueResCount;
+		uint resCount;
+		uint uniqueResCount;
 
 		// Temporary conversion cache for copying from a ShaderRegistryMap
 		const ShaderRegistryMap* pCopySrc;

@@ -40,9 +40,13 @@ void ShaderRegistryBuilder::Clear()
 	pCopySrc = nullptr;
 }
 
-int ShaderRegistryBuilder::GetResourceCount() const { return resCount; }
+uint ShaderRegistryBuilder::GetResourceCount() const { return resCount; }
 
-int ShaderRegistryBuilder::GetUniqueResCount() const { return uniqueResCount; }
+uint ShaderRegistryBuilder::GetUniqueResCount() const { return uniqueResCount; }
+
+uint ShaderRegistryBuilder::GetShaderCount() const { return (uint)shaders.GetLength(); }
+
+uint ShaderRegistryBuilder::GetEffectCount() const { return (uint)effects.GetLength(); }
 
 uint ShaderRegistryBuilder::GetOrAddStringID(string_view str) { return stringIDs.GetOrAddStringID(str); }
 

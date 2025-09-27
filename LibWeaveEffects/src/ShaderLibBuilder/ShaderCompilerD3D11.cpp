@@ -357,7 +357,6 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 	if (shaderDesc.BoundResources > 0)
 	{
 		Vector<uint> idBuf = builder.GetTmpIDBuffer();
-		uint resIndex = 0;
 
 		for (uint i = 0; i < shaderDesc.BoundResources; i++)
 		{
@@ -372,7 +371,6 @@ static void GetResources(ID3D11ShaderReflection* pReflect, const D3D11_SHADER_DE
 				res.slot = resDesc.BindPoint;
 
 				idBuf.EmplaceBack(builder.GetOrAddResource(res));
-				resIndex++;
 			}
 		}
 

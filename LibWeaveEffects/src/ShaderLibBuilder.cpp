@@ -7,6 +7,7 @@
 #include "WeaveEffects/ShaderLibBuilder/ShaderCompiler.hpp"
 #include "WeaveEffects/ShaderLibBuilder/VariantPreprocessor.hpp"
 #include "WeaveEffects/ShaderLibBuilder/ShaderRegistryBuilder.hpp"
+#include "WeaveEffects/ShaderLibMap.hpp"
 #include "WeaveEffects/ShaderLibBuilder.hpp"
 #include "WeaveEffects/Version.hpp"
 
@@ -19,7 +20,8 @@ ShaderLibBuilder::ShaderLibBuilder() :
 	pShaderGen(new ShaderGenerator()),
 	pShaderRegistry(new ShaderRegistryBuilder()),
 	isDebugging(false),
-	libBufIndex(0)
+	libBufIndex(0),
+	cacheStats({})
 {
 	platform = PlatformDef
 	{
@@ -33,97 +35,14 @@ ShaderLibBuilder::ShaderLibBuilder() :
 
 ShaderLibBuilder::~ShaderLibBuilder() = default;
 
-void ShaderLibBuilder::AddRepo(string_view repoPath, string_view libSrc)
-{
-	const uint repoID = (uint)repos.GetLength() << g_VariantGroupOffset;
-	pVariantGen->SetSrc(repoPath, libSrc);
-
-	VariantRepoDef& lib = repos.EmplaceBack();
-	lib.sourceSizeBytes = (uint)libSrc.length();
-	lib.sourceCRC = GetCRC32(libSrc);
-	lib.path = repoPath;
-
-	for (uint configID = 0; configID < pVariantGen->GetVariantCount(); configID++)
-	{
-		const uint vID = repoID | configID;
-		VariantSrcBuf* pBuf = &libBufs[libBufIndex];
-		pBuf->libText.clear();
-		pBuf->vID = configID;
-
-		// Generate variant
-		pVariantGen->GetVariant(configID, pBuf->libText, entrypoints);
-		bool isDuplicate = false;
-
-		for (int i = 0; i < std::size(libBufs); i++)
-		{
-			if (libBufIndex != i && pBuf->libText == libBufs[i].libText)
-			{
-				isDuplicate = true;
-				pBuf = &libBufs[i];
-				break;
-			}
-		}
-
-		if (configID == 0)
-			InitVariants(lib);
-
-		if (!isDuplicate) // Parse and precompile variants
-		{
-			const uint resCount = pShaderRegistry->GetUniqueResCount();
-
-			pAnalyzer->AnalyzeSource(repoPath, pBuf->libText);
-			pTable->ParseBlocks(*pAnalyzer);
-
-			// Shaders
-			GetEntryPoints();
-			lib.variants[configID].shaders = DynamicArray<ShaderVariantDef>(entrypoints.GetLength());
-			GetShaderDefs(repoPath, lib.variants[configID].shaders, vID);
-
-			// Effects
-			GetEffects();
-			lib.variants[configID].effects = DynamicArray<EffectVariantDef>(effectBlocks.GetLength());
-			GetEffectDefs(lib.variants[configID].effects, vID);
-
-			if (resCount == pShaderRegistry->GetUniqueResCount())
-				WV_LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Not skipped.";
-
-			libBufIndex++;
-			libBufIndex %= std::size(libBufs);
-		}
-		else // Skip processing
-		{
-			// Copy variant mappings and update ID
-			lib.variants[configID] = lib.variants[pBuf->vID];
-
-			for (ShaderVariantDef& shader : lib.variants[configID].shaders)
-				shader.variantID = configID;
-
-			for (EffectVariantDef& effect : lib.variants[configID].effects)
-				effect.variantID = configID;
-
-			WV_LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Skipped.";
-		}
-
-		ClearVariant();
-	}
-}
+/* 
+	Configuration 
+*/
 
 void ShaderLibBuilder::SetName(string_view newName)
 {
 	name.clear();
 	name.append(newName);
-}
-
-ShaderLibDef::Handle ShaderLibBuilder::GetDefinition() const
-{
-	return
-	{
-		.pName = &name,
-		.pPlatform = &platform,
-		.pRepos = &repos,
-		.regHandle = pShaderRegistry->GetDefinition(),
-		.strMapHandle = pShaderRegistry->GetStringIDBuilder().GetDefinition()
-	};
 }
 
 void ShaderLibBuilder::SetTarget(PlatformTargets target) { platform.target = target; }
@@ -132,7 +51,139 @@ void ShaderLibBuilder::SetFeatureLevel(string_view featureLevel) { platform.feat
 
 void ShaderLibBuilder::SetDebug(bool isDebugging) { this->isDebugging = isDebugging; }
 
-void ShaderLibBuilder::InitVariants(VariantRepoDef& lib)
+void ShaderLibBuilder::SetCache(const ShaderLibDef::Handle& cachedDef)
+{
+	if (platform == *cachedDef.pPlatform)
+	{
+		if (pCacheMap.get() != nullptr && pCacheMap->GetName() == *cachedDef.pName)
+			return;
+
+		WV_LOG_INFO() << "Using shader cache for " << *cachedDef.pName;
+		pCacheMap.reset(new ShaderLibMap(cachedDef));
+		pathRepoMap.clear();
+
+		const auto& repos = pCacheMap->GetRepos();
+
+		for (uint i = 0; i < (uint)repos.GetLength(); i++)
+			pathRepoMap.emplace(repos[i].path, i);
+	}
+	else
+		WV_LOG_INFO() << "Shader cache version mismatch for " << *cachedDef.pName << ". Falling back to full reprocessing...";
+}
+
+/* 
+	Main Processing 
+*/
+
+void ShaderLibBuilder::AddRepo(string_view repoPath, string_view libSrc)
+{
+	FX_CHECK_MSG((!repoPath.empty() && !libSrc.empty()), "Invalid input: repoPath or libSrc is empty");
+
+	const uint repoID = (uint)repos.GetLength() << g_VariantGroupOffset;
+	const uint crc = GetCRC32(libSrc);
+	pVariantGen->SetSrc(repoPath, libSrc);
+
+	// Check repo cache
+	if (const VariantRepoDef* pRepo = TryGetCachedRepo(repoPath); pRepo != nullptr)
+	{
+		if (libSrc.length() == pRepo->sourceSizeBytes && crc == pRepo->sourceCRC)
+		{
+			WV_LOG_DEBUG() << "Cache hit for repository: " << repoPath;
+			cacheHits.Add(pRepo);
+		}
+		else
+			WV_LOG_DEBUG() << "Cache miss for " << repoPath << ": source changed, reprocessing";
+	}
+	else // Fall back to full processing
+	{	
+		VariantRepoDef& repo = repos.EmplaceBack();
+		repo.sourceSizeBytes = (uint)libSrc.length();
+		repo.sourceCRC = crc;
+		repo.path = repoPath;
+
+		for (uint configID = 0; configID < pVariantGen->GetVariantCount(); configID++)
+		{
+			AddRepoConfiguration(repoPath, configID, repoID, repo);
+			ClearVariant();
+		}
+	}
+}
+
+const VariantRepoDef* ShaderLibBuilder::TryGetCachedRepo(string_view path) const
+{
+	if (pCacheMap.get() == nullptr)
+		return nullptr;
+
+	const auto& it = pathRepoMap.find(path);
+	return (it != pathRepoMap.end()) ? &pCacheMap->GetRepos()[it->second] : nullptr;
+}
+
+void ShaderLibBuilder::AddRepoConfiguration(string_view repoPath, const uint configID, const uint repoID, VariantRepoDef& repo)
+{
+	const uint vID = repoID | configID;
+	RepoSrcBuf* pBuf = &libBufs[libBufIndex];
+	pBuf->libText.clear();
+	pBuf->configID = configID;
+
+	// Generate variant
+	pVariantGen->GetVariant(configID, pBuf->libText, entrypoints);
+
+	// Update variant history and check for repeats
+	bool isDuplicate = false;
+
+	for (int i = 0; i < std::size(libBufs); i++)
+	{
+		if (libBufIndex != i && pBuf->libText == libBufs[i].libText)
+		{
+			isDuplicate = true;
+			pBuf = &libBufs[i];
+			break;
+		}
+	}
+
+	// Initialize storage
+	if (configID == 0)
+		InitRepo(repo);
+
+	if (!isDuplicate) // Parse and precompile variants
+	{
+		const uint resCount = pShaderRegistry->GetUniqueResCount();
+
+		pAnalyzer->AnalyzeSource(repoPath, pBuf->libText);
+		pTable->ParseBlocks(*pAnalyzer);
+
+		// Shaders
+		GetEntryPoints();
+		repo.variants[configID].shaders = DynamicArray<ShaderVariantDef>(entrypoints.GetLength());
+		GetShaderDefs(repoPath, repo.variants[configID].shaders, vID);
+
+		// Effects
+		GetEffects();
+		repo.variants[configID].effects = DynamicArray<EffectVariantDef>(effectBlocks.GetLength());
+		GetEffectDefs(repo.variants[configID].effects, vID);
+
+		if (resCount == pShaderRegistry->GetUniqueResCount())
+			WV_LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Not skipped.";
+
+		libBufIndex++;
+		libBufIndex %= std::size(libBufs);
+	}
+	else // Skip processing
+	{
+		// Copy variant mappings and update ID
+		repo.variants[configID] = repo.variants[pBuf->configID];
+
+		for (ShaderVariantDef& shader : repo.variants[configID].shaders)
+			shader.variantID = vID;
+
+		for (EffectVariantDef& effect : repo.variants[configID].effects)
+			effect.variantID = vID;
+
+		WV_LOG_WARN() << "Unused flag/mode combination detected. ID: " << vID << ". Skipped.";
+	}
+}
+
+void ShaderLibBuilder::InitRepo(VariantRepoDef& lib)
 {
 	const IDynamicArray<StringSpan>& flags = pVariantGen->GetVariantFlags();
 	lib.flagIDs = DynamicArray<uint>(flags.GetLength());
@@ -151,6 +202,127 @@ void ShaderLibBuilder::InitVariants(VariantRepoDef& lib)
 	WV_LOG_INFO() << "Variants declared: " << lib.variants.GetLength();
 	FX_CHECK_MSG(lib.variants.GetLength() != 0, "No shaders found.");
 }
+
+ShaderLibDef::Handle ShaderLibBuilder::GetDefinition()
+{
+	// Cache merging deferred
+	if (cacheHits.GetLength() > 0)
+	{
+		// Fully cached
+		if (cacheHits.GetLength() == pCacheMap->GetRepos().GetLength())
+		{
+			WV_LOG_INFO() << "No changes detected. Reusing shader cache.";
+			cacheHits.Clear();
+			return pCacheMap->GetDefinition();
+		}
+		// Partially cached
+		else
+		{
+			MergeCacheHits();
+
+			WV_LOG_INFO() << "Reused "
+				<< cacheStats.cachedEffectCount << " of " << pShaderRegistry->GetEffectCount() << " effects and "
+				<< cacheStats.cachedShaderCount << " of " << pShaderRegistry->GetShaderCount() << " shaders from cache.";
+		}
+	}
+
+	return
+	{
+		.pName = &name,
+		.pPlatform = &platform,
+		.pRepos = &repos,
+		.regHandle = pShaderRegistry->GetDefinition(),
+		.strMapHandle = pShaderRegistry->GetStringIDBuilder().GetDefinition()
+	};
+}
+
+void ShaderLibBuilder::MergeCacheHits()
+{
+	const uint newRepoCount = (uint)repos.GetLength();
+	const uint newShaderCount = pShaderRegistry->GetShaderCount();
+	const uint newEffectCount = pShaderRegistry->GetEffectCount();
+	const uint newResourceCount = pShaderRegistry->GetResourceCount();
+
+	for (const VariantRepoDef* pRepo : cacheHits)
+	{
+		const uint repoID = (uint)repos.GetLength() << g_VariantGroupOffset;
+		VariantRepoDef& repo = repos.EmplaceBack(*pRepo);
+		const StringIDMap& oldStrings = pCacheMap->GetStringMap();
+
+		// Remap define names
+		for (uint& flagID : repo.flagIDs)
+			flagID = pShaderRegistry->GetOrAddStringID(oldStrings.GetString(flagID));
+
+		for (uint& modeID : repo.modeIDs)
+			modeID = pShaderRegistry->GetOrAddStringID(oldStrings.GetString(modeID));
+
+		// Remap shaders
+		for (VariantDef& variant : repo.variants)
+		{
+			for (ShaderVariantDef& shader : variant.shaders)
+			{
+				const ShaderDefHandle handle = pCacheMap->GetShader(shader.shaderID);
+				shader.shaderID = pShaderRegistry->GetOrAddShader(handle);
+				shader.variantID = (shader.variantID & g_VariantMask) | repoID;
+			}
+
+			for (EffectVariantDef& effect : variant.effects)
+			{
+				const EffectDefHandle handle = pCacheMap->GetEffect(effect.effectID);
+				effect.effectID = pShaderRegistry->GetOrAddEffect(handle);
+				effect.variantID = (effect.variantID & g_VariantMask) | repoID;
+			}
+		}
+	}
+
+	cacheHits.Clear();
+	cacheStats.cachedRepoCount = (uint)repos.GetLength() - newRepoCount;
+	cacheStats.cachedShaderCount = pShaderRegistry->GetShaderCount() - newShaderCount;
+	cacheStats.cachedEffectCount = pShaderRegistry->GetEffectCount() - newEffectCount;
+	cacheStats.cachedResourceCount = pShaderRegistry->GetResourceCount() - newResourceCount;
+}
+
+void ShaderLibBuilder::Clear()
+{
+	ClearVariant();
+	libBufIndex = 0;
+
+	for (int i = 0; i < std::size(libBufs); i++)
+	{
+		libBufs[i].libText.clear();
+		libBufs[i].configID = 0;
+	}
+
+	repos.Clear();
+	pVariantGen->Clear();
+	pShaderRegistry->Clear();
+	name.clear();
+
+	pCacheMap.reset();
+	pathRepoMap.clear();
+	cacheHits.Clear();
+	cacheStats = {};
+}
+
+void ShaderLibBuilder::ClearVariant()
+{
+	pTable->Clear();
+	pAnalyzer->Clear();
+	pShaderGen->Clear();
+
+	entrypoints.Clear();
+	epNameShaderIDMap.clear();
+
+	effectBlocks.Clear();
+	effectPasses.Clear();
+	effectShaders.Clear();
+
+	hlslBuf.clear();
+}
+
+/* 
+	Metadata Analysis 
+*/
 
 void ShaderLibBuilder::GetEntryPoints()
 {
@@ -375,37 +547,4 @@ void ShaderLibBuilder::GetEffectDefs(DynamicArray<EffectVariantDef>& effects, ui
 			.variantID = vID
 		};
 	}
-}
-
-void ShaderLibBuilder::Clear()
-{
-	ClearVariant();
-	libBufIndex = 0;
-
-	for (int i = 0; i < std::size(libBufs); i++)
-	{
-		libBufs[i].libText.clear();
-		libBufs[i].vID = 0;
-	}
-
-	repos.Clear();
-	pVariantGen->Clear();
-	pShaderRegistry->Clear();
-	name.clear();
-}
-
-void ShaderLibBuilder::ClearVariant()
-{
-	pTable->Clear();
-	pAnalyzer->Clear();
-	pShaderGen->Clear();
-
-	entrypoints.Clear();
-	epNameShaderIDMap.clear();
-
-	effectBlocks.Clear();
-	effectPasses.Clear();
-	effectShaders.Clear();
-
-	hlslBuf.clear();
 }

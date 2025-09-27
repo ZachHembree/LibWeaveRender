@@ -3,7 +3,7 @@
 #include "Version.hpp"
 
 constexpr std::string_view g_FX_HelpText = R"(
-WFX Preprocessor - Shader Library Compiler v)" VERSION_STRING R"(
+WFXC - Shader Library Compiler v)" VERSION_STRING R"(
 ----------------------------------------------------
 Preprocesses and compiles Weave Effects (.wfx) shader source files into
 optimized, deployable shader libraries. These libraries can be output as
@@ -38,6 +38,10 @@ OPTIONS:
                           * <path> MUST be specified and MUST be a single output
                             filename (e.g., 'output/merged_library.bin').
 
+    --cache <path>
+                      Overrides the default directory to be used for reading and 
+                      writing cache files.
+
     --feature-level <level>
                       Sets the target shader feature level (e.g., '5_0', '6_0').
                       [Default: '5_0']
@@ -57,7 +61,7 @@ OPTIONS:
                       increase file size and potentially impact runtime performance.
                       [Default: Disabled]
 
-    --help            Display this help message and exit.
+    --help            You are here.
 
 EXAMPLES:
     # Compile all .wfx files in the current directory into separate .bin files
