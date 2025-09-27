@@ -70,6 +70,12 @@ namespace Weave::Effects
 		void SetCache(const ShaderLibDef::Handle& cachedDef);
 
 		/// <summary>
+		/// Assigns a preexisting shader library to be used as a cache, allowing definitions to 
+		/// be reused if their source hasn't changed in the cache.
+		/// </summary>
+		void SetCache(ShaderLibDef&& cachedDef);
+
+		/// <summary>
 		/// Returns a serializable library handle containing all preprocessed source 
 		/// data and their variants added via AddRepo().
 		/// </summary>
@@ -79,33 +85,6 @@ namespace Weave::Effects
 		/// Resets the builder for reuse. Invalidates definition handles.
 		/// </summary>
 		void Clear();
-
-		/// <summary>
-		/// Appends a description of the current definition to a stringstream-like object
-		/// </summary>
-		template<typename StreamT>
-		requires IsStreamLike<StreamT>
-		void WriteDescriptionString(StreamT& output)
-		{
-			const ShaderLibDef::Handle shaderLib = GetDefinition();
-
-			// Get combined variant count
-			uint vCount = 0;
-
-			for (uint i = 0; i < shaderLib.pRepos->GetLength(); i++)
-				vCount += (uint)shaderLib.pRepos->at(i).variants.GetLength();
-
-			output << "Library Stats:";
-			output << "\n  Repos: " << shaderLib.pRepos->GetLength();
-			output << "\n  Variants: " << vCount;
-			output << "\n  Shaders: " << (shaderLib.regHandle.pShaders ? shaderLib.regHandle.pShaders->GetLength() : 0);
-			output << "\n  Effects: " << (shaderLib.regHandle.pEffects ? shaderLib.regHandle.pEffects->GetLength() : 0);
-			output << "\n  Constants: " << (shaderLib.regHandle.pConstants ? shaderLib.regHandle.pConstants->GetLength() : 0);
-			output << "\n  Resources: " << (shaderLib.regHandle.pResources ? shaderLib.regHandle.pResources->GetLength() : 0);
-			output << "\nPlatform Info:";
-			output << "\n  Compiler: " << shaderLib.pPlatform->compilerVersion;
-			output << "\n  Feature Level: " << shaderLib.pPlatform->featureLevel;
-		}
 
 	private:
 		struct PassBlock

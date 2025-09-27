@@ -318,8 +318,7 @@ static void GetCache(string_view libName, std::stringstream& streamBuf, ShaderLi
     if (fs::exists(cachePath) && fs::is_regular_file(cachePath))
     {
         GetInput(cachePath, streamBuf);
-        ShaderLibDef libCache = GetDeserializedLibDef(streamBuf.view());
-        libBuilder.SetCache(libCache.GetHandle());
+        libBuilder.SetCache(GetDeserializedLibDef(streamBuf.view()));
     }
     else
         WV_LOG_INFO() << "No cache found for " << libName << ". Falling back to full compilation...";
@@ -358,7 +357,7 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
     WV_LOG_INFO() << "Wrote library to: " << output.native();
 
     auto descLog = WV_LOG_INFO();
-    libBuilder.WriteDescriptionString(descLog);
+    shaderLib.WriteDescriptionString(descLog);
     descLog << "\nCompression Ratio: " << 100.0f * zipBuffer.GetCompressionRatio() << "%";
 
     libBuilder.Clear();

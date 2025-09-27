@@ -71,6 +71,26 @@ void ShaderLibBuilder::SetCache(const ShaderLibDef::Handle& cachedDef)
 		WV_LOG_INFO() << "Shader cache version mismatch for " << *cachedDef.pName << ". Falling back to full reprocessing...";
 }
 
+void ShaderLibBuilder::SetCache(ShaderLibDef&& cachedDef)
+{
+	if (platform == cachedDef.platform)
+	{
+		if (pCacheMap.get() != nullptr && pCacheMap->GetName() == cachedDef.name)
+			return;
+
+		WV_LOG_INFO() << "Using shader cache for " << cachedDef.name;
+		pCacheMap.reset(new ShaderLibMap(std::move(cachedDef)));
+		pathRepoMap.clear();
+
+		const auto& repos = pCacheMap->GetRepos();
+
+		for (uint i = 0; i < (uint)repos.GetLength(); i++)
+			pathRepoMap.emplace(repos[i].path, i);
+	}
+	else
+		WV_LOG_INFO() << "Shader cache version mismatch for " << cachedDef.name << ". Falling back to full reprocessing...";
+}
+
 /* 
 	Main Processing 
 */
@@ -209,7 +229,7 @@ ShaderLibDef::Handle ShaderLibBuilder::GetDefinition()
 	if (cacheHits.GetLength() > 0)
 	{
 		// Fully cached
-		if (cacheHits.GetLength() == pCacheMap->GetRepos().GetLength())
+		if (cacheHits.GetLength() == pCacheMap->GetRepos().GetLength() && repos.IsEmpty())
 		{
 			WV_LOG_INFO() << "No changes detected. Reusing shader cache.";
 			cacheHits.Clear();

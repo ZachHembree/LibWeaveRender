@@ -605,6 +605,31 @@ namespace Weave::Effects
 					.stringIDs = strMapHandle.GetCopy()
 				};
 			}
+
+			/// <summary>
+			/// Appends a description of the definition to a stringstream-like object
+			/// </summary>
+			template<typename StreamT>
+			requires IsStreamLike<StreamT>
+			void WriteDescriptionString(StreamT& output)
+			{
+				// Get combined variant count
+				uint vCount = 0;
+
+				for (uint i = 0; i < pRepos->GetLength(); i++)
+					vCount += (uint)pRepos->at(i).variants.GetLength();
+
+				output << "Library Stats:";
+				output << "\n  Repos: " << pRepos->GetLength();
+				output << "\n  Variants: " << vCount;
+				output << "\n  Shaders: " << (regHandle.pShaders ? regHandle.pShaders->GetLength() : 0);
+				output << "\n  Effects: " << (regHandle.pEffects ? regHandle.pEffects->GetLength() : 0);
+				output << "\n  Constants: " << (regHandle.pConstants ? regHandle.pConstants->GetLength() : 0);
+				output << "\n  Resources: " << (regHandle.pResources ? regHandle.pResources->GetLength() : 0);
+				output << "\nPlatform Info:";
+				output << "\n  Compiler: " << pPlatform->compilerVersion;
+				output << "\n  Feature Level: " << pPlatform->featureLevel;
+			}
 		};
 
 		/// <summary>
