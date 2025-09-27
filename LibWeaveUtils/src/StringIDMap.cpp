@@ -44,6 +44,8 @@ std::string_view StringIDMap::GetString(uint id) const
 
 uint StringIDMap::GetStringCount() const { return (uint)(pDef->substrings.GetLength() / 2); }
 
+StringIDMapDef::Handle StringIDMap::GetDefinition() const { return pDef->GetHandle(); }
+
 void StringIDMap::InitMapData()
 {
     const uint strCount = (uint)(pDef->substrings.GetLength() / 2);

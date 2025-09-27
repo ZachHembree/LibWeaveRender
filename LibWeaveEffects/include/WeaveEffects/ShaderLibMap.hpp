@@ -232,6 +232,11 @@ namespace Weave::Effects
 		/// </summary>
 		uint GetEffectCount(uint vID) const;
 
+		/// <summary>
+		/// Returns a read only view of the map's definition
+		/// </summary>
+		ShaderLibDef::Handle GetDefinition() const;
+
 	private:
 		using NameIndexMap = std::unordered_map<uint, uint>;
 

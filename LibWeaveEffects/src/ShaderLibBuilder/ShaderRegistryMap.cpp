@@ -50,3 +50,5 @@ const ConstBufDef& ShaderRegistryMap::GetConstBuf(const uint cbufID) const
 
 const ConstDef& ShaderRegistryMap::GetConstant(const uint constID) const 
 { return pRegDef->constants[ShaderRegistryBuilder::GetIndex(constID)]; }
+
+ShaderRegistryDef::Handle ShaderRegistryMap::GetDefinition() const { return pRegDef->GetHandle(); }

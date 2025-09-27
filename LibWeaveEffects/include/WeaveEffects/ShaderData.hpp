@@ -484,6 +484,8 @@ namespace Weave::Effects
 	/// </summary>
 	struct PlatformDef
 	{
+		USE_DEFAULT_CMP(PlatformDef)
+
 		/// <summary>
 		/// Version string of the RPFX library used to process the shaders
 		/// </summary>
@@ -537,7 +539,7 @@ namespace Weave::Effects
 		DynamicArray<uint> flagIDs;
 
 		/// <summary>
-		/// Mutually exclusive shader modes/features used for static shader variant generation
+		/// Mutually exclusive shader modes names used for static shader variant generation
 		/// </summary>
 		DynamicArray<uint> modeIDs;
 

@@ -88,6 +88,8 @@ namespace Weave
         /// </summary>
         uint GetStringCount() const;
 
+        StringIDMapDef::Handle GetDefinition() const;
+
     private:
         std::unique_ptr<StringIDMapDef> pDef;
         // String -> ID map

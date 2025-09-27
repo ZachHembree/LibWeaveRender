@@ -53,6 +53,8 @@ namespace Weave::Effects
 
 		const ConstDef& GetConstant(const uint constID) const;
 
+		ShaderRegistryDef::Handle GetDefinition() const;
+
 	private:
 		std::unique_ptr<ShaderRegistryDef> pRegDef;
 		StringIDMap stringMap;

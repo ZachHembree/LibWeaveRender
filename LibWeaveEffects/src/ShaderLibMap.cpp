@@ -410,6 +410,18 @@ uint ShaderLibMap::GetEffectCount(uint vID) const
 	return (uint)variantRepos[repoIndex].variants[configIndex].effects.GetLength();
 }
 
+ShaderLibDef::Handle ShaderLibMap::GetDefinition() const
+{
+	return 
+	{
+		.pName = &name,
+		.pPlatform = &platform,
+		.pRepos = &variantRepos,
+		.regHandle = pRegMap->GetDefinition(),
+		.strMapHandle = pRegMap->GetStringMap().GetDefinition()
+	};
+}
+
 uint ShaderLibMap::GetFlagVariantCount(uint repoIndex) const
 {
 	const uint flagCount = (uint)variantRepos[repoIndex].flagIDs.GetLength();
