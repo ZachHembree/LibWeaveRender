@@ -283,14 +283,14 @@ static void ValidateOutputDir(const fs::path& outputPath)
 /// <param name="outputPath">The path to the output file.</param>
 /// <param name="ss">The stringstream containing the data to write.</param>
 /// <exception cref="EffectParseException">If the output file cannot be opened for writing.</exception>
-static void WriteBinary(const fs::path& outputPath, const std::stringstream& ss)
+static void WriteBinary(const fs::path& outputPath, string_view data)
 {
     ValidateOutputDir(outputPath); // Ensure parent directory exists
 
     std::ofstream dstFile(outputPath, std::ios::binary);
     FX_CHECK_MSG(dstFile.is_open(), "Failed to open output file for writing: {}", outputPath.string());
 
-    dstFile << ss.rdbuf(); // Write the stringstream buffer to the file
+    dstFile << data; // Write the buffer to the file
 }
 
 //-----------------------------------------------------------------------------
@@ -339,31 +339,10 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
     // Get finished library definition
     libBuilder.SetName(name);
     ShaderLibDef::Handle shaderLib = libBuilder.GetDefinition();
-
-    // Serialize the library definition into the stream buffer
-    {
-        streamBuf.str({});
-        streamBuf.clear();
-
-        Serializer libWriter(streamBuf);
-        libWriter(shaderLib);
-    }
-
-    // Compress serialized library into container struct
-    zipBuffer.compressionLevel = 9;
-    CompressBytes(streamBuf.view(), zipBuffer);
-
-    // Serialize container into stream buffer
-    {
-        streamBuf.str({});
-        streamBuf.clear();
-
-        Serializer zipWriter(streamBuf);
-        zipWriter(zipBuffer);
-    }
+    GetCompressedSerializedStream(shaderLib, zipBuffer, streamBuf);
 
     // Cache binary
-    WriteBinary(GetCachePath(name), streamBuf);
+    WriteBinary(GetCachePath(name), streamBuf.view());
 
     // Convert serialized binary data to a C++ header if requested
     if (isHeaderLib)
@@ -373,7 +352,7 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
     output.replace_extension(isHeaderLib ? ".hpp" : ".bin");
 
     // Write the final data (binary or header text) to the output file
-    WriteBinary(output, streamBuf);
+    WriteBinary(output, streamBuf.view());
 
     // Log success and statistics
     WV_LOG_INFO() << "Wrote library to: " << output.native();

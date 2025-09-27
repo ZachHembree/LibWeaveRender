@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "WeaveUtils/Compression.hpp"
+#include "WeaveUtils/Span.hpp"
 #include "WeaveEffects/ShaderData.hpp"
 #include "WeaveEffects/ShaderDataSerialization.hpp"
 
@@ -8,31 +9,25 @@ using namespace Weave::Effects;
 
 ShaderLibDef Weave::Effects::GetDeserializedLibDef(string_view libData)
 {
-	static thread_local std::stringstream bufStream;
-	static thread_local ZLibArchive zipBuffer;
-	static thread_local Vector<byte> libBuffer;
+	static thread_local ZLibArchive archive;
 
 	// Deserialize zip wrapper
 	{
-		bufStream.clear();
-		bufStream.str({});
-		bufStream << libData;
-
-		Deserializer zipReader(bufStream);
-		zipReader(zipBuffer);
+		// Interpret input as istream
+		std::istrstream inStream(libData.data(), (int)libData.size());
+		Deserializer zipReader(inStream);
+		zipReader(archive);
 	}
 
 	// Unzip shader data
-	DecompressBytes(zipBuffer, libBuffer);
+	static thread_local Vector<byte> zipBuffer;
+	DecompressBytes(archive, zipBuffer);
 
-	// Copy unzipped data to ss
-	bufStream.clear();
-	bufStream.str({});
-	bufStream.write(reinterpret_cast<char*>(libBuffer.GetData()), libBuffer.GetLength());
-
-	// Deserialize decompressed data
+	// Interpret zip buffer as char istream
+	std::istrstream vecStream(reinterpret_cast<char*>(zipBuffer.GetData()), (int)zipBuffer.GetLength());
+	Deserializer libReader(vecStream);
 	ShaderLibDef lib;
-	Deserializer libReader(bufStream);
+	// Deserialize decompressed data
 	libReader(lib);
 
 	return lib;

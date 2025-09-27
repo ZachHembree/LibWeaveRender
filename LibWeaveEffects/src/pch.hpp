@@ -1,4 +1,8 @@
 #pragma once
+// spanstream is only available in C++23 and later
+#define _SILENCE_CXX17_STRSTREAM_DEPRECATION_WARNING
+#include <strstream>
+
 #include <unordered_map>
 #include <list>
 #include <stack>

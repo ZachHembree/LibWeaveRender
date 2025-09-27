@@ -70,4 +70,36 @@ namespace Weave
     /// Decompresses the given deflate archive into the given byte array
     /// </summary>
     void DecompressBytes(const ZLibArchive& input, Vector<byte>& output);
+
+    /// <summary>
+    /// Compresses a serializable source object (SerialT) into an intermediate ZLibArchive and returns the finished compressed
+    /// and serialized stream.
+    /// </summary>
+    template<typename SerialT>
+    string_view GetCompressedSerializedStream(const SerialT& src, ZLibArchive& zipBuffer, std::stringstream& dst)
+    {
+        // Serialize the object into the stream buffer
+        {
+            dst.str({});
+            dst.clear();
+
+            Serializer libWriter(dst);
+            libWriter(src);
+        }
+
+        // Compress serialized object into container struct
+        zipBuffer.compressionLevel = 9;
+        CompressBytes(dst.view(), zipBuffer);
+
+        // Serialize container into stream buffer
+        {
+            dst.str({});
+            dst.clear();
+
+            Serializer zipWriter(dst);
+            zipWriter(zipBuffer);
+        }
+
+        return dst.view();
+    }
 }
