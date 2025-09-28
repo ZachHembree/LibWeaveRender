@@ -289,7 +289,7 @@ static void WriteBinary(const fs::path& outputPath, string_view data)
 
     std::ofstream dstFile(outputPath, std::ios::binary);
     FX_CHECK_MSG(dstFile.is_open(), "Failed to open output file for writing: {}", outputPath.string());
-
+    
     dstFile << data; // Write the buffer to the file
 }
 
@@ -311,14 +311,19 @@ static fs::path GetCachePath(string_view libName)
 /// Attempts to load the cache file corresponding to the given input, within the configured
 /// cache directory, into the library builder.
 /// </summary>
-static void GetCache(string_view libName, std::stringstream& streamBuf, ShaderLibBuilder& libBuilder)
+static void GetCache(string_view libName, std::stringstream& streamBuf, ShaderLibDef& libCache, ShaderLibBuilder& libBuilder)
 {
     fs::path cachePath = GetCachePath(libName);
 
     if (fs::exists(cachePath) && fs::is_regular_file(cachePath))
     {
         GetInput(cachePath, streamBuf);
-        libBuilder.SetCache(GetDeserializedLibDef(streamBuf.view()));
+        libCache = GetDeserializedLibDef(streamBuf.view());
+        
+        if (libBuilder.TrySetCache(libCache.GetHandle()))
+            WV_LOG_INFO() << "Using shader cache for " << libCache.name;
+        else
+            WV_LOG_INFO() << "Shader cache version mismatch for " << libCache.name << ". Falling back to full reprocessing...";
     }
     else
         WV_LOG_INFO() << "No cache found for " << libName << ". Falling back to full compilation...";
@@ -337,11 +342,24 @@ static void WriteLibrary(string_view name, ShaderLibBuilder& libBuilder, std::st
 {
     // Get finished library definition
     libBuilder.SetName(name);
-    ShaderLibDef::Handle shaderLib = libBuilder.GetDefinition();
+    const ShaderLibDef::Handle& shaderLib = libBuilder.GetDefinition();
+    const ShaderLibCacheStats& cacheStats = libBuilder.GetCacheStats();
+
+    if (cacheStats.isUnchanged)
+        WV_LOG_INFO() << "No changes detected. Reusing shader cache.";
+    else if (cacheStats.isCached)
+    {
+        WV_LOG_INFO() << "Reused "
+            << cacheStats.cachedEffectCount << " of " << shaderLib.regHandle.pEffects->GetLength() << " effects and "
+            << cacheStats.cachedShaderCount << " of " << shaderLib.regHandle.pShaders->GetLength() << " shaders from cache.";
+    } 
+
+    // Compress binary
     GetCompressedSerializedStream(shaderLib, zipBuffer, streamBuf);
 
-    // Cache binary
-    WriteBinary(GetCachePath(name), streamBuf.view());
+    // Update cache
+    if (!cacheStats.isUnchanged)
+        WriteBinary(GetCachePath(name), streamBuf.view());
 
     // Convert serialized binary data to a C++ header if requested
     if (isHeaderLib)
@@ -418,6 +436,7 @@ static void ValidateConfiguration()
 static void CreateLibrary()
 {
     ShaderLibBuilder libBuilder;
+    ShaderLibDef libCache;
     std::stringstream streamBuf;
     ZLibArchive zipBuffer;
     fs::path outPath(outputDir);
@@ -431,7 +450,7 @@ static void CreateLibrary()
 
     // Use shared caching
     if (isMerging)
-        GetCache(outPath.stem().string(), streamBuf, libBuilder);
+        GetCache(outPath.stem().string(), streamBuf, libCache, libBuilder);
 
     // Process each input file
     for (const string& inputFileStr : inputFiles)
@@ -447,7 +466,7 @@ static void CreateLibrary()
 
         // Use per-input caching
         if (!isMerging)
-            GetCache(baseName, streamBuf, libBuilder);
+            GetCache(baseName, streamBuf, libCache, libBuilder);
 
         // Preprocess and add to library builder
         libBuilder.AddRepo(inputPathString, streamBuf.view());

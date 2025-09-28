@@ -52,44 +52,27 @@ void ShaderLibBuilder::SetFeatureLevel(string_view featureLevel) { platform.feat
 
 void ShaderLibBuilder::SetDebug(bool isDebugging) { this->isDebugging = isDebugging; }
 
-void ShaderLibBuilder::SetCache(const ShaderLibDef::Handle& cachedDef)
+bool ShaderLibBuilder::TrySetCache(const ShaderLibDef::Handle& cachedDef)
 {
 	if (platform == *cachedDef.pPlatform)
 	{
-		if (pCacheMap.get() != nullptr && pCacheMap->GetName() == *cachedDef.pName)
-			return;
-
-		WV_LOG_INFO() << "Using shader cache for " << *cachedDef.pName;
-		pCacheMap.reset(new ShaderLibMap(cachedDef));
-		pathRepoMap.clear();
-
-		const auto& repos = pCacheMap->GetRepos();
-
-		for (uint i = 0; i < (uint)repos.GetLength(); i++)
-			pathRepoMap.emplace(repos[i].path, i);
-	}
-	else
-		WV_LOG_INFO() << "Shader cache version mismatch for " << *cachedDef.pName << ". Falling back to full reprocessing...";
-}
-
-void ShaderLibBuilder::SetCache(ShaderLibDef&& cachedDef)
-{
-	if (platform == cachedDef.platform)
-	{
-		if (pCacheMap.get() != nullptr && pCacheMap->GetName() == cachedDef.name)
-			return;
-
-		WV_LOG_INFO() << "Using shader cache for " << cachedDef.name;
-		pCacheMap.reset(new ShaderLibMap(std::move(cachedDef)));
-		pathRepoMap.clear();
-
-		const auto& repos = pCacheMap->GetRepos();
+		if (memcmp(&cachedDef, &lastDefHandle, sizeof(ShaderLibDef::Handle)) == 0)
+			return true;
+		else
+			lastDefHandle = cachedDef;
+	
+		repoPathCacheMap.clear();
+		const IDynamicArray<VariantRepoDef>& repos = *cachedDef.pRepos;
 
 		for (uint i = 0; i < (uint)repos.GetLength(); i++)
-			pathRepoMap.emplace(repos[i].path, i);
+			repoPathCacheMap.emplace(repos[i].path, i);
+
+		cacheStats.isCached = true;
+		return true;
 	}
-	else
-		WV_LOG_INFO() << "Shader cache version mismatch for " << cachedDef.name << ". Falling back to full reprocessing...";
+
+	cacheStats.isCached = false;
+	return false;
 }
 
 /* 
@@ -132,11 +115,11 @@ void ShaderLibBuilder::AddRepo(string_view repoPath, string_view libSrc)
 
 const VariantRepoDef* ShaderLibBuilder::TryGetCachedRepo(string_view path) const
 {
-	if (pCacheMap.get() == nullptr)
+	if (!lastDefHandle.GetIsValid())
 		return nullptr;
 
-	const auto& it = pathRepoMap.find(path);
-	return (it != pathRepoMap.end()) ? &pCacheMap->GetRepos()[it->second] : nullptr;
+	const auto& it = repoPathCacheMap.find(path);
+	return (it != repoPathCacheMap.end()) ? &lastDefHandle.pRepos->at(it->second) : nullptr;
 }
 
 void ShaderLibBuilder::AddRepoConfiguration(string_view repoPath, const uint configID, const uint repoID, VariantRepoDef& repo)
@@ -220,34 +203,15 @@ void ShaderLibBuilder::InitRepo(VariantRepoDef& lib)
 
 	lib.variants = DynamicArray<VariantDef>(pVariantGen->GetVariantCount());
 
-	WV_LOG_INFO() << "Variants declared: " << lib.variants.GetLength();
+	WV_LOG_DEBUG() << "Variants declared: " << lib.variants.GetLength();
 	FX_CHECK_MSG(lib.variants.GetLength() != 0, "No shaders found.");
 }
 
-ShaderLibDef::Handle ShaderLibBuilder::GetDefinition()
+const ShaderLibDef::Handle& ShaderLibBuilder::GetDefinition() const
 {
-	// Cache merging deferred
-	if (cacheHits.GetLength() > 0)
-	{
-		// Fully cached
-		if (cacheHits.GetLength() == pCacheMap->GetRepos().GetLength() && repos.IsEmpty())
-		{
-			WV_LOG_INFO() << "No changes detected. Reusing shader cache.";
-			cacheHits.Clear();
-			lastDefHandle = pCacheMap->GetDefinition();
-		}
-		// Partially cached
-		else
-		{
-			MergeCacheHits();
+	FinalizeDefinition();
 
-			WV_LOG_INFO() << "Reused "
-				<< cacheStats.cachedEffectCount << " of " << pShaderRegistry->GetEffectCount() << " effects and "
-				<< cacheStats.cachedShaderCount << " of " << pShaderRegistry->GetShaderCount() << " shaders from cache.";
-		}
-	}
-
-	if (!lastDefHandle.GetIsValid())
+	if (!cacheStats.isUnchanged)
 	{
 		lastDefHandle =
 		{
@@ -262,8 +226,28 @@ ShaderLibDef::Handle ShaderLibBuilder::GetDefinition()
 	return lastDefHandle;
 }
 
-void ShaderLibBuilder::MergeCacheHits()
+const ShaderLibCacheStats& ShaderLibBuilder::GetCacheStats() const { FinalizeDefinition(); return cacheStats; }
+
+void ShaderLibBuilder::FinalizeDefinition() const
 {
+	// Cache merging deferred
+	if (cacheHits.GetLength() > 0)
+	{
+		cacheStats.isUnchanged = cacheHits.GetLength() == lastDefHandle.pRepos->GetLength() && repos.IsEmpty();
+
+		if (!cacheStats.isUnchanged)
+			MergeCacheHits();
+
+		cacheHits.Clear();
+	}
+}
+
+void ShaderLibBuilder::MergeCacheHits() const
+{
+	// Only create map if merging is needed
+	if (pCacheMap.get() == nullptr)
+		pCacheMap.reset(new ShaderLibMap(lastDefHandle));
+
 	const uint newRepoCount = (uint)repos.GetLength();
 	const uint newShaderCount = pShaderRegistry->GetShaderCount();
 	const uint newEffectCount = pShaderRegistry->GetEffectCount();
@@ -272,18 +256,18 @@ void ShaderLibBuilder::MergeCacheHits()
 	for (const VariantRepoDef* pRepo : cacheHits)
 	{
 		const uint repoID = (uint)repos.GetLength() << g_VariantGroupOffset;
-		VariantRepoDef& repo = repos.EmplaceBack(*pRepo);
 		const StringIDMap& oldStrings = pCacheMap->GetStringMap();
+		VariantRepoDef& cachedRepo = repos.EmplaceBack(*pRepo);
 
 		// Remap define names
-		for (uint& flagID : repo.flagIDs)
+		for (uint& flagID : cachedRepo.flagIDs)
 			flagID = pShaderRegistry->GetOrAddStringID(oldStrings.GetString(flagID));
 
-		for (uint& modeID : repo.modeIDs)
+		for (uint& modeID : cachedRepo.modeIDs)
 			modeID = pShaderRegistry->GetOrAddStringID(oldStrings.GetString(modeID));
 
 		// Remap shaders
-		for (VariantDef& variant : repo.variants)
+		for (VariantDef& variant : cachedRepo.variants)
 		{
 			for (ShaderVariantDef& shader : variant.shaders)
 			{
@@ -301,7 +285,6 @@ void ShaderLibBuilder::MergeCacheHits()
 		}
 	}
 
-	cacheHits.Clear();
 	cacheStats.cachedRepoCount = (uint)repos.GetLength() - newRepoCount;
 	cacheStats.cachedShaderCount = pShaderRegistry->GetShaderCount() - newShaderCount;
 	cacheStats.cachedEffectCount = pShaderRegistry->GetEffectCount() - newEffectCount;
@@ -325,10 +308,10 @@ void ShaderLibBuilder::Clear()
 	name.clear();
 
 	pCacheMap.reset();
-	pathRepoMap.clear();
+	repoPathCacheMap.clear();
 	cacheHits.Clear();
-	cacheStats = {};
 	lastDefHandle = {};
+	cacheStats = {};
 }
 
 void ShaderLibBuilder::ClearVariant()

@@ -616,7 +616,7 @@ namespace Weave::Effects
 			/// </summary>
 			template<typename StreamT>
 			requires IsStreamLike<StreamT>
-			void WriteDescriptionString(StreamT& output)
+			void WriteDescriptionString(StreamT& output) const
 			{
 				// Get combined variant count
 				uint vCount = 0;

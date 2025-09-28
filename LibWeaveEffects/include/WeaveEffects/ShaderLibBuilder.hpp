@@ -22,6 +22,8 @@ namespace Weave::Effects
 		uint cachedShaderCount;
 		uint cachedEffectCount;
 		uint cachedResourceCount;
+		bool isUnchanged;
+		bool isCached;
 	};
 
 	/// <summary>
@@ -65,21 +67,20 @@ namespace Weave::Effects
 
 		/// <summary>
 		/// Assigns a preexisting shader library to be used as a cache, allowing definitions to 
-		/// be reused if their source hasn't changed in the cache.
+		/// be reused if their source hasn't changed in the cache. Returns false on cache mismatch.
 		/// </summary>
-		void SetCache(const ShaderLibDef::Handle& cachedDef);
-
-		/// <summary>
-		/// Assigns a preexisting shader library to be used as a cache, allowing definitions to 
-		/// be reused if their source hasn't changed in the cache.
-		/// </summary>
-		void SetCache(ShaderLibDef&& cachedDef);
+		bool TrySetCache(const ShaderLibDef::Handle& cachedDef);
 
 		/// <summary>
 		/// Returns a serializable library handle containing all preprocessed source 
 		/// data and their variants added via AddRepo().
 		/// </summary>
-		ShaderLibDef::Handle GetDefinition();
+		const ShaderLibDef::Handle& GetDefinition() const;
+
+		/// <summary>
+		/// Returns the cache stats for the last completed library definition
+		/// </summary>
+		const ShaderLibCacheStats& GetCacheStats() const;
 
 		/// <summary>
 		/// Resets the builder for reuse. Invalidates definition handles.
@@ -109,7 +110,7 @@ namespace Weave::Effects
 
 		string name;
 		PlatformDef platform;
-		UniqueVector<VariantRepoDef> repos;
+		mutable UniqueVector<VariantRepoDef> repos;
 		bool isDebugging;
 
 		// Parsing, code gen and reflection
@@ -136,11 +137,11 @@ namespace Weave::Effects
 		UniqueVector<uint> effectShaders;
 
 		// Caching
-		ShaderLibCacheStats cacheStats;
-		unique_ptr<ShaderLibMap> pCacheMap;
-		std::unordered_map<string_view, uint> pathRepoMap;
-		Vector<const VariantRepoDef*> cacheHits;
-		ShaderLibDef::Handle lastDefHandle;
+		mutable unique_ptr<ShaderLibMap> pCacheMap;
+		mutable std::unordered_map<string_view, uint> repoPathCacheMap;
+		mutable Vector<const VariantRepoDef*> cacheHits;
+		mutable ShaderLibDef::Handle lastDefHandle;
+		mutable ShaderLibCacheStats cacheStats;
 
 		/// <summary>
 		/// Initializes the variant repo and corresponding flags
@@ -153,9 +154,14 @@ namespace Weave::Effects
 		void AddRepoConfiguration(string_view repoPath, const uint configID, const uint repoID, VariantRepoDef& repo);
 
 		/// <summary>
+		/// Ensures definition is resolved with the cache
+		/// </summary>
+		void FinalizeDefinition() const;
+
+		/// <summary>
 		/// Copies unchanged definitions from the cache into the final definition
 		/// </summary>
-		void MergeCacheHits();
+		void MergeCacheHits() const;
 
 		/// <summary>
 		/// Attempts to retrieve a repo from the cache based on its original source path
