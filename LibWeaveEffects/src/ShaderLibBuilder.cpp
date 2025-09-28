@@ -21,7 +21,8 @@ ShaderLibBuilder::ShaderLibBuilder() :
 	pShaderRegistry(new ShaderRegistryBuilder()),
 	isDebugging(false),
 	libBufIndex(0),
-	cacheStats({})
+	cacheStats({}),
+	lastDefHandle({})
 {
 	platform = PlatformDef
 	{
@@ -233,7 +234,7 @@ ShaderLibDef::Handle ShaderLibBuilder::GetDefinition()
 		{
 			WV_LOG_INFO() << "No changes detected. Reusing shader cache.";
 			cacheHits.Clear();
-			return pCacheMap->GetDefinition();
+			lastDefHandle = pCacheMap->GetDefinition();
 		}
 		// Partially cached
 		else
@@ -246,14 +247,19 @@ ShaderLibDef::Handle ShaderLibBuilder::GetDefinition()
 		}
 	}
 
-	return
+	if (!lastDefHandle.GetIsValid())
 	{
-		.pName = &name,
-		.pPlatform = &platform,
-		.pRepos = &repos,
-		.regHandle = pShaderRegistry->GetDefinition(),
-		.strMapHandle = pShaderRegistry->GetStringIDBuilder().GetDefinition()
-	};
+		lastDefHandle =
+		{
+			.pName = &name,
+			.pPlatform = &platform,
+			.pRepos = &repos,
+			.regHandle = pShaderRegistry->GetDefinition(),
+			.strMapHandle = pShaderRegistry->GetStringIDBuilder().GetDefinition()
+		};
+	}
+
+	return lastDefHandle;
 }
 
 void ShaderLibBuilder::MergeCacheHits()
@@ -322,6 +328,7 @@ void ShaderLibBuilder::Clear()
 	pathRepoMap.clear();
 	cacheHits.Clear();
 	cacheStats = {};
+	lastDefHandle = {};
 }
 
 void ShaderLibBuilder::ClearVariant()

@@ -588,8 +588,13 @@ namespace Weave::Effects
 			const string* pName;
 			const PlatformDef* pPlatform;
 			const IDynamicArray<VariantRepoDef>* pRepos;
-			const ShaderRegistryDef::Handle regHandle;
-			const StringIDMapDef::Handle strMapHandle;
+			ShaderRegistryDef::Handle regHandle;
+			StringIDMapDef::Handle strMapHandle;
+
+			/// <summary>
+			/// Returns true if the handle has been initialized
+			/// </summary>
+			bool GetIsValid() const { return pName && pPlatform && pRepos; }
 
 			/// <summary>
 			/// Returns a deep copy of the definition data

@@ -140,6 +140,7 @@ namespace Weave::Effects
 		unique_ptr<ShaderLibMap> pCacheMap;
 		std::unordered_map<string_view, uint> pathRepoMap;
 		Vector<const VariantRepoDef*> cacheHits;
+		ShaderLibDef::Handle lastDefHandle;
 
 		/// <summary>
 		/// Initializes the variant repo and corresponding flags
