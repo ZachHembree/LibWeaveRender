@@ -111,22 +111,22 @@ void ShaderLibBuilder::AddRepo(string_view repoPath, string_view libSrc)
 		{
 			WV_LOG_DEBUG() << "Cache hit for repository: " << repoPath;
 			cacheHits.Add(pRepo);
+			return;
 		}
 		else
 			WV_LOG_DEBUG() << "Cache miss for " << repoPath << ": source changed, reprocessing";
 	}
-	else // Fall back to full processing
-	{	
-		VariantRepoDef& repo = repos.EmplaceBack();
-		repo.sourceSizeBytes = (uint)libSrc.length();
-		repo.sourceCRC = crc;
-		repo.path = repoPath;
 
-		for (uint configID = 0; configID < pVariantGen->GetVariantCount(); configID++)
-		{
-			AddRepoConfiguration(repoPath, configID, repoID, repo);
-			ClearVariant();
-		}
+	// Fall back to full processing
+	VariantRepoDef& repo = repos.EmplaceBack();
+	repo.sourceSizeBytes = (uint)libSrc.length();
+	repo.sourceCRC = crc;
+	repo.path = repoPath;
+
+	for (uint configID = 0; configID < pVariantGen->GetVariantCount(); configID++)
+	{
+		AddRepoConfiguration(repoPath, configID, repoID, repo);
+		ClearVariant();
 	}
 }
 
