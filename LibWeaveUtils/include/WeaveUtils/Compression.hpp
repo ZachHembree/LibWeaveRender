@@ -38,6 +38,14 @@ namespace Weave
         /// </summary>
         string_view GetDataAsString() const;
 
+        /// <summary>
+        /// Returns compressed bytestream as an istream
+        /// </summary>
+        ISpanStream GetDataAsStream() const;
+
+        /// <summary>
+        /// Returns ratio of compressedSize / originalSize
+        /// </summary>
         float GetCompressionRatio() const;
     };
 
@@ -121,10 +129,12 @@ namespace Weave
         // Unzip object data
         DecompressBytes(archive, zipBuffer);
 
-        // Interpret zip buffer as char istream
-        ISpanStream vecStream(Span(reinterpret_cast<char*>(zipBuffer.GetData()), (int)zipBuffer.GetLength()));
-        Deserializer reader(vecStream);
         // Deserialize decompressed data
-        reader(dst);
+        {
+            // Interpret zip buffer as char istream
+            ISpanStream vecStream(Span(reinterpret_cast<const char*>(zipBuffer.GetData()), zipBuffer.GetLength()));
+            Deserializer reader(vecStream);      
+            reader(dst);
+        }
     }
 }

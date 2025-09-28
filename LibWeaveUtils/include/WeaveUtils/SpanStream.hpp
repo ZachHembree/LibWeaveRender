@@ -19,40 +19,20 @@ namespace Weave
             setup_pointers(buffer.data(), buffer.size());
         }
 
-        SpanBuffer(Span<char> buffer, std::ios_base::openmode mode)
-            : mode(mode)
-        {
-            setup_pointers(buffer.GetData(), buffer.GetLength());
-        }
-
         SpanBuffer(std::span<const char> buffer, std::ios_base::openmode mode)
             : mode(mode) 
-        {
-            if (mode & std::ios_base::out) 
-            {
-                // Cannot have output mode with a const buffer
-                // Set no pointers to make the stream immediately invalid
-                return;
-            }
-            // It's generally considered safe to const_cast for std::streambuf's get area
-            // as input operations will not modify the buffer.
-            char* start = const_cast<char*>(buffer.data());
-            setup_pointers(start, buffer.size());
-        }
-
-        SpanBuffer(Span<const char> buffer, std::ios_base::openmode mode)
-            : mode(mode)
         {
             if (mode & std::ios_base::out)
                 return;
 
-            char* start = const_cast<char*>(buffer.GetData());
-            setup_pointers(start, buffer.GetLength());
+            char* start = const_cast<char*>(buffer.data());
+            setup_pointers(start, buffer.size());
         }
 
     protected:
         // Override seekoff for relative positioning
-        pos_type seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override 
+        pos_type seekoff(off_type off, std::ios_base::seekdir way, 
+            std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override 
         {
             if ((which & std::ios_base::in) && (mode & std::ios_base::in)) 
             {
@@ -135,14 +115,6 @@ namespace Weave
             : std::istream(&spanBuf), spanBuf(buffer, std::ios_base::in) 
         { }
 
-        ISpanStream(Span<const char> buffer)
-            : std::istream(&spanBuf), spanBuf(buffer, std::ios_base::in)
-        { }
-
-        ISpanStream(Span<char> buffer)
-            : std::istream(&spanBuf), spanBuf(buffer, std::ios_base::in)
-        { }
-
         SpanBuffer* rdbuf() const { return const_cast<SpanBuffer*>(&spanBuf); }
 
     private:
@@ -159,10 +131,6 @@ namespace Weave
             : std::ostream(&spanBuf), spanBuf(buffer, std::ios_base::out) 
         { }
 
-        OSpanStream(Span<char> buffer)
-            : std::ostream(&spanBuf), spanBuf(buffer, std::ios_base::out)
-        { }
-
         SpanBuffer* rdbuf() const { return const_cast<SpanBuffer*>(&spanBuf); }
 
     private:
@@ -177,10 +145,6 @@ namespace Weave
     public:
         SpanStream(std::span<char> buffer)
             : std::iostream(&spanBuf), spanBuf(buffer, std::ios_base::in | std::ios_base::out) 
-        { }
-
-        SpanStream(Span<char> buffer)
-            : std::iostream(&spanBuf), spanBuf(buffer, std::ios_base::in | std::ios_base::out)
         { }
 
         SpanBuffer* rdbuf() const { return const_cast<SpanBuffer*>(&spanBuf); }

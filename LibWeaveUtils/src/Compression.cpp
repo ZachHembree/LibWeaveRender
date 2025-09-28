@@ -151,12 +151,17 @@ void Weave::DecompressBytes(const ZLibArchive& input, Vector<byte>& output)
         input.originalSizeBytes, output.GetLength());
 }
 
-string_view Weave::ZLibArchive::GetDataAsString() const
+string_view ZLibArchive::GetDataAsString() const
 {
     return string_view(reinterpret_cast<const char*>(data.GetData()), data.GetLength());
 }
 
-float Weave::ZLibArchive::GetCompressionRatio() const
+ISpanStream ZLibArchive::GetDataAsStream() const
+{
+    return ISpanStream({ reinterpret_cast<const char*>(data.GetData()), data.GetLength() });
+}
+
+float ZLibArchive::GetCompressionRatio() const
 {
     return (data.GetLength() / (float)originalSizeBytes);
 }

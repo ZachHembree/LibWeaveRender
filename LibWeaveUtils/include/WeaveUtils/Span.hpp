@@ -122,6 +122,11 @@ namespace Weave
 		{
 			return GetArrayAtIndex(this->data(), index, this->size());
 		}
+
+		/// <summary>
+		/// Returns Weave::Span as std::span
+		/// </summary>
+		operator std::span<T>() { return std::span<T>(this->data(), this->size()); }
 	};
 }
 
