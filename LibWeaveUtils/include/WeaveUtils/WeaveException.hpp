@@ -2,6 +2,7 @@
 #include <exception>
 #include <source_location>
 #include <format>
+#include <assert.h>
 #include "WeaveUtils/TextUtils.hpp"
 
 // Wraps a block in a conditional macro that behaves like a statement

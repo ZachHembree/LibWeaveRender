@@ -1,5 +1,6 @@
 #pragma once
 #include <concepts>
+#include "GlobalUtils.hpp"
 #include "DynamicCollections.hpp"
 
 namespace Weave
