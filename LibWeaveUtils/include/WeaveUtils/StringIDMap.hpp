@@ -6,13 +6,13 @@
 
 namespace Weave
 {
+    class StringIDBuilder;
+
     /// <summary>
     /// Serializable string ID mapping data
     /// </summary>
     struct StringIDMapDef
     {
-        static constexpr uint INVALID_ID = -1;
-
         /// <summary>
         /// Alternating starting indices + string length. ID == index / 2
         /// </summary>
@@ -60,14 +60,41 @@ namespace Weave
     };
 
     /// <summary>
-    /// Read-only interface for string ID lookup
+    /// Abstract read-only interface for retrieving unique strings and IDs
     /// </summary>
-    class StringIDMap
+    class IStringIDMap
+    {
+    public:
+        /// <summary>
+        /// Returns true if the string exists in the map and retrieves its ID
+        /// </summary>
+        virtual bool TryGetStringID(std::string_view str, uint& id) const = 0;
+
+        /// <summary>
+        /// Returns the string_view corresponding to the given ID
+        /// </summary>
+        virtual std::string_view GetString(uint id) const = 0;
+
+        /// <summary>
+        /// Returns the number of unique strings in the map
+        /// </summary>
+        virtual uint GetStringCount() const = 0;
+
+        /// <summary>
+        /// Returns a read-only view to a serializable definition of the string ID map
+        /// </summary>
+        virtual StringIDMapDef::Handle GetDefinition() const = 0;
+
+        virtual ~IStringIDMap() = default;
+    };
+
+    /// <summary>
+    /// Read-only map for retrieving unique strings and IDs
+    /// </summary>
+    class StringIDMap : public IStringIDMap
     {
     public:
         MAKE_NO_COPY(StringIDMap)
-
-        static constexpr uint INVALID_ID = StringIDMapDef::INVALID_ID;
 
         explicit StringIDMap(const StringIDMapDef::Handle& def);
 
@@ -76,26 +103,68 @@ namespace Weave
         /// <summary>
         /// Returns true if the string exists in the map and retrieves its ID
         /// </summary>
-        bool TryGetStringID(std::string_view str, uint& id) const;
+        bool TryGetStringID(std::string_view str, uint& id) const override;
 
         /// <summary>
         /// Returns the string_view corresponding to the given ID
         /// </summary>
-        std::string_view GetString(uint id) const;
+        std::string_view GetString(uint id) const override;
 
         /// <summary>
         /// Returns the number of unique strings in the map
         /// </summary>
-        uint GetStringCount() const;
+        uint GetStringCount() const override;
 
-        StringIDMapDef::Handle GetDefinition() const;
+        /// <summary>
+        /// Returns a read-only view to a serializable definition of the string ID map
+        /// </summary>
+        StringIDMapDef::Handle GetDefinition() const override;
 
     private:
         std::unique_ptr<StringIDMapDef> pDef;
         // String -> ID map
-        std::unordered_map<std::string_view, uint> idMap;
+        mutable std::unordered_map<std::string_view, uint> idMap;
 
-        void InitMapData();
+        void InitMapData() const;
     };
 
+    /// <summary>
+    /// StringID subset backed by a StringIDBuilder superset
+    /// </summary>
+    class StringIDMapAlias : public IStringIDMap
+    {
+    public:
+        StringIDMapAlias(const StringIDMapDef::Handle& def, StringIDBuilder& parent);
+
+        const StringIDBuilder& GetParent() const;
+
+        /// <summary>
+        /// Returns the equivalent stringID in the parent StringIDBuilder
+        /// </summary>
+        uint GetParentStringID(uint localID) const;
+
+        /// <summary>
+        /// Returns true if the string exists in the map and retrieves its ID
+        /// </summary>
+        bool TryGetStringID(std::string_view str, uint& id) const override;
+
+        /// <summary>
+        /// Returns the string_view corresponding to the given ID
+        /// </summary>
+        std::string_view GetString(uint id) const override;
+
+        /// <summary>
+        /// Returns the number of unique strings in the map
+        /// </summary>
+        uint GetStringCount() const override;
+
+        /// <summary>
+        /// Returns a read-only view to a serializable definition of the string ID map
+        /// </summary>
+        StringIDMapDef::Handle GetDefinition() const override;
+
+    private:
+        const StringIDBuilder* pParent;
+        UniqueArray<uint> idAliases;
+    };
 }

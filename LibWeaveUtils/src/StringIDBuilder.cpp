@@ -49,7 +49,7 @@ bool StringIDBuilder::TryGetStringID(std::string_view str, uint& id) const
         return true;
     }
 
-    id = INVALID_ID;
+    id = g_InvalidID32;
     return false;
 }
 
@@ -57,7 +57,10 @@ bool StringIDBuilder::TryGetStringID(std::string_view str, uint& id) const
 /// Returns the string corresponding to the given ID
 /// </summary>
 string_view StringIDBuilder::GetString(uint id) const 
-{ 
+{
+    id &= ~g_Bit32; // Bit 32 is reserved for alias maps
+    WV_ASSERT_MSG((id * 2 + 1) < substrings.GetLength(), "StringID ({}) invalid.", id);
+
     const uint start = substrings[id * 2],
         length = substrings[id * 2 + 1];
 

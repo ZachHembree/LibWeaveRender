@@ -24,7 +24,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Retrieves interface for querying string IDs used in library resources
 		/// </summary>
-		const StringIDMap& GetStringMap() const;
+		const IStringIDMap& GetStringMap() const;
 
 		/// <summary>
 		/// Tries to retrieve the given shader as a vertex shader

@@ -33,7 +33,7 @@ size_t ConstBufDefHandle::GetLength() const
 	return members.GetLength();
 }
 
-const StringIDMap& ConstBufDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
+const IStringIDMap& ConstBufDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
 
 // ShaderDef
 ShaderDefHandle::ShaderDefHandle() :
@@ -94,7 +94,7 @@ const ShaderDef& ShaderDefHandle::GetDefinition() const { return *pDef; }
 
 const ShaderRegistryMap& ShaderDefHandle::GetRegistry() const { return *pMap; }
 
-const StringIDMap& ShaderDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
+const IStringIDMap& ShaderDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
 
 // EffectDef
 EffectDefHandle::EffectDefHandle() :
@@ -135,7 +135,7 @@ const EffectDef& EffectDefHandle::GetDefinition() const { return def; }
 
 const ShaderRegistryMap& EffectDefHandle::GetRegistry() const { return *pMap; }
 
-const StringIDMap& EffectDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
+const IStringIDMap& EffectDefHandle::GetStringMap() const { return pMap->GetStringMap(); }
 
 // IO layout
 IOLayoutHandle::IOLayoutHandle() :
@@ -150,7 +150,7 @@ const IOElementDef& IOLayoutHandle::operator[](const ptrdiff_t index) const { re
 
 size_t IOLayoutHandle::GetLength() const { return layout.GetLength(); }
 
-const StringIDMap& IOLayoutHandle::GetStringMap() const { return pMap->GetStringMap(); }
+const IStringIDMap& IOLayoutHandle::GetStringMap() const { return pMap->GetStringMap(); }
 
 // Resource layout
 ResourceGroupHandle::ResourceGroupHandle() :
@@ -165,7 +165,7 @@ const ResourceDef& ResourceGroupHandle::operator[](const ptrdiff_t index) const 
 
 size_t ResourceGroupHandle::GetLength() const { return layout.GetLength(); }
 
-const StringIDMap& ResourceGroupHandle::GetStringMap() const { return pMap->GetStringMap(); }
+const IStringIDMap& ResourceGroupHandle::GetStringMap() const { return pMap->GetStringMap(); }
 
 // Cbuf group
 ConstBufGroupHandle::ConstBufGroupHandle() :
@@ -183,4 +183,4 @@ ConstBufDefHandle ConstBufGroupHandle::operator[](const ptrdiff_t index) const {
 /// </summary>
 size_t ConstBufGroupHandle::GetLength() const { return layout.GetLength(); }
 
-const StringIDMap& ConstBufGroupHandle::GetStringMap() const { return pMap->GetStringMap(); }
+const IStringIDMap& ConstBufGroupHandle::GetStringMap() const { return pMap->GetStringMap(); }

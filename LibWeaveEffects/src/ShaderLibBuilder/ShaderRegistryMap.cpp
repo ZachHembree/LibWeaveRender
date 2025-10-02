@@ -8,24 +8,24 @@ using namespace Weave::Effects;
 
 ShaderRegistryMap::ShaderRegistryMap(const StringIDMapDef::Handle& strDef, const ShaderRegistryDef::Handle& def) :
 	pRegDef(new ShaderRegistryDef(def.GetCopy())),
-	stringMap(strDef)
+	pStringIDs(new StringIDMap(strDef))
 { }
 
 ShaderRegistryMap::ShaderRegistryMap(StringIDMapDef&& strDef, ShaderRegistryDef&& def) :
 	pRegDef(new ShaderRegistryDef(std::move(def))),
-	stringMap(std::move(strDef))
+	pStringIDs(new StringIDMap(std::move(strDef)))
 { }
 
-const StringIDMap& ShaderRegistryMap::GetStringMap() const { return stringMap; }
+const IStringIDMap& ShaderRegistryMap::GetStringMap() const { return *pStringIDs; }
 
 bool ShaderRegistryMap::TryGetStringID(string_view str, uint& id) const
 {
-	return stringMap.TryGetStringID(str, id);
+	return pStringIDs->TryGetStringID(str, id);
 }
 
-string_view ShaderRegistryMap::GetString(uint id) const { return stringMap.GetString(id); }
+string_view ShaderRegistryMap::GetString(uint id) const { return pStringIDs->GetString(id); }
 
-uint ShaderRegistryMap::GetStringCount() const { return stringMap.GetStringCount(); }
+uint ShaderRegistryMap::GetStringCount() const { return pStringIDs->GetStringCount(); }
 
 const EffectDef& ShaderRegistryMap::GetEffect(uint effectID) const 
 { return pRegDef->effects[ShaderRegistryBuilder::GetIndex(effectID)]; }

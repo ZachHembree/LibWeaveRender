@@ -222,7 +222,7 @@ void Renderer::SetIsDepthStencilEnabled(bool value) { useDefaultDS = value; }
 
 Material& Renderer::GetDefaultMaterial(string_view name) const
 {
-	const StringIDMap& stringMap = shaderLibs[0].GetStringMap();
+	const IStringIDMap& stringMap = shaderLibs[0].GetStringMap();
 	uint stringID;
 
 	D3D_CHECK_MSG(stringMap.TryGetStringID(name, stringID), "Default material undefined");
@@ -243,7 +243,7 @@ Material& Renderer::GetDefaultMaterial(string_view name) const
 
 ComputeInstance& Renderer::GetDefaultCompute(string_view name) const
 {
-	const StringIDMap& stringMap = shaderLibs[0].GetStringMap();
+	const IStringIDMap& stringMap = shaderLibs[0].GetStringMap();
 	uint stringID;
 	D3D_CHECK_MSG(stringMap.TryGetStringID(name, stringID), "Default compute shader undefined");
 

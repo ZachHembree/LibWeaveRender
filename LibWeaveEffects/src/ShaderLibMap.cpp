@@ -50,7 +50,7 @@ ShaderLibMap::~ShaderLibMap() = default;
 
 string_view ShaderLibMap::GetName() const { return name; }
 
-const StringIDMap& ShaderLibMap::GetStringMap() const { return pRegMap->GetStringMap(); }
+const IStringIDMap& ShaderLibMap::GetStringMap() const { return pRegMap->GetStringMap(); }
 
 ShaderLibMap::ShaderLibMap(const ShaderLibDef::Handle& def) :
 	name(*def.pName),
@@ -101,20 +101,20 @@ void ShaderLibMap::InitMaps()
 		// Default global name -> variant mapping
 		// sharedVariantMap[nameID] -> vID
 		const VariantDef& baseVariant = repoDef.variants[0];
-		const uint baseID = PackVariantID(repoIndex, 0);
+		const uint repoID = repoIndex << g_VariantGroupOffset;
 
 		// Shaders
 		for (const ShaderVariantDef& varShaderPair : baseVariant.shaders)
 		{
 			const ShaderDef& shader = pRegMap->GetShader(varShaderPair.shaderID);
-			sharedVariantMap.shaders[shader.nameID] = baseID;
+			sharedVariantMap.shaders[shader.nameID] = repoID;
 		}
 
 		// Effects
 		for (const EffectVariantDef& varEffectPair : baseVariant.effects)
 		{
 			const EffectDef& effect = pRegMap->GetEffect(varEffectPair.effectID);
-			sharedVariantMap.effects[effect.nameID] = baseID;
+			sharedVariantMap.effects[effect.nameID] = repoID;
 		}
 
 		// vID ~= (repoIndex << 16) | flagID

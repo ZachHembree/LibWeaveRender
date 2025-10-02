@@ -44,7 +44,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Map for stringID lookup
 		/// </summary>
-		const StringIDMap& GetStringMap() const;
+		const IStringIDMap& GetStringMap() const;
 
 	private:
 		const ShaderRegistryMap* pMap;
@@ -74,7 +74,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Map for stringID lookup
 		/// </summary>
-		const StringIDMap& GetStringMap() const;
+		const IStringIDMap& GetStringMap() const;
 
 	private:
 		const ShaderRegistryMap* pMap;
@@ -104,7 +104,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Map for stringID lookup
 		/// </summary>
-		const StringIDMap& GetStringMap() const;
+		const IStringIDMap& GetStringMap() const;
 
 	private:
 		const ShaderRegistryMap* pMap;
@@ -134,7 +134,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Map for stringID lookup
 		/// </summary>
-		const StringIDMap& GetStringMap() const;
+		const IStringIDMap& GetStringMap() const;
 
 	private:
 		const ShaderRegistryMap* pMap;
@@ -219,7 +219,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Map for stringID lookup
 		/// </summary>
-		const StringIDMap& GetStringMap() const;
+		const IStringIDMap& GetStringMap() const;
 
 	private:
 		const ShaderRegistryMap* pMap;
@@ -281,7 +281,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Map for stringID lookup
 		/// </summary>
-		const StringIDMap& GetStringMap() const;
+		const IStringIDMap& GetStringMap() const;
 
 	private:
 		EffectDef def;

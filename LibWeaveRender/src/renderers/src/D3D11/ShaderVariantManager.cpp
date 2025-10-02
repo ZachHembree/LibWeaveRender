@@ -19,7 +19,7 @@ ShaderVariantManager::ShaderVariantManager(Device& device, ShaderLibDef&& def) :
 	libMap(std::move(def))
 { }
 
-const StringIDMap& ShaderVariantManager::GetStringMap() const { return libMap.GetStringMap(); }
+const IStringIDMap& ShaderVariantManager::GetStringMap() const { return libMap.GetStringMap(); }
 
 bool ShaderVariantManager::TryGetShader(uint shaderID, const VertexShaderVariant*& pVS)
 {

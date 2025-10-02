@@ -10,12 +10,10 @@ namespace Weave
     /// <summary>
     /// Builds a map of uint IDs corresponding to unique strings
     /// </summary>
-    class StringIDBuilder 
+    class StringIDBuilder : public IStringIDMap
     {
     public:
         MAKE_NO_COPY(StringIDBuilder)
-
-        static constexpr uint INVALID_ID = StringIDMapDef::INVALID_ID;
 
         StringIDBuilder();
 
@@ -32,22 +30,22 @@ namespace Weave
         /// <summary>
         /// Returns true if the string exists in the map and retrieves its ID
         /// </summary>
-        bool TryGetStringID(string_view str, uint& id) const;
+        bool TryGetStringID(string_view str, uint& id) const override;
 
         /// <summary>
         /// Returns the string corresponding to the given ID
         /// </summary>
-        string_view GetString(uint id) const;
+        string_view GetString(uint id) const override;
 
         /// <summary>
         /// Returns the total number of strings mapped
         /// </summary>
-        uint GetStringCount() const;
+        uint GetStringCount() const override;
 
         /// <summary>
         /// Returns serializable handle to string ID map data
         /// </summary>
-        StringIDMapDef::Handle GetDefinition() const;
+        StringIDMapDef::Handle GetDefinition() const override;
 
         /// <summary>
         /// Clears all strings from the builder

@@ -20,7 +20,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Returns string ID lookup map
 		/// </summary>
-		const StringIDMap& GetStringMap() const;
+		const IStringIDMap& GetStringMap() const;
 
 		/// <summary>
 		/// Returns true if the string exists in the map and retrieves its ID
@@ -57,7 +57,7 @@ namespace Weave::Effects
 
 	private:
 		std::unique_ptr<ShaderRegistryDef> pRegDef;
-		StringIDMap stringMap;
+		std::unique_ptr<IStringIDMap> pStringIDs;
 
 	};
 }

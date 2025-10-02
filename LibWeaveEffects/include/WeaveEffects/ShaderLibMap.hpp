@@ -29,7 +29,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Returns string ID lookup map
 		/// </summary>
-		const StringIDMap& GetStringMap() const;
+		const IStringIDMap& GetStringMap() const;
 
 		/// <summary>
 		/// Returns an array of all variant repo definitions

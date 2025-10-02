@@ -23,7 +23,7 @@ ShaderLibrary::ShaderLibrary(Renderer& renderer, ShaderLibDef&& def) :
 
 string_view ShaderLibrary::GetName() const { return pManager->GetLibMap().GetName(); }
 
-const StringIDMap& ShaderLibrary::GetStringMap() const { return pManager->GetStringMap(); }
+const IStringIDMap& ShaderLibrary::GetStringMap() const { return pManager->GetStringMap(); }
 
 Material ShaderLibrary::GetMaterial(uint effectNameID) const
 { 

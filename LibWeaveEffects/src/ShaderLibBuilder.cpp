@@ -256,7 +256,7 @@ void ShaderLibBuilder::MergeCacheHits() const
 	for (const VariantRepoDef* pRepo : cacheHits)
 	{
 		const uint repoID = (uint)repos.GetLength() << g_VariantGroupOffset;
-		const StringIDMap& oldStrings = pCacheMap->GetStringMap();
+		const IStringIDMap& oldStrings = pCacheMap->GetStringMap();
 		VariantRepoDef& cachedRepo = repos.EmplaceBack(*pRepo);
 
 		// Remap define names
