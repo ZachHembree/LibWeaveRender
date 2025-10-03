@@ -9,6 +9,22 @@ StringIDBuilder::StringIDBuilder(StringIDBuilder&& other) noexcept = default;
 
 StringIDBuilder& StringIDBuilder::operator=(StringIDBuilder&& other) noexcept = default;
 
+void StringIDBuilder::GetOrAddStrings(const IDynamicArray<uint>& newSubstrings, const string& newStringData, 
+    IDynamicArray<uint>& ids)
+{
+    substrings.Reserve(substrings.GetLength() + newSubstrings.GetLength());
+    stringData.reserve(stringData.size() + newStringData.size());
+    idMap.reserve(idMap.size() + ids.GetLength());
+    
+    for (uint id = 0; id < ids.GetLength(); id++)
+    {
+        size_t start = newSubstrings[id * 2];
+        size_t length = newSubstrings[id * 2 + 1];
+        string_view str(&newStringData[start], length);
+        ids[id] = GetOrAddStringID(str);
+    }
+}
+
 /// <summary>
 /// Returns the ID corresponding to the given string. Adds a copy of
 /// the string to the map if it hasn't been added previously.
@@ -26,7 +42,7 @@ uint StringIDBuilder::GetOrAddStringID(std::string_view str)
     else
     {
         const uint id = static_cast<uint>(substrings.GetLength() / 2);
-        WV_CHECK_MSG(id < g_Bit32, "String ID limit reached: {}.", id);
+        WV_CHECK_MSG(id < g_InvalidID32, "String ID limit reached: {}.", id);
 
         substrings.Add((uint)ss.GetIndex());
         substrings.Add((uint)ss.GetLength() - 1); // Exclude null-terminator
@@ -36,7 +52,7 @@ uint StringIDBuilder::GetOrAddStringID(std::string_view str)
     }
 }
 
-uint StringIDBuilder::GetOrAddStringID(const StringSpan ss)
+uint StringIDBuilder::GetOrAddStringID(const StringSpan& ss)
 {
     return GetOrAddStringID(string_view(ss));
 }
@@ -65,8 +81,6 @@ bool StringIDBuilder::TryGetStringID(std::string_view str, uint& id) const
 /// </summary>
 const StringSpan StringIDBuilder::GetString(uint id) const
 {
-    WV_CHECK_MSG(id != g_InvalidID32, "StringID is invalid");
-    id &= ~g_Bit32; // Bit 32 is reserved for alias maps
     WV_CHECK_MSG((id * 2 + 1) < substrings.GetLength(), "StringID ({}) invalid.", id);
 
     const uint start = substrings[id * 2],

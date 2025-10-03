@@ -96,11 +96,6 @@ namespace Weave
         /// </summary>
         virtual uint GetAliasedID(uint localID) const { return localID; }
 
-        /// <summary>
-        /// Returns true if the given ID is shared between a StringIDBuilder and a StringIDMapAlias
-        /// </summary>
-        static bool GetIsShared(uint id);
-
         virtual ~IStringIDMap() = default;
     };
 
@@ -157,7 +152,7 @@ namespace Weave
         const StringIDBuilder& GetParent() const;
 
         /// <summary>
-        /// Returns the equivalent stringID in the parent StringIDBuilder
+        /// Returns the equivalent stringID in the parent StringIDBuilder for the given local ID
         /// </summary>
         uint GetAliasedID(uint localID) const override;
 

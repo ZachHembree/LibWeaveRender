@@ -22,6 +22,11 @@ namespace Weave
         StringIDBuilder& operator=(StringIDBuilder&& other) noexcept;
 
         /// <summary>
+        /// Adds a group of substrings to the map and appends their IDs to the output vector
+        /// </summary>
+        void GetOrAddStrings(const IDynamicArray<uint>& newSubstrings, const string& newStringData, IDynamicArray<uint>& ids);
+
+        /// <summary>
         /// Returns the ID corresponding to the given string. Adds a copy of
         /// the string to the map if it hasn't been added previously.
         /// </summary>
@@ -31,7 +36,7 @@ namespace Weave
         /// Returns the ID corresponding to the given string. Adds a copy of
         /// the string to the map if it hasn't been added previously.
         /// </summary>
-        uint GetOrAddStringID(const StringSpan str);
+        uint GetOrAddStringID(const StringSpan& str);
 
         /// <summary>
         /// Returns true if the string exists in the map and retrieves its ID

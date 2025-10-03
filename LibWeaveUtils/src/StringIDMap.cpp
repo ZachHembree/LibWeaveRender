@@ -64,51 +64,30 @@ void StringIDMap::InitMapData() const
 
 // Alias map
 
-bool IStringIDMap::GetIsShared(uint id) { return (id & g_Bit32) > 0; }
-
 StringIDMapAlias::StringIDMapAlias(const StringIDMapDef::Handle& def, StringIDBuilder& parent) :
     pParent(&parent),
     idAliases(def.pSubstrings->GetLength() / 2)
 {
-    const Vector<uint>& substrings = *def.pSubstrings;
-    const string& stringData = *def.pStringData;
-
-    for (uint id = 0; id < idAliases.GetLength(); id++)
-    {
-        size_t start = substrings[id * 2];
-        size_t length = substrings[id * 2 + 1];
-        string_view str(&stringData[start], length);
-        idAliases[id] = parent.GetOrAddStringID(str) | g_Bit32; // Set bit 32 to indicate aliased ID
-    }
+    parent.GetOrAddStrings(*def.pSubstrings, *def.pStringData, idAliases);
 }
 
 const StringIDBuilder& StringIDMapAlias::GetParent() const  { return *pParent; }
 
-uint StringIDMapAlias::GetAliasedID(uint id) const { return GetIsShared(id) ? id : idAliases[id]; }
-
-bool StringIDMapAlias::TryGetStringID(std::string_view str, uint& id) const
-{
-    const bool success = pParent->TryGetStringID(str, id);
-    id |= g_Bit32; // Indicate parent owned aliased ID
-
-    return success;
-}
-
-const StringSpan StringIDMapAlias::GetString(uint id) const
-{
-    WV_CHECK_MSG(id != g_InvalidID32, "String ID is invalid");
-
-    // IDs with bit 32 set indicate an aliased ID owned by a parent builder
-    // Otherwise the ID is local to the current map
-    if (GetIsShared(id))
-        return pParent->GetString(id);
-    else
-        return pParent->GetString(idAliases[id]);
-}
+uint StringIDMapAlias::GetAliasedID(uint id) const { return idAliases[id]; }
 
 uint StringIDMapAlias::GetStringCount() const
 {
     return (uint)idAliases.GetLength();
+}
+
+bool StringIDMapAlias::TryGetStringID(std::string_view str, uint& id) const
+{
+    return pParent->TryGetStringID(str, id);
+}
+
+const StringSpan StringIDMapAlias::GetString(uint id) const
+{
+    return pParent->GetString(id);
 }
 
 StringIDMapDef::Handle StringIDMapAlias::GetDefinition() const
