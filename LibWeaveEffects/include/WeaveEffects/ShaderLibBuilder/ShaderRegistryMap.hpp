@@ -13,9 +13,21 @@ namespace Weave::Effects
 	public:
 		MAKE_NO_COPY(ShaderRegistryMap)
 
-		ShaderRegistryMap(const StringIDMapDef::Handle& strDef, const ShaderRegistryDef::Handle& def);
+		ShaderRegistryMap(const ShaderRegistryDef::Handle& def, const StringIDMapDef::Handle& strDef);
 
-		ShaderRegistryMap(StringIDMapDef&& strDef, ShaderRegistryDef&& def);
+		ShaderRegistryMap(ShaderRegistryDef&& def, StringIDMapDef&& strDef);
+
+		/// <summary>
+		/// Constructs a shader definition map with shared string IDs by copying the given definitions
+		/// </summary>
+		ShaderRegistryMap(const ShaderRegistryDef::Handle& def, const StringIDMapDef::Handle& strDef, StringIDBuilder& stringIDs);
+
+		/// <summary>
+		/// Constructs a shader definition map with shared string IDs by moving the given definitions where possible
+		/// </summary>
+		ShaderRegistryMap(ShaderRegistryDef&& def, const StringIDMapDef::Handle& strDef, StringIDBuilder& stringIDs);
+
+		~ShaderRegistryMap();
 
 		/// <summary>
 		/// Returns string ID lookup map
@@ -59,5 +71,6 @@ namespace Weave::Effects
 		std::unique_ptr<ShaderRegistryDef> pRegDef;
 		std::unique_ptr<IStringIDMap> pStringIDs;
 
+		void InitStringIDAliases();
 	};
 }

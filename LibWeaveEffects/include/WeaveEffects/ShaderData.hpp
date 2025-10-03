@@ -168,7 +168,7 @@ namespace Weave::Effects
 		USE_DEFAULT_CMP(IOElementDef);
 
 		/// <summary>
-		/// Semantic associated with the element
+		/// Semantic stringID associated with the element
 		/// </summary>
 		uint semanticID;
 

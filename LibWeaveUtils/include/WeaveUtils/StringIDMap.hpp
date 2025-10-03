@@ -86,7 +86,7 @@ namespace Weave
         virtual StringIDMapDef::Handle GetDefinition() const = 0;
 
         /// <summary>
-        /// Returns true if the string ID map a set of aliases in a StringIDBuilder
+        /// Returns true if map represents a set of aliases in a StringIDBuilder
         /// </summary>
         virtual bool GetIsAlias() const { return false; }
 
@@ -95,6 +95,11 @@ namespace Weave
         /// map is an alias.
         /// </summary>
         virtual uint GetAliasedID(uint localID) const { return localID; }
+
+        /// <summary>
+        /// Returns true if the given ID is shared between a StringIDBuilder and a StringIDMapAlias
+        /// </summary>
+        static bool GetIsShared(uint id);
 
         virtual ~IStringIDMap() = default;
     };

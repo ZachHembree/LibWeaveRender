@@ -292,7 +292,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Serializable variant repo data
 		/// </summary>
-		UniqueArray<VariantRepoDef> variantRepos;
+		mutable UniqueArray<VariantRepoDef> variantRepos;
 
 		void InitMaps();
 

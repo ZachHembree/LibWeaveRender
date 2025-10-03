@@ -6,15 +6,57 @@
 using namespace Weave;
 using namespace Weave::Effects;
 
-ShaderRegistryMap::ShaderRegistryMap(const StringIDMapDef::Handle& strDef, const ShaderRegistryDef::Handle& def) :
+ShaderRegistryMap::ShaderRegistryMap(const ShaderRegistryDef::Handle& def, const StringIDMapDef::Handle& strDef) :
 	pRegDef(new ShaderRegistryDef(def.GetCopy())),
 	pStringIDs(new StringIDMap(strDef))
 { }
 
-ShaderRegistryMap::ShaderRegistryMap(StringIDMapDef&& strDef, ShaderRegistryDef&& def) :
+ShaderRegistryMap::ShaderRegistryMap(ShaderRegistryDef&& def, StringIDMapDef&& strDef) :
 	pRegDef(new ShaderRegistryDef(std::move(def))),
 	pStringIDs(new StringIDMap(std::move(strDef)))
 { }
+
+ShaderRegistryMap::ShaderRegistryMap(const ShaderRegistryDef::Handle& def, const StringIDMapDef::Handle& strDef, 
+	StringIDBuilder& stringIDs) :
+	pRegDef(new ShaderRegistryDef(def.GetCopy())),
+	pStringIDs(new StringIDMapAlias(strDef, stringIDs))
+{ 
+	InitStringIDAliases();
+}
+
+ShaderRegistryMap::ShaderRegistryMap(ShaderRegistryDef&& def, const StringIDMapDef::Handle& strDef, 
+	StringIDBuilder& stringIDs) :
+	pRegDef(new ShaderRegistryDef(std::move(def))),
+	pStringIDs(new StringIDMapAlias(strDef, stringIDs))
+{
+	InitStringIDAliases();
+}
+
+void ShaderRegistryMap::InitStringIDAliases()
+{
+	for (EffectDef& def : pRegDef->effects)
+		def.nameID = GetStringMap().GetAliasedID(def.nameID);
+
+	for (ShaderDef& def : pRegDef->shaders)
+	{
+		def.fileStringID = GetStringMap().GetAliasedID(def.fileStringID);
+		def.nameID = GetStringMap().GetAliasedID(def.nameID);
+	}
+
+	for (ResourceDef& def : pRegDef->resources)
+		def.stringID = GetStringMap().GetAliasedID(def.stringID);
+
+	for (IOElementDef& def : pRegDef->ioElements)
+		def.semanticID = GetStringMap().GetAliasedID(def.semanticID);
+
+	for (ConstBufDef& def : pRegDef->cbufDefs)
+		def.stringID = GetStringMap().GetAliasedID(def.stringID);
+
+	for (ConstDef& def : pRegDef->constants)
+		def.stringID = GetStringMap().GetAliasedID(def.stringID);
+}
+
+ShaderRegistryMap::~ShaderRegistryMap() = default;
 
 const IStringIDMap& ShaderRegistryMap::GetStringMap() const { return *pStringIDs; }
 

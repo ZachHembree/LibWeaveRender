@@ -64,6 +64,8 @@ void StringIDMap::InitMapData() const
 
 // Alias map
 
+bool IStringIDMap::GetIsShared(uint id) { return (id & g_Bit32) > 0; }
+
 StringIDMapAlias::StringIDMapAlias(const StringIDMapDef::Handle& def, StringIDBuilder& parent) :
     pParent(&parent),
     idAliases(def.pSubstrings->GetLength() / 2)
@@ -82,7 +84,7 @@ StringIDMapAlias::StringIDMapAlias(const StringIDMapDef::Handle& def, StringIDBu
 
 const StringIDBuilder& StringIDMapAlias::GetParent() const  { return *pParent; }
 
-uint StringIDMapAlias::GetAliasedID(uint localID) const { return idAliases[localID]; }
+uint StringIDMapAlias::GetAliasedID(uint id) const { return GetIsShared(id) ? id : idAliases[id]; }
 
 bool StringIDMapAlias::TryGetStringID(std::string_view str, uint& id) const
 {
@@ -98,7 +100,7 @@ const StringSpan StringIDMapAlias::GetString(uint id) const
 
     // IDs with bit 32 set indicate an aliased ID owned by a parent builder
     // Otherwise the ID is local to the current map
-    if ((id & g_Bit32) > 0)
+    if (GetIsShared(id))
         return pParent->GetString(id);
     else
         return pParent->GetString(idAliases[id]);
