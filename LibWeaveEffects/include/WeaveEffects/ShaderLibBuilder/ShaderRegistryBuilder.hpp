@@ -120,6 +120,8 @@ namespace Weave::Effects
 		*
 		* StringIDs are separate from shader definition types. */
 
+		uint GetOrAddStringID(const StringSpan str);
+
 		uint GetOrAddStringID(string_view str);
 
 		uint GetOrAddConstant(const ConstDef& constDef);

@@ -18,7 +18,7 @@ ShaderInstanceBase::ShaderInstanceBase(ShaderVariantManager& lib, uint nameID, u
 
 uint ShaderInstanceBase::GetNameID() const { return nameID; }
 
-string_view ShaderInstanceBase::GetName() const { return pLib->GetStringMap().GetString(nameID); }
+const StringSpan ShaderInstanceBase::GetName() const { return pLib->GetStringMap().GetString(nameID); }
 
 uint ShaderInstanceBase::GetVariantID() const { return vID; }
 
@@ -63,7 +63,7 @@ bool ShaderInstanceBase::TryGetStringID(string_view str, uint& id) const
 	return pLib->GetStringMap().TryGetStringID(str, id);
 }
 
-string_view ShaderInstanceBase::GetString(uint stringID) const { return pLib->GetLibMap().GetStringMap().GetString(stringID); }
+const StringSpan ShaderInstanceBase::GetString(uint stringID) const { return pLib->GetLibMap().GetStringMap().GetString(stringID); }
 
 void ShaderInstanceBase::GetDefines(Vector<string_view>& names) const { pLib->GetLibMap().GetDefines(vID, names); }
 

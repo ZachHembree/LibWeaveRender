@@ -36,6 +36,11 @@ uint StringIDBuilder::GetOrAddStringID(std::string_view str)
     }
 }
 
+uint StringIDBuilder::GetOrAddStringID(const StringSpan ss)
+{
+    return GetOrAddStringID(string_view(ss));
+}
+
 /// <summary>
 /// Returns true if the string exists in the map and retrieves its ID
 /// </summary>

@@ -23,7 +23,7 @@ bool ShaderRegistryMap::TryGetStringID(string_view str, uint& id) const
 	return pStringIDs->TryGetStringID(str, id);
 }
 
-string_view ShaderRegistryMap::GetString(uint id) const { return pStringIDs->GetString(id); }
+StringSpan ShaderRegistryMap::GetString(uint id) const { return pStringIDs->GetString(id); }
 
 uint ShaderRegistryMap::GetStringCount() const { return pStringIDs->GetStringCount(); }
 

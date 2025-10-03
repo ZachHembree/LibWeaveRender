@@ -30,7 +30,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Returns the string_view corresponding to the given ID
 		/// </summary>
-		string_view GetString(uint id) const;
+		StringSpan GetString(uint id) const;
 
 		/// <summary>
 		/// Returns the number of unique strings in the map

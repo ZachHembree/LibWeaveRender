@@ -48,6 +48,8 @@ uint ShaderRegistryBuilder::GetShaderCount() const { return (uint)shaders.GetLen
 
 uint ShaderRegistryBuilder::GetEffectCount() const { return (uint)effects.GetLength(); }
 
+uint ShaderRegistryBuilder::GetOrAddStringID(const StringSpan str) { return stringIDs.GetOrAddStringID(str); }
+
 uint ShaderRegistryBuilder::GetOrAddStringID(string_view str) { return stringIDs.GetOrAddStringID(str); }
 
 // Add helpers
@@ -82,7 +84,7 @@ static uint RemapIOLayout(const std::optional<IOLayoutHandle>& layout, ShaderReg
 		for (uint i = 0; i < layout->GetLength(); i++)
 		{
 			IOElementDef element = (*layout)[i];
-			string_view name = layout->GetStringMap().GetString(element.semanticID);
+			const StringSpan name = layout->GetStringMap().GetString(element.semanticID);
 			element.semanticID = builder.GetOrAddStringID(name);
 			idBuf.EmplaceBack(builder.GetOrAddIOElement(element));
 		}
@@ -119,7 +121,7 @@ static uint RemapConstants(const std::optional<ConstBufGroupHandle>& group, Shad
 			for (uint j = 0; j < bufHandle.GetLength(); j++)
 			{
 				ConstDef varDef = bufHandle[j];
-				string_view varName = bufHandle.GetStringMap().GetString(varDef.stringID);
+				const StringSpan varName = bufHandle.GetStringMap().GetString(varDef.stringID);
 				varDef.stringID = builder.GetOrAddStringID(varName);
 				constIDbuf.EmplaceBack(builder.GetOrAddConstant(varDef));
 			}
@@ -150,7 +152,7 @@ static uint RemapResources(const std::optional<ResourceGroupHandle>& resources, 
 		for (uint i = 0; i < resources->GetLength(); i++)
 		{
 			ResourceDef res = (*resources)[i];
-			string_view resName = resources->GetStringMap().GetString(res.stringID);
+			const StringSpan resName = resources->GetStringMap().GetString(res.stringID);
 			res.stringID = builder.GetOrAddStringID(resName);
 			idBuf.EmplaceBack(builder.GetOrAddResource(res));
 		}

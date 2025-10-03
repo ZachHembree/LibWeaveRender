@@ -552,8 +552,8 @@ void ContextState::LogInvalidStateTransitions(RWConflictDesc conflict)
 	{
 		ShaderDefHandle lastShader = conflictState.pShader->GetDefinition();
 		ShaderDefHandle nextShader = GetStage(conflict.nextStage).pShader->GetDefinition();
-		string_view lastName = lastShader.GetStringMap().GetString(lastShader.GetNameID());
-		string_view nextName = nextShader.GetStringMap().GetString(nextShader.GetNameID());
+		string_view lastName(lastShader.GetStringMap().GetString(lastShader.GetNameID()));
+		string_view nextName(nextShader.GetStringMap().GetString(nextShader.GetNameID()));
 
 		WV_LOG_DEBUG() << "A conflicting resource usage was specified during the setup phase.\n"
 			<< GetUsageName(conflict.lastUsage) << " (slot: " << conflict.slot << ")"

@@ -1,5 +1,6 @@
 #pragma once
 #include "WeaveUtils/Span.hpp"
+#include "WeaveUtils/StringSpan.hpp"
 #include "../Resources/ResourceBase.hpp"
 #include "../Resources/Sampler.hpp"
 #include "../Resources/ResourceHandles.hpp"
@@ -30,7 +31,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns the name of the underlying unique resource
 		/// </summary>
-		string_view GetName() const;
+		const StringSpan GetName() const;
 
 		/// <summary>
 		/// Returns a unique int ID for the resource corresponding to the given name
@@ -45,7 +46,7 @@ namespace Weave::D3D11
 		/// <summary>
 		/// Returns the string corresponding to the given ID
 		/// </summary>
-		string_view GetString(uint stringID) const;
+		const StringSpan GetString(uint stringID) const;
 
 		/// <summary>
 		/// Returns a strongly typed constant wrapper for the given constant

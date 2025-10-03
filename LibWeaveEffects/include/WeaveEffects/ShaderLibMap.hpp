@@ -19,6 +19,10 @@ namespace Weave::Effects
 
 		ShaderLibMap(ShaderLibDef&& def);
 
+		ShaderLibMap(const ShaderLibDef::Handle& def, StringIDBuilder& sharedStringIDs);
+
+		ShaderLibMap(ShaderLibDef&& def, StringIDBuilder& sharedStringIDs);
+
 		~ShaderLibMap();
 
 		/// <summary>

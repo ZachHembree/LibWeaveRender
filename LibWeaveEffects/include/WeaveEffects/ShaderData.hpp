@@ -138,15 +138,13 @@ namespace Weave::Effects
 			offset(0),
 			size(0),
 			stringID(0)
-		{
-		}
+		{ }
 
 		ConstDef(uint stringID, uint offset, uint size) :
 			stringID(stringID),
 			offset(offset),
 			size(size)
-		{
-		}
+		{ }
 	};
 
 	/// <summary>

@@ -17,29 +17,40 @@ namespace Weave
 		using VectorSpan<string>::VectorSpan;
 
 		/// <summary>
-		/// Returns pointer to first character in the span. Requires null-termination of substring.
+		/// Returns temporary pointer to first character in the span. Requires null-termination of substring.
 		/// </summary>
 		char* c_str() { assert(*GetLast() == '\0'); return GetFirst(); }
 
 		/// <summary>
-		/// Returns pointer to first character in the span. Requires null-termination of substring.
+		/// Returns temporary pointer to first character in the span. Requires null-termination of substring.
 		/// </summary>
 		const char* c_str() const { assert(*GetLast() == '\0'); return GetFirst(); }
 
 		/// <summary>
-		/// Returns pointer to first character in the span. Does not guarantee null termination.
+		/// Returns temporary pointer to first character in the span. Does not guarantee null termination.
 		/// </summary>
 		char* data() { return GetFirst(); }
 
 		/// <summary>
-		/// Returns pointer to first character in the span. Does not guarantee null termination.
+		/// Returns temporary pointer to first character in the span. Does not guarantee null termination.
 		/// </summary>
 		const char* data() const { return GetFirst(); }
 
 		/// <summary>
-		/// Returns a string view interface representing the range
+		/// Returns a copy of the StringSpan as a new std::string
 		/// </summary>
-		operator string_view() const { return string_view(GetFirst(), length); }
+		string GetCopy() const { return string(GetFirst(), length); }
+
+		/// <summary>
+		/// Returns a copy of the StringSpan as a new std::string
+		/// </summary>
+		explicit operator string() const { return string(GetFirst(), length); }
+
+		/// <summary>
+		/// Returns a string view interface representing the range. Use outside temporary variables 
+		/// may lead to dangling pointers.
+		/// </summary>
+		explicit operator string_view() const { return string_view(GetFirst(), length); }
 
 		/// <summary>
 		/// Writes substring to output stream

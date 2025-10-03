@@ -17,7 +17,7 @@ ConstBufDefHandle::ConstBufDefHandle(const ShaderRegistryMap & map, uint bufID) 
 
 uint ConstBufDefHandle::GetNameID() const { return pDef->stringID; }
 
-string_view ConstBufDefHandle::GetName() const { return pMap->GetString(pDef->stringID); }
+const StringSpan ConstBufDefHandle::GetName() const { return pMap->GetString(pDef->stringID); }
 
 uint ConstBufDefHandle::GetSize() const { return pDef->size; }
 
@@ -46,11 +46,11 @@ ShaderDefHandle::ShaderDefHandle(const ShaderRegistryMap& map, uint shaderID) :
 
 uint ShaderDefHandle::GetFilePathID() const { return pDef->fileStringID; }
 
-string_view ShaderDefHandle::GetFilePath() const { return pMap->GetString(pDef->fileStringID); }
+const StringSpan ShaderDefHandle::GetFilePath() const { return pMap->GetString(pDef->fileStringID); }
 
 uint ShaderDefHandle::GetNameID() const { return pDef->nameID; }
 
-string_view ShaderDefHandle::GetName() const { return pMap->GetString(pDef->nameID); }
+const StringSpan ShaderDefHandle::GetName() const { return pMap->GetString(pDef->nameID); }
 
 ByteSpan ShaderDefHandle::GetBinSrc() const { return pMap->GetByteCode(pDef->byteCodeID); }
 
@@ -107,7 +107,7 @@ EffectDefHandle::EffectDefHandle(const ShaderRegistryMap& map, uint effectID) :
 
 uint EffectDefHandle::GetNameID() const { return def.nameID; }
 
-string_view EffectDefHandle::GetName() const { return pMap->GetString(def.nameID); }
+const StringSpan EffectDefHandle::GetName() const { return pMap->GetString(def.nameID); }
 
 ShaderDefHandle EffectDefHandle::GetShader(int pass, int shader) const
 {

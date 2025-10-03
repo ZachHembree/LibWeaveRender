@@ -24,7 +24,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Returns the name of the constant buffer
 		/// </summary>
-		string_view GetName() const;
+		const StringSpan GetName() const;
 
 		/// <summary>
 		/// Returns total buffer size in bytes
@@ -159,7 +159,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Returns the file path the shader was compiled from
 		/// </summary>
-		string_view GetFilePath() const;
+		const StringSpan GetFilePath() const;
 
 		/// <summary>
 		/// Returns the string ID associated with the shader's name
@@ -169,7 +169,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Returns the name of the shader
 		/// </summary>
-		string_view GetName() const;
+		const StringSpan GetName() const;
 
 		/// <summary>
 		/// Returns precompiled platform-specific bytecode
@@ -246,7 +246,7 @@ namespace Weave::Effects
 		/// <summary>
 		/// Returns the name of the effect
 		/// </summary>
-		string_view GetName() const;
+		const StringSpan GetName() const;
 
 		/// <summary>
 		/// Returns a shader definition used by the effect for the given pass and index

@@ -28,6 +28,12 @@ namespace Weave
         uint GetOrAddStringID(string_view str);
 
         /// <summary>
+        /// Returns the ID corresponding to the given string. Adds a copy of
+        /// the string to the map if it hasn't been added previously.
+        /// </summary>
+        uint GetOrAddStringID(const StringSpan str);
+
+        /// <summary>
         /// Returns true if the string exists in the map and retrieves its ID
         /// </summary>
         bool TryGetStringID(string_view str, uint& id) const override;
