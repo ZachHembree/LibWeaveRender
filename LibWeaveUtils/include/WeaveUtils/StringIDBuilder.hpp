@@ -35,7 +35,7 @@ namespace Weave
         /// <summary>
         /// Returns the string corresponding to the given ID
         /// </summary>
-        string_view GetString(uint id) const override;
+        const StringSpan GetString(uint id) const override;
 
         /// <summary>
         /// Returns the total number of strings mapped

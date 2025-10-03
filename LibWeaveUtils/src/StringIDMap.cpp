@@ -40,13 +40,13 @@ bool StringIDMap::TryGetStringID(std::string_view str, uint& id) const
     return false;
 }
 
-std::string_view StringIDMap::GetString(uint id) const 
+const StringSpan StringIDMap::GetString(uint id) const
 { 
     WV_CHECK_MSG(id != g_InvalidID32, "String ID is invalid");
 
     size_t start = pDef->substrings[id * 2];
     size_t length = pDef->substrings[id * 2 + 1];
-    return string_view(&pDef->stringData[start], length); 
+    return StringSpan(const_cast<string&>(pDef->stringData), start, length);
 }
 
 uint StringIDMap::GetStringCount() const { return (uint)(pDef->substrings.GetLength() / 2); }
@@ -82,7 +82,7 @@ StringIDMapAlias::StringIDMapAlias(const StringIDMapDef::Handle& def, StringIDBu
 
 const StringIDBuilder& StringIDMapAlias::GetParent() const  { return *pParent; }
 
-uint StringIDMapAlias::GetParentStringID(uint localID) const { return idAliases[localID]; }
+uint StringIDMapAlias::GetAliasedID(uint localID) const { return idAliases[localID]; }
 
 bool StringIDMapAlias::TryGetStringID(std::string_view str, uint& id) const
 {
@@ -92,7 +92,7 @@ bool StringIDMapAlias::TryGetStringID(std::string_view str, uint& id) const
     return success;
 }
 
-std::string_view StringIDMapAlias::GetString(uint id) const
+const StringSpan StringIDMapAlias::GetString(uint id) const
 {
     WV_CHECK_MSG(id != g_InvalidID32, "String ID is invalid");
 

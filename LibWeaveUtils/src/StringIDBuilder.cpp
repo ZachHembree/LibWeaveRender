@@ -26,6 +26,8 @@ uint StringIDBuilder::GetOrAddStringID(std::string_view str)
     else
     {
         const uint id = static_cast<uint>(substrings.GetLength() / 2);
+        WV_CHECK_MSG(id < g_Bit32, "String ID limit reached: {}.", id);
+
         substrings.Add((uint)ss.GetIndex());
         substrings.Add((uint)ss.GetLength() - 1); // Exclude null-terminator
         idMap.emplace(ss, id);
@@ -56,15 +58,16 @@ bool StringIDBuilder::TryGetStringID(std::string_view str, uint& id) const
 /// <summary>
 /// Returns the string corresponding to the given ID
 /// </summary>
-string_view StringIDBuilder::GetString(uint id) const 
+const StringSpan StringIDBuilder::GetString(uint id) const
 {
+    WV_CHECK_MSG(id != g_InvalidID32, "StringID is invalid");
     id &= ~g_Bit32; // Bit 32 is reserved for alias maps
-    WV_ASSERT_MSG((id * 2 + 1) < substrings.GetLength(), "StringID ({}) invalid.", id);
+    WV_CHECK_MSG((id * 2 + 1) < substrings.GetLength(), "StringID ({}) invalid.", id);
 
     const uint start = substrings[id * 2],
         length = substrings[id * 2 + 1];
 
-    return string_view(&stringData[start], length);
+    return StringSpan(const_cast<string&>(stringData), start, length);
 }
 
 /// <summary>

@@ -1,8 +1,8 @@
 #pragma once
 #include "WeaveUtils/GlobalUtils.hpp"
 #include "WeaveUtils/DynamicCollections.hpp"
+#include "WeaveUtils/StringSpan.hpp"
 #include <unordered_map>
-#include <limits>
 
 namespace Weave
 {
@@ -73,7 +73,7 @@ namespace Weave
         /// <summary>
         /// Returns the string_view corresponding to the given ID
         /// </summary>
-        virtual std::string_view GetString(uint id) const = 0;
+        virtual const StringSpan GetString(uint id) const = 0;
 
         /// <summary>
         /// Returns the number of unique strings in the map
@@ -84,6 +84,17 @@ namespace Weave
         /// Returns a read-only view to a serializable definition of the string ID map
         /// </summary>
         virtual StringIDMapDef::Handle GetDefinition() const = 0;
+
+        /// <summary>
+        /// Returns true if the string ID map a set of aliases in a StringIDBuilder
+        /// </summary>
+        virtual bool GetIsAlias() const { return false; }
+
+        /// <summary>
+        /// Returns the ID equivalent to the given local ID in the parent StringIDBuilder if this 
+        /// map is an alias.
+        /// </summary>
+        virtual uint GetAliasedID(uint localID) const { return localID; }
 
         virtual ~IStringIDMap() = default;
     };
@@ -108,7 +119,7 @@ namespace Weave
         /// <summary>
         /// Returns the string_view corresponding to the given ID
         /// </summary>
-        std::string_view GetString(uint id) const override;
+        const StringSpan GetString(uint id) const override;
 
         /// <summary>
         /// Returns the number of unique strings in the map
@@ -134,6 +145,8 @@ namespace Weave
     class StringIDMapAlias : public IStringIDMap
     {
     public:
+        MAKE_NO_COPY(StringIDMapAlias)
+
         StringIDMapAlias(const StringIDMapDef::Handle& def, StringIDBuilder& parent);
 
         const StringIDBuilder& GetParent() const;
@@ -141,7 +154,12 @@ namespace Weave
         /// <summary>
         /// Returns the equivalent stringID in the parent StringIDBuilder
         /// </summary>
-        uint GetParentStringID(uint localID) const;
+        uint GetAliasedID(uint localID) const override;
+
+        /// <summary>
+        /// Always returns true because the StringIDMap is a set of aliases for another map
+        /// </summary>
+        bool GetIsAlias() const override { return true; }
 
         /// <summary>
         /// Returns true if the string exists in the map and retrieves its ID
@@ -151,7 +169,7 @@ namespace Weave
         /// <summary>
         /// Returns the string_view corresponding to the given ID
         /// </summary>
-        std::string_view GetString(uint id) const override;
+        const StringSpan GetString(uint id) const override;
 
         /// <summary>
         /// Returns the number of unique strings in the map
