@@ -76,9 +76,15 @@ namespace Weave::Effects
 	}
 
 	template <class Archive>
+	inline void serialize(Archive& ar, ConfigIDTableDef& def)
+	{
+		ar(def.flagIDs, def.modeIDs);
+	}
+
+	template <class Archive>
 	inline void serialize(Archive& ar, VariantRepoDef& def)
 	{
-		ar(def.path, def.sourceSizeBytes, def.sourceCRC, def.flagIDs, def.modeIDs, def.variants);
+		ar(def.path, def.sourceSizeBytes, def.sourceCRC, def.configTable, def.variants);
 	}
 
 	template <class Archive>

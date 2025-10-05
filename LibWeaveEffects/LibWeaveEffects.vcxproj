@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\WeaveEffects\ConfigIDTable.hpp" />
     <ClInclude Include="include\WeaveEffects\EffectParseException.hpp" />
     <ClInclude Include="include\WeaveEffects\ShaderLibBuilder\ShaderRegistryBuilder.hpp" />
     <ClInclude Include="include\WeaveEffects\ShaderDataHandles.hpp" />
@@ -46,6 +47,7 @@
     <ClInclude Include="src\pch.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ConfigIDTable.cpp" />
     <ClCompile Include="src\EffectParseException.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

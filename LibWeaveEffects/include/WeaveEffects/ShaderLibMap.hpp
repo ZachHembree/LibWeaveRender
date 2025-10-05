@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <concepts>
 #include "WeaveEffects/ShaderDataHandles.hpp"
+#include "WeaveEffects/ConfigIDTable.hpp"
 
 namespace Weave::Effects
 {
@@ -36,19 +37,21 @@ namespace Weave::Effects
 		const IStringIDMap& GetStringMap() const;
 
 		/// <summary>
-		/// Returns an array of all variant repo definitions
+		/// Returns the number of shaders in a given variant
 		/// </summary>
-		const IDynamicArray<VariantRepoDef>& GetRepos() const;
+		uint GetShaderCount(uint vID) const;
 
 		/// <summary>
-		/// Returns all flag IDs used by the variant repo associated with the given ID
+		/// Returns the number of effects in a given variant
 		/// </summary>
-		const IDynamicArray<uint>& GetFlags(uint vID) const;
+		uint GetEffectCount(uint vID) const;
 
 		/// <summary>
-		/// Returns all mode IDs used by the variant repo associated with the given ID
+		/// Returns a read only view of the map's definition
 		/// </summary>
-		const IDynamicArray<uint>& GetModes(uint vID) const;
+		ShaderLibDef::Handle GetDefinition() const;
+
+		// Shader getters
 
 		/// <summary>
 		/// Returns the shader by shaderID
@@ -80,101 +83,7 @@ namespace Weave::Effects
 		/// </summary>
 		uint TryGetEffectID(uint nameID, uint vID) const;
 
-		/// <summary>
-		/// Finds the shader variant modeID corresponding to the given mode name
-		/// </summary>
-		uint TryGetModeID(uint nameID, uint vID) const;
-
-		/// <summary>
-		/// Gets bit flag configuration using the given flag name(s)
-		/// </summary>
-		template<typename Iterator>
-			requires std::forward_iterator<Iterator> &&
-			std::convertible_to<typename std::iterator_traits<Iterator>::value_type, std::string_view>
-		uint TryGetFlags(const Iterator begin, const Iterator end, uint vID) const
-		{
-			uint flags = 0;
-
-			for (Iterator it = begin; it != end; ++it)
-			{
-				const string_view& name = *it;
-				uint stringID;
-
-				if (GetStringMap().TryGetStringID(name, stringID))
-				{
-					const uint flag = TryGetFlag(stringID, vID);
-
-					if (flag != -1)
-						flags |= flag;
-					else
-						return -1;
-				}
-				else
-					return -1;
-			}
-
-			return flags;
-		}
-
-		/// <summary>
-		/// Gets bit flag configuration from the stringIDs corresponding to flag names
-		/// </summary>
-		template<typename Iterator>
-			requires std::forward_iterator<Iterator> &&
-			std::is_integral_v<typename std::iterator_traits<Iterator>::value_type>
-		uint TryGetFlags(const Iterator begin, const Iterator end, uint vID) const
-		{
-			uint flags = 0;
-
-			for (Iterator it = begin; it != end; ++it)
-			{
-				const uint flag = TryGetFlag(*it, vID);
-
-				if (flag != -1)
-					flags |= flag;
-				else
-					return -1;
-			}
-
-			return flags;
-		}
-
-		/// <summary>
-		/// Gets bit flag configuration using the given flag name(s)
-		/// </summary>
-		uint TryGetFlags(const std::initializer_list<string_view>& defines, uint vID) const;
-
-		/// <summary>
-		/// Gets bit flag configuration using the given flag name(s)
-		/// </summary>
-		uint TryGetFlags(const IDynamicArray<string_view>& defines, uint vID) const;
-
-		/// <summary>
-		/// Gets bit flag configuration using the given flag name(s)
-		/// </summary>
-		template <typename... T> requires std::convertible_to<T..., string_view>
-		uint TryGetFlags(const T&... args, uint vID) const { return TryGetFlags(std::initializer_list<string_view>{ args... }, vID); }
-
-		/// <summary>
-		/// Gets bit flag configuration using the given flag name IDs
-		/// </summary>
-		uint TryGetFlags(const std::initializer_list<uint>& defines, uint vID) const;
-
-		/// <summary>
-		/// Gets bit flag configuration using the given flag name IDs
-		/// </summary>
-		uint TryGetFlags(const IDynamicArray<uint>& defines, uint vID) const;
-
-		/// <summary>
-		/// Gets bit flag configuration using the given flag name(s)
-		/// </summary>
-		template <typename... T> requires std::convertible_to<T..., uint>
-		uint TryGetFlags(const T&... args, uint vID) const { return TryGetFlags(std::initializer_list<uint>{ args... }, vID); }
-
-		/// <summary>
-		/// Gets the flagID associated with the given name and variant. -1 on fail.
-		/// </summary>
-		uint TryGetFlag(uint nameID, uint vID) const;
+		// Flag/Mode getters
 
 		/// <summary>
 		/// Returns true if the given flag or mode is set for the given vID
@@ -191,10 +100,7 @@ namespace Weave::Effects
 		/// </summary>
 		void GetDefines(uint vID, Vector<uint>& defines) const;
 
-		/// <summary>
-		/// Returns all mode and flag names set for the given variant
-		/// </summary>
-		void GetDefines(uint vID, Vector<string_view>& defines) const;
+		// Flag/Mode setters
 
 		/// <summary>
 		/// Returns variantID with the given flag set to the given value.
@@ -202,14 +108,19 @@ namespace Weave::Effects
 		uint SetFlag(uint nameID, bool value, uint vID) const;
 
 		/// <summary>
-		/// Returns variantID with the given mode
-		/// </summary>
-		uint SetMode(uint modeID, uint vID) const;
-
-		/// <summary>
 		/// Returns variantID with the given flag set to the given value.
 		/// </summary>
 		uint SetFlag(string_view name, bool value, uint vID) const;
+
+		/// <summary>
+		/// Returns variantID with the given mode
+		/// </summary>
+		uint SetMode(uint nameID, uint vID) const;
+
+		/// <summary>
+		/// Returns variantID with the given mode
+		/// </summary>
+		uint SetMode(string_view name, uint vID) const;
 
 		/// <summary>
 		/// Returns default variant based on the given ID
@@ -221,27 +132,8 @@ namespace Weave::Effects
 		/// </summary>
 		uint ResetMode(uint vID) const;
 
-		/// <summary>
-		/// Returns variantID with the given mode
-		/// </summary>
-		uint SetMode(string_view name, uint vID) const;
-
-		/// <summary>
-		/// Returns the number of shaders in a given variant
-		/// </summary>
-		uint GetShaderCount(uint vID) const;
-
-		/// <summary>
-		/// Returns the number of effects in a given variant
-		/// </summary>
-		uint GetEffectCount(uint vID) const;
-
-		/// <summary>
-		/// Returns a read only view of the map's definition
-		/// </summary>
-		ShaderLibDef::Handle GetDefinition() const;
-
 	private:
+		// (StringID) => ResourceID/Index
 		using NameIndexMap = std::unordered_map<uint, uint>;
 
 		struct VariantNameMap
@@ -280,14 +172,9 @@ namespace Weave::Effects
 		UniqueArray<UniqueArray<VariantNameMap>> variantShaderMaps;
 
 		/// <summary>
-		/// Flag names used for static shader variant generation
+		/// Tables for encoding/decoding config IDs for a given repo
 		/// </summary>
-		UniqueArray<NameIndexMap> variantFlagMaps;
-
-		/// <summary>
-		/// Mutually exclusive shader modes/features used for static shader variant generation
-		/// </summary>
-		UniqueArray<NameIndexMap> variantModeMaps;
+		UniqueArray<ConfigIDTable> repoConfigTables;
 
 		/// <summary>
 		/// Serializable variant repo data
@@ -296,29 +183,5 @@ namespace Weave::Effects
 
 		void InitMaps();
 
-		/// <summary>
-		/// Calculates the combined bit flag configuration used from a given variant ID
-		/// </summary>
-		uint GetFlags(uint repoIndex, uint configIndex) const;
-
-		/// <summary>
-		/// Calculates the modeID from a given variant ID
-		/// </summary>
-		uint GetModeIndex(uint repoIndex, uint configIndex) const;
-
-		/// <summary>
-		/// Calculates variantID from the given flag and mode configuration. Required for variant lookup.
-		/// </summary>
-		uint GetVariantID(uint repoIndex, uint flagID, uint modeID) const;
-
-		/// <summary>
-		/// Returns the total number of flag combinations used for variant generation
-		/// </summary>
-		uint GetFlagVariantCount(uint repoIndex) const;
-
-		/// <summary>
-		/// Returns the total number of modes used for variant generation
-		/// </summary>
-		uint GetModeCount(uint vID) const;
 	};
 }

@@ -511,6 +511,22 @@ namespace Weave::Effects
 	};
 
 	/// <summary>
+	/// Serializable collection of defines used to encode/decode precompiled shader variant IDs
+	/// </summary>
+	struct ConfigIDTableDef
+	{
+		/// <summary>
+		/// Flag names used for static shader variant generation
+		/// </summary>
+		DynamicArray<uint> flagIDs;
+
+		/// <summary>
+		/// Mutually exclusive shader modes names used for static shader variant generation
+		/// </summary>
+		DynamicArray<uint> modeIDs;
+	};
+
+	/// <summary>
 	/// Serializable collection of effect and shader variants compiled from the same
 	/// effect file.
 	/// </summary>
@@ -532,14 +548,9 @@ namespace Weave::Effects
 		uint sourceCRC;
 
 		/// <summary>
-		/// Flag names used for static shader variant generation
+		/// Information used to encode/decode precompiled shader variant IDs
 		/// </summary>
-		DynamicArray<uint> flagIDs;
-
-		/// <summary>
-		/// Mutually exclusive shader modes names used for static shader variant generation
-		/// </summary>
-		DynamicArray<uint> modeIDs;
+		ConfigIDTableDef configTable;
 
 		/// <summary>
 		/// Array of shaders and effects for each variant

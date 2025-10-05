@@ -172,11 +172,6 @@ namespace Weave::D3D11
 		void GetDefines(Vector<uint>& nameIDs) const;
 
 		/// <summary>
-		/// Returns mode name and flags set
-		/// </summary>
-		void GetDefines(Vector<string_view>& names) const;
-
-		/// <summary>
 		/// Returns true if the given mode or flag is set
 		/// </summary>
 		bool GetIsDefined(uint nameID) const;

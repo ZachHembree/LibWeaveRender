@@ -35,7 +35,9 @@ ShaderVariantBase::ShaderVariantBase(Device& dev, const ShaderDefHandle& def) :
 
 	if (bufData.has_value())
 	{ 
+		// Initialize constant maps
 		pConstants.reset(new ConstantGroupMap(bufData));
+		// Create constant buffers
 		cbufs = UniqueArray<ConstantBuffer>(bufData->GetLength());
 
 		for (int i = 0; i < cbufs.GetLength(); i++)
@@ -46,6 +48,7 @@ ShaderVariantBase::ShaderVariantBase(Device& dev, const ShaderDefHandle& def) :
 
 	if (resData.has_value())
 	{
+		// Create resource maps for samplers and SRVs
 		pSampMap.reset(new SamplerMap(resData));
 		pSrvMap.reset(new ResourceViewMap(resData));
 	}

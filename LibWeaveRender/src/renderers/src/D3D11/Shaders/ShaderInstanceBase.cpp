@@ -65,8 +65,6 @@ bool ShaderInstanceBase::TryGetStringID(string_view str, uint& id) const
 
 const StringSpan ShaderInstanceBase::GetString(uint stringID) const { return pLib->GetLibMap().GetStringMap().GetString(stringID); }
 
-void ShaderInstanceBase::GetDefines(Vector<string_view>& names) const { pLib->GetLibMap().GetDefines(vID, names); }
-
 bool ShaderInstanceBase::GetIsDefined(uint nameID) const { return pLib->GetLibMap().GetIsDefined(nameID, vID); }
 
 bool ShaderInstanceBase::GetIsDefined(string_view name) const { return pLib->GetLibMap().GetIsDefined(name, vID); }

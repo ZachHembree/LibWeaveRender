@@ -190,16 +190,16 @@ void ShaderLibBuilder::AddRepoConfiguration(string_view repoPath, const uint con
 void ShaderLibBuilder::InitRepo(VariantRepoDef& lib)
 {
 	const IDynamicArray<StringSpan>& flags = pVariantGen->GetVariantFlags();
-	lib.flagIDs = DynamicArray<uint>(flags.GetLength());
+	lib.configTable.flagIDs = DynamicArray<uint>(flags.GetLength());
 
 	for (int i = 0; i < flags.GetLength(); i++)
-		lib.flagIDs[i] = pShaderRegistry->GetOrAddStringID(flags[i]);
+		lib.configTable.flagIDs[i] = pShaderRegistry->GetOrAddStringID(flags[i]);
 
 	const IDynamicArray<StringSpan>& modes = pVariantGen->GetVariantModes();
-	lib.modeIDs = DynamicArray<uint>(modes.GetLength());
+	lib.configTable.modeIDs = DynamicArray<uint>(modes.GetLength());
 
 	for (int i = 0; i < modes.GetLength(); i++)
-		lib.modeIDs[i] = pShaderRegistry->GetOrAddStringID(modes[i]);
+		lib.configTable.modeIDs[i] = pShaderRegistry->GetOrAddStringID(modes[i]);
 
 	lib.variants = DynamicArray<VariantDef>(pVariantGen->GetVariantCount());
 
@@ -260,10 +260,10 @@ void ShaderLibBuilder::MergeCacheHits() const
 		VariantRepoDef& cachedRepo = repos.EmplaceBack(*pRepo);
 
 		// Remap define names
-		for (uint& flagID : cachedRepo.flagIDs)
+		for (uint& flagID : cachedRepo.configTable.flagIDs)
 			flagID = pShaderRegistry->GetOrAddStringID(oldStrings.GetString(flagID));
 
-		for (uint& modeID : cachedRepo.modeIDs)
+		for (uint& modeID : cachedRepo.configTable.modeIDs)
 			modeID = pShaderRegistry->GetOrAddStringID(oldStrings.GetString(modeID));
 
 		// Remap shaders
