@@ -2,6 +2,7 @@
 #include <condition_variable>
 #include "WeaveUtils/Logger.hpp"
 #include "WeaveUtils/Stopwatch.hpp"
+#include "WeaveUtils/WeaveException.hpp"
 
 namespace Weave
 {
@@ -29,8 +30,7 @@ namespace Weave
         msgHistory(g_DedupeBufSize),
         msgTimes(g_DedupeBufSize),
         msgCounts(g_DedupeBufSize),
-        historyIndex(0),
-        sstreamPool() 
+        historyIndex(0)
     { }
 
     /// <summary>
@@ -202,7 +202,7 @@ namespace Weave
     /// <summary>
     /// Retrieves a stringstream buffer from the pool. Thread-safe.
     /// </summary>
-    Logger::MessageBuffer Logger::GetStrBuf()
+    Logger::MessageBuffer Logger::GetStreamBuf()
     {
         MessageBuffer pBuf;
         {
@@ -224,11 +224,26 @@ namespace Weave
     /// <summary>
     /// Returns a stringstream buffer to the pool. Thread-safe.
     /// </summary>
-    void Logger::ReturnStrBuf(MessageBuffer&& buf)
+    void Logger::ReturnStreamBuf(MessageBuffer&& buf)
     {
         if (!buf) return;
         std::lock_guard<std::mutex> lock(s_MsgPoolMutex);
         s_Instance.sstreamPool.Return(std::move(buf));
+    }
+
+    /// <summary>Gets a temporary string buffer from the pool or creates a new one.</summary>
+    string Logger::GetStringBuf()
+    {
+        std::lock_guard<std::mutex> lock(s_MsgPoolMutex);
+        return s_Instance.stringPool.Get();
+    }
+
+    /// <summary>Returns a string buffer to the pool.</summary>
+    void Logger::ReturnStringBuf(string&& buf)
+    {
+        buf.clear();
+        std::lock_guard<std::mutex> lock(s_MsgPoolMutex);
+        s_Instance.stringPool.Return(std::move(buf));
     }
 
     static double GetNowMS()
@@ -283,8 +298,8 @@ namespace Weave
     /// </summary>
     Logger::Message Logger::Log(Level level)
     {
-        if (GetIsLevelEnabled(level) || !s_IsLogInitialized)
-            return Message(level, GetStrBuf());
+        if (GetIsLevelEnabled(level) && s_IsLogInitialized)
+            return Message(level, GetStreamBuf());
         else
             return Message();
     }
@@ -377,7 +392,7 @@ namespace Weave
                 Logger::WriteToLog(level, messageContent);
             }
 
-            Logger::ReturnStrBuf(std::move(pMsgBuf));
+            Logger::ReturnStreamBuf(std::move(pMsgBuf));
         }
     }
 

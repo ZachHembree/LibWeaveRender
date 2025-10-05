@@ -5,8 +5,10 @@
 #include <atomic>
 #include <thread>
 #include "GlobalUtils.hpp"
+#include "TextUtils.hpp"
 #include "DynamicCollections.hpp"
 #include "ObjectPool.hpp"
+#include "WeaveException.hpp"
 
 // --- Compile-Time Configuration ---
 
@@ -54,33 +56,49 @@
 #if WV_LOG_LEVEL >= WV_LOG_ERROR_LEVEL
 // Logs an Error message. Usage: WV_LOG_ERROR() << "Error message " << value;
 #define WV_LOG_ERROR() Weave::Logger::Log(Weave::Logger::Level::Error)
+// Logs a Warning message with std::format. Usage: WV_LOG_ERROR_FMT("Error message {}", value);
+#define WV_LOG_ERROR_FMT(...) Weave::Logger::Log(Weave::Logger::Level::Error, __VA_ARGS__)
 #else
 // Disabled Error log macro (due to compile-time WV_LOG_LEVEL).
 #define WV_LOG_ERROR() Weave::Logger::GetNullMessage()
+// Disabled Info log macro (due to compile-time WV_LOG_LEVEL).
+#define WV_LOG_ERROR_FMT(...) WV_EMPTY()
 #endif
 
 #if WV_LOG_LEVEL >= WV_LOG_WARN_LEVEL
 // Logs a Warning message. Usage: WV_LOG_WARN() << "Warning message " << value;
 #define WV_LOG_WARN() Weave::Logger::Log(Weave::Logger::Level::Warning)
+// Logs a Warning message with std::format. Usage: WV_LOG_WARN_FMT("Warning message {}", value);
+#define WV_LOG_WARN_FMT(...) Weave::Logger::Log(Weave::Logger::Level::Warning, __VA_ARGS__)
 #else
 // Disabled Warning log macro (due to compile-time WV_LOG_LEVEL).
 #define WV_LOG_WARN() Weave::Logger::GetNullMessage()
+// Disabled Info log macro (due to compile-time WV_LOG_LEVEL).
+#define WV_LOG_WARN_FMT(...) WV_EMPTY()
 #endif
 
 #if WV_LOG_LEVEL >= WV_LOG_INFO_LEVEL
 // Logs an Info message. Usage: WV_LOG_INFO() << "Info message " << value;
 #define WV_LOG_INFO() Weave::Logger::Log(Weave::Logger::Level::Info)
+// Logs a Info message with std::format. Usage: WV_LOG_INFO_FMT("Info message {}", value);
+#define WV_LOG_INFO_FMT(...) Weave::Logger::Log(Weave::Logger::Level::Info, __VA_ARGS__)
 #else
 // Disabled Info log macro (due to compile-time WV_LOG_LEVEL).
 #define WV_LOG_INFO() Weave::Logger::GetNullMessage()
+// Disabled Info log macro (due to compile-time WV_LOG_LEVEL).
+#define WV_LOG_INFO_FMT(...) WV_EMPTY()
 #endif
 
 #if WV_LOG_LEVEL >= WV_LOG_DEBUG_LEVEL
 // Logs a Debug message. Usage: WV_LOG_DEBUG() << "Debug message " << value;
 #define WV_LOG_DEBUG() Weave::Logger::Log(Weave::Logger::Level::Debug)
+// Logs a Debug message with std::format. Usage: WV_LOG_DEBUG_FMT("Debug message {}", value);
+#define WV_LOG_DEBUG_FMT(...) Weave::Logger::Log(Weave::Logger::Level::Debug, __VA_ARGS__)
 #else
 // Disabled Debug log macro (due to compile-time WV_LOG_LEVEL).
 #define WV_LOG_DEBUG() Weave::Logger::GetNullMessage()
+// Disabled Debug log macro (due to compile-time WV_LOG_LEVEL).
+#define WV_LOG_DEBUG_FMT(...) WV_EMPTY()
 #endif
 
 namespace Weave
@@ -214,6 +232,30 @@ namespace Weave
         static const NullMessage& GetNullMessage();
 
         /// <summary>
+        /// Writes a log message using std::format with the given level
+        /// </summary>
+        template<typename... FmtArgs>
+        static void Log(Level level, string_view fmt, FmtArgs&&... args)
+        {
+            if (GetIsLevelEnabled(level) && GetIsInitialized())
+            {
+                string msg = GetStringBuf();
+                
+                try
+                {
+                    VFormatTo(msg, fmt, std::forward<FmtArgs>(args)...);
+                    WriteToLog(level, msg);
+                }
+                catch (const std::format_error& e) 
+                {
+                    WriteToLog(Level::Error, std::format("Format error in log: {}", e.what()));
+                }
+
+                ReturnStringBuf(std::move(msg));
+            }
+        }
+
+        /// <summary>
         /// Checks if a given log level is currently enabled, considering both the
         /// compile-time level (WV_LOG_LEVEL) and the runtime level (set by SetLogLevel).
         /// </summary>
@@ -249,6 +291,7 @@ namespace Weave
         UniqueVector<LogWriteCallback> logWriteFast;
 
         ObjectPool<MessageBuffer> sstreamPool;
+        ObjectPool<string> stringPool;
 
         Logger();
 
@@ -279,11 +322,17 @@ namespace Weave
 
         /// <summary>Gets a stringstream buffer from the pool or creates a new one.</summary>
         /// <returns>A MessageBuffer (unique_ptr to a stringstream).</returns>
-        static MessageBuffer GetStrBuf();
+        static MessageBuffer GetStreamBuf();
 
         /// <summary>Returns a stringstream buffer to the pool.</summary>
         /// <param name="buf">The MessageBuffer to return (ownership is transferred).</param>
-        static void ReturnStrBuf(MessageBuffer&& buf);
+        static void ReturnStreamBuf(MessageBuffer&& buf);
+
+        /// <summary>Gets a temporary string buffer from the pool or creates a new one.</summary>
+        static string GetStringBuf();
+
+        /// <summary>Returns a string buffer to the pool.</summary>
+        static void ReturnStringBuf(string&& buf);
 
         /// <summary>
         /// Checks if the message is a duplicate of a recently logged message.
@@ -304,3 +353,12 @@ namespace Weave
         static void StartPolling();
     };
 } 
+
+#ifndef NDEBUG
+#define WV_SOFT_THROW(...) WV_THROW(__VA_ARGS__)
+#else
+#define WV_SOFT_THROW(...) WV_LOG_WARN_FMT(__VA_ARGS__)
+#endif
+
+#define WV_ENSURE_MSG(COND, ...) WV_IF_NOT(COND, WV_SOFT_THROW(__VA_ARGS__))
+#define WV_ENSURE(COND) WV_CHECK_MSG(COND, "Ensure failed")
